@@ -1,0 +1,4 @@
+* Sensu Plugins & Handlers
+** Structure
+  - plugins directory contains monitoring plugins, organized into service directories
+  - handlers directory contains handlers

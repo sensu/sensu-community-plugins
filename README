@@ -1,9 +1,0 @@
-Sensu Plugins & Handlers
-===
-
-Structure:
-
-- plugins directory contains monitoring plugins
-- handlers directory contains handlers
-
-
