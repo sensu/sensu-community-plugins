@@ -13,7 +13,9 @@
 # limitations under the License.
 #
 #!/usr/bin/env ruby
-
+#
+# Puppet Agent Plugin
+# ===
 #
 # This plugin checks to see if the Puppet Labs Puppet agent is running
 #
