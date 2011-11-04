@@ -12,23 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Sensu IRC Handler
+# ===
+#
+# This handler reports alerts to a specified IRC channel. You need to set the IRC_SERVER
+# contant in this file to your requested nick, password, IRC server, port and channel. If 
+# you wish to use SSL please set IRC_SSL to true.
+#
 #!/usr/bin/env ruby
- require 'rubygems' if RUBY_VERSION < '1.9.0'
- require 'carrier-pigeon'
- IRC_SERVER = 'irc://sensubot:password@irc.freenode.net:6667#channel'
- IRC_SSL = false
- module Sensu
+
+require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'carrier-pigeon'
+
+IRC_SERVER = 'irc://sensubot:password@irc.freenode.net:6667#channel'
+IRC_SSL = false
+
+module Sensu
   class Handler
     def self.run
       handler = self.new
       handler.filter
       handler.alert
     end
-    
+
     def initialize
       read_event
     end
-    
+
     def read_event
       @event = JSON.parse(STDIN.read)
     end
@@ -49,7 +59,7 @@
         irc
       end
     end
-   
+
     def irc
       incident_key = @event['client']['name'] + '/' + @event['check']['name']
       description = [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
@@ -77,5 +87,5 @@
       puts line
     end
   end
- end
- Sensu::Handler.run
+end
+Sensu::Handler.run
