@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # Copyright 2011 Sonian Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#!/usr/bin/env ruby
-
+# Chef Client Plugin
+# ===
 #
 # This plugin checks to see if the OpsCode Chef client daemon is running
 #

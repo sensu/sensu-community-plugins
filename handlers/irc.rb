@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # Copyright 2011 James Turnbull
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,6 @@
 # contant in this file to your requested nick, password, IRC server, port and channel. If 
 # you wish to use SSL please set IRC_SSL to true.
 #
-#!/usr/bin/env ruby
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'carrier-pigeon'
