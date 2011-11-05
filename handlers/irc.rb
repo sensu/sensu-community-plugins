@@ -23,6 +23,8 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'carrier-pigeon'
+require 'timeout'
+require 'json'
 
 IRC_SERVER = 'irc://sensubot:password@irc.freenode.net:6667#channel'
 IRC_SSL = false
@@ -44,11 +46,9 @@ module Sensu
     end
 
     def filter
-      if (@event['check']['alert'] == false || @event['client']['subscriptions'].include?('spot'))
-        log(
-          :name => 'Alert Disabled',
-          :reason => 'Filtered event ' + [@event['client']['name'], @event['check']['name']].join(' : ')
-        )
+      @incident_key = @event['client']['name'] + '/' + @event['check']['name']
+      if @event['check']['alert'] == false
+        puts 'alert disabled -- filtered event ' + @incident_key
         exit 0
       end
     end
@@ -61,30 +61,15 @@ module Sensu
     end
 
     def irc
-      incident_key = @event['client']['name'] + '/' + @event['check']['name']
-      description = [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
+      description = "#{@incident_key}: #{@event['check']['output']}"
       begin
-        timeout(8) do
-          CarrierPigeon.send(:uri => IRC_SERVER, :message => description, :ssl => IRC_SSL)
-        end
+        timeout(10) do
+          CarrierPigeon.send(:uri => IRC_SERVER, :message => description, :ssl => IRC_SSL, :join => true)
+          puts 'irc -- sent alert for ' + @incident_key + ' to IRC.'
+       end
       rescue Timeout::Error
-        max_attempts -= 1
-        if max_attempts > 0
-          retry
-        else
-          log(
-            :name => 'Timeout',
-            :reason => "Timed out while attempting send #{incident_key} to IRC"
-          )
-        end
+        puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + @incident_key
       end
-    end
-
-    def log(line_hash={})
-      line = 'name="' + line_hash[:name] + '" event_id=handler:default'
-      line += ' reason="' + line_hash[:reason] + '"' unless line_hash[:reason].nil?
-      line += ' action="' + line_hash[:action] + '"' unless line_hash[:action].nil?
-      puts line
     end
   end
 end
