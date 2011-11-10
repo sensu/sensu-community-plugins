@@ -16,18 +16,17 @@
 # Sensu IRC Handler
 # ===
 #
-# This handler reports alerts to a specified IRC channel. You need to set the IRC_SERVER
-# contant in this file to your requested nick, password, IRC server, port and channel. If 
-# you wish to use SSL please set IRC_SSL to true.
+# This handler reports alerts to a specified IRC channel. You need to set the options in the 
+# irc.json configuration file, located by default in /etc/sensu. Set the irc_server option to
+# control the IRC server to connect to, the irc_password option to set an optional channel 
+# password and the irc_ssl option to true to enable an SSL connection if required. An example 
+# file is contained in this irc handler directory.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'carrier-pigeon'
 require 'timeout'
 require 'json'
-
-IRC_SERVER = 'irc://sensubot:password@irc.freenode.net:6667#channel'
-IRC_SSL = false
 
 module Sensu
   class Handler
@@ -38,7 +37,21 @@ module Sensu
     end
 
     def initialize
+      config
       read_event
+    end
+
+    def config
+      config_file = '/etc/sensu/irc.json'
+      if File.readable?(config_file)
+        begin
+          @settings = JSON.parse(File.open(config_file, 'r').read)
+        rescue JSON::ParserError => e
+          puts 'configuration file must be valid JSON: ' + e
+        end
+      else
+        puts 'configuration file does not exist or is not readable: ' + config_file
+      end
     end
 
     def read_event
@@ -64,9 +77,13 @@ module Sensu
       description = "#{@incident_key}: #{@event['check']['output']}"
       begin
         timeout(10) do
-          CarrierPigeon.send(:uri => IRC_SERVER, :message => description, :ssl => IRC_SSL, :join => true)
+          if @settings["irc_password"]
+            CarrierPigeon.send(:uri => @settings["irc_server"], :channel_password => @settings["irc_password"], :message => description, :ssl => @settings["irc_ssl"], :join => true)
+          else
+            CarrierPigeon.send(:uri => @settings["irc_server"], :message => description, :ssl => @settings["irc_ssl"], :join => true)
+          end
           puts 'irc -- sent alert for ' + @incident_key + ' to IRC.'
-       end
+        end
       rescue Timeout::Error
         puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + @incident_key
       end
