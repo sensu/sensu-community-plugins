@@ -1,5 +1,4 @@
 {
   "irc_server":"irc://sensubot:password@irc.freenode.net:6667#channel",
-  "irc_ssl": false,
-  "irc_password":""
+  "irc_ssl": false
 }

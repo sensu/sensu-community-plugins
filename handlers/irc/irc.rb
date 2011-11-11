@@ -37,15 +37,14 @@ module Sensu
     end
 
     def initialize
-      config
+      @settings = read_config('/etc/sensu/irc.json')
       read_event
     end
 
-    def config
-      config_file = '/etc/sensu/irc.json'
+    def read_config(config_file)
       if File.readable?(config_file)
         begin
-          @settings = JSON.parse(File.open(config_file, 'r').read)
+          JSON.parse(File.open(config_file, 'r').read)
         rescue JSON::ParserError => e
           puts 'configuration file must be valid JSON: ' + e
         end
@@ -74,14 +73,18 @@ module Sensu
     end
 
     def irc
-      description = "#{@incident_key}: #{@event['check']['output']}"
+      params = {
+        :uri => @settings["irc_server"],
+        :message => "#{@incident_key}: #{@event['check']['output']}",
+        :ssl => @settings["irc_ssl"],
+        :join => true,
+      }
+      if @settings.has_key?("irc_password")
+        params[:channel_password] = @settings["irc_password"]
+      end
       begin
         timeout(10) do
-          if @settings["irc_password"]
-            CarrierPigeon.send(:uri => @settings["irc_server"], :channel_password => @settings["irc_password"], :message => description, :ssl => @settings["irc_ssl"], :join => true)
-          else
-            CarrierPigeon.send(:uri => @settings["irc_server"], :message => description, :ssl => @settings["irc_ssl"], :join => true)
-          end
+          CarrierPigeon.send(params)
           puts 'irc -- sent alert for ' + @incident_key + ' to IRC.'
         end
       rescue Timeout::Error
