@@ -16,19 +16,16 @@ class ChefClient < Sensu::Plugin::Check::CLI
 
   check_name 'chef-client'
 
+  def get_procs
+    `which tasklist`; $? == 0 ? `tasklist` : `ps aux`
+  end
+
+  def find_proc(procs, proc)
+    procs.split("\n").find {|ln| ln.include?(proc) }
+  end
+
   def run
-    `which tasklist`
-    case
-    when $? == 0
-      procs = `tasklist`
-    else
-      procs = `ps aux`
-    end
-    running = false
-    procs.each_line do |proc|
-      running = true if proc.include?('chef-client')
-    end
-    if running
+    if find_proc(get_procs, 'chef-client')
       ok 'Chef client daemon is running'
     else
       warning 'Chef client daemon is NOT running'
