@@ -10,21 +10,29 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-`which tasklist`
-case
-when $? == 0
-  procs = `tasklist`
-else
-  procs = `ps aux`
-end
-running = false
-procs.each_line do |proc|
-  running = true if proc.include?('chef-client')
-end
-if running
-  puts 'CHEF CLIENT - OK - Chef client daemon is running'
-  exit 0
-else
-  puts 'CHEF CLIENT - WARNING - Chef client daemon is NOT running'
-  exit 1
+require 'sensu/plugin/check/cli'
+
+class ChefClient < Sensu::Plugin::Check::CLI
+
+  check_name 'chef-client'
+
+  def run
+    `which tasklist`
+    case
+    when $? == 0
+      procs = `tasklist`
+    else
+      procs = `ps aux`
+    end
+    running = false
+    procs.each_line do |proc|
+      running = true if proc.include?('chef-client')
+    end
+    if running
+      ok 'Chef client daemon is running'
+    else
+      warning 'Chef client daemon is NOT running'
+    end
+  end
+
 end
