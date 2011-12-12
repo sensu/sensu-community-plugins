@@ -1,24 +1,14 @@
 #!/usr/bin/env ruby
 #
-# Copyright 2011 Sonian Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 # Chef Client Plugin
 # ===
 #
 # This plugin checks to see if the OpsCode Chef client daemon is running
 #
+# Copyright 2011 Sonian, Inc.
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 `which tasklist`
 case

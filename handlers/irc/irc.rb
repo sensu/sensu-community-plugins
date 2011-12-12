@@ -1,27 +1,19 @@
 #!/usr/bin/env ruby
-# Copyright 2011 James Turnbull
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 #
 # Sensu IRC Handler
 # ===
 #
-# This handler reports alerts to a specified IRC channel. You need to set the options in the 
-# irc.json configuration file, located by default in /etc/sensu. Set the irc_server option to
-# control the IRC server to connect to, the irc_password option to set an optional channel 
-# password and the irc_ssl option to true to enable an SSL connection if required. An example 
-# file is contained in this irc handler directory.
+# This handler reports alerts to a specified IRC channel. You need to
+# set the options in the irc.json configuration file, located by default
+# in /etc/sensu. Set the irc_server option to control the IRC server to
+# connect to, the irc_password option to set an optional channel
+# password and the irc_ssl option to true to enable an SSL connection if
+# required. An example file is contained in this irc handler directory.
 #
+# Copyright 2011 James Turnbull
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'carrier-pigeon'

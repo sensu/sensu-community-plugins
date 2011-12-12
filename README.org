@@ -17,4 +17,13 @@ For your own handler, subclass:
 License
 =======
 
-Released under the MIT license; see LICENSE for copyright and terms.
+Copyright 2011 Sonian, Inc. and contributors.
+
+Released under the same terms as Sensu (the MIT license); see LICENSE
+for details.
+
+NOTE: When adding a plugin, copy the preceding two paragraphs to a
+comment in each source file, changing the copyright holder to your own
+name or organization. If you wish to use a different open source
+license, please submit a pull request adding that license to the repo
+and use that license's boilerplate instead.
