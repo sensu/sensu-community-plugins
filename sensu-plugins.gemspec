@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__)) + '/lib/sensu/plugins'
+require File.expand_path(File.dirname(__FILE__)) + '/lib/sensu/plugin'
 
 Gem::Specification.new do |s|
   s.name          = 'sensu-plugins'
