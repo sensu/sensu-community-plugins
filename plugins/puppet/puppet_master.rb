@@ -10,21 +10,15 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-`which tasklist`
-case
-when $? == 0
-  procs = `tasklist`
-else
-  procs = `ps aux`
-end
-running = false
-procs.each_line do |proc|
-  running = true if proc.find { |p| /puppetmasterd|puppet master/ =~ p }
-end
-if running
-  puts 'PUPPET MASTER - OK - Puppet master is running'
-  exit 0
-else
-  puts 'PUPPET MASTER - WARNING - Puppet master is NOT running'
-  exit 1
+class PuppetMaster < Sensu::Plugin::Check::CLI::Procs
+
+  check_name 'PUPPET MASTER'
+
+  def run
+    if find_proc_regex(get_procs, /puppetmasterd|puppet master/)
+      ok 'Puppet master is running'
+    else
+      warning 'Puppet master is NOT running'
+    end
+  end
 end
