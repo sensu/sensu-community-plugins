@@ -1,4 +1,20 @@
-* Sensu Plugins & Handlers
-** Structure
-  - plugins directory contains monitoring plugins, organized into service directories
-  - handlers directory contains handlers
+Sensu Plugins
+=============
+
+This gem contains some example plugins, and libraries for writing your
+own. For a Nagios-style check plugin, subclass:
+
+  * Sensu::Plugin::Check::CLI
+
+For a metric outputting JSON, subclass:
+
+  * Sensu::Plugin::Metric::CLI
+
+For your own handler, subclass:
+
+  * Sensu::Handler
+
+License
+=======
+
+Released under the MIT license; see LICENSE for copyright and terms.
