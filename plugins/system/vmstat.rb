@@ -11,64 +11,69 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
-require 'json'
+require 'sensu-plugin/metric/cli'
 
-def convert_integers(values)
-  values.each_with_index do |value, index|
-    begin
-      converted = Integer(value)
-      values[index] = converted
-    rescue ArgumentError
+class VMStat < Sensu::Plugin::Metric::CLI
+
+  def convert_integers(values)
+    values.each_with_index do |value, index|
+      begin
+        converted = Integer(value)
+        values[index] = converted
+      rescue ArgumentError
+      end
     end
+    values
   end
-  values
+
+  def run
+    result = convert_integers(`vmstat`.split("\n")[2].split(" "))
+
+    procs = {
+      :waiting => result[0],
+      :uninterruptible => result[1]
+    }
+
+    memory = {
+      :swap_used => result[2],
+      :free => result[3],
+      :inactive => result[4],
+      :active => result[5]
+    }
+
+    swap = {
+      :in => result[6],
+      :out => result[7]
+    }
+
+    io = {
+      :received => result[8],
+      :sent => result[9]
+    }
+
+    system = {
+      :interrupts_per_second => result[10],
+      :context_switches_per_second => result[11]
+    }
+
+    cpu = {
+      :user => result[12],
+      :system => result[13],
+      :idle => result[14],
+      :waiting => result[15]
+    }
+
+    all = {
+      :timestamp => Time.now.to_i,
+      :procs => procs,
+      :memory => memory,
+      :swap => swap,
+      :io => io,
+      :system => system,
+      :cpu => cpu
+    }
+
+    ok all
+  end
+
 end
-
-result = convert_integers(`vmstat`.split("\n")[2].split(" "))
-
-procs = {
-  :waiting => result[0],
-  :uninterruptible => result[1]
-}
-
-memory = {
-  :swap_used => result[2],
-  :free => result[3],
-  :inactive => result[4],
-  :active => result[5]
-}
-
-swap = {
-  :in => result[6],
-  :out => result[7]
-}
-
-io = {
-  :received => result[8],
-  :sent => result[9]
-}
-
-system = {
-  :interrupts_per_second => result[10],
-  :context_switches_per_second => result[11]
-}
-
-cpu = {
-  :user => result[12],
-  :system => result[13],
-  :idle => result[14],
-  :waiting => result[15]
-}
-
-all = {
-  :timestamp => Time.now.to_i,
-  :procs => procs,
-  :memory => memory,
-  :swap => swap,
-  :io => io,
-  :system => system,
-  :cpu => cpu
-}
-
-puts all.to_json
