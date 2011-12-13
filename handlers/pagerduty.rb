@@ -8,7 +8,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'sensu-plugin/handler'
+require 'sensu-handler'
 require 'redphone/pagerduty'
 
 PAGERDUTY_API_KEY = 'foobar'
