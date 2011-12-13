@@ -21,6 +21,12 @@ class CheckLog < Sensu::Plugin::Check::CLI
 
   BASE_DIR = '/var/cache/check_log'
 
+  option :state_auto,
+         :description => "Set state file dir automatically using name",
+         :short => '-n NAME',
+         :long => '--name NAME',
+         :proc => proc {|arg| "#{BASE_DIR}/#{arg}" }
+
   option :state_dir,
          :description => "Dir to keep state files under",
          :short => '-s DIR',
@@ -60,8 +66,9 @@ class CheckLog < Sensu::Plugin::Check::CLI
   end
 
   def open_log
+    state_dir = config[:state_auto] || config[:state_dir]
     @log = File.open(config[:log_file])
-    @state_file = File.join(config[:state_dir], File.expand_path(config[:log_file]))
+    @state_file = File.join(state_dir, File.expand_path(config[:log_file]))
     @bytes_to_skip = begin
       File.open(@state_file) do |file|
         file.readline.to_i
