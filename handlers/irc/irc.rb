@@ -15,74 +15,46 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'sensu-plugin/handler'
 require 'carrier-pigeon'
 require 'timeout'
-require 'json'
 
-module Sensu
-  class Handler
-    def self.run
-      handler = self.new
-      handler.filter
-      handler.alert
-    end
+class IRC < Sensu::Handler
 
-    def initialize
-      @settings = read_config('/etc/sensu/irc.json')
-      read_event
-    end
+  def initialize
+    @settings = read_config('/etc/sensu/irc.json')
+  end
 
-    def read_config(config_file)
-      if File.readable?(config_file)
-        begin
-          JSON.parse(File.open(config_file, 'r').read)
-        rescue JSON::ParserError => e
-          puts 'configuration file must be valid JSON: ' + e
-        end
-      else
-        puts 'configuration file does not exist or is not readable: ' + config_file
-      end
-    end
-
-    def read_event
-      @event = JSON.parse(STDIN.read)
-    end
-
-    def filter
-      @incident_key = @event['client']['name'] + '/' + @event['check']['name']
-      if @event['check']['alert'] == false
-        puts 'alert disabled -- filtered event ' + @incident_key
-        exit 0
-      end
-    end
-
-    def alert
-      refresh = (60.fdiv(@event['check']['interval']) * 30).to_i
-      if @event['occurrences'] == 1 || @event['occurrences'] % refresh == 0
-        irc
-      end
-    end
-
-    def irc
-      params = {
-        :uri => @settings["irc_server"],
-        :message => "#{@incident_key}: #{@event['check']['output']}",
-        :ssl => @settings["irc_ssl"],
-        :join => true,
-      }
-      if @settings.has_key?("irc_password")
-        params[:channel_password] = @settings["irc_password"]
-      end
+  def read_config(config_file)
+    if File.readable?(config_file)
       begin
-        timeout(10) do
-          CarrierPigeon.send(params)
-          puts 'irc -- sent alert for ' + @incident_key + ' to IRC.'
-        end
-      rescue Timeout::Error
-        puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + @incident_key
+        JSON.parse(File.open(config_file, 'r').read)
+      rescue JSON::ParserError => e
+        puts 'configuration file must be valid JSON: ' + e
       end
+    else
+      puts 'configuration file does not exist or is not readable: ' + config_file
     end
   end
+
+  def handle(event)
+    params = {
+      :uri => @settings["irc_server"],
+      :message => "#{short_name(event)}: #{event['check']['output']}",
+      :ssl => @settings["irc_ssl"],
+      :join => true,
+    }
+    if @settings.has_key?("irc_password")
+      params[:channel_password] = @settings["irc_password"]
+    end
+    begin
+      timeout(10) do
+        CarrierPigeon.send(params)
+        puts 'irc -- sent alert for ' + short_name(event) + ' to IRC.'
+      end
+    rescue Timeout::Error
+      puts 'irc -- timed out while attempting to ' + event['action'] + ' a incident -- ' + short_name(event)
+    end
+  end
+
 end
-Sensu::Handler.run
