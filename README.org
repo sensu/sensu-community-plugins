@@ -9,6 +9,12 @@ In the future, some sort of browsing/metadata/installation system may be
 implemented. For now, just clone this repository, take a look around,
 and copy the plugins you want to use.
 
+* Contributing
+
+If you have a new plugin or handler, send a pull request! Please format
+the names of scripts using dashes to separate words and without =.rb=
+on the end, and make sure they are =chmod +x='d.
+
 * License
 
 Copyright 2011 Sonian, Inc. and contributors.
