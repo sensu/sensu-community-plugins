@@ -3,7 +3,7 @@
 # Sensu Twitter Handler
 # ===
 #
-# This handler reports alerts to a configured twitter handler. 
+# This handler reports alerts to a configured twitter handler.
 # Map a twitter handle to a sensusub value in the twitter.json to get going!
 # sensusub == subscription in the client object, not check..
 # see twitter.json for required values
@@ -20,11 +20,9 @@ require 'timeout'
 
 class TwitterHandler < Sensu::Handler
 
-  site_config 'twitter'
-
   def handle(event)
-    puts config
-    config.each do |account|
+    puts settings['twitter']
+    settings['twitter'].each do |account|
       if event['client']['subscriptions'].include?(account[1]["sensusub"])
         Twitter.configure do |t|
           t.consumer_key = account[1]["consumer_key"]

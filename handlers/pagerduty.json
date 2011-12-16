@@ -1,3 +1,5 @@
 {
-  "api_key": "12345"
+  "pagerduty": {
+    "api_key": "12345"
+  }
 }

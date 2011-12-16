@@ -22,17 +22,15 @@ require 'timeout'
 
 class IRC < Sensu::Handler
 
-  site_config 'irc'
-
   def handle(event)
     params = {
-      :uri => config["irc_server"],
+      :uri => settings["irc"]["irc_server"],
       :message => "#{short_name(event)}: #{event['check']['output']}",
-      :ssl => config["irc_ssl"],
+      :ssl => settings["irc"]["irc_ssl"],
       :join => true,
     }
-    if config.has_key?("irc_password")
-      params[:channel_password] = config["irc_password"]
+    if settings["irc"].has_key?("irc_password")
+      params[:channel_password] = settings["irc"]["irc_password"]
     end
     begin
       timeout(10) do
