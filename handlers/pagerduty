@@ -12,9 +12,9 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'redphone/pagerduty'
 
-PAGERDUTY_API_KEY = 'foobar'
-
 class Pagerduty < Sensu::Handler
+
+  site_config 'pagerduty'
 
   def handle(event)
     description = event['notification'] || [event['client']['name'], event['check']['name'], event['check']['output']].join(' : ')
@@ -23,7 +23,7 @@ class Pagerduty < Sensu::Handler
         response = case event['action']
         when 'create'
           Redphone::Pagerduty.trigger_incident(
-            :service_key => PAGERDUTY_API_KEY,
+            :service_key => config['api_key'],
             :incident_key => @incident_key,
             :description => description,
             :details => event

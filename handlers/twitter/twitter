@@ -20,31 +20,17 @@ require 'timeout'
 
 class TwitterHandler < Sensu::Handler
 
-  def initialize
-    @settings = read_config('/etc/sensu/twitter.json')
-  end
-
-  def read_config(config_file)
-    if File.readable?(config_file)
-      begin
-        JSON.parse(File.open(config_file, 'r').read)
-      rescue JSON::ParserError => e
-        puts 'configuration file must be valid JSON: ' + e
-      end
-    else
-      puts 'configuration file does not exist or is not readable: ' + config_file
-    end
-  end
+  site_config 'twitter'
 
   def handle(event)
-    puts @settings
-    @settings.each do |account|
+    puts config
+    config.each do |account|
       if event['client']['subscriptions'].include?(account[1]["sensusub"])
-        Twitter.configure do |config|
-          config.consumer_key = account[1]["consumer_key"]
-          config.consumer_secret = account[1]["consumer_secret"]
-          config.oauth_token = account[1]["oauth_token"]
-          config.oauth_token_secret = account[1]["oauth_token_secret"]
+        Twitter.configure do |t|
+          t.consumer_key = account[1]["consumer_key"]
+          t.consumer_secret = account[1]["consumer_secret"]
+          t.oauth_token = account[1]["oauth_token"]
+          t.oauth_token_secret = account[1]["oauth_token_secret"]
         end
         if event['action'].eql?("resolve")
           Twitter.update("RESOLVED - #{short_name(event)}: #{event['check']['notification']} Time: #{Time.now()} ")
