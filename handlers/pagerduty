@@ -30,7 +30,7 @@ class Pagerduty < Sensu::Handler
           )
         when 'resolve'
           Redphone::Pagerduty.resolve_incident(
-            :service_key => PAGERDUTY_API_KEY,
+            :service_key => config['api_key'],
             :incident_key => @incident_key
           )
         end
