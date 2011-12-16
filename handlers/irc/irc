@@ -22,31 +22,17 @@ require 'timeout'
 
 class IRC < Sensu::Handler
 
-  def initialize
-    @settings = read_config('/etc/sensu/irc.json')
-  end
-
-  def read_config(config_file)
-    if File.readable?(config_file)
-      begin
-        JSON.parse(File.open(config_file, 'r').read)
-      rescue JSON::ParserError => e
-        puts 'configuration file must be valid JSON: ' + e
-      end
-    else
-      puts 'configuration file does not exist or is not readable: ' + config_file
-    end
-  end
+  site_config 'irc'
 
   def handle(event)
     params = {
-      :uri => @settings["irc_server"],
+      :uri => config["irc_server"],
       :message => "#{short_name(event)}: #{event['check']['output']}",
-      :ssl => @settings["irc_ssl"],
+      :ssl => config["irc_ssl"],
       :join => true,
     }
-    if @settings.has_key?("irc_password")
-      params[:channel_password] = @settings["irc_password"]
+    if config.has_key?("irc_password")
+      params[:channel_password] = config["irc_password"]
     end
     begin
       timeout(10) do
