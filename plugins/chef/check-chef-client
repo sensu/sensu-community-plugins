@@ -10,6 +10,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
+require 'rubygems'
 require 'sensu-plugin/util/procs'
 
 class ChefClient < Sensu::Plugin::Check::CLI
