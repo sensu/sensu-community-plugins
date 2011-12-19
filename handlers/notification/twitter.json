@@ -1,0 +1,18 @@
+{
+  "twitter": {
+    "twitterhandle": {
+      "sensusub": "webservers",
+      "consumer_key": "",
+      "consumer_secret": "",
+      "oauth_token": "",
+      "oauth_token_secret": ""
+    },
+    "twitterhandle2": {
+      "sensusub": "databases",
+      "consumer_key": "",
+      "consumer_secret": "",
+      "oauth_token": "",
+      "oauth_token_secret": ""
+    }
+  }
+}
