@@ -22,10 +22,14 @@ require 'timeout'
 
 class IRC < Sensu::Handler
 
-  def handle(event)
+  def short_name
+    @event['client']['name'] + '/' + @event['check']['name']
+  end
+
+  def handle
     params = {
       :uri => settings["irc"]["irc_server"],
-      :message => "#{short_name(event)}: #{event['check']['output']}",
+      :message => "#{short_name(@event)}: #{@event['check']['output']}",
       :ssl => settings["irc"]["irc_ssl"],
       :join => true,
     }
@@ -35,10 +39,10 @@ class IRC < Sensu::Handler
     begin
       timeout(10) do
         CarrierPigeon.send(params)
-        puts 'irc -- sent alert for ' + short_name(event) + ' to IRC.'
+        puts 'irc -- sent alert for ' + short_name(@event) + ' to IRC.'
       end
     rescue Timeout::Error
-      puts 'irc -- timed out while attempting to ' + event['action'] + ' a incident -- ' + short_name(event)
+      puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + short_name(@event)
     end
   end
 
