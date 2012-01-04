@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+#
+# Check Procs
+# ===
+#
+# Finds processes matching various filters (name, state, etc). Will not
+# match itself by default. The number of processes found will be tested
+# against the Warning/critical thresholds. By default, fails with a
+# CRITICAL if more than one process matches -- you must specify values
+# for -w and -c to override this.
+#
+# Attempts to work on Cygwin (where ps does not have the features we
+# need) by calling Windows' tasklist.exe, but this is not well tested.
+#
+# Examples:
+#
+#   # chef-client is running
+#   check-procs -p chef-client -W 1
+#
+#   # there are not too many zombies
+#   check-procs -s Z -w 5 -c 10
+#
+# Copyright 2011 Sonian, Inc.
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
+
+require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'sensu-plugin/util/procs'
+
+class CheckProcs < Sensu::Plugin::Check::CLI
+
+  option :warn_over, :short => '-w N', :proc => proc {|a| a.to_i }, :default => 1
+  option :crit_over, :short => '-c N', :proc => proc {|a| a.to_i }, :default => 1
+  option :warn_under, :short => '-W N', :proc => proc {|a| a.to_i }, :default => 0
+  option :crit_under, :short => '-C N', :proc => proc {|a| a.to_i }, :default => 0
+
+  option :match_self, :short => '-m', :boolean => true, :default => false
+  option :match_parent, :short => '-M', :boolean => true, :default => false
+  option :cmd_pat, :short => '-p PATTERN'
+  option :state, :short => '-s STATE'
+  option :user, :short => '-u USER'
+
+  def read_lines(cmd, header_lines, *cols)
+    IO.popen(cmd + ' 2>&1') do |ps|
+      ps.read.split("\n").drop(header_lines).map do |line|
+        Hash[cols.zip(line.split($;, cols.size))]
+      end
+    end
+  end
+
+  def get_procs
+    `ps x`
+    if $?.exitstatus == 0
+      # We're on Linux
+      lines = read_lines('ps axwwo user,pid,state,command', 1, :user, :pid, :state, :command)
+    else
+      # We're probably on Windows
+      lines = read_lines('tasklist', 3, :command, :pid, :session, :mem, :k)
+    end
+  end
+
+  def run
+    procs = get_procs
+    procs.reject! {|p| p[:pid] == $$.to_s } unless config[:match_self]
+    procs.reject! {|p| p[:pid] == Process.ppid.to_s } unless config[:match_parent]
+    procs.reject! {|p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
+    procs.reject! {|p| p[:state] != config[:state] } if config[:state]
+    procs.reject! {|p| p[:user] != config[:user] } if config[:user]
+
+    msg = "Found #{procs.size} matching processes"
+    if procs.size < config[:crit_under] || procs.size > config[:crit_over]
+      critical msg
+    elsif procs.size < config[:warn_under] || procs.size > config[:warn_over]
+      warning msg
+    else
+      ok msg
+    end
+  end
+
+end
