@@ -38,6 +38,9 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :match_self, :short => '-m', :boolean => true, :default => false
   option :match_parent, :short => '-M', :boolean => true, :default => false
   option :cmd_pat, :short => '-p PATTERN'
+  option :vsz, :short => '-z VSZ', :proc => proc {|a| a.to_f }
+  option :rss, :short => '-r RSS', :proc => proc {|a| a.to_f }
+  option :pcpu, :short => '-P PCPU', :proc => proc {|a| a.to_f }
   option :state, :short => '-s STATE'
   option :user, :short => '-u USER'
 
@@ -53,7 +56,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     `ps x`
     if $?.exitstatus == 0
       # We're on Linux
-      lines = read_lines('ps axwwo user,pid,state,command', 1, :user, :pid, :state, :command)
+      lines = read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,command', 1, :user, :pid, :vsz, :rss, :pcpu, :state, :command)
     else
       # We're probably on Windows
       lines = read_lines('tasklist', 3, :command, :pid, :session, :mem, :k)
@@ -62,9 +65,12 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
   def run
     procs = get_procs
-    procs.reject! {|p| p[:pid] == $$.to_s } unless config[:match_self]
-    procs.reject! {|p| p[:pid] == Process.ppid.to_s } unless config[:match_parent]
+    procs.reject! {|p| p[:pid].to_i == $$ } unless config[:match_self]
+    procs.reject! {|p| p[:pid].to_i == Process.ppid } unless config[:match_parent]
     procs.reject! {|p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
+    procs.reject! {|p| p[:vsz].to_f < config[:vsz] } if config[:vsz]
+    procs.reject! {|p| p[:rss].to_f < config[:rss] } if config[:rss]
+    procs.reject! {|p| p[:pcpu].to_f < config[:pcpu] } if config[:pcpu]
     procs.reject! {|p| p[:state] != config[:state] } if config[:state]
     procs.reject! {|p| p[:user] != config[:user] } if config[:user]
 
