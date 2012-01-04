@@ -69,6 +69,10 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! {|p| p[:user] != config[:user] } if config[:user]
 
     msg = "Found #{procs.size} matching processes"
+    msg += ", cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
+    msg += ", state #{config[:state]}" if config[:state]
+    msg += ", user #{config[:user]}" if config[:user]
+
     if procs.size < config[:crit_under] || procs.size > config[:crit_over]
       critical msg
     elsif procs.size < config[:warn_under] || procs.size > config[:warn_over]
