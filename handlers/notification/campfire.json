@@ -1,0 +1,7 @@
+{ "campfire":
+  {
+    "room": "devops",
+    "account": "subdomain",
+    "token": "xxxxxxxxxxxxxxxxxxx"
+  }
+}
