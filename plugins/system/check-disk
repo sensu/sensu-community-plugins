@@ -16,8 +16,8 @@ require 'sensu-plugin/check/cli'
 
 class CheckDisk < Sensu::Plugin::Check::CLI
 
-  option :fstype, :short => '-t TYPE'
-  option :ignore, :short => '-x TYPE'
+  option :fstype, :short => '-t TYPE', :proc => proc {|a| a.split(',') }
+  option :ignore, :short => '-x TYPE', :proc => proc {|a| a.split(',') }
   option :warn, :short => '-w PERCENT', :proc => proc {|a| a.to_i }, :default => 85
   option :crit, :short => '-c PERCENT', :proc => proc {|a| a.to_i }, :default => 95
 
@@ -31,8 +31,8 @@ class CheckDisk < Sensu::Plugin::Check::CLI
     `df -PT`.split("\n").drop(1).each do |line|
       begin
         fs, type, blocks, used, avail, capacity, mnt = line.split
-        next if config[:fstype] && type != config[:fstype]
-        next if config[:ignore] && type == config[:ignore]
+        next if config[:fstype] && !config[:fstype].include?(type)
+        next if config[:ignore] && config[:ignore].include?(type)
       rescue
         unknown "malformed line from df: #{line}"
       end
