@@ -41,8 +41,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :vsz, :short => '-z VSZ', :proc => proc {|a| a.to_f }
   option :rss, :short => '-r RSS', :proc => proc {|a| a.to_f }
   option :pcpu, :short => '-P PCPU', :proc => proc {|a| a.to_f }
-  option :state, :short => '-s STATE'
-  option :user, :short => '-u USER'
+  option :state, :short => '-s STATE', :proc => proc {|a| a.split(',') }
+  option :user, :short => '-u USER', :proc => proc {|a| a.split(',') }
 
   def read_lines(cmd, header_lines, *cols)
     IO.popen(cmd + ' 2>&1') do |ps|
@@ -71,13 +71,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! {|p| p[:vsz].to_f < config[:vsz] } if config[:vsz]
     procs.reject! {|p| p[:rss].to_f < config[:rss] } if config[:rss]
     procs.reject! {|p| p[:pcpu].to_f < config[:pcpu] } if config[:pcpu]
-    procs.reject! {|p| p[:state] != config[:state] } if config[:state]
-    procs.reject! {|p| p[:user] != config[:user] } if config[:user]
+    procs.reject! {|p| config[:state].include?(p[:state]) } if config[:state]
+    procs.reject! {|p| config[:user].include?(p[:user]) } if config[:user]
 
     msg = "Found #{procs.size} matching processes"
-    msg += ", cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
-    msg += ", state #{config[:state]}" if config[:state]
-    msg += ", user #{config[:user]}" if config[:user]
+    msg += "; cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
+    msg += "; state #{config[:state].join(',')}" if config[:state]
+    msg += "; user #{config[:user].join(',')}" if config[:user]
 
     if procs.size < config[:crit_under] || procs.size > config[:crit_over]
       critical msg
