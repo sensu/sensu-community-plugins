@@ -71,8 +71,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! {|p| p[:vsz].to_f < config[:vsz] } if config[:vsz]
     procs.reject! {|p| p[:rss].to_f < config[:rss] } if config[:rss]
     procs.reject! {|p| p[:pcpu].to_f < config[:pcpu] } if config[:pcpu]
-    procs.reject! {|p| config[:state].include?(p[:state]) } if config[:state]
-    procs.reject! {|p| config[:user].include?(p[:user]) } if config[:user]
+    procs.reject! {|p| !config[:state].include?(p[:state]) } if config[:state]
+    procs.reject! {|p| !config[:user].include?(p[:user]) } if config[:user]
 
     msg = "Found #{procs.size} matching processes"
     msg += "; cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
