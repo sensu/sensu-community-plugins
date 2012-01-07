@@ -46,23 +46,21 @@ class ESHeapUsage < Sensu::Plugin::Check::CLI
     stats = get_es_resource('/_cluster/nodes/_local/stats')
     node = stats['nodes'].keys.first
     begin
-      heap_used = stats['nodes'][node]['jvm']['mem']['heap_used_in_bytes']
+      stats['nodes'][node]['jvm']['mem']['heap_used_in_bytes']
     rescue
       warning 'Failed to obtain heap used in bytes'
     end
-    heap_used
   end
 
   def run
     heap_used = get_heap_used
-    message = "Heap used in bytes #{heap_used}"
-    case
-    when heap_used >= config[:crit]
-      critical message
-    when heap_used >= config[:warn]
-      warning message
+    message "Heap used in bytes #{heap_used}"
+    if heap_used >= config[:crit]
+      critical
+    elsif heap_used >= config[:warn]
+      warning
     else
-      ok message
+      ok
     end
   end
 end
