@@ -34,8 +34,8 @@ class VMStat < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    timestamp = Time.now.to_i
     result = convert_integers(`vmstat`.split("\n")[2].split(" "))
+    timestamp = Time.now.to_i
     metrics = {
       :procs => {
          :waiting => result[0],
@@ -68,7 +68,7 @@ class VMStat < Sensu::Plugin::Metric::CLI::Graphite
     }
     metrics.each do |parent, children|
       children.each do |child, value|
-        output([config[:scheme], parent, child].join("."), value, timestamp)
+        output [config[:scheme], parent, child].join("."), value, timestamp
       end
     end
     ok
