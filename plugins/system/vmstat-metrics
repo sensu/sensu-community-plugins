@@ -4,7 +4,7 @@
 # ===
 #
 # This plugin uses vmstat to collect basic system metrics, produces
-# a Graphite formated output.
+# Graphite formated output.
 #
 # Copyright 2011 Sonian, Inc.
 #
