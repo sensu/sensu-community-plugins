@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+#
+# Copyright 2011 Sonian, Inc.
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
+
+require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'sensu-handler'
+require 'librato/metrics'
+
+class Librato < Sensu::Handler
+
+  def handle
+    hostname = @event['client']['name'].split('.').first
+    checkname = @event['check']['name'].gsub(%r|[ \.]|, '_')
+    status = @event['action']
+    metric = "sensu.checks.#{hostname}.#{checkname}.#{status}"
+
+    Librato::Metrics.authenticate settings['librato']['email'], settings['librato']['api_key']
+
+    begin
+      timeout(3) do
+        Librato::Metrics.submit metric.to_sym => {:value => 1}
+      end
+    rescue Timeout::Error
+      puts "librato -- timed out while sending metric #{metric}"
+    rescue => error
+      puts "librato -- failed to send metric #{metric} : #{error}"
+    end
+  end
+
+end
