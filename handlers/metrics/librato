@@ -13,15 +13,14 @@ class Librato < Sensu::Handler
 
   def handle
     hostname = @event['client']['name'].split('.').first
-    checkname = @event['check']['name'].gsub(%r|[ \.]|, '_')
-    status = @event['action']
-    metric = "sensu.checks.#{hostname}.#{checkname}.#{status}"
+    check_name = @event['check']['name'].gsub(%r|[ \.]|, '_')
+    metric = ["sensu.checks", hostname, check_name, @event['action']].join('.')
 
     Librato::Metrics.authenticate settings['librato']['email'], settings['librato']['api_key']
 
     begin
       timeout(3) do
-        Librato::Metrics.submit metric.to_sym => {:value => 1}
+        Librato::Metrics.submit metric.to_sym => {:value => @event['occurences']}
       end
     rescue Timeout::Error
       puts "librato -- timed out while sending metric #{metric}"
