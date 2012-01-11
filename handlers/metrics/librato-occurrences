@@ -21,7 +21,7 @@ class Librato < Sensu::Handler
 
     begin
       timeout(3) do
-        Librato::Metrics.submit metric.to_sym => {:type => :counter, :value => value}
+        Librato::Metrics.submit metric.to_sym => {:type => :counter, :value => value, :source => 'sensu'}
       end
     rescue Timeout::Error
       puts "librato -- timed out while sending metric #{metric}"
