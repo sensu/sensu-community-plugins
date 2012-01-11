@@ -12,8 +12,10 @@ and copy the plugins you want to use.
 * Contributing
 
 If you have a new plugin or handler, send a pull request! Please format
-the names of scripts using dashes to separate words and without =.rb=
-on the end, and make sure they are =chmod +x='d.
+the names of scripts using dashes to separate words and with an
+extension (=.rb=, =.sh=, etc), and make sure they are =chmod +x='d.
+Extensions are unfortunately necessary for Sensu to be able to directly
+exec plugins and handlers on Windows.
 
 * License
 
