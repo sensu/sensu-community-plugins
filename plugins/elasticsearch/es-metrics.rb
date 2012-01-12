@@ -16,7 +16,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'rest-client'
 
-class ESMetrics < Sensu::Plugin::Metric::CLI
+class ESMetrics < Sensu::Plugin::Metric::CLI::JSON
 
   def delete_strings(hash)
     hash.each do |key, value|
@@ -34,16 +34,17 @@ class ESMetrics < Sensu::Plugin::Metric::CLI
       stats = RestClient::Resource.new 'http://localhost:9200/_cluster/nodes/_local/stats', :timeout => 30
       stats = JSON.parse(stats.get)
       node = stats['nodes'].keys.first
-    rescue Errno::ECONNREFUSED => e
-      critical e
-    rescue RestClient::RequestTimeout => e
-      warning e
+    rescue Errno::ECONNREFUSED
+      critical
+    rescue RestClient::RequestTimeout
+      warning
     end
     metrics = delete_strings(stats["nodes"][node])
+    output metrics
     if metrics.empty?
-      warning metrics
+      warning
     else
-      ok metrics
+      ok
     end
   end
 

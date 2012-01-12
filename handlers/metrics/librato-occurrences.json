@@ -1,0 +1,6 @@
+{
+  "librato": {
+    "email": "email@example.com",
+    "api_key": "12345"
+  }
+}
