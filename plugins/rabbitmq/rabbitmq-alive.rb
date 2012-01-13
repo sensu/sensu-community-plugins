@@ -64,9 +64,16 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
     password = config[:password]
     vhost    = config[:vhost]
 
-    resource = RestClient::Resource.new "http://#{host}:#{port}/api/aliveness-test/#{vhost}"
-    resource.get 
+    begin
+      resource = RestClient::Resource.new "http://#{host}:#{port}/api/aliveness-test/#{vhost}", username, password
+      resource.get
+    rescue Errno::ECONNREFUSED => e
+      puts e.message
+      "dead"
+    rescue Exception => e
+      puts e.message
+      raise
+    end     
   end
 
 end
-
