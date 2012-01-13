@@ -26,7 +26,7 @@
 #  - The Sensu error level (eg: WARNING, CRITICAL) is available in the
 #    '_status' field as an integer.
 # 
-# Copyright 2012 Joe Miller
+# Copyright 2012 Joe Miller (https://github.com/joemiller | http://twitter.com/miller_joe)
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
