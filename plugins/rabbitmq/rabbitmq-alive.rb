@@ -49,11 +49,13 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
   
   def run
     res = vhost_alive?
-    
-    if res.include? '{"status":"ok"}'
+
+    if res.to_s.include? '{"status":"ok"}'
       ok "RabbitMQ server is alive"
+    elsif res.to_s.include? "dead:"
+      critical res
     else
-      critical "RabbitMQ server is dead"
+      unknown res
     end
   end
 
@@ -68,12 +70,10 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
       resource = RestClient::Resource.new "http://#{host}:#{port}/api/aliveness-test/#{vhost}", username, password
       resource.get
     rescue Errno::ECONNREFUSED => e
-      puts e.message
-      "dead"
+      "dead: #{e.message}"
     rescue Exception => e
-      puts e.message
-      raise
-    end     
+      "#{e.message}"
+    end
   end
 
-end
+end  
