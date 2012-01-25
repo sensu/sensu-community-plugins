@@ -51,11 +51,11 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
     res = vhost_alive?
 
     if res["status"] == "ok"
-      ok res["msg"]
+      ok res["message"]
     elsif res["status"] == "critical"
-      critical res["msg"]
+      critical res["message"]
     else
-      unknown res["msg"]
+      unknown res["message"]
     end
   end
 
