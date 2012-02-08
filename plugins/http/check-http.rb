@@ -62,7 +62,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       if config[:cert]
         cert_data = File.read(config[:cert])
         http.cert = OpenSSL::X509::Certificate.new(cert_data)
-        cli.key = OpenSSL::PKey::RSA.new(cert_data, nil)
+        http.key = OpenSSL::PKey::RSA.new(cert_data, nil)
       end
       if config[:cacert]
         http.ca_file = config[:cacert]
