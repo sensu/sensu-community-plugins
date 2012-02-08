@@ -46,12 +46,16 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--filter REGEX"
 
   def get_rabbitmq_queues
-    rabbitmq_info = CarrotTop.new(
-      :host => config[:host],
-      :port => config[:port],
-      :user => config[:user],
-      :password => config[:password]
-    )
+    begin
+      rabbitmq_info = CarrotTop.new(
+        :host => config[:host],
+        :port => config[:port],
+        :user => config[:user],
+        :password => config[:password]
+      )
+    rescue
+      warning "could not get rabbitmq queue info"
+    end
     rabbitmq_info.queues
   end
 
@@ -63,11 +67,8 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
           next
         end
       end
-      %w[messages consumers].each do |metric|
-        output([config[:scheme], queue['name'], metric].join("."), queue[metric], timestamp)
-      end
-      if queue.has_key?('message_stats')
-        output([config[:scheme], queue['name'], 'consumption'].join("."), queue['message_stats']['deliver_get_details']['rate'], timestamp)
+      %w[messages].each do |metric|
+        output([config[:scheme], queue['name'], metric].join('.'), queue[metric], timestamp)
       end
     end
     ok
