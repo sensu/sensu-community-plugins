@@ -44,25 +44,40 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :short => '-q PAT',
          :long => '--pattern PAT'
 
-  option :warn_only,
+  option :warn,
+         :description => "Warning level if pattern has a group",
+         :short => '-w N',
+         :long => '--warn N',
+         :proc => proc {|a| a.to_i }
+
+  option :crit,
+         :description => "Critical level if pattern has a group",
+         :short => '-c N',
+         :long => '--crit N',
+         :proc => proc {|a| a.to_i }
+
+  option :only_warn,
          :description => "Warn instead of critical on match",
-         :short => '-w',
+         :short => '-o',
          :long => '--warn-only',
          :boolean => true
 
   def run
     unknown "No log file specified" unless config[:log_file]
     unknown "No pattern specified" unless config[:pattern]
-    open_log
-    n_matches = search_log
-    if n_matches == 0
-      ok "No matches"
+    begin
+      open_log
+    rescue => e
+      unknown "Could not open log file: #{e}"
+    end
+    n_warns, n_crits = search_log
+    message "#{n_warns} warnings, #{n_crits} criticals"
+    if n_crits > 0
+      critical
+    elsif n_warns > 0
+      warning
     else
-      if config[:warn_only]
-        warning "#{n_matches} matches found"
-      else
-        critical "#{n_matches} matches found"
-      end
+      ok
     end
   end
 
@@ -85,21 +100,34 @@ class CheckLog < Sensu::Plugin::Check::CLI
       @bytes_to_skip = 0
     end
     bytes_read = 0
-    n_matches = 0
+    n_warns = 0
+    n_crits = 0
     if @bytes_to_skip > 0
       @log.seek(@bytes_to_skip, File::SEEK_SET)
     end
     @log.each_line do |line|
       bytes_read += line.size
-      if line.match(config[:pattern])
-        n_matches += 1
+      if m = line.match(config[:pattern])
+        if m[1]
+          if config[:crit] && m[1].to_i > config[:crit]
+            n_crits += 1
+          elsif config[:warn] && m[1].to_i > config[:warn]
+            n_warns += 1
+          end
+        else
+          if config[:only_warn]
+            n_warns += 1
+          else
+            n_crits += 1
+          end
+        end
       end
     end
     FileUtils.mkdir_p(File.dirname(@state_file))
     File.open(@state_file, 'w') do |file|
       file.write(@bytes_to_skip + bytes_read)
     end
-    n_matches
+    [n_warns, n_crits]
   end
 
 end
