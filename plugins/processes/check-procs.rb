@@ -30,6 +30,14 @@ require 'sensu-plugin/check/cli'
 
 class CheckProcs < Sensu::Plugin::Check::CLI
 
+  def self.read_pid(path)
+    begin
+      File.read(path).chomp.to_i
+    rescue
+      self.new.unknown "Could not read pid file #{path}"
+    end
+  end
+
   option :warn_over, :short => '-w N', :proc => proc {|a| a.to_i }, :default => 1
   option :crit_over, :short => '-c N', :proc => proc {|a| a.to_i }, :default => 1
   option :warn_under, :short => '-W N', :proc => proc {|a| a.to_i }, :default => 0
@@ -39,7 +47,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :match_self, :short => '-m', :boolean => true, :default => false
   option :match_parent, :short => '-M', :boolean => true, :default => false
   option :cmd_pat, :short => '-p PATTERN'
-  option :file_pid, :short => '-f PATH', :proc => proc {|a| File.read(a).chomp.to_i }
+  option :file_pid, :short => '-f PATH', :proc => proc {|a| read_pid(a) }
   option :vsz, :short => '-z VSZ', :proc => proc {|a| a.to_i }
   option :rss, :short => '-r RSS', :proc => proc {|a| a.to_i }
   option :pcpu, :short => '-P PCPU', :proc => proc {|a| a.to_f }
@@ -96,15 +104,16 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     msg += "; cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
     msg += "; state #{config[:state].join(',')}" if config[:state]
     msg += "; user #{config[:user].join(',')}" if config[:user]
-    msg += "; rss > #{config[:vsz]}" if config[:vsz]
-    msg += "; vsz > #{config[:rss]}" if config[:rss]
+    msg += "; vsz > #{config[:vsz]}" if config[:vsz]
+    msg += "; rss > #{config[:rss]}" if config[:rss]
     msg += "; pcpu > #{config[:pcpu]}" if config[:pcpu]
     msg += "; pid #{config[:file_pid]}" if config[:file_pid]
 
-    count = if config[:metric]
-      procs.map {|p| p[config[:metric]].to_i }.reduce {|a, b| a + b }
+    if config[:metric]
+      count = procs.map {|p| p[config[:metric]].to_i }.reduce {|a, b| a + b }
+      msg += "; #{config[:metric]} == #{count}"
     else
-      procs.size
+      count = procs.size
     end
 
     if count < config[:crit_under] || count > config[:crit_over]
