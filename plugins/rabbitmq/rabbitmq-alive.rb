@@ -19,7 +19,7 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
 
   option :host,
          :description => "RabbitMQ host",
-         :short => '-w',
+         :short => '-h',
          :long => '--host HOST',
          :default => 'localhost'
 
