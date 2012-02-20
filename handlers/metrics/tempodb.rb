@@ -35,9 +35,9 @@ class TempoDBSensu < Sensu::Handler
                 client.write_bulk(time, data)
             end
         rescue Timeout::Error
-            puts "tempodb -- timed out while sending metric #{metric}"
+            puts "tempodb -- timed out while sending bulk write"
         rescue => error
-            puts "tempodb -- failed to send metric #{metric} : #{error}"
+            puts "tempodb -- failed to send bulk write : #{error}"
         end
     end
 end
