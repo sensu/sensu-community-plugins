@@ -39,10 +39,10 @@ class IRC < Sensu::Handler
     begin
       timeout(10) do
         CarrierPigeon.send(params)
-        puts 'irc -- sent alert for ' + short_name(@event) + ' to IRC.'
+        puts 'irc -- sent alert for ' + short_name + ' to IRC.'
       end
     rescue Timeout::Error
-      puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + short_name(@event)
+      puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + short_name
     end
   end
 
