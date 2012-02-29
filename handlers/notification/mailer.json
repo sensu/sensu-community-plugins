@@ -1,0 +1,6 @@
+{
+  "mailer": {
+    "mail_from": "sensu@example.com",
+    "mail_to": "monitor@example.com"
+  }
+}
