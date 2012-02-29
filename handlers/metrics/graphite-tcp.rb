@@ -23,6 +23,9 @@ require 'sensu-handler'
 
 class Graphite < Sensu::Handler
 
+  # override filters from Sensu::Handler. not appropriate for metric handlers
+  def filter; end
+  
   def handle
     graphite_server = settings['graphite']['server']
     graphite_port = settings['graphite']['port']
