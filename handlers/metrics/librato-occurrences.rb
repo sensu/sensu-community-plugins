@@ -11,6 +11,9 @@ require 'librato/metrics'
 
 class Librato < Sensu::Handler
 
+  # override filters from Sensu::Handler. not appropriate for metric handlers
+  def filter; end
+
   def handle
     hostname = @event['client']['name'].split('.').first
     check_name = @event['check']['name'].gsub(%r|[ \.]|, '_')
