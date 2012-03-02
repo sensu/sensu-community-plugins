@@ -37,7 +37,7 @@ require 'gelf'
 
 class GelfHandler < Sensu::Handler
 
-  def short_name
+  def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
@@ -48,11 +48,11 @@ class GelfHandler < Sensu::Handler
   def action_to_gelf_level
     @event['action'].eql?('resolve') ? ::GELF::Levels::INFO : ::GELF::Levels::FATAL
   end
-    
+
   def handle
     @notifier = ::GELF::Notifier.new(settings['gelf']['server'], settings['gelf']['port'])
     gelf_msg = {
-      :short_message => "#{action_to_string} - #{short_name}: #{@event['check']['notification']}",
+      :short_message => "#{action_to_string} - #{event_name}: #{@event['check']['notification']}",
       :full_message  => @event['check']['output'],
       :facility      => 'sensu',
       :level         => action_to_gelf_level,

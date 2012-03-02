@@ -20,20 +20,24 @@ require 'timeout'
 
 class TwitterHandler < Sensu::Handler
 
-  def handle(event)
+  def event_name
+    @event['client']['name'] + '/' + @event['check']['name']
+  end
+
+  def handle
     puts settings['twitter']
     settings['twitter'].each do |account|
-      if event['client']['subscriptions'].include?(account[1]["sensusub"])
+      if @event['client']['subscriptions'].include?(account[1]["sensusub"])
         Twitter.configure do |t|
           t.consumer_key = account[1]["consumer_key"]
           t.consumer_secret = account[1]["consumer_secret"]
           t.oauth_token = account[1]["oauth_token"]
           t.oauth_token_secret = account[1]["oauth_token_secret"]
         end
-        if event['action'].eql?("resolve")
-          Twitter.update("RESOLVED - #{short_name(event)}: #{event['check']['notification']} Time: #{Time.now()} ")
+        if @event['action'].eql?("resolve")
+          Twitter.update("RESOLVED - #{event_name}: #{@event['check']['notification']} Time: #{Time.now()} ")
         else
-          Twitter.update("ALERT - #{short_name(event)}: #{event['check']['notification']} Time: #{Time.now()} ")
+          Twitter.update("ALERT - #{event_name}: #{@event['check']['notification']} Time: #{Time.now()} ")
         end
       end
     end
