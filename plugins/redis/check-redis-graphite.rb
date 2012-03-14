@@ -1,41 +1,15 @@
 #!/usr/bin/env ruby
 #
-# ==================================================================
-# => Redis stats into graphite
-# ==================================================================
+# Push Redis INFO stats into graphite
+# ===
 #
-#  By Pete Shima - https://github.com/petey5king
+# Created by Pete Shima - me@peteshima.com
 #
-# ==================================================================
-#  Requirements
-# ==================================================================
-#  * redis gem
-#  * graphite handler already setup
-#  * firewall ports opened (if needed)
-#  
-# ==================================================================
-#  Example sensu config:
-# ==================================================================
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 #
-# "checks": {
-#       "redis_graphite_staging": {
-#         "handlers": [
-#           "graphite"
-#         ],
-#         "command": "/path/to/check-redis-graphite.rb -h my.hostname.com -p 6379",
-#         "subscribers": [
-#           "sensu_server"
-#         ],
-#         "type": "metric",
-#         "interval": 60
-#       },
+# TODO - Only pass integer metrics with options for single metrics.
 #
-# ==================================================================
-#  TODO
-# ==================================================================
-#  * Only pass integer based or needed metrics rather than all
-#
-
 
 require "rubygems" if RUBY_VERSION < "1.9.0"
 require 'sensu-plugin/metric/cli'
@@ -44,27 +18,30 @@ require "redis"
 class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
 
   option :host,
-  :short => "-h HOST",
-  :long => "--host HOST",
-  :description => "Redis Host to connect to",
-  :required => true
+    :short => "-h HOST",
+    :long => "--host HOST",
+    :description => "Redis Host to connect to",
+    :required => true
 
   option :port,
-  :short => "-p PORT",
-  :long => "--port PORT",
-  :description => "Redis Port to connect to",
-  :proc => proc {|p| p.to_i },
-  :required => true
+    :short => "-p PORT",
+    :long => "--port PORT",
+    :description => "Redis Port to connect to",
+    :proc => proc {|p| p.to_i },
+    :required => true
 
+  option :scheme,
+    :description => "Metric naming scheme, text to prepend to metric",
+    :short => "-s SCHEME",
+    :long => "--scheme SCHEME",
+    :default => "#{Socket.gethostname}.redis"
 
-  def run
-    gstring = "servers." + config[:host].gsub(/.my.hostname.com/, '')  
-    
-    $cache = Redis.new(:host => config[:host], :port =>config[:port])
+  def run    
+    redis = Redis.new(:host => config[:host], :port =>config[:port])
 
-    $cache.info.each {|k,v|
-      output "#{gstring}.redis.#{k}", v
-    }
+    redis.info.each do |k,v|
+      output "#{config[:scheme]}.#{k}", v
+    end
 
     ok
 
