@@ -4,11 +4,16 @@
 # ===
 #
 # Created by Pete Shima - me@peteshima.com
+# Additional hacks by Joe Miller - https://github.com/joemiller
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 #
-# TODO: replication stats
+# NOTE: This plugin will attempt to get replication stats but the user must have 
+#  SUPER or REPLICATION CLIENT privileges to run 'SHOW SLAVE STATUS'. It will
+#  silently ignore and continue if 'SHOW SLAVE STATUS' fails for any reason.
+#  The key 'slaveLag' will not be present in the output.
+# 
 
 require "rubygems" if RUBY_VERSION < "1.9.0"
 require 'sensu-plugin/metric/cli'
@@ -20,15 +25,15 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
   option :host,
     :short => "-h HOST",
     :long => "--host HOST",
-    :description => "Solr Host to connect to",
+    :description => "Mysql Host to connect to",
     :required => true
 
   option :port,
     :short => "-P PORT",
     :long => "--port PORT",
-    :description => "Solr Port to connect to",
+    :description => "Mysql Port to connect to",
     :proc => proc {|p| p.to_i },
-    :required => true
+    :default => 3306
 
   option :username,
     :short => "-u USERNAME",
@@ -159,27 +164,25 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     }
 
     begin
+      mysql = Mysql2::Client.new(
+        :host => config[:host], 
+        :port =>config[:port], 
+        :username => config[:username], 
+        :password => config[:password]
+        )      
 
-    mysql = Mysql2::Client.new(
-      :host => config[:host], 
-      :port =>config[:port], 
-      :username => config[:username], 
-      :password => config[:password]
-      )
-    
-    results = mysql.query("SHOW GLOBAL STATUS")
-
+      results = mysql.query("SHOW GLOBAL STATUS")
     rescue => e
       puts e.message
     end
-
+    
     results.each do |row|
       if general.include?(row["Variable_name"]) then
         output "#{config[:scheme]}.mysql.general.#{general[row["Variable_name"]]}", row["Value"]
       end
 
       if queryCache.include?(row["Variable_name"]) then
-        output "#{config[:scheme]}.mysql.querycache.#{querycache[row["Variable_name"]]}", row["Value"]
+        output "#{config[:scheme]}.mysql.querycache.#{queryCache[row["Variable_name"]]}", row["Value"]
       end
 
       if commands.include?(row["Variable_name"]) then
@@ -193,12 +196,26 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       if innodb.include?(row["Variable_name"]) then
         output "#{config[:scheme]}.mysql.innodb.#{innodb[row["Variable_name"]]}", row["Value"]
       end
-
     end
+    
 
-    ok
-
-
+    begin
+      slave_results = mysql.query("SHOW SLAVE STATUS")
+      # should return a single element array containing one hash
+      slave_results.first.each do |key,value|
+        if general.include?(key) then
+          # Replication lag being null is bad, very bad, so negativate it here
+          if key == 'Seconds_Behind_Master' and value.nil?
+            value = -1
+          end
+          output "#{config[:scheme]}.mysql.general.#{general[key]}", value
+        end
+      end
+    rescue
+      # do nothing? often there is no slave status or user doesn't have proper perms
+      # so don't pollute the output.
+    end
+  
   end
 
 end
