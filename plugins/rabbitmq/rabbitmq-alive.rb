@@ -3,7 +3,7 @@
 # RabbitMQ check alive plugin
 # ===
 #
-# This plugin checks if RabbitMQ server is alive using the REST API 
+# This plugin checks if RabbitMQ server is alive using the REST API
 #
 # Copyright 2012 Abhijith G <abhi@runa.com> and Runa Inc.
 #
@@ -46,7 +46,7 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
          :short => '-P',
          :long => '--port PORT',
          :default => '55672'
-  
+
   def run
     res = vhost_alive?
 
@@ -69,7 +69,7 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
     begin
       resource = RestClient::Resource.new "http://#{host}:#{port}/api/aliveness-test/#{vhost}", username, password
       JSON.parse(resource.get) == { "status" => "ok" }
-      
+
       { "status" => "ok", "message" => "RabbitMQ server is alive" }
     rescue Errno::ECONNREFUSED => e
       { "status" => "critical", "message" => e.message }

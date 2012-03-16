@@ -19,13 +19,13 @@
 #     "ALERT - client_hostname/check_name: Check Notification Message",
 #    and when an alert is resolved the content will look like:
 #     "RESOLVE - client_hostname/check_name: Check Notification Message",
-# 
+#
 #  - The 'level' field is set to GELF::INFO when an alert is resolved,
 #    and GELF::FATAL when an alert is created.
 #
 #  - The Sensu error level (eg: WARNING, CRITICAL) is available in the
 #    '_status' field as an integer.
-# 
+#
 # Copyright 2012 Joe Miller (https://github.com/joemiller | http://twitter.com/miller_joe)
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
