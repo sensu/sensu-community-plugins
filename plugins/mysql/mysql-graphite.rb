@@ -123,7 +123,6 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Com_unlock_tables' =>  'unlock_tables',
         'Com_alter_table' =>    'alter_table'
       },
-
       'counters' => {
         'Handler_write' =>              'handlerWrite',
         'Handler_update' =>             'handlerUpdate',
