@@ -3,7 +3,7 @@
 # Grapite TCP handler
 # ===
 #
-# This handler sends metrics to a Graphite server via 
+# This handler sends metrics to a Graphite server via
 # TCP socket.
 #
 # Compatible checks should generate output in the format:
@@ -25,7 +25,7 @@ class Graphite < Sensu::Handler
 
   # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
-  
+
   def handle
     graphite_server = settings['graphite']['server']
     graphite_port = settings['graphite']['port']
@@ -36,7 +36,7 @@ class Graphite < Sensu::Handler
       timeout(3) do
         sock = TCPSocket.new(graphite_server, graphite_port)
         sock.puts metrics
-        sock.close        
+        sock.close
       end
     rescue Timeout::Error
       puts "graphite -- timed out while sending metrics"
