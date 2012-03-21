@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Pull nginx metrics for backends through stub status module
+# Pull riak metrics through /stats
 # ===
 #
 # Created by Pete Shima - me@peteshima.com
