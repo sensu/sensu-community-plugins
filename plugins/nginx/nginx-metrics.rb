@@ -13,8 +13,7 @@ require "rubygems" if RUBY_VERSION < "1.9.0"
 require 'sensu-plugin/metric/cli'
 require "net/http"
 require "socket"
-require "csv"
-require "uri"
+
 
 class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
