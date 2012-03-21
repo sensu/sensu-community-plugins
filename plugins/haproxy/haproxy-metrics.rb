@@ -14,36 +14,40 @@
 require "rubygems" if RUBY_VERSION < "1.9.0"
 require 'sensu-plugin/metric/cli'
 require "net/http"
-require "net/https"
 require "socket"
 require "csv"
+require "uri"
 
 
 class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
-  option :hostname,
-    :short => "-h HOSTNAME",
-    :long => "--host HOSTNAME",
-    :description => "HAproxy web stats hostname",
+  option :connection,
+    :short => "-c HOSTNAME|SOCKETPATH",
+    :long => "--connect HOSTNAME|SOCKETPATH",
+    :description => "HAproxy web stats hostname or path to stats socket",
     :required => true
+
+  option :port,
+    :short => "-P PORT",
+    :long => "--port PORT",
+    :description => "HAproxy web stats port",
+    :default => "80"
 
   option :path,
     :short => "-q STATUSPATH",
     :long => "--statspath STATUSPATH",
     :description => "HAproxy web stats path",
-    :required => true
+    :default => "/"
 
   option :username,
     :short => "-u USERNAME",
     :long => "--user USERNAME",
-    :description => "HAproxy web stats username",
-    :required => true
+    :description => "HAproxy web stats username"
 
   option :password,
     :short => "-p PASSWORD",
     :long => "--pass PASSWORD",
-    :description => "HAproxy web stats password",
-    :required => true
+    :description => "HAproxy web stats password"
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
@@ -53,15 +57,24 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
 
   def run
+    uri = URI.parse(config[:connection])
 
-    res = Net::HTTP.start(config[:hostname], "80") do |http|
-      req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
-      req.basic_auth config[:username], config[:password]
-      http.request(req)
+    if uri.is_a?(URI::Generic) and File.socket?(uri.path)
+      socket = UNIXSocket.new(config[:connection])
+      socket.puts("show stat")
+      out = socket.gets(nil)
+    else
+      res = Net::HTTP.start(config[:connection], config[:port]) do |http|
+        req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
+        unless config[:username].nil? then
+          req.basic_auth config[:username], config[:password]
+        end
+        http.request(req)
+      end
+      out = res.body
     end
 
-    output = {}
-    parsed = CSV.parse(res.body)
+    parsed = CSV.parse(out)
     parsed.shift
     parsed.each do |line|
       next if line[1] != 'BACKEND'
@@ -69,10 +82,10 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       output "#{config[:scheme]}.haproxy.#{line[0]}.sessiontotal", line[7]
       output "#{config[:scheme]}.haproxy.#{line[0]}.bytesin", line[8]
       output "#{config[:scheme]}.haproxy.#{line[0]}.bytesout", line[9]
+      output "#{config[:scheme]}.haproxy.#{line[0]}.connectionerrors", line[13]
     end
 
     ok
-
 
   end
 
