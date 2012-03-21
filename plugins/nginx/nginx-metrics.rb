@@ -15,7 +15,7 @@ require "net/http"
 require "socket"
 
 
-class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
+class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :hostname,
     :short => "-h HOSTNAME",
