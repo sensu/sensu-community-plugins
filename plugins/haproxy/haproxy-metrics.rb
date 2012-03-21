@@ -63,6 +63,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       socket = UNIXSocket.new(config[:connection])
       socket.puts("show stat")
       out = socket.gets(nil)
+      socket.close
     else
       res = Net::HTTP.start(config[:connection], config[:port]) do |http|
         req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
@@ -78,11 +79,11 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     parsed.shift
     parsed.each do |line|
       next if line[1] != 'BACKEND'
-      output "#{config[:scheme]}.haproxy.#{line[0]}.sessioncurrent", line[4]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.sessiontotal", line[7]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.bytesin", line[8]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.bytesout", line[9]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.connectionerrors", line[13]
+      output "#{config[:scheme]}.haproxy.#{line[0]}.session_current", line[4]
+      output "#{config[:scheme]}.haproxy.#{line[0]}.session_total", line[7]
+      output "#{config[:scheme]}.haproxy.#{line[0]}.bytes_in", line[8]
+      output "#{config[:scheme]}.haproxy.#{line[0]}.bytes_out", line[9]
+      output "#{config[:scheme]}.haproxy.#{line[0]}.connection_errors", line[13]
     end
 
     ok
