@@ -62,7 +62,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     if uri.is_a?(URI::Generic) and File.socket?(uri.path)
       socket = UNIXSocket.new(config[:connection])
       socket.puts("show stat")
-      out = socket.gets(nil)
+      out = socket.read
       socket.close
     else
       res = Net::HTTP.start(config[:connection], config[:port]) do |http|
