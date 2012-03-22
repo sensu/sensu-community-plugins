@@ -58,7 +58,7 @@ class NewRelicMetrics < Sensu::Plugin::Metric::CLI::Graphite
     stats  = Crack::XML.parse(res.body)
 
     app = stats["accounts"].first["applications"].find_all {|v| v["name"] == config[:appname]}.first["threshold_values"].each do |v|
-      metric_name = v["name"].gsub(/\s+/, "").downcase
+      metric_name = v["name"].gsub(/\s+/, "_").downcase
       output "#{config[:scheme]}.newrelic.#{metric_name}", v["metric_value"]
     end
 
