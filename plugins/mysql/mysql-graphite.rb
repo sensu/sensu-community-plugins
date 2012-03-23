@@ -3,19 +3,19 @@
 # Push mysql stats into graphite
 # ===
 #
-# Created by Pete Shima - me@peteshima.com
+# NOTE: This plugin will attempt to get replication stats but the user
+# must have SUPER or REPLICATION CLIENT privileges to run 'SHOW SLAVE
+# STATUS'. It will silently ignore and continue if 'SHOW SLAVE STATUS'
+# fails for any reason. The key 'slaveLag' will not be present in the
+# output.
+#
+# Copyright 2012 Pete Shima <me@peteshima.com>
 # Additional hacks by Joe Miller - https://github.com/joemiller
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
-#
-# NOTE: This plugin will attempt to get replication stats but the user must have
-#  SUPER or REPLICATION CLIENT privileges to run 'SHOW SLAVE STATUS'. It will
-#  silently ignore and continue if 'SHOW SLAVE STATUS' fails for any reason.
-#  The key 'slaveLag' will not be present in the output.
-#
 
-require "rubygems" if RUBY_VERSION < "1.9.0"
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'mysql2'
 require 'socket'
@@ -53,10 +53,9 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
-
   def run
 
-    #props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
+    # props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
 
     metrics = {
       'general' => {
