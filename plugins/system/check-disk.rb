@@ -6,7 +6,7 @@
 # Uses GNU's -T option for listing filesystem type; unfortunately, this
 # is not portable to BSD. Warning/critical levels are percentages only.
 #
-# Copyright 2011 Sonian, Inc.
+# Copyright 2011 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -16,11 +16,27 @@ require 'sensu-plugin/check/cli'
 
 class CheckDisk < Sensu::Plugin::Check::CLI
 
-  option :fstype, :short => '-t TYPE', :proc => proc {|a| a.split(',') }
-  option :ignoretype, :short => '-x TYPE', :proc => proc {|a| a.split(',') }
-  option :ignoremnt, :short => '-i MNT', :proc => proc {|a| a.split(',') }
-  option :warn, :short => '-w PERCENT', :proc => proc {|a| a.to_i }, :default => 85
-  option :crit, :short => '-c PERCENT', :proc => proc {|a| a.to_i }, :default => 95
+  option :fstype,
+    :short => '-t TYPE',
+    :proc => proc {|a| a.split(',') }
+
+  option :ignoretype,
+    :short => '-x TYPE',
+    :proc => proc {|a| a.split(',') }
+
+  option :ignoremnt,
+    :short => '-i MNT',
+    :proc => proc {|a| a.split(',') }
+
+  option :warn,
+    :short => '-w PERCENT',
+    :proc => proc {|a| a.to_i },
+    :default => 85
+
+  option :crit,
+    :short => '-c PERCENT',
+    :proc => proc {|a| a.to_i },
+    :default => 95
 
   def initialize
     super

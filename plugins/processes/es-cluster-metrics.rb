@@ -7,7 +7,7 @@
 # document which is outputted to STDOUT. An exit status of 0 indicates
 # the plugin has successfully collected and produced.
 #
-# Copyright 2011 Sonian, Inc.
+# Copyright 2011 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.

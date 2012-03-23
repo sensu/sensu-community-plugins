@@ -6,7 +6,7 @@
 # Takes either a URL or a combination of host/path/port/ssl, and checks for
 # a 200 response (that matches a pattern, if given). Can use client certs.
 #
-# Copyright 2011 Sonian, Inc.
+# Copyright 2011 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.

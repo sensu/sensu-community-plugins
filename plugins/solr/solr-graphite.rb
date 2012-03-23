@@ -3,15 +3,14 @@
 # Push Apache Solr stats into graphite
 # ===
 #
-# Created by Pete Shima - me@peteshima.com
+# TODO: Narrow down needed stats, find a cleaner way to parse the xml
+#
+# Copyright 2012 Pete Shima <me@peteshima.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
-#
-# TODO - Narrow down needed stats, find a cleaner way to parse the xml
-#
 
-require "rubygems" if RUBY_VERSION < "1.9.0"
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
 require 'json'
@@ -39,25 +38,21 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.solr"
 
-
   def run
     ping_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/ping?wt=json"
-
 
     resp = Net::HTTP.get_response(URI.parse(ping_url))
     ping = JSON.parse(resp.body)
 
-
     output "#{config[:scheme]}.solr.QueryTime", ping["responseHeader"]["QTime"]
     output "#{config[:scheme]}.solr.Status", ping["responseHeader"]["status"]
-
 
     stats_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/stats.jsp"
 
     xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n","")
     stats  = Crack::XML.parse(xml_data)
 
-    #this xml is an ugly beast.
+    # this xml is an ugly beast.
     core_searcher = stats["solr"]["solr_info"]["CORE"]["entry"].find_all {|v| v["name"].strip! == "searcher"}.first["stats"]["stat"]
     standard = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"].strip! == "standard"}.first["stats"]["stat"]
     update = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"] == "/update"}.first["stats"]["stat"]
@@ -127,10 +122,7 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     output "#{config[:scheme]}.solr.queryhandler.filtercache.cumulativehitratio", filtercache[9].strip!
     output "#{config[:scheme]}.solr.queryhandler.filtercache.cumulativeinserts", documentcache[10].strip!
 
-
     ok
-
-
   end
 
 end
