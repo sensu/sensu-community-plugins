@@ -3,7 +3,7 @@
 # MySQL Replication Status (modded from disk)
 # ===
 #
-# Copyright 2011 Sonian, Inc.
+# Copyright 2011 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -15,42 +15,42 @@ require 'mysql'
 class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
 
   option :host,
-  :short => '-h',
-  :long => '--host=VALUE',
-  :description => 'Database host'
+    :short => '-h',
+    :long => '--host=VALUE',
+    :description => 'Database host'
 
   option :user,
-  :short => '-u',
-  :long => '--username=VALUE',
-  :description => 'Database username'
+    :short => '-u',
+    :long => '--username=VALUE',
+    :description => 'Database username'
 
   option :pass,
-  :short => '-p',
-  :long => '--password=VALUE',
-  :description => 'Database password'
+    :short => '-p',
+    :long => '--password=VALUE',
+    :description => 'Database password'
 
   option :warn,
-  :short => '-w',
-  :long => '--warning=VALUE',
-  :description => 'Warning threshold for replication lag',
-  :default => 900,
-  :proc => lambda { |s| s.to_i }
+    :short => '-w',
+    :long => '--warning=VALUE',
+    :description => 'Warning threshold for replication lag',
+    :default => 900,
+    :proc => lambda { |s| s.to_i }
 
   option :crit,
-  :short => '-c',
-  :long => '--critical=VALUE',
-  :description => 'Critical threshold for replication lag',
-  :default => 1800,
-  :proc => lambda { |s| s.to_i }
+    :short => '-c',
+    :long => '--critical=VALUE',
+    :description => 'Critical threshold for replication lag',
+    :default => 1800,
+    :proc => lambda { |s| s.to_i }
 
   option :help,
-  :short => "-h",
-  :long => "--help",
-  :description => "Check MySQL replication status",
-  :on => :tail,
-  :boolean => true,
-  :show_options => true,
-  :exit => 0
+    :short => "-h",
+    :long => "--help",
+    :description => "Check MySQL replication status",
+    :on => :tail,
+    :boolean => true,
+    :show_options => true,
+    :exit => 0
 
   def run
     db_host = config[:host]

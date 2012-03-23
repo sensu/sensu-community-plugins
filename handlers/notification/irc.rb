@@ -10,7 +10,7 @@
 # password and the irc_ssl option to true to enable an SSL connection if
 # required. An example file is contained in this irc handler directory.
 #
-# Copyright 2011 James Turnbull
+# Copyright 2011 James Turnbull <james@lovedthanlost.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.

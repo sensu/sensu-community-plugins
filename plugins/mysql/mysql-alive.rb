@@ -5,7 +5,7 @@
 #
 # This plugin attempts to login to mysql with provided credentials.
 #
-# Copyright 2011 Joe Crim
+# Copyright 2011 Joe Crim <josephcrim@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.

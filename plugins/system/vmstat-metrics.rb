@@ -6,14 +6,14 @@
 # This plugin uses vmstat to collect basic system metrics, produces
 # Graphite formated output.
 #
-# Copyright 2011 Sonian, Inc.
+# Copyright 2011 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require "rubygems" if RUBY_VERSION < "1.9.0"
-require "sensu-plugin/metric/cli"
-require "socket"
+require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'sensu-plugin/metric/cli'
+require 'socket'
 
 class VMStat < Sensu::Plugin::Metric::CLI::Graphite
 

@@ -10,7 +10,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems'
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
 require 'rest_client'
@@ -18,34 +18,34 @@ require 'rest_client'
 class CheckRabbitMQ < Sensu::Plugin::Check::CLI
 
   option :host,
-         :description => "RabbitMQ host",
-         :short => '-w',
-         :long => '--host HOST',
-         :default => 'localhost'
+    :description => "RabbitMQ host",
+    :short => '-w',
+    :long => '--host HOST',
+    :default => 'localhost'
 
   option :vhost,
-         :description => "RabbitMQ vhost",
-         :short => '-v',
-         :long => '--vhost VHOST',
-         :default => '%2F'
+    :description => "RabbitMQ vhost",
+    :short => '-v',
+    :long => '--vhost VHOST',
+    :default => '%2F'
 
   option :username,
-         :description => "RabbitMQ username",
-         :short => '-u',
-         :long => '--username USERNAME',
-         :default => 'guest'
+    :description => "RabbitMQ username",
+    :short => '-u',
+    :long => '--username USERNAME',
+    :default => 'guest'
 
   option :password,
-         :description => "RabbitMQ password",
-         :short => '-p',
-         :long => '--password PASSWORD',
-         :default => 'guest'
+    :description => "RabbitMQ password",
+    :short => '-p',
+    :long => '--password PASSWORD',
+    :default => 'guest'
 
   option :port,
-         :description => "RabbitMQ API port",
-         :short => '-P',
-         :long => '--port PORT',
-         :default => '55672'
+    :description => "RabbitMQ API port",
+    :short => '-P',
+    :long => '--port PORT',
+    :default => '55672'
 
   def run
     res = vhost_alive?
@@ -69,7 +69,6 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
     begin
       resource = RestClient::Resource.new "http://#{host}:#{port}/api/aliveness-test/#{vhost}", username, password
       JSON.parse(resource.get) == { "status" => "ok" }
-
       { "status" => "ok", "message" => "RabbitMQ server is alive" }
     rescue Errno::ECONNREFUSED => e
       { "status" => "critical", "message" => e.message }

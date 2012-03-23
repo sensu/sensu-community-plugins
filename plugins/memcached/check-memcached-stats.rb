@@ -8,10 +8,10 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require "rubygems" if RUBY_VERSION < "1.9.0"
-require "sensu-plugin/check/cli"
-require "socket"
-require "timeout"
+require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'sensu-plugin/check/cli'
+require 'socket'
+require 'timeout'
 
 class MemcachedStats < Sensu::Plugin::Check::CLI
 
@@ -36,6 +36,6 @@ class MemcachedStats < Sensu::Plugin::Check::CLI
     else
       ok "memcached stats protocol responded in a timely fashion"
     end
-
   end
+
 end
