@@ -3,7 +3,7 @@
 # Check Linux system load
 # ===
 #
-# Copyright 2012 Sonian, Inc.
+# Copyright 2012 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -27,6 +27,7 @@ class LoadAverage
 end
 
 class CheckLoad < Sensu::Plugin::Check::CLI
+
   option :warn,
     :short => '-w L1,L5,L15',
     :long => '--warn L1,L5,L15',
@@ -48,4 +49,5 @@ class CheckLoad < Sensu::Plugin::Check::CLI
     warning if avg.exceed?(config[:warn])
     ok
   end
+
 end

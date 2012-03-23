@@ -3,7 +3,7 @@
 # Check Elasticsearch Heap Usage
 # ===
 #
-# Copyright 2011 Sonian, Inc.
+# Copyright 2011 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -63,4 +63,5 @@ class ESHeapUsage < Sensu::Plugin::Check::CLI
       ok
     end
   end
+
 end

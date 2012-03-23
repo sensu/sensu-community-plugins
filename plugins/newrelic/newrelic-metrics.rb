@@ -3,13 +3,13 @@
 # Pull new relic metrics
 # ===
 #
-# Created by Pete Shima - me@peteshima.com
+# NOTE: this is setup to only work if you have a single account under
+# your api key.
+#
+# Copyright 2012 Pete Shima <me@peteshima.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
-#
-# NOTE: this is setup to only work if you have a single account under
-#       your apikey.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
