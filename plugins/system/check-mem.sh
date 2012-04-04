@@ -4,6 +4,8 @@
 #
 # Date: 2007-11-12
 # Author: Thomas Borger - ESG
+# Date: 2012-04-02
+# Modified: Norman Harman - norman.harman@mutualmobile.com
 #
 # The memory check is done with following command line:
 # free -m | grep buffers/cache | awk '{ print $4 }'
@@ -30,7 +32,7 @@ HELP="
         -h --> print this help screen
 "
 
-if [ "$hlp" = "yes" -o $# -lt 1 ]; then
+if [ "$hlp" = "yes" ]; then
   echo "$HELP"
   exit 0
 fi
@@ -41,7 +43,7 @@ CRIT=${CRIT:=0}
 FREE_MEMORY=`free -m | grep buffers/cache | awk '{ print $4 }'`
 
 if [ "$FREE_MEMORY" = "" ]; then
-  echo "no output from plugin"
+  echo "MEM UNKNOWN -"
   exit 3
 fi
 
