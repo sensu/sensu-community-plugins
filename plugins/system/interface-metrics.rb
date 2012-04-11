@@ -23,10 +23,12 @@ class InterfaceGraphite < Sensu::Plugin::Metric::CLI::Graphite
     ]
 
     File.open("/proc/net/dev", "r").each_line do |line|
-      interface, stats_string = line.scan(/^\s+([^:]+):\s+(.*)$/).first
+      interface, stats_string = line.scan(/^\s*([^:]+):\s*(.*)$/).first
       next unless interface
 
       stats = stats_string.split(/\s+/)
+      next if stats == ['0'].cycle.take(stats.size)
+
       metrics.size.times { |i| output "#{config[:scheme]}.#{interface}.#{metrics[i]}", stats[i] }
     end
 
