@@ -198,6 +198,8 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       # so don't pollute the output.
     end
 
+    ok
+
   end
 
 end
