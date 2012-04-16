@@ -1,0 +1,17 @@
+{
+ "geckoboard": {
+    "checks": {
+      "my.newrelic.throughput": {
+        "type":"geckometer",
+        "min":"200",
+        "max":"40000",
+        "widget_key":"12322-a831fsdda99f0jajd0fjas0dfja0fju9"
+      },
+      "my.newrelic.responsetime": {
+        "type":"number_and_secondary_value",
+        "widget_key":"12322-df2f2fw29f9jf9sdfsf02ihf020s0dhf"
+      }
+    },
+    "api_key":"9239932fwew8f8777ff28fh8hf8dh"
+ }
+}
