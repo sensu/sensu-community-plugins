@@ -51,7 +51,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+    :default => "#{Socket.gethostname}.mysql"
 
   def run
 
@@ -190,7 +190,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
           if key == 'Seconds_Behind_Master' and value.nil?
             value = -1
           end
-          output "#{config[:scheme]}.mysql.general.#{general[key]}", value
+          output "#{config[:scheme]}.general.#{general[key]}", value
         end
       end
     rescue

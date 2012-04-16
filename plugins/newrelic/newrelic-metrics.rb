@@ -37,7 +37,7 @@ class NewRelicMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+    :default => "#{Socket.gethostname}.newrelic"
 
   def run
     rpm = "http://rpm.newrelic.com"
@@ -55,7 +55,7 @@ class NewRelicMetrics < Sensu::Plugin::Metric::CLI::Graphite
     app = stats["accounts"].first["applications"].find {|v| v["name"] == config[:appname] }
     app["threshold_values"].each do |v|
       metric_name = v["name"].gsub(/\s+/, "_").downcase
-      output "#{config[:scheme]}.newrelic.#{metric_name}", v["metric_value"]
+      output "#{config[:scheme]}.#{metric_name}", v["metric_value"]
     end
 
     ok
