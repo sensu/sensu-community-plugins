@@ -27,7 +27,7 @@ class YoutubeMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => Socket.gethostname
+    :default => "#{Socket.gethostname}.youtube"
 
   def run
       unless config[:videoid].nil?
@@ -57,13 +57,13 @@ class YoutubeMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
         name = author.gsub(/(\W)/, '_').downcase
 
-        output "#{config[:scheme]}.youtube.video.#{config[:videoid]}.comments", comments
-        output "#{config[:scheme]}.youtube.video.#{config[:videoid]}.likes", likes
-        output "#{config[:scheme]}.youtube.video.#{config[:videoid]}.favorites", favorites
-        output "#{config[:scheme]}.youtube.video.#{config[:videoid]}.views", views
-        output "#{config[:scheme]}.youtube.channel.#{name}.subs", chansubs
-        output "#{config[:scheme]}.youtube.channel.#{name}.views", chanviews
-        output "#{config[:scheme]}.youtube.channel.#{name}.videoviews", chanuploadviews
+        output "#{config[:scheme]}.video.#{config[:videoid]}.comments", comments
+        output "#{config[:scheme]}.video.#{config[:videoid]}.likes", likes
+        output "#{config[:scheme]}.video.#{config[:videoid]}.favorites", favorites
+        output "#{config[:scheme]}.video.#{config[:videoid]}.views", views
+        output "#{config[:scheme]}.channel.#{name}.subs", chansubs
+        output "#{config[:scheme]}.channel.#{name}.views", chanviews
+        output "#{config[:scheme]}.channel.#{name}.videoviews", chanuploadviews
       end
 
     ok

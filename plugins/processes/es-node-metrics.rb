@@ -23,7 +23,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to queue_name.metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+    :default => "#{Socket.gethostname}.elasticsearch"
 
   def run
     ln = RestClient::Resource.new 'http://localhost:9200/_cluster/nodes/_local', :timeout => 30
@@ -41,7 +41,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['jvm.mem.non_heap_used_in_bytes'] = node['jvm']['mem']['non_heap_used_in_bytes']
     metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis']
     metrics.each do |k,v|
-      output([config[:scheme], "elasticsearch", k].join("."), v, timestamp)
+      output([config[:scheme], k].join("."), v, timestamp)
     end
     ok
   end

@@ -51,7 +51,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+    :default => "#{Socket.gethostname}.haproxy"
 
   def run
     uri = URI.parse(config[:connection])
@@ -76,11 +76,11 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     parsed.shift
     parsed.each do |line|
       next if line[1] != 'BACKEND'
-      output "#{config[:scheme]}.haproxy.#{line[0]}.session_current", line[4]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.session_total", line[7]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.bytes_in", line[8]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.bytes_out", line[9]
-      output "#{config[:scheme]}.haproxy.#{line[0]}.connection_errors", line[13]
+      output "#{config[:scheme]}.#{line[0]}.session_current", line[4]
+      output "#{config[:scheme]}.#{line[0]}.session_total", line[7]
+      output "#{config[:scheme]}.#{line[0]}.bytes_in", line[8]
+      output "#{config[:scheme]}.#{line[0]}.bytes_out", line[9]
+      output "#{config[:scheme]}.#{line[0]}.connection_errors", line[13]
     end
 
     ok
