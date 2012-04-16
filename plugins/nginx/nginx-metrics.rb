@@ -37,7 +37,7 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => Socket.gethostname
+    :default => "#{Socket.gethostname}.nginx"
 
   def run
     res = Net::HTTP.start(config[:hostname], config[:port]) do |http|
@@ -47,17 +47,17 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     res.body.split(/\r?\n/).each do |line|
       if connections = line.match(/^Active connections:\s+(\d+)/).to_a
-        output "#{config[:scheme]}.nginx.active_connections", connections[1]
+        output "#{config[:scheme]}.active_connections", connections[1]
       end
       if requests = line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/).to_a
-        output "#{config[:scheme]}.nginx.accepted", requests[1]
-        output "#{config[:scheme]}.nginx.handled", requests[2]
-        output "#{config[:scheme]}.nginx.handles", requests[3]
+        output "#{config[:scheme]}.accepted", requests[1]
+        output "#{config[:scheme]}.handled", requests[2]
+        output "#{config[:scheme]}.handles", requests[3]
       end
       if queue = line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/).to_a
-        output "#{config[:scheme]}.nginx.reading", queue[1]
-        output "#{config[:scheme]}.nginx.writing", queue[2]
-        output "#{config[:scheme]}.nginx.waiting", queue[3]
+        output "#{config[:scheme]}.reading", queue[1]
+        output "#{config[:scheme]}.writing", queue[2]
+        output "#{config[:scheme]}.waiting", queue[3]
       end
     end
 

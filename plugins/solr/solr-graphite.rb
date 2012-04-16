@@ -61,66 +61,66 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     documentcache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "documentCache"}.first["stats"]["stat"]
     filtercache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "filterCache"}.first["stats"]["stat"]
 
-    output "#{config[:scheme]}.solr.core.maxdocs", core_searcher[2].strip!
-    output "#{config[:scheme]}.solr.core.maxdocs", core_searcher[3].strip!
-    output "#{config[:scheme]}.solr.core.warmuptime", core_searcher[9].strip!
+    output "#{config[:scheme]}.core.maxdocs", core_searcher[2].strip!
+    output "#{config[:scheme]}.core.maxdocs", core_searcher[3].strip!
+    output "#{config[:scheme]}.core.warmuptime", core_searcher[9].strip!
 
-    output "#{config[:scheme]}.solr.queryhandler.standard.requests", standard[1].strip!
-    output "#{config[:scheme]}.solr.queryhandler.standard.errors", standard[2].strip!
-    output "#{config[:scheme]}.solr.queryhandler.standard.timeouts", standard[3].strip!
-    output "#{config[:scheme]}.solr.queryhandler.standard.totaltime", standard[4].strip!
-    output "#{config[:scheme]}.solr.queryhandler.standard.timeperrequest", standard[5].strip!
-    output "#{config[:scheme]}.solr.queryhandler.standard.requestspersecond", standard[6].strip!
+    output "#{config[:scheme]}.queryhandler.standard.requests", standard[1].strip!
+    output "#{config[:scheme]}.queryhandler.standard.errors", standard[2].strip!
+    output "#{config[:scheme]}.queryhandler.standard.timeouts", standard[3].strip!
+    output "#{config[:scheme]}.queryhandler.standard.totaltime", standard[4].strip!
+    output "#{config[:scheme]}.queryhandler.standard.timeperrequest", standard[5].strip!
+    output "#{config[:scheme]}.queryhandler.standard.requestspersecond", standard[6].strip!
 
-    output "#{config[:scheme]}.solr.queryhandler.update.requests", update[1].strip!
-    output "#{config[:scheme]}.solr.queryhandler.update.errors", update[2].strip!
-    output "#{config[:scheme]}.solr.queryhandler.update.timeouts", update[3].strip!
-    output "#{config[:scheme]}.solr.queryhandler.update.totaltime", update[4].strip!
-    output "#{config[:scheme]}.solr.queryhandler.update.timeperrequest", update[5].strip!
-    output "#{config[:scheme]}.solr.queryhandler.update.requestspersecond", standard[6].strip!
+    output "#{config[:scheme]}.queryhandler.update.requests", update[1].strip!
+    output "#{config[:scheme]}.queryhandler.update.errors", update[2].strip!
+    output "#{config[:scheme]}.queryhandler.update.timeouts", update[3].strip!
+    output "#{config[:scheme]}.queryhandler.update.totaltime", update[4].strip!
+    output "#{config[:scheme]}.queryhandler.update.timeperrequest", update[5].strip!
+    output "#{config[:scheme]}.queryhandler.update.requestspersecond", standard[6].strip!
 
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.commits", updatehandler[0].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.autocommits", updatehandler[3].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.optimizes", updatehandler[4].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.rollbacks", updatehandler[5].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.docspending", updatehandler[7].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.adds", updatehandler[8].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.errors", updatehandler[11].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.cumulativeadds", updatehandler[12].strip!
-    output "#{config[:scheme]}.solr.queryhandler.updatehandler.cumulativeerrors", updatehandler[15].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.commits", updatehandler[0].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.autocommits", updatehandler[3].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.optimizes", updatehandler[4].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.rollbacks", updatehandler[5].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.docspending", updatehandler[7].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.adds", updatehandler[8].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.errors", updatehandler[11].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.cumulativeadds", updatehandler[12].strip!
+    output "#{config[:scheme]}.queryhandler.updatehandler.cumulativeerrors", updatehandler[15].strip!
 
-    output "#{config[:scheme]}.solr.queryhandler.querycache.lookups", querycache[0].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.hits", querycache[1].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.hitRatio", querycache[2].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.inserts", querycache[3].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.size", querycache[5].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.warmuptime", querycache[6].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.cumulativelookups", querycache[7].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.cumulativehits", querycache[8].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.cumulativehitratio", querycache[9].strip!
-    output "#{config[:scheme]}.solr.queryhandler.querycache.cumulativeinserts", querycache[10].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.lookups", querycache[0].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.hits", querycache[1].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.hitRatio", querycache[2].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.inserts", querycache[3].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.size", querycache[5].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.warmuptime", querycache[6].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.cumulativelookups", querycache[7].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.cumulativehits", querycache[8].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.cumulativehitratio", querycache[9].strip!
+    output "#{config[:scheme]}.queryhandler.querycache.cumulativeinserts", querycache[10].strip!
 
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.lookups", documentcache[0].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.hits", documentcache[1].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.hitRatio", documentcache[2].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.inserts", documentcache[3].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.size", documentcache[5].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.warmuptime", documentcache[6].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.cumulativelookups", documentcache[7].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.cumulativehits", documentcache[8].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.cumulativehitratio", documentcache[9].strip!
-    output "#{config[:scheme]}.solr.queryhandler.documentcache.cumulativeinserts", documentcache[10].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.lookups", documentcache[0].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.hits", documentcache[1].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.hitRatio", documentcache[2].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.inserts", documentcache[3].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.size", documentcache[5].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.warmuptime", documentcache[6].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.cumulativelookups", documentcache[7].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.cumulativehits", documentcache[8].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.cumulativehitratio", documentcache[9].strip!
+    output "#{config[:scheme]}.queryhandler.documentcache.cumulativeinserts", documentcache[10].strip!
 
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.lookups", filtercache[0].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.hits", filtercache[1].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.hitRatio", filtercache[2].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.inserts", filtercache[3].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.size", filtercache[5].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.warmuptime", filtercache[6].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.cumulativelookups", filtercache[7].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.cumulativehits", filtercache[8].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.cumulativehitratio", filtercache[9].strip!
-    output "#{config[:scheme]}.solr.queryhandler.filtercache.cumulativeinserts", documentcache[10].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.lookups", filtercache[0].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.hits", filtercache[1].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.hitRatio", filtercache[2].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.inserts", filtercache[3].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.size", filtercache[5].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.warmuptime", filtercache[6].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.cumulativelookups", filtercache[7].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.cumulativehits", filtercache[8].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.cumulativehitratio", filtercache[9].strip!
+    output "#{config[:scheme]}.queryhandler.filtercache.cumulativeinserts", documentcache[10].strip!
 
     ok
   end

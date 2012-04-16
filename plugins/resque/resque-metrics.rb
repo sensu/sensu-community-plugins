@@ -32,7 +32,7 @@ class ResqueMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => Socket.gethostname
+    :default => "#{Socket.gethostname}.resque"
 
   def run
 
@@ -43,15 +43,15 @@ class ResqueMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     Resque.queues.each do |v|
       sz = Resque.size(v)
-      output "#{config[:scheme]}.resque.queue.#{v}", sz
+      output "#{config[:scheme]}.queue.#{v}", sz
     end
 
-    output "#{config[:scheme]}.resque.queues", info[:queues]
-    output "#{config[:scheme]}.resque.workers", info[:workers]
-    output "#{config[:scheme]}.resque.working", info[:working]
-    output "#{config[:scheme]}.resque.failed", count
-    output "#{config[:scheme]}.resque.pending", info[:pending]
-    output "#{config[:scheme]}.resque.processed", info[:processed]
+    output "#{config[:scheme]}.queues", info[:queues]
+    output "#{config[:scheme]}.workers", info[:workers]
+    output "#{config[:scheme]}.working", info[:working]
+    output "#{config[:scheme]}.failed", count
+    output "#{config[:scheme]}.pending", info[:pending]
+    output "#{config[:scheme]}.processed", info[:processed]
 
     ok
   end

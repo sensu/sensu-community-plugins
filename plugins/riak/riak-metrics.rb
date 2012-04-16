@@ -38,7 +38,7 @@ class RiakMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+    :default => "#{Socket.gethostname}.riak"
 
   def run
     res = Net::HTTP.start(config[:hostname], config[:port]) do |http|
@@ -139,7 +139,7 @@ class RiakMetrics < Sensu::Plugin::Metric::CLI::Graphite
     ]
 
     stats.reject {|k, v| exclude.include?(k) }.select {|k, v| stats[k].kind_of? Integer }.each do |k, v|
-      output "#{config[:scheme]}.riak.#{k}", v
+      output "#{config[:scheme]}.#{k}", v
     end
 
     ok
