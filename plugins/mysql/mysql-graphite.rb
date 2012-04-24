@@ -185,12 +185,12 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       slave_results = mysql.query("SHOW SLAVE STATUS")
       # should return a single element array containing one hash
       slave_results.first.each do |key,value|
-        if general.include?(key) then
+        if metrics['general'].include?(key) then
           # Replication lag being null is bad, very bad, so negativate it here
           if key == 'Seconds_Behind_Master' and value.nil?
             value = -1
           end
-          output "#{config[:scheme]}.general.#{general[key]}", value
+          output "#{config[:scheme]}.general.#{metrics['general'][key]}", value
         end
       end
     rescue
