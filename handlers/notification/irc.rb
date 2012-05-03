@@ -8,9 +8,16 @@
 # in /etc/sensu. Set the irc_server option to control the IRC server to
 # connect to, the irc_password option to set an optional channel
 # password and the irc_ssl option to true to enable an SSL connection if
-# required. An example file is contained in this irc handler directory.
+# required. Set the nickserv_password to identify to nickserv with the
+# standard Epona-services compatible:
+# PRIVMSG NICKSERV :IDENTIFY <password>
+# Alternately, Set the nickserv_command to specify the entire string
+# to send before joining.
+# An example file is contained in this irc handler directory.
+
 #
 # Copyright 2011 James Turnbull <james@lovedthanlost.net>
+# Copyright 2012 AJ Christensen <aj@junglist.gen.nz>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -36,6 +43,13 @@ class IRC < Sensu::Handler
     if settings["irc"].has_key?("irc_password")
       params[:channel_password] = settings["irc"]["irc_password"]
     end
+
+    if settings["irc"].has_key?("nickserv_command")
+      params[:nickserv_command] = settings["irc"]["nickserv_command"]
+    elsif settings["irc"].has_key?("nickserv_password")
+      params[:nickserv_password] = settings["irc"]["nickserv_password"]
+    end
+
     begin
       timeout(10) do
         CarrierPigeon.send(params)
