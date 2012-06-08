@@ -28,6 +28,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :cacert, :short => '-C FILE'
   option :pattern, :short => '-q PAT'
   option :timeout, :short => '-t SECS', :proc => proc {|a| a.to_i }, :default => 15
+  option :redirectok, :short => '-r', :boolean => true, :default => false
 
   def run
     if config[:url]
@@ -85,6 +86,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         end
       else
         ok "#{res.code}, #{res.body.size} bytes"
+      end
+    when /^3/
+      if config[:redirectok]  
+	ok "#{res.code}, #{res.body.size} bytes"
+      else
+	warning res.code	
       end
     when /^4/, /^5/
       critical res.code
