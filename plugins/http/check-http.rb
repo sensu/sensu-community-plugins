@@ -89,9 +89,9 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       end
     when /^3/
       if config[:redirectok]  
-	ok "#{res.code}, #{res.body.size} bytes"
+        ok "#{res.code}, #{res.body.size} bytes"
       else
-	warning res.code	
+        warning res.code
       end
     when /^4/, /^5/
       critical res.code
