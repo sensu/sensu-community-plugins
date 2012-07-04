@@ -41,9 +41,9 @@ class Mailer < Sensu::Handler
 
     Mail.defaults do
       delivery_method :smtp, {
-        :address => '',
-        :port    => '',
-        :domain  => '',
+        :address => params[:smtp_addr],
+        :port    => params[:smtp_port],
+        :domain  => params[:smtp_domain],
         :openssl_verify_mode => 'none'
       }
     end
