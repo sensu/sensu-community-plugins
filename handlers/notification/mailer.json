@@ -1,9 +1,9 @@
 {
   "mailer": {
     "mail_from": "sensu@example.com",
-    "mail_to": "monitor@example.com"
-    "smtp_address": "smtp.example.org"
-    "smtp_port": "25"
+    "mail_to": "monitor@example.com",
+    "smtp_address": "smtp.example.org",
+    "smtp_port": "25",
     "smtp_domain": "example.org"
   }
 }
