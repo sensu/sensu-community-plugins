@@ -9,7 +9,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'librato/metrics'
 
-class Librato < Sensu::Handler
+class LibratoMetrics < Sensu::Handler
 
   # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
