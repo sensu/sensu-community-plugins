@@ -1,0 +1,10 @@
+{
+  "talker": {
+    "token": "1234abcdefg1234abcdefg",
+    "account": "account_name",
+    "room": "Ops",
+    "host": "talkerapp.com",
+    "port": 8500,
+    "ssl": false
+  }
+}
