@@ -7,6 +7,7 @@
 # a 200 response (that matches a pattern, if given). Can use client certs.
 #
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# Updated by Lewis Preson 2012 to accept basic auth credentials
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -21,13 +22,15 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :url, :short => '-u URL'
   option :host, :short => '-h HOST'
   option :path, :short => '-p PATH'
-  option :port, :short => '-P PORT', :proc => proc {|a| a.to_i }
+  option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
   option :ssl, :short => '-s', :boolean => true, :default => false
   option :insecure, :short => '-k', :boolean => true, :default => false
+  option :user, :short => '-U', :long => '--username USER'
+  option :password, :short => '-a', :long => '--password PASS'
   option :cert, :short => '-c FILE'
   option :cacert, :short => '-C FILE'
   option :pattern, :short => '-q PAT'
-  option :timeout, :short => '-t SECS', :proc => proc {|a| a.to_i }, :default => 15
+  option :timeout, :short => '-t SECS', :proc => proc { |a| a.to_i }, :default => 15
   option :redirectok, :short => '-r', :boolean => true, :default => false
 
   def run
@@ -74,29 +77,32 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
 
     req = Net::HTTP::Get.new(config[:path])
+    if (config[:user] != nil and config[:password] != nil)
+      req.basic_auth config[:user], config[:password]
+    end
     res = http.request(req)
 
     case res.code
-    when /^2/
-      if config[:pattern]
-        if res.body =~ /#{config[:pattern]}/
-          ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes"
+      when /^2/
+        if config[:pattern]
+          if res.body =~ /#{config[:pattern]}/
+            ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes"
+          else
+            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
+          end
         else
-          critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
+          ok "#{res.code}, #{res.body.size} bytes"
         end
-      else
-        ok "#{res.code}, #{res.body.size} bytes"
-      end
-    when /^3/
-      if config[:redirectok]  
-        ok "#{res.code}, #{res.body.size} bytes"
+      when /^3/
+        if config[:redirectok]
+          ok "#{res.code}, #{res.body.size} bytes"
+        else
+          warning res.code
+        end
+      when /^4/, /^5/
+        critical res.code
       else
         warning res.code
-      end
-    when /^4/, /^5/
-      critical res.code
-    else
-      warning res.code
     end
   end
 

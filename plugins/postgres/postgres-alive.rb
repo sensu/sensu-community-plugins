@@ -1,29 +1,27 @@
 #!/usr/bin/env ruby
 #
-# MySQL Alive Plugin
-# ===
+# Postgres Alive Plugin
 #
-# This plugin attempts to login to mysql with provided credentials.
+# This plugin attempts to login to postgres with provided credentials.
 #
-# Copyright 2011 Joe Crim <josephcrim@gmail.com>
-# Updated by Lewis Preson 2012 to accept a database parameter
+# Copyright 2012 Lewis Preson & Tom Bassindale
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'mysql'
+require 'pg'
 
-class CheckMySQL < Sensu::Plugin::Check::CLI
+class CheckPostgres < Sensu::Plugin::Check::CLI
 
   option :user,
-         :description => "MySQL User",
+         :description => "Postgres User",
          :short => '-u USER',
          :long => '--user USER'
 
   option :password,
-         :description => "MySQL Password",
+         :description => "Postgres Password",
          :short => '-p PASS',
          :long => '--password PASS'
 
@@ -38,15 +36,23 @@ class CheckMySQL < Sensu::Plugin::Check::CLI
          :long => '--database DATABASE',
          :default => "test"
 
+  option :port,
+         :description => "Database port",
+         :short => '-P PORT',
+         :long => '--port PORT',
+         :default => 5432
+
   def run
     begin
-      db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database])
-      info = db.get_server_info
+      con = PG::Connection.new(config[:hostname], config[:port], nil, nil, config[:database], config[:user], config[:password])
+      res = con.exec('select version();')
+      info = res.first
+
       ok "Server version: #{info}"
-    rescue Mysql::Error => e
-      critical "Error message: #{e.error}"
+    rescue PG::Error => e
+      critical "Error message: #{e.error.split("\n").first}"
     ensure
-      db.close if db
+      con.close if con
     end
   end
 
