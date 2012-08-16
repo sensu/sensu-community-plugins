@@ -23,6 +23,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :host, :short => '-h HOST'
   option :path, :short => '-p PATH'
   option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
+  option :header, :short => '-H HEADER', :long => '--header HEADER'
   option :ssl, :short => '-s', :boolean => true, :default => false
   option :insecure, :short => '-k', :boolean => true, :default => false
   option :user, :short => '-U', :long => '--username USER'
@@ -79,6 +80,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     req = Net::HTTP::Get.new(config[:path])
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
+    end
+    if config[:header]
+      header, value = config[:header].split(':', 2)
+      req[header] = value.strip
     end
     res = http.request(req)
 
