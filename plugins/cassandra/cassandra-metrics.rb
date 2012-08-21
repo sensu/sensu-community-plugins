@@ -57,8 +57,6 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 
-require 'pp' # JOE DEBUG
-
 UNITS_FACTOR = {
   'bytes' => 1,
   'KB' => 1024,
@@ -98,6 +96,14 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :on => :tail,
     :short => '-i',
     :long => '--[no-]info',
+    :boolean => true,
+    :default => true
+
+  option :compactionstats,
+    :description => 'output Cassandra "compactionstats" metrics (default: yes)',
+    :on => :tail,
+    :short => '-o',
+    :long => '--[no-]compactionstats',
     :boolean => true,
     :default => true
 
@@ -149,6 +155,20 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
   # Rack             : 76
   # Exceptions       : 0
   #
+  # v 1.1
+  # Token            : 141784319550391026443072753096570088106
+  # Gossip active    : true
+  # Thrift active    : true
+  # Load             : 821.59 GB
+  # Generation No    : 1345535280
+  # Uptime (seconds) : 34269
+  # Heap Memory (MB) : 2382.02 / 3032.00
+  # Data Center      : datacenter1
+  # Rack             : rack1
+  # Exceptions       : 0
+  # Key Cache        : size 28141776 (bytes), capacity 104857584 (bytes), 9489268 hits, 9676043 requests, 0.987 recent hit rate, 14400 save period in seconds
+  # Row Cache        : size 7947581 (bytes), capacity 1048576000 (bytes), 84005 hits, 104727 requests, 0.701 recent hit rate, 0 save period in seconds
+  #
   # According to io/util/FileUtils.java units for load are:
   # TB/GB/MB/KB/bytes
   #
@@ -170,6 +190,21 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       if m = line.match(/^Heap Memory[^:]+:\s+([0-9.]+)\s+\/\s+([0-9.]+)$/)
         output "#{config[:scheme]}.heap.used", convert_to_bytes(m[1], 'MB'), @timestamp
         output "#{config[:scheme]}.heap.total", convert_to_bytes(m[2], 'MB'), @timestamp
+      end
+
+      # v1.1+
+      if m = line.match(/^Key Cache[^:]+: size ([0-9]+) \(bytes\), capacity ([0-9]+) \(bytes\), ([0-9]+) hits, ([0-9]+) requests/)
+        output "#{config[:scheme]}.key_cache.size", m[1], @timestamp
+        output "#{config[:scheme]}.key_cache.capacity", m[2], @timestamp
+        output "#{config[:scheme]}.key_cache.hits", m[3], @timestamp
+        output "#{config[:scheme]}.key_cache.requests", m[4], @timestamp
+      end
+
+      if m = line.match(/^Row Cache[^:]+: size ([0-9]+) \(bytes\), capacity ([0-9]+) \(bytes\), ([0-9]+) hits, ([0-9]+) requests/)
+        output "#{config[:scheme]}.row_cache.size", m[1], @timestamp
+        output "#{config[:scheme]}.row_cache.capacity", m[2], @timestamp
+        output "#{config[:scheme]}.row_cache.hits", m[3], @timestamp
+        output "#{config[:scheme]}.row_cache.requests", m[4], @timestamp
       end
     end
   end
@@ -216,6 +251,21 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       if m = line.match(/^(\w+)\s+(\d+)$/)
         (message_type, dropped) = m.captures
         output "#{config[:scheme]}.message_type.#{message_type}.dropped", dropped, @timestamp
+      end
+    end
+  end
+
+  # nodetool -h localhost compactionstats
+  # pending tasks: 1
+  #    compaction type        keyspace   column family bytes compacted     bytes total  progress
+  #     ....
+  #
+  # note: we are only capturing the 'pending tasks' stats
+  def parse_compactionstats
+    cstats = nodetool_cmd('compactionstats')
+    cstats.each_line do |line|
+      if m = line.match(/^pending tasks:\s+([0-9]+)/)
+        output "#{config[:scheme]}.compactionstats.pending_tasks", m[1], @timestamp
       end
     end
   end
@@ -308,6 +358,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
     @timestamp = Time.now.to_i
 
     parse_info    if config[:info]
+    parse_compactionstats if config[:compactionstats]
     parse_tpstats if config[:tpstats]
     parse_cfstats if config[:cfstats]
 
