@@ -30,7 +30,7 @@ class Graphite < Sensu::Handler
     graphite_server = settings['graphite']['server']
     graphite_port = settings['graphite']['port']
 
-    metrics = @event['check']['output']
+    metrics = @event['payload']['check']['output']
 
     begin
       timeout(3) do
