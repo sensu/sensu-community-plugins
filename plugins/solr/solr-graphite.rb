@@ -56,7 +56,7 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     output "#{config[:scheme]}.solr.QueryTime", ping["responseHeader"]["QTime"]
     output "#{config[:scheme]}.solr.Status", ping["responseHeader"]["status"]
 
-    stats_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/stats.jsp"
+    stats_url = "http://#{config[:host]}:#{config[:port]}/solr#{core}/admin/stats.jsp"
 
     xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n","")
     stats  = Crack::XML.parse(xml_data)
