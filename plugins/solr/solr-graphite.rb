@@ -45,6 +45,7 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.solr"
 
   def run
+    core = ""
     if config[:core]
         core = "/#{config[:core]}"
     end
