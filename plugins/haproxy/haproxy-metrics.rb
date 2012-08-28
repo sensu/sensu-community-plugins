@@ -53,6 +53,13 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.haproxy"
 
+  option :backends,
+    :description => "comma-separated list of backends to fetch stats from. Default is all backends",
+    :short => "-f BACKEND1[,BACKEND2]",
+    :long => "--backends BACKEND1[,BACKEND2]",
+    :proc => Proc.new { |l| l.split(',') },
+    :default => Array.new()  # an empty list means show all backends
+
   def run
     uri = URI.parse(config[:connection])
 
@@ -76,6 +83,9 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     parsed.shift
     parsed.each do |line|
       next if line[1] != 'BACKEND'
+      if config[:backends].length > 0
+        next unless config[:backends].include? line[0]
+      end
       output "#{config[:scheme]}.#{line[0]}.session_current", line[4]
       output "#{config[:scheme]}.#{line[0]}.session_total", line[7]
       output "#{config[:scheme]}.#{line[0]}.bytes_in", line[8]
