@@ -32,6 +32,12 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :proc => proc {|p| p.to_i },
     :required => true
 
+  option :core,
+    :description => "Solr Core to check",
+    :short => "-c CORE",
+    :long => "--core CORE",
+    :default => nil
+
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
@@ -39,7 +45,11 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.solr"
 
   def run
-    ping_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/ping?wt=json"
+    core = ""
+    if config[:core]
+        core = "/#{config[:core]}"
+    end
+    ping_url = "http://#{config[:host]}:#{config[:port]}/solr#{core}/admin/ping?wt=json"
 
     resp = Net::HTTP.get_response(URI.parse(ping_url))
     ping = JSON.parse(resp.body)
@@ -47,7 +57,7 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     output "#{config[:scheme]}.solr.QueryTime", ping["responseHeader"]["QTime"]
     output "#{config[:scheme]}.solr.Status", ping["responseHeader"]["status"]
 
-    stats_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/stats.jsp"
+    stats_url = "http://#{config[:host]}:#{config[:port]}/solr#{core}/admin/stats.jsp"
 
     xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n","")
     stats  = Crack::XML.parse(xml_data)
