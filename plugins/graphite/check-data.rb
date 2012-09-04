@@ -105,7 +105,12 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Return alert if required
   def check(type)
     if(config[type])
-      if(@data.last > config[type] && !decreased?)
+      last_value = nil
+      @data.reverse.each do |value|
+        last_value = value
+        break unless value.nil?
+      end
+      if(last_value > config[type] && !decreased?)
         send(type, "#{name} has passed #{type} threshold")
       end
     end
