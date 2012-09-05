@@ -89,6 +89,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       begin
         handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}")
         @raw_data = JSON.parse(handle.gets).first
+        @raw_data['datapoints'].delete(@raw_data['datapoints'].last) if @raw_data['datapoints'].last.first.nil?
         @data = @raw_data['datapoints'].map(&:first)
         @target = @raw_data['target']
         @start = @raw_data['datapoints'].first.last
@@ -105,12 +106,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Return alert if required
   def check(type)
     if(config[type])
-      last_value = nil
-      @data.reverse.each do |value|
-        last_value = value
-        break unless value.nil?
-      end
-      if(last_value > config[type] && !decreased?)
+      if(@data.last > config[type] && !decreased?)
         send(type, "#{name} has passed #{type} threshold")
       end
     end
