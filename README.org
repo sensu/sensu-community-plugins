@@ -17,6 +17,9 @@ extension (=.rb=, =.sh=, etc), and make sure they are =chmod +x='d.
 Extensions are unfortunately necessary for Sensu to be able to directly
 exec plugins and handlers on Windows.
 
+Dependencies (ruby gems, packages, etc) and other requirements should
+be declared in the header of the plugin/handler file.
+
 * License
 
 Copyright 2011 Sonian, Inc. and contributors.
