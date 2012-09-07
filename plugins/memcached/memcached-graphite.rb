@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 #
 # Push Memcached stats into graphite
+#
+# Dependencies
+# -----------
+# - Ruby gem `memcached`
+#
 # ===
 #
 # TODO: HitRatio percent and per second calculations
