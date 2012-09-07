@@ -16,15 +16,15 @@ require 'timeout'
 class MemcachedStats < Sensu::Plugin::Check::CLI
 
   option :port,
-  :short => "-p PORT",
-  :long => "--port PORT",
-  :description => "Memcached Port to connect to",
-  :proc => proc {|p| p.to_i },
-  :required => true
+         :short       => "-p PORT",
+         :long        => "--port PORT",
+         :description => "Memcached Port to connect to",
+         :proc        => proc { |p| p.to_i },
+         :default     => 11211
 
   def run
     begin
-      status = Timeout::timeout(30) do
+      Timeout::timeout(30) do
         TCPSocket.open("localhost", config[:port]) do |socket|
           socket.print "stats\r\n"
           socket.close_write
@@ -33,6 +33,8 @@ class MemcachedStats < Sensu::Plugin::Check::CLI
       end
     rescue Timeout::Error
       warning "timed out connecting to memcached on port #{config[:port]}"
+    rescue
+      critical "Can't connect to port #{config[:port]}"
     else
       ok "memcached stats protocol responded in a timely fashion"
     end
