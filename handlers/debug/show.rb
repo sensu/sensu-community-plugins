@@ -12,9 +12,9 @@ require 'sensu-handler'
 
 class Show < Sensu::Handler
 
-  def handle(event)
+  def handle
     puts 'Settings: ' + settings.to_hash.inspect
-    puts 'Event: ' + event.inspect
+    puts 'Event: ' + @event.inspect
   end
 
 end
