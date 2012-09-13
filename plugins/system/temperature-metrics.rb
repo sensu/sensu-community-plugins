@@ -25,8 +25,7 @@ class Sensors < Sensu::Plugin::Metric::CLI::Graphite
      :default => "#{Socket.gethostname}.sensors"
 	
   def run
-	file = File.open("c:/temp/sensors.txt", "r")
-	raw = file.read
+	raw = `sensors`
 	
 	sections = raw.split("\n\n")
 	
