@@ -76,7 +76,7 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
               :disk=> {
                   "#{fs}.iused" => used,
                   "#{fs}.iavail" => avail,
-                  "#{fs}.capacity" => capacity.gsub('%','')
+                  "#{fs}.icapacity" => capacity.gsub('%','')
               }
           }
           metrics.each do |parent, children|
