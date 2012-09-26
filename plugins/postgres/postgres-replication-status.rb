@@ -22,7 +22,6 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Check::CLI
 
 
   def run
-    begin
     # Establishing connections to the master
     conn_master = PGconn.connect('@dbmaster',@dbport,'','','postgres',"@dbusername","@password")
     res1 = conn_master.exec('SELECT pg_current_xlog_location()').getvalue(0,0)
@@ -55,6 +54,5 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Check::CLI
       ok "slave: #{message}"
     end
 
-    end
   end
 end
