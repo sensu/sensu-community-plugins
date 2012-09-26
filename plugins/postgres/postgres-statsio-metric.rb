@@ -45,6 +45,12 @@ class PostgresStatsIOMetrics < Sensu::Plugin::Metric::CLI::Graphite
          :long        => '--port PORT',
          :default     => 5432
 
+  option :db,
+         :description => "Database name",
+         :short       => '-d DB',
+         :long        => '--db DB',
+         :default     => 'postgres'
+
   option :scope,
          :description => "Scope, see http://www.postgresql.org/docs/9.2/static/monitoring-stats.html",
          :short       => '-s SCOPE',
@@ -59,7 +65,7 @@ class PostgresStatsIOMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
 
-    con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, 'postgres', config[:user], config[:password])
+    con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, config[:db], config[:user], config[:password])
     request = [
         "select sum(heap_blks_read), sum(heap_blks_hit),",
         "sum(idx_blks_read), sum(idx_blks_hit),",
