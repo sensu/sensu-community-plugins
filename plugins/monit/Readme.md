@@ -23,7 +23,7 @@ The setup is very different from other sensu plugins so RTFM.
 * Configure postfix to pipe messages from monit email address to monit-email.rb plugin
   * Create/Modify postfix transport at /etc/postfix/transport
     ```
-    monit@hipchat.com       monit:
+    monit@domain.com       monit:
     ```
   * Create transport map db
     $ postmap /etc/postfix/transport
