@@ -67,24 +67,24 @@ class PostgresStatsTableMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, config[:db], config[:user], config[:password])
     request = [
-        "select sum(seq_scan), sum(seq_tup_read),",
-        "sum(idx_scan), sum(idx_tup_fetch),",
-        "sum(n_tup_ins), sum(n_tup_upd), sum(n_tup_del),",
-        "sum(n_tup_hot_upd), sum(n_live_tup), sum(n_dead_tup)",
+        "select sum(seq_scan) as seq_scan, sum(seq_tup_read) as seq_tup_read,",
+        "sum(idx_scan) as idx_scan, sum(idx_tup_fetch) as idx_tup_fetch,",
+        "sum(n_tup_ins) as n_tup_ins, sum(n_tup_upd) as n_tup_upd, sum(n_tup_del) as n_tup_del,",
+        "sum(n_tup_hot_upd) as n_tup_hot_upd, sum(n_live_tup) as n_live_tup, sum(n_dead_tup) as n_dead_tup",
         "from pg_stat_#{config[:scope]}_tables"
     ]
     con.exec(request.join(' ')) do |result|
       result.each do |row|
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.seq_scan", row['seq_scan'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.seq_tup_read", row['seq_tup_read'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.idx_scan", row['idx_scan'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.idx_tup_fetch", row['idx_tup_fetch'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.n_tup_ins", row['n_tup_ins'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.n_tup_upd", row['n_tup_upd'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.n_tup_del", row['n_tup_del'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.n_tup_hot_upd", row['n_tup_hot_upd'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.n_live_tup", row['n_live_tup'], timestamp
-        output "#{config[:scheme]}.statstable.#{config[:scope]}.n_dead_tup", row['n_dead_tup'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.seq_scan", row['seq_scan'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.seq_tup_read", row['seq_tup_read'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.idx_scan", row['idx_scan'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.idx_tup_fetch", row['idx_tup_fetch'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.n_tup_ins", row['n_tup_ins'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.n_tup_upd", row['n_tup_upd'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.n_tup_del", row['n_tup_del'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.n_tup_hot_upd", row['n_tup_hot_upd'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.n_live_tup", row['n_live_tup'], timestamp
+        output "#{config[:scheme]}.statstable.#{config[:db]}.n_dead_tup", row['n_dead_tup'], timestamp
       end
     end
 
