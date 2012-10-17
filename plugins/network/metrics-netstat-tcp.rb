@@ -29,7 +29,7 @@
 # - Code for parsing Linux /proc/net/tcp from Anthony Goddard's ruby-netstat:
 #   https://github.com/agoddard/ruby-netstat
 #
-# Copyright 2012 Joe Miller <https://github.com/joemiller)
+# Copyright 2012 Joe Miller <https://github.com/joemiller>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
