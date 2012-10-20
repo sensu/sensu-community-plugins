@@ -44,7 +44,7 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     redis = Redis.new(:host => config[:host], :port => config[:port])
 
     redis.info.each do |k, v|
-      next if SKIP_KEYS_REGEX.map { |re| k.match(/#{re}/)}.compact.empty?
+      next unless SKIP_KEYS_REGEX.map { |re| k.match(/#{re}/)}.compact.empty?
 
       # "db0"=>"keys=123,expires=12"
       if k =~ /^db/
