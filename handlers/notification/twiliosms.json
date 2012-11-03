@@ -1,0 +1,19 @@
+{
+	"twiliosms":{
+		"token":"a9d8ag98daf98ga9fd8g",
+		"number":"+111111111",
+		"sid":"AC0ds98gd098gf09d8fg",
+		"recipients":{
+			"+11111111111": {
+				"sensu_roles":[ "web-server" ], // subscribers
+				"sensu_checks":[], // checks
+				"sensu_level": 1 // 1 for warnging, 2 for critical alerts
+			},
+			"+11111222222": {
+				"sensu_roles":[],
+				"sensu_checks":[ "mysql-alive" ],
+				"sensu_level": 2
+			}
+		}
+	}
+}
