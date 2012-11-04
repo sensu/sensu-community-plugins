@@ -64,7 +64,7 @@ def run
     when "Scoreboard"
       value = value.strip
       stats["open"] = value.count(".")
-      stats["waiting"] = value.count(".")
+      stats["waiting"] = value.count("_")
       stats["starting"] = value.count("S")
       stats["reading"] = value.count("R")
       stats["sending"] = value.count("W")
