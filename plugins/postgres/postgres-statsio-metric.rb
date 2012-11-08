@@ -67,22 +67,22 @@ class PostgresStatsIOMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, config[:db], config[:user], config[:password])
     request = [
-        "select sum(heap_blks_read), sum(heap_blks_hit),",
-        "sum(idx_blks_read), sum(idx_blks_hit),",
-        "sum(toast_blks_read), sum(toast_blks_hit),",
-        "sum(tidx_blks_read), sum(tidx_blks_hit)",
+        "select sum(heap_blks_read) as heap_blks_read, sum(heap_blks_hit) as heap_blks_hit,",
+        "sum(idx_blks_read) as idx_blks_read, sum(idx_blks_hit) as idx_blks_hit,",
+        "sum(toast_blks_read) as toast_blks_read, sum(toast_blks_hit) as toast_blks_hit,",
+        "sum(tidx_blks_read) as tidx_blks_read, sum(tidx_blks_hit) as tidx_blks_hit",
         "from pg_statio_#{config[:scope]}_tables"
     ]
     con.exec(request.join(' ')) do |result|
       result.each do |row|
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.heap_blks_read", row['heap_blks_read'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.heap_blks_hit", row['heap_blks_hit'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.idx_blks_read", row['idx_blks_read'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.idx_blks_hit", row['idx_blks_hit'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.toast_blks_read", row['toast_blks_read'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.toast_blks_hit", row['toast_blks_hit'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.tidx_blks_read", row['tidx_blks_read'], timestamp
-        output "#{config[:scheme]}.statsio.#{config[:scope]}.tidx_blks_hit", row['tidx_blks_hit'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.heap_blks_read", row['heap_blks_read'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.heap_blks_hit", row['heap_blks_hit'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.idx_blks_read", row['idx_blks_read'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.idx_blks_hit", row['idx_blks_hit'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.toast_blks_read", row['toast_blks_read'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.toast_blks_hit", row['toast_blks_hit'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.tidx_blks_read", row['tidx_blks_read'], timestamp
+        output "#{config[:scheme]}.statsio.#{config[:db]}.tidx_blks_hit", row['tidx_blks_hit'], timestamp
       end
     end
 

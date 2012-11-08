@@ -1,0 +1,15 @@
+{
+	"ponymailer": {
+		"authenticate":true,
+		"username":"ops@example.com",
+		"tls":true,
+		"port":"587",
+		"fromname":"Operations",
+		"hostname":"mail.example.com",
+		"password":"example",
+		"from":"ops@example.com",
+		"recipients":[ 
+			"sysadmin@example.com"
+		]
+	}
+}
