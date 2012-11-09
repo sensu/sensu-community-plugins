@@ -63,6 +63,12 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.tcp"
 
+  option :port,
+    :description => "Port you wish to get metrics for",
+    :short => "-p PORT",
+    :long => "--port PORT",
+    :proc => proc {|a| a.to_i }
+
   def netstat(protocol='tcp')
     state_counts = Hash.new(0)
     TCP_STATES.each_pair { |hex,name| state_counts[name] = 0 }
@@ -71,8 +77,13 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
       line.strip!
       if m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/)
         connection_state = m[5]
+        connection_port = m[2].to_i(16)
         connection_state = TCP_STATES[connection_state]
-        state_counts[connection_state] += 1
+        if config[:port] && config[:port] == connection_port
+          state_counts[connection_state] += 1
+        elsif !config[:port] 
+          state_counts[connection_state] += 1          
+        end
       end
     end
     return state_counts
@@ -81,7 +92,9 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
     netstat('tcp').each do |state,count|
-      output "#{config[:scheme]}.#{state}", count, timestamp
+      graphite_name = config[:port] ? "#{config[:scheme]}.#{config[:port]}.#{state}" : 
+        "#{config[:scheme]}.#{state}"
+      output "#{graphite_name}", count, timestamp
     end
     ok
   end
