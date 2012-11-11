@@ -1,0 +1,10 @@
+{
+  "xmpp": {
+    "jid": "user@domain",
+    "password": "guest",
+    "target": "room@conference.domain",
+    "target_type": "conference",
+    "server": "server.domain"
+  }
+}
+
