@@ -1,0 +1,6 @@
+{
+  "opsgenie": {
+    "customerKey": "the-key",
+    "recipients": "the-recipients"
+  }
+}
