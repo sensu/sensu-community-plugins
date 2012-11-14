@@ -17,7 +17,7 @@ class LogEvent < Sensu::Handler
       f.write(JSON.pretty_generate(@event))
     end
 
-    if settings['logevent']['keep'] < Dir.glob("/var/log/sensu/events/#{@event['client']['name']}/#{@event['check']['name']}/*.#{@event['action']}").length
+    if settings['logevent']['keep'] < Dir.glob("#{settings['logevent']['eventdir']}/#{@event['client']['name']}/#{@event['check']['name']}/*.#{@event['action']}").length
       FileUtils.rm_f(Dir.glob("#{settings['logevent']['eventdir']}/#{@event['client']['name']}/#{@event['check']['name']}/*.#{@event['action']}").sort.first)
     end
   end
