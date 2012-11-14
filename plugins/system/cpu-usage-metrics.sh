@@ -7,20 +7,24 @@ usage()
   cat <<EOF
 usage: $0 options
 
-This plugin produces CPU usage (%) using /proc/stat
+This plugin produces CPU usage (%)
 
 OPTIONS:
    -h      Show this message
-   -s      Metric naming scheme, text to prepend to cpu.usage
+   -p      PID
+   -s      Metric naming scheme, text to prepend to cpu.usage (default: $SCHEME)
 EOF
 }
 
-while getopts "hs:" OPTION
+while getopts "hp:s:" OPTION
   do
     case $OPTION in
       h)
         usage
         exit 1
+        ;;
+      p)
+        PID="$OPTARG"
         ;;
       s)
         SCHEME="$OPTARG"
@@ -34,25 +38,52 @@ done
 
 get_idle_total()
 {
-  CPU=(`cat /proc/stat | grep '^cpu '`)
-  unset CPU[0]
-  IDLE=${CPU[4]}
+  CPU=(`sed -n 's/^cpu \+//p' /proc/stat`)
+  IDLE=${CPU[3]}
   TOTAL=0
-  for VALUE in "${CPU[@]}"; do
+  for VALUE in ${CPU[@]}; do
     let "TOTAL=$TOTAL+$VALUE"
   done
 }
 
-get_idle_total
-PREV_TOTAL="$TOTAL"
-PREV_IDLE="$IDLE"
+get_proc()
+{
+  PROC=`cat /proc/${PID}/stat | awk '{total = $14 + $15; print total}'`
+}
 
-sleep 1
+if [ -z "$PID" ]; then
+  get_idle_total
 
-get_idle_total
+  PREV_TOTAL=$TOTAL
+  PREV_IDLE=$IDLE
 
-let "DIFF_IDLE=$IDLE-$PREV_IDLE"
-let "DIFF_TOTAL=$TOTAL-$PREV_TOTAL"
-let "DIFF_USAGE=(1000*($DIFF_TOTAL-$DIFF_IDLE)/$DIFF_TOTAL+5)/10"
+  sleep 1
 
-echo "$SCHEME.cpu.usage $DIFF_USAGE `date +%s`"
+  get_idle_total
+
+  let "DIFF_IDLE=$IDLE-$PREV_IDLE"
+  let "DIFF_TOTAL=$TOTAL-$PREV_TOTAL"
+  let "CPU_USAGE=(($DIFF_TOTAL-$DIFF_IDLE)*1000/$DIFF_TOTAL+5)/10"
+else
+  if [ ! -f /proc/${PID}/stat ]; then
+    echo "/proc/$PID/stat does not exist"
+    exit 1
+  fi
+
+  get_idle_total
+  get_proc
+
+  PREV_TOTAL=$TOTAL
+  PREV_PROC=$PROC
+
+  sleep 1
+
+  get_idle_total
+  get_proc
+
+  let "DIFF_PROC=$PROC-$PREV_PROC"
+  let "DIFF_TOTAL=$TOTAL-$PREV_TOTAL"
+  let "CPU_USAGE=(($DIFF_PROC*1000/$DIFF_TOTAL)+5)/10"
+fi
+
+echo "$SCHEME.cpu.usage $CPU_USAGE `date +%s`"
