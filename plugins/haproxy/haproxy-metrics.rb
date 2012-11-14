@@ -60,7 +60,12 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :proc => Proc.new { |l| l.split(',') },
     :default => Array.new()  # an empty list means show all backends
 
-  def run
+
+  def crtiical(message)
+    output "CRITICAL: #{message}"
+  end
+
+  def get_stats
     uri = URI.parse(config[:connection])
 
     if uri.is_a?(URI::Generic) and File.socket?(uri.path)
@@ -77,6 +82,18 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
         http.request(req)
       end
       out = res.body
+    end
+    return out
+  rescue
+    return nil
+  end
+
+  def run
+    out = nil
+    1.upto(3) do |i|
+      out = get_stats();
+      break unless out.to_s.length.zero?
+      sleep(1)
     end
 
     parsed = CSV.parse(out)
