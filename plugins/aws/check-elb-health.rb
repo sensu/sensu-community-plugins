@@ -36,9 +36,9 @@ class AwsElbCheck < Sensu::Plugin::Check::CLI
         :description => "AWS Region (such as eu-west-1 or us-west-1). If you do not specify a region, it will automatically be detected by the server the script is run on",
         :required => false
 
-    option :elb_id,
-        :short => '-e ELB_ID',
-        :long => '--elb-id ELB_ID',
+    option :elb_name,
+        :short => '-n ELB_NAME',
+        :long => '--elb-name ELB_NAME',
         :description => 'The Elastic Load Balancer name of which you want to check the health',
         :required => true
 
@@ -66,15 +66,14 @@ class AwsElbCheck < Sensu::Plugin::Check::CLI
 
             if config[:instances]
                 instances = config[:instances].split(',')
-                health = elb.describe_instance_health(config[:elb_id], instances)
+                health = elb.describe_instance_health(config[:elb_name], instances)
             else
-                health = elb.describe_instance_health(config[:elb_id])
+                health = elb.describe_instance_health(config[:elb_name])
             end
         rescue Exception => e
             critical "An issue occured while communicating with the AWS EC2 API: #{e.message}"
         end
-
-        if health
+        unless health.empty?
             unhealthy_instances = Hash.new              
             health.each do |instance|
                  unhealthy_instances[instance[:instance_id]] = instance[:state] unless instance[:state].eql?('InService')
@@ -86,7 +85,7 @@ class AwsElbCheck < Sensu::Plugin::Check::CLI
                     critical "Detected [#{unhealthy_instances.size}] unhealthy instances"
                 end
             else
-                ok 'All instances healthy!'
+                ok "All instances on ELB #{aws_region}::#{config[:elb_name]} healthy!"
             end
         else
             critical 'Failed to retrieve ELB instance health data'
@@ -103,7 +102,7 @@ class AwsElbCheck < Sensu::Plugin::Check::CLI
             end            
             instance_az[0...-1]
         rescue Exception => e
-            raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS? Message was: #{e.message}" 
+            raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?" 
         end
     end
 
