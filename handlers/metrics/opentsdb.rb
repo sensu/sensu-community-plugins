@@ -11,6 +11,9 @@
 # to work around a bug in netty. 
 # https://github.com/OpenTSDB/opentsdb/issues/100  
 #
+# In the future this really should just be a mutator to a tcp pipe,
+# but at the moment you cannot chain mutators.  
+#
 # OpenTSDB 'server', 'port', and 'hostname_length'  must be 
 # specified in a config file in /etc/sensu/conf.d.  
 # See opentsdb.json for an example.
@@ -43,10 +46,10 @@ class OpenTSDB < Sensu::Handler
       (metric_name, metric_value, epoch_time) = output_line.split("\t")
       tokens = metric_name.split('.')
       host_name = tokens[0..host_name_len].join('.')
-      short_metric = tokens[(host_name_len + 1)..-1].join('.')
-      mutated_output = "put #{short_metric} #{epoch_time} #{metric_value} check=#{check_name} host=#{host_name}"
+      short_metric = tokens[(host_name_len + 1)]
+      long_metric = tokens[(host_name_len + 2)..-1].join('.')
+      mutated_output = "put #{short_metric} #{epoch_time} #{metric_value} check=#{check_name} host=#{host_name} metric=#{long_metric}"
       timeout(3) do
-
         sock.puts mutated_output
       end
     end
