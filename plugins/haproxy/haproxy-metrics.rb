@@ -61,7 +61,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => Array.new()  # an empty list means show all backends
 
 
-  def crtiical(message)
+  def critical(message)
     output "CRITICAL: #{message}"
   end
 
