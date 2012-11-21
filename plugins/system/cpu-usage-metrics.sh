@@ -12,11 +12,12 @@ This plugin produces CPU usage (%)
 OPTIONS:
    -h      Show this message
    -p      PID
+   -f      Path to PID file		
    -s      Metric naming scheme, text to prepend to cpu.usage (default: $SCHEME)
 EOF
 }
 
-while getopts "hp:s:" OPTION
+while getopts "hp:f:s:" OPTION
   do
     case $OPTION in
       h)
@@ -28,6 +29,9 @@ while getopts "hp:s:" OPTION
         ;;
       s)
         SCHEME="$OPTARG"
+        ;;
+      f)
+        PIDFILE="$OPTARG" 
         ;;
       ?)
         usage
@@ -50,6 +54,21 @@ get_proc()
 {
   PROC=`cat /proc/${PID}/stat | awk '{total = $14 + $15; print total}'`
 }
+
+get_proc_name()
+{
+  PROCNAME=`cat /proc/${PID}/stat | awk '{gsub(/[),(]/,""); print $2}'`
+}
+
+if [ ! -z "$PIDFILE" ]; then
+  if [ ! -s $PIDFILE ]; then
+    echo "PID file ${PID} does not exist"
+    exit 1
+  fi
+  PID=`cat ${PIDFILE}`
+  get_proc_name
+  SCHEME="${SCHEME}.${PROCNAME}"
+fi
 
 if [ -z "$PID" ]; then
   get_idle_total
@@ -84,6 +103,7 @@ else
   let "DIFF_PROC=$PROC-$PREV_PROC"
   let "DIFF_TOTAL=$TOTAL-$PREV_TOTAL"
   let "CPU_USAGE=(($DIFF_PROC*1000/$DIFF_TOTAL)+5)/10"
+
 fi
 
 echo "$SCHEME.cpu.usage $CPU_USAGE `date +%s`"
