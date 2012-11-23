@@ -65,7 +65,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   def run
     rabbitmq = get_rabbitmq_info
     overview = rabbitmq.overview
-    total = overview['queue_totals']['messages']
+    total = overview['queue_totals']['messages'] rescue citical "Message count unavailable"
     message "#{total}"
     critical if total > config[:critical].to_i
     warning if total > config[:warn].to_i
