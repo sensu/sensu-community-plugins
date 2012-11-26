@@ -24,16 +24,28 @@ class Mailer < Sensu::Handler
   end
 
   def handle
+    smtp_address = settings['mailer']['smtp_address'] || 'localhost'
+    smtp_port = settings['mailer']['smtp_port'] || '25'
+    smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
+    
     params = {
       :mail_to   => settings['mailer']['mail_to'],
       :mail_from => settings['mailer']['mail_from'],
+      :smtp_addr => smtp_address,
+      :smtp_port => smtp_port,
+      :smtp_domain => smtp_domain
     }
 
     body = "#{@event['check']['output']}"
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     Mail.defaults do
-      delivery_method :smtp, { :openssl_verify_mode => 'none' }
+      delivery_method :smtp, {
+        :address => params[:smtp_addr],
+        :port    => params[:smtp_port],
+        :domain  => params[:smtp_domain],
+        :openssl_verify_mode => 'none'
+      }
     end
 
     begin
