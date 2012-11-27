@@ -26,7 +26,6 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Port to check mod_status output",
     :default => "80"
 
-
   option :path,
     :short => "-path PATH",
     :long => "--path PATH",
@@ -95,12 +94,13 @@ def get_mod_status
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
+
     res = http.request(req)
     case res.code
-      when "200"
+    when "200"
         res.body
-      else
-        raise "Unexpected HTTP response code:#{res.code}"
+    else
+        output "Unexpected HTTP response code:#{res.code}"
         critical
     end
 end
