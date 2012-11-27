@@ -100,8 +100,7 @@ def get_mod_status
     when "200"
         res.body
     else
-        output "Unexpected HTTP response code:#{res.code}"
-        critical
+        critical "Unexpected HTTP response code:#{res.code}"
     end
 end
 end
