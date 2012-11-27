@@ -12,7 +12,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
 
-class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
+class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :host,
     :short => "-h HOST",
@@ -86,6 +86,7 @@ def run
       output [config[:scheme], parent, child].join("."), value, timestamp
     end
   end
+  ok
 end
 
 def get_mod_status
@@ -100,6 +101,7 @@ def get_mod_status
         res.body
       else
         raise "Unexpected HTTP response code:#{res.code}"
+        critical
     end
 end
 end
