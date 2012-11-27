@@ -12,7 +12,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
 
-class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
+class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :host,
     :short => "-h HOST",
@@ -25,7 +25,6 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--port PORT",
     :description => "Port to check mod_status output",
     :default => "80"
-
 
   option :path,
     :short => "-path PATH",
@@ -86,6 +85,7 @@ def run
       output [config[:scheme], parent, child].join("."), value, timestamp
     end
   end
+  ok
 end
 
 def get_mod_status
@@ -94,12 +94,13 @@ def get_mod_status
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
+
     res = http.request(req)
     case res.code
-      when "200"
+    when "200"
         res.body
-      else
-        raise "Unexpected HTTP response code:#{res.code}"
+    else
+        critical "Unexpected HTTP response code:#{res.code}"
     end
 end
 end
