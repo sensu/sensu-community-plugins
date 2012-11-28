@@ -24,7 +24,7 @@ class MessageMedia < Sensu::Handler
   end
 
   def should_send
-    lower_limit = settings['sms']['min_occurrences'].to_i * 10
+    lower_limit = settings['messagemedia']['min_occurrences'].to_i * 10
     case
     when @event['occurrences'] < lower_limit
       return false
@@ -36,8 +36,8 @@ class MessageMedia < Sensu::Handler
 
   def handle
     Rumeme.configure do |config|
-      config.username = settings['sms']['username'] || 'xxx'
-      config.password = settings['sms']['password'] || 'yyy'
+      config.username = settings['messagemedia']['username'] || 'xxx'
+      config.password = settings['messagemedia']['password'] || 'yyy'
       config.use_message_id = true
       config.secure = true
       # config.allow_splitting = false
@@ -50,7 +50,7 @@ class MessageMedia < Sensu::Handler
       if should_send then
         timeout 10 do
           si = Rumeme::SmsInterface.new
-          settings['sms']['mobile_numbers'].each do |mobile_number|
+          settings['messagemedia']['mobile_numbers'].each do |mobile_number|
             si.add_message :phone_number => mobile_number, :message => message
           end
           si.send_messages
