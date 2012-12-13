@@ -97,6 +97,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
           end
 
         end
+        ok "show slave status was nil. This server is not a slave."
       end
 
     rescue Mysql::Error => e
