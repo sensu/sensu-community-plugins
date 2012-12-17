@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 #
-# Checks an ELB's health status and report back
+# Checks an ELB's health
 # ===
 #
 # DESCRIPTION:
-#   This plugin checks the health of an Elastic Load Balancer.
+#   This plugin checks the health of an Amazon Elastic Load Balancer.
 #
 # OUTPUT:
 #   plain-text
