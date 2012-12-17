@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bootstrap, from Twitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Sensu Community Plugins</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Contributors</a></li>
+              <li><a href="https://github.com/sensu/sensu-community-plugins/">Code</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+    <h2><%= authors.count %> Contributors</h2>
+
+    <% authors.each do |author| %>
+		  <a href="#author_modal_<%= author.id %>" role="button" class="btn" data-toggle="modal">
+			 <img src="<%= author.gravatar_url %>"/>
+		  </a>
+		
+		  <div id="author_modal_<%= author.id %>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_<%= author.id %>_label" aria-hidden="true">
+		    <div class="modal-header">
+		      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		      <h3 id="author_modal_<%= author.id %>_label"><%= author.email %></h3>
+		    </div>
+		    <div class="modal-body">
+		      <% if author.plugins_changed.length > 0 %>
+  		      Plugins Changed:
+  		      <ul>
+              <% author.plugins_changed.each do |file| %>
+              <li><%= file %></li>
+              <% end %>
+  		      </ul>
+		      <% end %>
+
+          <% if author.handlers_changed.length > 0 %>
+  		      Handlers Changed:
+  		      <ul>
+              <% author.handlers_changed.each do |file| %>
+                <li><%= file %></li>
+              <% end %>
+          <% end %>
+        </div>          
+		  </div>
+	<% end %>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+  </body>
+</html>
