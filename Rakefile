@@ -39,6 +39,13 @@ class Author
     @id = Digest::MD5.hexdigest(@email.downcase)
   end
 
+  def pretty_name
+    first, last = name.split
+    pretty_name = first
+    pretty_name << " #{last.to_s[0..0]}." if last
+    pretty_name
+  end
+
   def files_changed
     files = []
     commits.each do |commit|      
