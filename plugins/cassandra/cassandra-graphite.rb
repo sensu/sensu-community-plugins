@@ -58,7 +58,6 @@
 #
 #     $ ./cassandra-metrics.rb --cfstats NOTHING_SHOULD_MATCH_THIS_REGEX
 #
-#
 # Copyright 2012 Joe Miller https://github.com/joemiller
 #
 # Heavily inspired by Datadog's python plugin:
