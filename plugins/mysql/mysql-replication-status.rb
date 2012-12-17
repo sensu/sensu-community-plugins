@@ -89,7 +89,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
 
           if replication_delay > config[:warn] and
               replication_delay <= config[:crit]
-            warn message
+            warning message
           elsif replication_delay >= config[:crit]
             critical message
           else
