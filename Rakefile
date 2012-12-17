@@ -9,10 +9,10 @@ def download_gravatar(email, dest)
 end
 
 def find_all_authors
-  g = Git.open(Dir.pwd)
+  g = Git.open(Dir.pwd + "/../sensu-community-plugins")
   authors = {}
-  g.log(1000000).each do |commit|
-    authors[commit.author.email] ||= Author.new(commit.author.email)
+  g.object('master').log(1000000).each do |commit|
+    authors[commit.author.email] ||= Author.new(commit.author)
     authors[commit.author.email].commits << commit
   end
   authors.values.sort{|x,y| y.commits.length <=> x.commits.length}
@@ -29,11 +29,13 @@ end
 class Author
   attr :commits
   attr :email
+  attr :name
   attr :id
 
-  def initialize(email)
+  def initialize(author)
     @commits = []
-    @email = email
+    @email = author.email
+    @name = author.name
     @id = Digest::MD5.hexdigest(@email.downcase)
   end
 
