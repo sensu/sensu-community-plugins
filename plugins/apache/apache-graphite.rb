@@ -3,16 +3,19 @@
 # Apache metrics based on mod_status
 # ===
 #
+# DESCRIPTION:
+#   This plugin retrives machine-readable output of mod_status, parse
+#   it, and generates apache process metrics formated for Graphite.
+#
 # OUTPUT:
 #   Graphite plain-text format (name value timestamp\n)
+#
+# PLATFORMS:
+#   all
 #
 # DEPENDENCIES:
 #   Sensu Plugin Ruby gem
 #   Apache mod_status module
-#
-# DESCRIPTION:
-#   This plugin retrives machine-readable output of mod_status, parse
-#   it and generates apache process metrics formated for Graphite.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
