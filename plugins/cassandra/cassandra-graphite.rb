@@ -1,54 +1,68 @@
 #!/usr/bin/env ruby
 #
-# Cassandra metrics to graphite
+# Cassandra metrics using nodetool
 # ===
 #
-# This plugin uses Apache Cassandra's `nodetool` to collect metrics from
-# an instance of Cassandra. Default is localhost and port 7199. Use 8080 for
-# Cassandra < 0.8.
+# DESCRIPTION:
+#   This plugin uses Apache Cassandra's `nodetool` to collect metrics
+#   from an instance of Cassandra. Default is localhost and port 7199.
+#   Use 8080 for Cassandra < 0.8.
 #
-# By default, only 'info' and 'tpstats' metrics will be output, but can be
-# disabled with `--no-info` or `--no-tpstats`.
+#   By default, only 'info' and 'tpstats' metrics will be output, but
+#   can be disabled with `--no-info` or `--no-tpstats`.
 #
-# Use `--cfstats` to get detailed metrics on keyspaces and column families.
+#   Use `--cfstats` to get detailed metrics on keyspaces and column
+#   families.
 #
-# Only column-families matching a regex will be output if the `--filter REGEX`
-# flag is used.
+#   Only column-families matching a regex will be output if the
+#   `--filter REGEX` flag is used.
 #
-# Usage examples:
+# OUTPUT:
+#   Graphite plain-text format (name value timestamp\n)
 #
-# info and tpstats
-# ----------------
-#   $ ./cassandra-metrics.rb
+# PLATFORMS:
+#   linux
 #
-#    host.cassandra.load  75696701.44 1344547246
-#    host.cassandra.uptime  580640  1344547246
-#    host.cassandra.heap.used 88332042.24 1344547246
-#    host.cassandra.heap.total  408944640.0 1344547246
-#    host.cassandra.exceptions  0 1344547246
-#    host.cassandra.threadpool.ReadStage.active 0 1344547246
-#    host.cassandra.threadpool.ReadStage.pending  0 1344547246
-#    ...
+# DEPENDENCIES:
+#   Sensu Plugin Ruby gem
+#   Cassandra's nodetool
 #
-# All metrics, including keyspaces and column families
-# ----------------------------------------------------
+# USAGE:
 #
-#   $ ./cassandra-metrics.rb --cfstats
+#   info and tpstats
+#   ----------------
 #
-# Show metrics for column-families matching '.*user.*' regex
-# ----------------------------------------------------------
+#     $ ./cassandra-metrics.rb
 #
-#   $ ./cassandra-metrics.rb  --cfstats --filter .*user.*
+#      host.cassandra.load  75696701.44 1344547246
+#      host.cassandra.uptime  580640  1344547246
+#      host.cassandra.heap.used 88332042.24 1344547246
+#      host.cassandra.heap.total  408944640.0 1344547246
+#      host.cassandra.exceptions  0 1344547246
+#      host.cassandra.threadpool.ReadStage.active 0 1344547246
+#      host.cassandra.threadpool.ReadStage.pending  0 1344547246
+#      ...
 #
-# Show keyspace metrics, but not column family metrics
-# ----------------------------------------------------
+#   All metrics, including keyspaces and column families
+#   ----------------------------------------------------
 #
-#   $ ./cassandra-metrics.rb --cfstats NOTHING_SHOULD_MATCH_THIS_REGEX
+#     $ ./cassandra-metrics.rb --cfstats
+#
+#   Show metrics for column-families matching '.*user.*' regex
+#   ----------------------------------------------------------
+#
+#     $ ./cassandra-metrics.rb  --cfstats --filter .*user.*
+#
+#   Show keyspace metrics, but not column family metrics
+#   ----------------------------------------------------
+#
+#     $ ./cassandra-metrics.rb --cfstats NOTHING_SHOULD_MATCH_THIS_REGEX
 #
 #
 # Copyright 2012 Joe Miller https://github.com/joemiller
 #
-# Heavily inspired by Datadog's python plugin: https://github.com/miketheman/dd-agent/blob/master/checks/cassandra.py
+# Heavily inspired by Datadog's python plugin:
+# https://github.com/miketheman/dd-agent/blob/master/checks/cassandra.py
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -122,7 +136,6 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => '--[no-]cfstats',
     :boolean => true,
     :default => false
-
 
   # convert_to_bytes(512, 'KB') => 524288
   # convert_to_bytes(1, 'MB') => 1048576
