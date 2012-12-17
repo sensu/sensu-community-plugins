@@ -17,7 +17,6 @@
 #   Right AWS Ruby gem
 #
 # Copyright (c) 2012, Panagiotis Papadomitsos <pj@ezgr.net>
-# Copyright (c) 2012, Sean Porter Consulting <portertech@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
