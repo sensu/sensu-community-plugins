@@ -49,35 +49,35 @@
     <h2><%= authors.count %> Contributors</h2>
 
     <% authors.each do |author| %>
-		  <a href="#author_modal_<%= author.id %>" role="button" class="btn" data-toggle="modal">
-			 <img src="<%= author.gravatar_url %>"/>
-		  </a>
-		
-		  <div id="author_modal_<%= author.id %>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_<%= author.id %>_label" aria-hidden="true">
-		    <div class="modal-header">
-		      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		      <h3 id="author_modal_<%= author.id %>_label"><%= author.pretty_name %></h3>
-		    </div>
-		    <div class="modal-body">
-		      <% if author.plugins_changed.length > 0 %>
-  		      Plugins Changed:
-  		      <ul>
+      <a href="#author_modal_<%= author.id %>" role="button" class="btn" data-toggle="modal">
+       <img src="<%= author.gravatar_url %>"/>
+      </a>
+    
+      <div id="author_modal_<%= author.id %>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_<%= author.id %>_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_<%= author.id %>_label"><%= author.pretty_name %></h3>
+        </div>
+        <div class="modal-body">
+          <% if author.plugins_changed.length > 0 %>
+            Plugins Changed:
+            <ul>
               <% author.plugins_changed.each do |file| %>
               <li><%= file %></li>
               <% end %>
-  		      </ul>
-		      <% end %>
+            </ul>
+          <% end %>
 
           <% if author.handlers_changed.length > 0 %>
-  		      Handlers Changed:
-  		      <ul>
+            Handlers Changed:
+            <ul>
               <% author.handlers_changed.each do |file| %>
                 <li><%= file %></li>
               <% end %>
           <% end %>
         </div>          
-		  </div>
-	<% end %>
+      </div>
+  <% end %>
 
     </div> <!-- /container -->
 
