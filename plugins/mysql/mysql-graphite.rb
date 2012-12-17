@@ -103,6 +103,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Com_flush' =>          'flush',
         'Com_insert' =>         'insert',
         'Com_purge' =>          'purge',
+	'Com_replace' =>	'replace',
         'Com_rollback' =>       'rollback',
         'Com_select' =>         'select',
         'Com_set_option' =>     'set_option',
