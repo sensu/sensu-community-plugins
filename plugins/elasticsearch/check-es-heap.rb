@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 #
-# Checks Elasticsearch heap usage
+# Checks ElasticSearch heap usage
 # ===
 #
 # DESCRIPTION:
-#   This plugin checks Elasticsearch's Java heap usage using its API.
+#   This plugin checks ElasticSearch's Java heap usage using its API.
 #
 # OUTPUT:
 #   plain-text
