@@ -13,8 +13,8 @@
 #   all
 #
 # DEPENDENCIES:
-#   Sensu Plugin Ruby gem
-#   Right AWS Ruby gem
+#   sensu-plugin Ruby gem
+#   right_aws Ruby gem
 #
 # Copyright (c) 2012, Panagiotis Papadomitsos <pj@ezgr.net>
 #
@@ -27,7 +27,7 @@ require 'net/http'
 require 'uri'
 require 'right_aws'
 
-class AWSELB < Sensu::Plugin::Check::CLI
+class ELBHealth < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',

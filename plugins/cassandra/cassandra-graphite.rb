@@ -24,7 +24,7 @@
 #   linux
 #
 # DEPENDENCIES:
-#   Sensu Plugin Ruby gem
+#   sensu-plugin Ruby gem
 #   Cassandra's nodetool
 #
 # USAGE:

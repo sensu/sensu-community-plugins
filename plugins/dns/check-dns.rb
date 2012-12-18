@@ -14,7 +14,7 @@
 #   bsd
 #
 # DEPENDENCIES:
-#   Sensu Plugin Ruby gem
+#   sensu-plugin Ruby gem
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
