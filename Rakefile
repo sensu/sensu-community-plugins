@@ -4,12 +4,8 @@ require 'logger'
 require 'digest/md5'
 require 'erb'
 
-def download_gravatar(email, dest)
-  `wget #{email_to_gravatar_url(email)} -O #{dest}`
-end
-
 def find_all_authors
-  g = Git.open(Dir.pwd + "/../sensu-community-plugins")
+  g = Git.open(Dir.pwd)
   authors = {}
   g.object('master').log(1000000).each do |commit|
     authors[commit.author.email] ||= Author.new(commit.author)
@@ -73,6 +69,10 @@ class Author
     default = 'https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550'
     "http://www.gravatar.com/avatar/#{hash}?d=#{default}"    
   end
+
+  def download_gravatar(dest)
+    `wget #{gravatar_url} -O #{dest}`
+  end
 end
 
 desc "Generate HTML pages."
@@ -81,7 +81,7 @@ task :default do
 
   authors.each do |author|
     file = "images/#{author.id}"
-    download_gravatar(author.email, file) unless File.exists?(file)
+    author.download_gravatar(file) unless File.exists?(file)
   end
 
   write_template('templates/index.erb', 'index.html', binding())
