@@ -14,7 +14,7 @@
 #   all
 #
 # DEPENDENCIES:
-#   Sensu Plugin Ruby gem
+#   sensu-plugin Ruby gem
 #   Apache mod_status module
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
