@@ -9,7 +9,8 @@
 # CRITICAL if more than one process matches -- you must specify values
 # for -w and -c to override this.
 #
-# Requires WMI for Windows support.
+# Attempts to work on Cygwin (where ps does not have the features we
+# need) by calling Windows' tasklist.exe, but this is not well tested.
 #
 # Examples:
 #
