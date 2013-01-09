@@ -11,9 +11,6 @@
 #
 # Requires WMI for Windows support.
 #
-# This should work better than shelling to 'ps', since Proctable should
-# abstract platform differences, but it's untested
-#
 # Examples:
 #
 #   # chef-client is running
