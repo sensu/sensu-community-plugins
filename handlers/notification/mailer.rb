@@ -36,7 +36,16 @@ class Mailer < Sensu::Handler
       :smtp_domain => smtp_domain
     }
 
-    body = "#{@event['check']['output']}"
+    body = <<-BODY.gsub(/^ {14}/, '')
+            #{@event['check']['output']}
+            Host: #{@event['client']['name']}
+            Timestamp: #{Time.at(@event['check']['issued'])}
+            IP Address:  #{@event['client']['address']}
+            Check Name:  #{@event['check']['name']}
+            Command:  #{@event['check']['command']}
+            Status:  #{@event['check']['status']}
+            Occurrences:  #{@event['occurrences']}
+          BODY
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     Mail.defaults do
