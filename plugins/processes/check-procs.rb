@@ -27,10 +27,8 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'sys/proctable'
 
 class CheckProcs < Sensu::Plugin::Check::CLI
-  include Sys
 
   def self.read_pid(path)
     begin
@@ -56,8 +54,37 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :state, :short => '-s STATE', :proc => proc {|a| a.split(',') }
   option :user, :short => '-u USER', :proc => proc {|a| a.split(',') }
 
+  def read_lines(cmd)
+    IO.popen(cmd + ' 2>&1') do |child|
+      child.read.split("\n")
+    end
+  end
+
+  def line_to_hash(line, *cols)
+    Hash[cols.zip(line.strip.split(/\s+/, cols.size))]
+  end
+
+  def on_cygwin?
+    `ps -W 2>&1`; $?.exitstatus == 0
+  end
+
   def get_procs
-    ProcTable.ps
+    if on_cygwin?
+      read_lines('ps -aWl').drop(1).map do |line|
+        # Horrible hack because cygwin's ps has no o option, every
+        # format includes the STIME column (which may contain spaces),
+        # and the process state (which isn't actually a column) can be
+        # blank. As of revision 1.35, the format is:
+        # const char *lfmt = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
+        state = line.slice!(0..0)
+        stime = line.slice!(45..53)
+        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :command).merge(:state => state)
+      end
+    else
+      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,command').drop(1).map do |line|
+        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :command)
+      end
+    end
   end
 
   def run
@@ -66,10 +93,10 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! {|p| p[:pid].to_i != config[:file_pid] } if config[:file_pid]
     procs.reject! {|p| p[:pid].to_i == $$ } unless config[:match_self]
     procs.reject! {|p| p[:pid].to_i == Process.ppid } unless config[:match_parent]
-    procs.reject! {|p| p[:comm] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
+    procs.reject! {|p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
     procs.reject! {|p| p[:vsz].to_f < config[:vsz] } if config[:vsz]
     procs.reject! {|p| p[:rss].to_f < config[:rss] } if config[:rss]
-    procs.reject! {|p| p[:pctcpu].to_f < config[:pcpu] } if config[:pcpu]
+    procs.reject! {|p| p[:pcpu].to_f < config[:pcpu] } if config[:pcpu]
     procs.reject! {|p| !config[:state].include?(p[:state]) } if config[:state]
     procs.reject! {|p| !config[:user].include?(p[:user]) } if config[:user]
 
