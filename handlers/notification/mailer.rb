@@ -40,7 +40,7 @@ class Mailer < Sensu::Handler
             #{@event['check']['output']}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
-            IP Address:  #{@event['client']['address']}
+            Address:  #{@event['client']['address']}
             Check Name:  #{@event['check']['name']}
             Command:  #{@event['check']['command']}
             Status:  #{@event['check']['status']}
