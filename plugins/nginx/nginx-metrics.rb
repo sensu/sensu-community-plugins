@@ -45,22 +45,31 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.nginx"
 
   def run
-    if config[:url]
-      uri = URI.parse(config[:url])
-    
-      http = Net::HTTP.new(uri.host, uri.port)
-      if uri.scheme == 'https' then 
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    found = false
+    attempts = 0
+    until (found || attempts >= 10)
+      attempts+=1 
+      if config[:url]
+        uri = URI.parse(config[:url])
+        http = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == 'https' then 
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+        request = Net::HTTP::Get.new(uri.request_uri)
+        response = http.request(request)
+        if response.code=="200"
+          found = true
+        elsif response.header['location']!=nil
+	  config[:url] = response.header['location']
+        end
+      else
+        response= Net::HTTP.start(config[:hostname], config[:port]) do |http|
+          request = Net::HTTP::Get.new("/#{config[:path]}")
+          http.request(request)
+        end
       end
-      request = Net::HTTP::Get.new(uri.request_uri)
-      response = http.request(request)
-    else
-      response= Net::HTTP.start(config[:hostname], config[:port]) do |http|
-        request = Net::HTTP::Get.new("/#{config[:path]}")
-        http.request(request)
-      end
-    end
+    end #untl
 
     response.body.split(/\r?\n/).each do |line|
       if connections = line.match(/^Active connections:\s+(\d+)/).to_a
@@ -77,7 +86,6 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
         output "#{config[:scheme]}.waiting", queue[3]
       end
     end
-
     ok
   end
 
