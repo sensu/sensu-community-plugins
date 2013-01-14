@@ -8,6 +8,7 @@
 #
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
 # Updated by Lewis Preson 2012 to accept basic auth credentials
+# Updated by SweetSpot 2012 to require specified redirect
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -33,6 +34,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :pattern, :short => '-q PAT'
   option :timeout, :short => '-t SECS', :proc => proc { |a| a.to_i }, :default => 15
   option :redirectok, :short => '-r', :boolean => true, :default => false
+  option :redirectto, :short => '-R URL'
 
   def run
     if config[:url]
@@ -89,7 +91,9 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
 
     case res.code
       when /^2/
-        if config[:pattern]
+        if config[:redirectto]
+          critical "expected redirect to #{config[:redirectto]} but got #{res.code}"
+        elsif config[:pattern]
           if res.body =~ /#{config[:pattern]}/
             ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes"
           else
@@ -99,8 +103,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
           ok "#{res.code}, #{res.body.size} bytes"
         end
       when /^3/
-        if config[:redirectok]
-          ok "#{res.code}, #{res.body.size} bytes"
+        if config[:redirectok] || config[:redirectto]
+          if config[:redirectok]
+            ok "#{res.code}, #{res.body.size} bytes"
+          elsif config[:redirectto]
+            if config[:redirectto] == res['Location']
+              ok "#{res.code} found redirect to #{res['Location']}"
+            else
+              critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}"
+            end
+          end
         else
           warning res.code
         end
@@ -108,7 +120,6 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         critical res.code
       else
         warning res.code
-    end
+      end
   end
-
 end

@@ -1,9 +1,22 @@
 #!/usr/bin/env ruby
 #
-# ElasticSearch Cluster Health
+# Checks ElasticSearch cluster status
 # ===
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# DESCRIPTION:
+#   This plugin checks the ElasticSearch cluster status, using its API.
+#
+# OUTPUT:
+#   plain-text
+#
+# PLATFORMS:
+#   all
+#
+# DEPENDENCIES:
+#   sensu-plugin Ruby gem
+#   rest-client Ruby gem
+#
+# Copyright 2012 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -13,7 +26,7 @@ require 'sensu-plugin/check/cli'
 require 'rest-client'
 require 'json'
 
-class ESClusterHealth < Sensu::Plugin::Check::CLI
+class ESClusterStatus < Sensu::Plugin::Check::CLI
 
   def get_es_resource(resource)
     begin
