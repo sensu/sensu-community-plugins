@@ -24,17 +24,35 @@ class Mailer < Sensu::Handler
   end
 
   def handle
-    smtp_address = settings['mailer']['smtp_address'] || 'localhost'
-    smtp_port = settings['mailer']['smtp_port'] || '25'
-    smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
-    
-    params = {
-      :mail_to   => settings['mailer']['mail_to'],
-      :mail_from => settings['mailer']['mail_from'],
-      :smtp_addr => smtp_address,
-      :smtp_port => smtp_port,
-      :smtp_domain => smtp_domain
+
+    settings['mailer'] ||= {}
+
+    defaults = {
+      :address => 'localhost',
+      :port => 25
     }
+
+    # merge defaults and convert keys to symbols
+    params = defaults.merge(settings['mailer'].inject({}) { |result, (k, v)| result[k.to_sym] = v; result })
+
+    # for backwards-compatibility
+    mappings = {
+      :smtp_address => :address,
+      :smtp_port => :port,
+      :smtp_domain => :domain,
+      :mail_to => :to,
+      :mail_from => :from
+    }
+
+    params = mappings.inject({}) do |result, (k, v)|
+      result[v] = params[k] if params[k]
+      params.merge(result)
+    end
+
+    params.delete_if { |k, _| mappings.has_key? k }
+
+    raise StandardError, 'Missing setting: "to"' unless params[:to]
+    raise StandardError, 'Missing setting: "from"' unless params[:from]
 
     body = <<-BODY.gsub(/^ {14}/, '')
             #{@event['check']['output']}
@@ -46,27 +64,23 @@ class Mailer < Sensu::Handler
             Status:  #{@event['check']['status']}
             Occurrences:  #{@event['occurrences']}
           BODY
+
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     Mail.defaults do
-      delivery_method :smtp, {
-        :address => params[:smtp_addr],
-        :port    => params[:smtp_port],
-        :domain  => params[:smtp_domain],
-        :openssl_verify_mode => 'none'
-      }
+      delivery_method :smtp, params
     end
 
     begin
       timeout 10 do
         Mail.deliver do
-          to      params[:mail_to]
-          from    params[:mail_from]
+          to params[:to]
+          from params[:from]
           subject subject
-          body    body
+          body body
         end
 
-        puts 'mail -- sent alert for ' + short_name + ' to ' + params[:mail_to]
+        puts 'mail -- sent alert for ' + short_name + ' to ' + params[:to]
       end
     rescue Timeout::Error
       puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
