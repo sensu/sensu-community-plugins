@@ -26,6 +26,8 @@ class Mailer < Sensu::Handler
   def handle
 
     settings['mailer'] ||= {}
+    puts "settings is %s" % settings.inspect
+    puts "settings[mailer] is %s" % settings['mailer']
 
     defaults = {
       :address => 'localhost',
@@ -34,6 +36,8 @@ class Mailer < Sensu::Handler
 
     # merge defaults and convert keys to symbols
     params = defaults.merge(settings['mailer'].inject({}) { |result, (k, v)| result[k.to_sym] = v; result })
+
+    puts "params is %s" % params.inspect
 
     # for backwards-compatibility
     mappings = {
@@ -51,8 +55,8 @@ class Mailer < Sensu::Handler
 
     params.delete_if { |k, _| mappings.has_key? k }
 
-    raise StandardError, 'Missing setting: "to"' unless params[:to]
-    raise StandardError, 'Missing setting: "from"' unless params[:from]
+    bail 'Missing setting: "to"' unless params[:to]
+    bail 'Missing setting: "from"' unless params[:from]
 
     body = <<-BODY.gsub(/^ {14}/, '')
             #{@event['check']['output']}
