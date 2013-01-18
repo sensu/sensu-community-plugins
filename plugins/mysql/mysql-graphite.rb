@@ -191,7 +191,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
           if key == 'Seconds_Behind_Master' and value.nil?
             value = -1
           end
-          output "#{config[:scheme]}.general.#{metrics['general'][key]}", value
+          output "#{config[:scheme]}.mysql.general.#{metrics['general'][key]}", value
         end
       end
     rescue
