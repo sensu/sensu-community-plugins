@@ -98,20 +98,31 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     output "#{config[:scheme]}.queue_totals.messages_ready.count", overview['queue_totals']['messages_ready'], timestamp
     output "#{config[:scheme]}.queue_totals.messages_ready.rate", overview['queue_totals']['messages_ready_details']['rate'], timestamp
 
-    unless overview['message_stats'].empty? then 
-      # overview['message_stats']['publish']
+    # overview['message_stats']['publish']
+    if (defined? overview['message_stats']['publish']) then 
       output "#{config[:scheme]}.message_stats.publish.count", overview['message_stats']['publish'], timestamp
-      output "#{config[:scheme]}.message_stats.publish.rate", overview['message_stats']['publish_details']['rate'], timestamp 
-
-      # overview['message_stats']['deliver_no_ack']
-      output "#{config[:scheme]}.message_stats.deliver_no_ack.count", overview['message_stats']['deliver_no_ack'], timestamp
-      output "#{config[:scheme]}.message_stats.deliver_no_ack.rate", overview['message_stats']['deliver_no_ack_details']['rate'], timestamp
-
-      # overview['message_stats']['deliver_get']
-      output "#{config[:scheme]}.message_stats.deliver_get.count", overview['message_stats']['deliver_get'], timestamp
-      output "#{config[:scheme]}.message_stats.deliver_get.rate", overview['message_stats']['deliver_get_details']['rate'], timestamp
     end
+
+    # overview['message_stats']['publish_details']['rate'],
+    if (defined? overview['message_stats']['publish_details']['rate']) then
+      output "#{config[:scheme]}.message_stats.publish.rate", overview['message_stats']['publish_details']['rate'], timestamp 
+    end
+
+    # overview['message_stats']['deliver_no_ack']
+    if (defined? ['message_stats']['deliver_no_ack']) then 
+      output "#{config[:scheme]}.message_stats.deliver_no_ack.count", overview['message_stats']['deliver_no_ack'], timestamp
+    end
+
+    #overview['message_stats']['deliver_no_ack_details']['rate']
+    if (defined? overview['message_stats']['deliver_no_ack_details']['rate']) then 
+      output "#{config[:scheme]}.message_stats.deliver_no_ack.rate", overview['message_stats']['deliver_no_ack_details']['rate'], timestamp
+    end
+
+     # overview['message_stats']['deliver_get']
+    output "#{config[:scheme]}.message_stats.deliver_get.count", overview['message_stats']['deliver_get'], timestamp
+    output "#{config[:scheme]}.message_stats.deliver_get.rate", overview['message_stats']['deliver_get_details']['rate'], timestamp
+
     ok
   end
-
 end
+
