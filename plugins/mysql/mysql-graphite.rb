@@ -177,7 +177,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     results.each do |row|
       metrics.each do |category, var_mapping|
         if var_mapping.has_key?(row["Variable_name"]) then
-          output "#{config[:scheme]}.mysql.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
+          output "#{config[:scheme]}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
         end
       end
     end
