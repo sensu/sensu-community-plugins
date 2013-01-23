@@ -25,7 +25,7 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
       mem['swapFree']  = line.split(/\s+/)[1].to_i * 1024 if line.match /^SwapFree/
     end
 
-    mem['swapUsed'] = mem['swapTotal - mem.swapFree']
+    mem['swapUsed'] = mem['swapTotal'] - mem['swapFree']
     mem['used'] = mem['total'] - mem['free']
     mem['usedWOBuffersCaches'] = mem['used'] - (mem['buffers'] + mem['cached'])
     mem['freeWOBuffersCaches'] = mem['free'] + (mem['buffers'] + mem['cached'])
