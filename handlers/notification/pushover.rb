@@ -37,7 +37,7 @@ class Pushover < Sensu::Handler
         req.set_form_data(params)
         res = Net::HTTP.new(url.host, url.port)
         res.use_ssl = true
-        res.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        #res.verify_mode = OpenSSL::SSL::VERIFY_PEER
         res.start { |http| http.request(req) }
         puts 'pushover -- sent alert for ' + event_name + ' to pushover.'
       end
