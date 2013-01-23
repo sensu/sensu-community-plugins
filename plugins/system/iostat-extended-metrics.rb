@@ -24,7 +24,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to .$parent.$child",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.vmstat"
+    :default => "#{Socket.gethostname}"
 
   option :disk,
     :description => "Disk to gather stats for",
@@ -73,7 +73,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
     stats.each do |disk, metrics|
       metrics.each do |metric, value|
-        output [config[:scheme], disk, metric].join("."), value, timestamp
+        output [config[:scheme], "iostat", disk, metric].join("."), value, timestamp
       end
     end
     ok
