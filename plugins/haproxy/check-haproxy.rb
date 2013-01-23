@@ -89,7 +89,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
       haproxy.stats
     else
       haproxy.stats.select do |svc|
-        svc[:pxname] =~ /#{config[:service]}/
+        svc[:pxname] =~ /^#{config[:service]}$/
       end.reject do |svc|
         ["FRONTEND", "BACKEND"].include?(svc[:svname])
       end
