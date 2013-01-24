@@ -32,14 +32,21 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--disk DISK",
     :required => false 
 
+  option :interval,
+    :description => "Amount of time in seconds between each report", 
+    :short => "-i interval",
+    :long => "--interval interval",
+    :default => 1
+
   def parse_results(output)
     metrics = {}
-    result = output.split("\n")
+    res = output.split("Device:")
+    result = res[2].split("\n")
     result.each do |line|
       line.strip!
       parts = line.split(" ")
       next unless parts.size == 12
-      next if parts[0] == "Device:"
+      next if parts[0] == "rrqm/s:"
       key = parts[0]
       metrics[key] = {
         :rrqms => parts[1],
@@ -47,7 +54,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
         :rs => parts[3],
         :ws => parts[4],
         :rsecs => parts[5],
-        :wsecs => parts[6],
+        :wsec_s => parts[6],
         :avgrq_sz => parts[7],
         :avgqu_sz => parts[8],
         :await => parts[9],
@@ -60,12 +67,13 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     disk = config[:disk]
+    interval = config[:interval]
     if disk.nil?
-      raw = `iostat -x`
+      raw = `iostat -x #{interval} 2`
       stats = parse_results(raw)
     else
       disk_short = File.basename(disk)
-      raw = `iostat -xd #{disk}`
+      raw = `iostat -xd #{disk} #{interval} 2`
       stats = parse_results(raw)
     end
      
