@@ -22,7 +22,7 @@ class TalkerNotif < Sensu::Handler
   end
 
   def port
-    settings["talker"]["port"] || 80
+    settings["talker"]["port"] || ssl ? 443 : 80
   end
 
   def ssl
@@ -30,7 +30,7 @@ class TalkerNotif < Sensu::Handler
   end
 
   def room_uri
-    protocol = ssl ? "https" : "https"
+    protocol = ssl ? "https" : "http"
     URI.parse("#{protocol}://#{host}:#{port}/rooms/#{settings["talker"]["room"]}/messages.json")
   end
 
