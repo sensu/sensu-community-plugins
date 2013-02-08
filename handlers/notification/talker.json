@@ -4,7 +4,7 @@
     "account": "account_name",
     "room": "Ops",
     "host": "talkerapp.com",
-    "port": 8500,
-    "ssl": false
+    "port": 443,
+    "ssl": true
   }
 }
