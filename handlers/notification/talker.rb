@@ -6,15 +6,16 @@ require 'net/http'
 require 'uri'
 
 # required settings:
-# room
-# token
-# account (if using talkerapp.com)
-# host (if not using talkerapp.com)
+#  room
+#  token
+#  account (if using talkerapp.com)
+#  host (if not using talkerapp.com)
 #
 # optional settings:
-# ssl (default false)
-# port (default 8500)
-# host (default account_name.talkerapp.com)
+#  ssl (default true)
+#  port (default 80 or 443)
+#  host (default account.talkerapp.com)
+
 class TalkerNotif < Sensu::Handler
 
   def host
@@ -26,7 +27,7 @@ class TalkerNotif < Sensu::Handler
   end
 
   def ssl
-    settings["talker"]["ssl"].nil? ? false : settings["talker"]["ssl"]
+    settings["talker"]["ssl"].nil? ? true : settings["talker"]["ssl"]
   end
 
   def room_uri
