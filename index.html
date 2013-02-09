@@ -46,7 +46,7 @@
     </div>
 
     <div class="container">
-    <h2>51 Sensuers Contributing</h2>
+    <h2>52 Sensuers Contributing</h2>
 
     
       <a href="#author_modal_98f9dfc2e5e1318ac78b8c716582cd30" role="button" class="btn" data-toggle="modal">
@@ -543,6 +543,8 @@
               
               <li>plugins/processes/check-procs.rb</li>
               
+              <li>plugins/resque/resque-metrics.rb</li>
+              
               <li>plugins/system/iostat-extended-metrics.rb</li>
               
             </ul>
@@ -553,6 +555,10 @@
             <ul>
               
                 <li>handlers/notification/irc.rb</li>
+              
+                <li>handlers/notification/talker.json</li>
+              
+                <li>handlers/notification/talker.rb</li>
               
           
         </div>
@@ -608,99 +614,6 @@
                 <li>handlers/notification/mailer.json</li>
               
                 <li>handlers/notification/mailer.rb</li>
-              
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_ee9157074110a401fe14cd080e50ca0e" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/ee9157074110a401fe14cd080e50ca0e?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_ee9157074110a401fe14cd080e50ca0e" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_ee9157074110a401fe14cd080e50ca0e_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_ee9157074110a401fe14cd080e50ca0e_label">Andriy S.</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/apache/apache-metrics.rb</li>
-              
-              <li>plugins/aws/check-elb-health.rb</li>
-              
-              <li>plugins/cassandra/cassandra-metrics.rb</li>
-              
-              <li>plugins/dns/check-dns.rb</li>
-              
-              <li>plugins/haproxy/haproxy-metrics.rb</li>
-              
-              <li>plugins/monit/Gemfile</li>
-              
-              <li>plugins/monit/Readme.md</li>
-              
-              <li>plugins/monit/monit-email.rb</li>
-              
-              <li>plugins/network/metrics-netstat-tcp.rb</li>
-              
-              <li>plugins/postgres/postgres-alive.rb</li>
-              
-              <li>plugins/postgres/postgres-connections-metric.rb</li>
-              
-              <li>plugins/postgres/postgres-dbsize-metric.rb</li>
-              
-              <li>plugins/postgres/postgres-graphite.rb</li>
-              
-              <li>plugins/postgres/postgres-locks-metric.rb</li>
-              
-              <li>plugins/postgres/postgres-replication-status.rb</li>
-              
-              <li>plugins/postgres/postgres-statsbgwriter-metric.rb</li>
-              
-              <li>plugins/postgres/postgres-statsdb-metric.rb</li>
-              
-              <li>plugins/postgres/postgres-statsio-metric.rb</li>
-              
-              <li>plugins/postgres/postgres-statstable-metric.rb</li>
-              
-              <li>plugins/rabbitmq/check-rabbitmq-messages.rb</li>
-              
-              <li>plugins/rabbitmq/rabbitmq-overview-metrics.rb</li>
-              
-              <li>plugins/system/check-fs-writable.rb</li>
-              
-              <li>plugins/system/cpu-usage-metrics.sh</li>
-              
-              <li>plugins/system/temperature-metrics.rb</li>
-              
-              <li>plugins/varnish/varnish-metrics.rb</li>
-              
-            </ul>
-          
-
-          
-            Handlers Changed:
-            <ul>
-              
-                <li>handlers/metrics/geckoboard-push.rb</li>
-              
-                <li>handlers/metrics/opentsdb.json</li>
-              
-                <li>handlers/metrics/opentsdb.rb</li>
-              
-                <li>handlers/notification/messagemedia.json</li>
-              
-                <li>handlers/notification/messagemedia.rb</li>
-              
-                <li>handlers/notification/opsgenie.json</li>
-              
-                <li>handlers/notification/opsgenie.rb</li>
-              
-                <li>handlers/notification/xmpp.json</li>
-              
-                <li>handlers/notification/xmpp.rb</li>
               
           
         </div>
@@ -810,6 +723,99 @@
         </div>
       </div>
   
+      <a href="#author_modal_ee9157074110a401fe14cd080e50ca0e" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/ee9157074110a401fe14cd080e50ca0e?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_ee9157074110a401fe14cd080e50ca0e" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_ee9157074110a401fe14cd080e50ca0e_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_ee9157074110a401fe14cd080e50ca0e_label">Andriy S.</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/apache/apache-metrics.rb</li>
+              
+              <li>plugins/aws/check-elb-health.rb</li>
+              
+              <li>plugins/cassandra/cassandra-metrics.rb</li>
+              
+              <li>plugins/dns/check-dns.rb</li>
+              
+              <li>plugins/haproxy/haproxy-metrics.rb</li>
+              
+              <li>plugins/monit/Gemfile</li>
+              
+              <li>plugins/monit/Readme.md</li>
+              
+              <li>plugins/monit/monit-email.rb</li>
+              
+              <li>plugins/network/metrics-netstat-tcp.rb</li>
+              
+              <li>plugins/postgres/postgres-alive.rb</li>
+              
+              <li>plugins/postgres/postgres-connections-metric.rb</li>
+              
+              <li>plugins/postgres/postgres-dbsize-metric.rb</li>
+              
+              <li>plugins/postgres/postgres-graphite.rb</li>
+              
+              <li>plugins/postgres/postgres-locks-metric.rb</li>
+              
+              <li>plugins/postgres/postgres-replication-status.rb</li>
+              
+              <li>plugins/postgres/postgres-statsbgwriter-metric.rb</li>
+              
+              <li>plugins/postgres/postgres-statsdb-metric.rb</li>
+              
+              <li>plugins/postgres/postgres-statsio-metric.rb</li>
+              
+              <li>plugins/postgres/postgres-statstable-metric.rb</li>
+              
+              <li>plugins/rabbitmq/check-rabbitmq-messages.rb</li>
+              
+              <li>plugins/rabbitmq/rabbitmq-overview-metrics.rb</li>
+              
+              <li>plugins/system/check-fs-writable.rb</li>
+              
+              <li>plugins/system/cpu-usage-metrics.sh</li>
+              
+              <li>plugins/system/temperature-metrics.rb</li>
+              
+              <li>plugins/varnish/varnish-metrics.rb</li>
+              
+            </ul>
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/metrics/geckoboard-push.rb</li>
+              
+                <li>handlers/metrics/opentsdb.json</li>
+              
+                <li>handlers/metrics/opentsdb.rb</li>
+              
+                <li>handlers/notification/messagemedia.json</li>
+              
+                <li>handlers/notification/messagemedia.rb</li>
+              
+                <li>handlers/notification/opsgenie.json</li>
+              
+                <li>handlers/notification/opsgenie.rb</li>
+              
+                <li>handlers/notification/xmpp.json</li>
+              
+                <li>handlers/notification/xmpp.rb</li>
+              
+          
+        </div>
+      </div>
+  
       <a href="#author_modal_31cc2100279326dd6148a7e163692097" role="button" class="btn" data-toggle="modal">
        <img src="http://www.gravatar.com/avatar/31cc2100279326dd6148a7e163692097?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
@@ -844,6 +850,35 @@
                 <li>handlers/irc/irc.json</li>
               
                 <li>handlers/irc/irc.rb</li>
+              
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_4ac842e4f2c485cea30c979efe87db4d" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/4ac842e4f2c485cea30c979efe87db4d?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_4ac842e4f2c485cea30c979efe87db4d" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_4ac842e4f2c485cea30c979efe87db4d_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_4ac842e4f2c485cea30c979efe87db4d_label">Bryan B.</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/processes/check-procs.rb</li>
+              
+            </ul>
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/notification/mailer.rb</li>
               
           
         </div>
@@ -940,35 +975,6 @@
         </div>
       </div>
   
-      <a href="#author_modal_4ac842e4f2c485cea30c979efe87db4d" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/4ac842e4f2c485cea30c979efe87db4d?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_4ac842e4f2c485cea30c979efe87db4d" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_4ac842e4f2c485cea30c979efe87db4d_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_4ac842e4f2c485cea30c979efe87db4d_label">Bryan B.</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/processes/check-procs.rb</li>
-              
-            </ul>
-          
-
-          
-            Handlers Changed:
-            <ul>
-              
-                <li>handlers/notification/mailer.rb</li>
-              
-          
-        </div>
-      </div>
-  
       <a href="#author_modal_3429d19dc92977d67f4e4e599ade7ffc" role="button" class="btn" data-toggle="modal">
        <img src="http://www.gravatar.com/avatar/3429d19dc92977d67f4e4e599ade7ffc?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
@@ -1004,6 +1010,37 @@
             </ul>
           
 
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_19a87c2177b109320b7066557bbb5015" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/19a87c2177b109320b7066557bbb5015?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_19a87c2177b109320b7066557bbb5015" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_19a87c2177b109320b7066557bbb5015_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_19a87c2177b109320b7066557bbb5015_label">Rafael F.</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/haproxy/haproxy-metrics.rb</li>
+              
+            </ul>
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/notification/messagemedia.json</li>
+              
+                <li>handlers/notification/messagemedia.rb</li>
+              
           
         </div>
       </div>
@@ -1056,33 +1093,27 @@
         </div>
       </div>
   
-      <a href="#author_modal_19a87c2177b109320b7066557bbb5015" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/19a87c2177b109320b7066557bbb5015?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      <a href="#author_modal_2fb066547e8b565a75c482d48e4b6e07" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/2fb066547e8b565a75c482d48e4b6e07?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
     
-      <div id="author_modal_19a87c2177b109320b7066557bbb5015" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_19a87c2177b109320b7066557bbb5015_label" aria-hidden="true">
+      <div id="author_modal_2fb066547e8b565a75c482d48e4b6e07" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_2fb066547e8b565a75c482d48e4b6e07_label" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_19a87c2177b109320b7066557bbb5015_label">Rafael F.</h3>
+          <h3 id="author_modal_2fb066547e8b565a75c482d48e4b6e07_label">Brian R.</h3>
         </div>
         <div class="modal-body">
           
             Plugins Changed:
             <ul>
               
-              <li>plugins/haproxy/haproxy-metrics.rb</li>
+              <li>plugins/redis/redis-graphite.rb</li>
+              
+              <li>plugins/resque/resque-metrics.rb</li>
               
             </ul>
           
 
-          
-            Handlers Changed:
-            <ul>
-              
-                <li>handlers/notification/messagemedia.json</li>
-              
-                <li>handlers/notification/messagemedia.rb</li>
-              
           
         </div>
       </div>
@@ -1114,6 +1145,30 @@
         </div>
       </div>
   
+      <a href="#author_modal_632736adcf488fc2e034180e75ae0a19" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/632736adcf488fc2e034180e75ae0a19?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_632736adcf488fc2e034180e75ae0a19" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_632736adcf488fc2e034180e75ae0a19_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_632736adcf488fc2e034180e75ae0a19_label">Jan K.</h3>
+        </div>
+        <div class="modal-body">
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/notification/xmpp.json</li>
+              
+                <li>handlers/notification/xmpp.rb</li>
+              
+          
+        </div>
+      </div>
+  
       <a href="#author_modal_c3dd15d19b03333b23b881d9fb172cf8" role="button" class="btn" data-toggle="modal">
        <img src="http://www.gravatar.com/avatar/c3dd15d19b03333b23b881d9fb172cf8?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
@@ -1129,29 +1184,6 @@
             <ul>
               
               <li>plugins/system/vmstat-metrics.rb</li>
-              
-            </ul>
-          
-
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_2fb066547e8b565a75c482d48e4b6e07" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/2fb066547e8b565a75c482d48e4b6e07?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_2fb066547e8b565a75c482d48e4b6e07" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_2fb066547e8b565a75c482d48e4b6e07_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_2fb066547e8b565a75c482d48e4b6e07_label">Brian R.</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/redis/redis-graphite.rb</li>
               
             </ul>
           
@@ -1208,6 +1240,85 @@
         </div>
       </div>
   
+      <a href="#author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/c5476bd8b4cf84d832cc87a3e9c69c0c?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c_label">chrisalexander</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/percona-cluster/percona-cluster-metrics.rb</li>
+              
+              <li>plugins/percona-cluster/percona-cluster-size.rb</li>
+              
+            </ul>
+          
+
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_7f8e11834b0408b92a5d70f5846f1ab7" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/7f8e11834b0408b92a5d70f5846f1ab7?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_7f8e11834b0408b92a5d70f5846f1ab7" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_7f8e11834b0408b92a5d70f5846f1ab7_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_7f8e11834b0408b92a5d70f5846f1ab7_label">Joe C.</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/mysql/mysql-alive</li>
+              
+            </ul>
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/twitter/twitter</li>
+              
+                <li>handlers/twitter/twitter.json</li>
+              
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_c90cf736b1ff8af0f455b6ecc4432a38" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/c90cf736b1ff8af0f455b6ecc4432a38?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_c90cf736b1ff8af0f455b6ecc4432a38" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_c90cf736b1ff8af0f455b6ecc4432a38_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_c90cf736b1ff8af0f455b6ecc4432a38_label">dsuarez</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/system/temperature-metrics.rb</li>
+              
+            </ul>
+          
+
+          
+        </div>
+      </div>
+  
       <a href="#author_modal_57c3968a822055f2d5d8ed8da3d4f58d" role="button" class="btn" data-toggle="modal">
        <img src="http://www.gravatar.com/avatar/57c3968a822055f2d5d8ed8da3d4f58d?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
@@ -1229,53 +1340,6 @@
               <li>plugins/system/interface-metrics.rb</li>
               
               <li>plugins/system/memory-metrics.rb</li>
-              
-            </ul>
-          
-
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_632736adcf488fc2e034180e75ae0a19" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/632736adcf488fc2e034180e75ae0a19?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_632736adcf488fc2e034180e75ae0a19" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_632736adcf488fc2e034180e75ae0a19_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_632736adcf488fc2e034180e75ae0a19_label">Jan K.</h3>
-        </div>
-        <div class="modal-body">
-          
-
-          
-            Handlers Changed:
-            <ul>
-              
-                <li>handlers/notification/xmpp.json</li>
-              
-                <li>handlers/notification/xmpp.rb</li>
-              
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_c90cf736b1ff8af0f455b6ecc4432a38" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/c90cf736b1ff8af0f455b6ecc4432a38?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_c90cf736b1ff8af0f455b6ecc4432a38" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_c90cf736b1ff8af0f455b6ecc4432a38_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_c90cf736b1ff8af0f455b6ecc4432a38_label">dsuarez</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/system/temperature-metrics.rb</li>
               
             </ul>
           
@@ -1323,58 +1387,26 @@
         </div>
       </div>
   
-      <a href="#author_modal_7f8e11834b0408b92a5d70f5846f1ab7" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/7f8e11834b0408b92a5d70f5846f1ab7?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      <a href="#author_modal_afa7174b94b1be79e77e07b58d11f3c9" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/afa7174b94b1be79e77e07b58d11f3c9?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
     
-      <div id="author_modal_7f8e11834b0408b92a5d70f5846f1ab7" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_7f8e11834b0408b92a5d70f5846f1ab7_label" aria-hidden="true">
+      <div id="author_modal_afa7174b94b1be79e77e07b58d11f3c9" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_afa7174b94b1be79e77e07b58d11f3c9_label" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_7f8e11834b0408b92a5d70f5846f1ab7_label">Joe C.</h3>
+          <h3 id="author_modal_afa7174b94b1be79e77e07b58d11f3c9_label">Peter S.</h3>
         </div>
         <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/mysql/mysql-alive</li>
-              
-            </ul>
           
 
           
             Handlers Changed:
             <ul>
               
-                <li>handlers/twitter/twitter</li>
+                <li>handlers/notification/talker.json</li>
               
-                <li>handlers/twitter/twitter.json</li>
+                <li>handlers/notification/talker.rb</li>
               
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/c5476bd8b4cf84d832cc87a3e9c69c0c?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_c5476bd8b4cf84d832cc87a3e9c69c0c_label">chrisalexander</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/percona-cluster/percona-cluster-metrics.rb</li>
-              
-              <li>plugins/percona-cluster/percona-cluster-size.rb</li>
-              
-            </ul>
-          
-
           
         </div>
       </div>
@@ -1476,24 +1508,25 @@
         </div>
       </div>
   
-      <a href="#author_modal_f7fb4962f566eaa4bdbb32430bab19e0" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/f7fb4962f566eaa4bdbb32430bab19e0?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      <a href="#author_modal_eab6ce693f16aaff87482f1ff9b70bb0" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/eab6ce693f16aaff87482f1ff9b70bb0?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
     
-      <div id="author_modal_f7fb4962f566eaa4bdbb32430bab19e0" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_f7fb4962f566eaa4bdbb32430bab19e0_label" aria-hidden="true">
+      <div id="author_modal_eab6ce693f16aaff87482f1ff9b70bb0" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_eab6ce693f16aaff87482f1ff9b70bb0_label" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_f7fb4962f566eaa4bdbb32430bab19e0_label">Justin L.</h3>
+          <h3 id="author_modal_eab6ce693f16aaff87482f1ff9b70bb0_label">Jon-Erik S.</h3>
         </div>
         <div class="modal-body">
           
-
-          
-            Handlers Changed:
+            Plugins Changed:
             <ul>
               
-                <li>handlers/notification/hipchat.rb</li>
+              <li>plugins/mysql/mysql-graphite.rb</li>
               
+            </ul>
+          
+
           
         </div>
       </div>
@@ -1513,6 +1546,52 @@
             <ul>
               
               <li>plugins/http/check-http.rb</li>
+              
+            </ul>
+          
+
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_671fdec524efe839fd51eb42e98c9511" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/671fdec524efe839fd51eb42e98c9511?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_671fdec524efe839fd51eb42e98c9511" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_671fdec524efe839fd51eb42e98c9511_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_671fdec524efe839fd51eb42e98c9511_label">Cameron B.</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/system/memory-metrics.rb</li>
+              
+            </ul>
+          
+
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_583939add8ea395c201c40fce77d45bf" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/583939add8ea395c201c40fce77d45bf?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_583939add8ea395c201c40fce77d45bf" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_583939add8ea395c201c40fce77d45bf_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_583939add8ea395c201c40fce77d45bf_label">Anthony G.</h3>
+        </div>
+        <div class="modal-body">
+          
+            Plugins Changed:
+            <ul>
+              
+              <li>plugins/mysql/mysql-graphite.rb</li>
               
             </ul>
           
@@ -1543,14 +1622,14 @@
         </div>
       </div>
   
-      <a href="#author_modal_583939add8ea395c201c40fce77d45bf" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/583939add8ea395c201c40fce77d45bf?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      <a href="#author_modal_55b2823f44d3fda19cc6388bbf3f6fe2" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/55b2823f44d3fda19cc6388bbf3f6fe2?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
     
-      <div id="author_modal_583939add8ea395c201c40fce77d45bf" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_583939add8ea395c201c40fce77d45bf_label" aria-hidden="true">
+      <div id="author_modal_55b2823f44d3fda19cc6388bbf3f6fe2" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_55b2823f44d3fda19cc6388bbf3f6fe2_label" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_583939add8ea395c201c40fce77d45bf_label">Anthony G.</h3>
+          <h3 id="author_modal_55b2823f44d3fda19cc6388bbf3f6fe2_label">kcrayon</h3>
         </div>
         <div class="modal-body">
           
@@ -1588,52 +1667,6 @@
         </div>
       </div>
   
-      <a href="#author_modal_55b2823f44d3fda19cc6388bbf3f6fe2" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/55b2823f44d3fda19cc6388bbf3f6fe2?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_55b2823f44d3fda19cc6388bbf3f6fe2" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_55b2823f44d3fda19cc6388bbf3f6fe2_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_55b2823f44d3fda19cc6388bbf3f6fe2_label">kcrayon</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/mysql/mysql-graphite.rb</li>
-              
-            </ul>
-          
-
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_b075ff792526a3baf6dc1c522e71d4ee" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/b075ff792526a3baf6dc1c522e71d4ee?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_b075ff792526a3baf6dc1c522e71d4ee" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_b075ff792526a3baf6dc1c522e71d4ee_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_b075ff792526a3baf6dc1c522e71d4ee_label">Alan S.</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/http/check-http.rb</li>
-              
-            </ul>
-          
-
-          
-        </div>
-      </div>
-  
       <a href="#author_modal_390d564de1c8f8f1d1c09a5f13b33e55" role="button" class="btn" data-toggle="modal">
        <img src="http://www.gravatar.com/avatar/390d564de1c8f8f1d1c09a5f13b33e55?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
@@ -1651,52 +1684,6 @@
               <li>plugins/postgres/postgres-graphite.rb</li>
               
               <li>plugins/postgres/postgres-replication-status.rb</li>
-              
-            </ul>
-          
-
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_eab6ce693f16aaff87482f1ff9b70bb0" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/eab6ce693f16aaff87482f1ff9b70bb0?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_eab6ce693f16aaff87482f1ff9b70bb0" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_eab6ce693f16aaff87482f1ff9b70bb0_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_eab6ce693f16aaff87482f1ff9b70bb0_label">Jon-Erik S.</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/mysql/mysql-graphite.rb</li>
-              
-            </ul>
-          
-
-          
-        </div>
-      </div>
-  
-      <a href="#author_modal_671fdec524efe839fd51eb42e98c9511" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/671fdec524efe839fd51eb42e98c9511?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
-      </a>
-    
-      <div id="author_modal_671fdec524efe839fd51eb42e98c9511" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_671fdec524efe839fd51eb42e98c9511_label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_671fdec524efe839fd51eb42e98c9511_label">Cameron B.</h3>
-        </div>
-        <div class="modal-body">
-          
-            Plugins Changed:
-            <ul>
-              
-              <li>plugins/system/memory-metrics.rb</li>
               
             </ul>
           
@@ -1728,6 +1715,52 @@
         </div>
       </div>
   
+      <a href="#author_modal_f7fb4962f566eaa4bdbb32430bab19e0" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/f7fb4962f566eaa4bdbb32430bab19e0?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_f7fb4962f566eaa4bdbb32430bab19e0" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_f7fb4962f566eaa4bdbb32430bab19e0_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_f7fb4962f566eaa4bdbb32430bab19e0_label">Justin L.</h3>
+        </div>
+        <div class="modal-body">
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/notification/hipchat.rb</li>
+              
+          
+        </div>
+      </div>
+  
+      <a href="#author_modal_89e0ad1229121f46047977ac547bd7b4" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/89e0ad1229121f46047977ac547bd7b4?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      </a>
+    
+      <div id="author_modal_89e0ad1229121f46047977ac547bd7b4" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_89e0ad1229121f46047977ac547bd7b4_label" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="author_modal_89e0ad1229121f46047977ac547bd7b4_label">Daniel S.</h3>
+        </div>
+        <div class="modal-body">
+          
+
+          
+            Handlers Changed:
+            <ul>
+              
+                <li>handlers/notification/opsgenie.json</li>
+              
+                <li>handlers/notification/opsgenie.rb</li>
+              
+          
+        </div>
+      </div>
+  
       <a href="#author_modal_2f0ce1e8448514ffa90ac007688975b2" role="button" class="btn" data-toggle="modal">
        <img src="http://www.gravatar.com/avatar/2f0ce1e8448514ffa90ac007688975b2?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
@@ -1751,21 +1784,21 @@
         </div>
       </div>
   
-      <a href="#author_modal_32ad61336938c59b34e321fe6ca43fce" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/32ad61336938c59b34e321fe6ca43fce?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      <a href="#author_modal_b075ff792526a3baf6dc1c522e71d4ee" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/b075ff792526a3baf6dc1c522e71d4ee?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
     
-      <div id="author_modal_32ad61336938c59b34e321fe6ca43fce" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_32ad61336938c59b34e321fe6ca43fce_label" aria-hidden="true">
+      <div id="author_modal_b075ff792526a3baf6dc1c522e71d4ee" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_b075ff792526a3baf6dc1c522e71d4ee_label" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_32ad61336938c59b34e321fe6ca43fce_label">Tomas H.</h3>
+          <h3 id="author_modal_b075ff792526a3baf6dc1c522e71d4ee_label">Alan S.</h3>
         </div>
         <div class="modal-body">
           
             Plugins Changed:
             <ul>
               
-              <li>plugins/mysql/mysql-graphite.rb</li>
+              <li>plugins/http/check-http.rb</li>
               
             </ul>
           
@@ -1796,26 +1829,25 @@
         </div>
       </div>
   
-      <a href="#author_modal_89e0ad1229121f46047977ac547bd7b4" role="button" class="btn" data-toggle="modal">
-       <img src="http://www.gravatar.com/avatar/89e0ad1229121f46047977ac547bd7b4?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
+      <a href="#author_modal_32ad61336938c59b34e321fe6ca43fce" role="button" class="btn" data-toggle="modal">
+       <img src="http://www.gravatar.com/avatar/32ad61336938c59b34e321fe6ca43fce?d=https://secure.gravatar.com/avatar/f944437e121d4e1efc45dfaec2651550"/>
       </a>
     
-      <div id="author_modal_89e0ad1229121f46047977ac547bd7b4" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_89e0ad1229121f46047977ac547bd7b4_label" aria-hidden="true">
+      <div id="author_modal_32ad61336938c59b34e321fe6ca43fce" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="author_modal_32ad61336938c59b34e321fe6ca43fce_label" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3 id="author_modal_89e0ad1229121f46047977ac547bd7b4_label">Daniel S.</h3>
+          <h3 id="author_modal_32ad61336938c59b34e321fe6ca43fce_label">Tomas H.</h3>
         </div>
         <div class="modal-body">
           
-
-          
-            Handlers Changed:
+            Plugins Changed:
             <ul>
               
-                <li>handlers/notification/opsgenie.json</li>
+              <li>plugins/mysql/mysql-graphite.rb</li>
               
-                <li>handlers/notification/opsgenie.rb</li>
-              
+            </ul>
+          
+
           
         </div>
       </div>
