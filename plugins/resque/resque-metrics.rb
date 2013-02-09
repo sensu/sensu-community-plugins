@@ -28,6 +28,12 @@ class ResqueMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Redis port",
     :default => "6379"
 
+  option :namespace,
+    :description => "Resque namespace",
+    :short => "-n NAMESPACE",
+    :long => "--namespace NAMESPACE",
+    :default => "resque"
+
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
@@ -38,6 +44,7 @@ class ResqueMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     redis = Redis.new(:host => config[:hostname], :port => config[:port])
     Resque.redis = redis
+    Resque.redis.namespace = config[:namespace]
     count = Resque::Failure::Redis.count
     info = Resque.info
 
