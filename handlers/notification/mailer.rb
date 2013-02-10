@@ -11,6 +11,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
+gem 'mail', '~> 2.4.0'
 require 'mail'
 require 'timeout'
 
