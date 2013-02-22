@@ -36,6 +36,18 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     :long => "--password PASSWORD",
     :default => "guest"
 
+  option :vhost,
+    :description => "RabbitMQ vhost",
+    :short => '-v',
+    :long => '--vhost VHOST',
+    :default => '%2F'
+
+  option :queue,
+    :description => "RabbitMQ queue",
+    :short => '-q',
+    :long => '--queue QUEUE',
+    :default => nil
+
   option :warn,
     :short => '-w NUM_MESSAGES',
     :long => '--warn NUM_MESSAGES',
@@ -64,8 +76,21 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
 
   def run
     rabbitmq = get_rabbitmq_info
-    overview = rabbitmq.overview
-    total = overview['queue_totals']['messages']
+
+    if config[:queue]
+      all_queues = rabbitmq.queues
+      resolved_vhost = config[:vhost] == '%2F' ? '/' : config[:vhost]
+      begin
+        queue = all_queues.find {|q| q['vhost'] == resolved_vhost and q['name'] == config[:queue]}
+        total = queue['messages']
+      rescue
+        critical "could not find queue \"#{config[:queue]}\" on vhost \"#{resolved_vhost}\"" if queue.nil?
+      end
+    else
+      overview = rabbitmq.overview
+      total = overview['queue_totals']['messages']
+    end
+
     message "#{total}"
     critical if total > config[:critical].to_i
     warning if total > config[:warn].to_i
