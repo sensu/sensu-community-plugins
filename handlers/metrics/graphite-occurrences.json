@@ -1,0 +1,6 @@
+{
+ "graphite": {
+    "server":"graphite.example.com",
+    "port":"2003"
+ }
+}
