@@ -4,7 +4,7 @@
 #
 # This handler formats alerts as mails and sends them off to a pre-defined recipient.
 #
-# Copyright 2012 Pål-Kristian Hamre (https://github.com/pkhamre | http://twitter.com/pkhamre)
+# Copyright 2012 Pal-Kristian Hamre (https://github.com/pkhamre | http://twitter.com/pkhamre)
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
