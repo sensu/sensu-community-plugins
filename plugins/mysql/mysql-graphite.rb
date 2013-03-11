@@ -53,6 +53,11 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.mysql"
 
+  option :socket,
+    :short => "-S SOCKET",
+    :long => "--socket SOCKET",
+    :default => "/var/lib/mysql/mysql.sock"
+
   def run
 
     # props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
@@ -166,7 +171,8 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         :host => config[:host],
         :port =>config[:port],
         :username => config[:username],
-        :password => config[:password]
+        :password => config[:password],
+        :socket => config[:socket]
         )
 
       results = mysql.query("SHOW GLOBAL STATUS")
