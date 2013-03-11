@@ -47,8 +47,7 @@ class CheckMySQL < Sensu::Plugin::Check::CLI
   option :socket,
          :description => "Socket to use",
          :short => '-s SOCKET',
-         :long => '--socket SOCKET',
-         :default => "/var/lib/mysql/mysql.sock"
+         :long => '--socket SOCKET'
 
   def run
     begin
