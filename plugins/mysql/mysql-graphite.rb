@@ -56,7 +56,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
   option :socket,
     :short => "-S SOCKET",
     :long => "--socket SOCKET",
-    :default => "/var/lib/mysql/mysql.sock"
+    :default => nil
 
   def run
 
