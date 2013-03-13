@@ -23,7 +23,7 @@ def write_template(template, dest, var_binding)
 end
 
 class Author
-  attr :commits
+  attr_accessor :commits
   attr :email
   attr :name
   attr :id
@@ -33,6 +33,10 @@ class Author
     @email = author.email
     @name = author.name
     @id = Digest::MD5.hexdigest(@email.downcase)
+  end
+  
+  def same_as(other)
+    other.name == name || other.email == email
   end
 
   def pretty_name
@@ -75,10 +79,36 @@ class Author
   end
 end
 
+class CommitCounter
+  attr_accessor :authors
+  
+  def initialize
+    @authors = []
+  end
+  
+  def add(author)
+    index = authors.index { |p| p.same_as(author) }
+    if index
+      authors[index].commits += author.commits
+    else
+      authors << author
+    end
+  end
+  
+  def count
+    sorted = authors.sort_by { |p| - p.commits.length }
+  end
+end
+
 desc "Generate HTML pages."
 task :default do
-  authors = find_all_authors()
-
+  counter = CommitCounter.new
+  find_all_authors.each do |auth|
+    counter.add auth
+  end
+  
+  authors = counter.count
+  
   authors.each do |author|
     file = "images/#{author.id}"
     author.download_gravatar(file) unless File.exists?(file)
