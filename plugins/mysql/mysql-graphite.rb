@@ -75,6 +75,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Aborted_clients' =>        'abortedClients',
         'Aborted_connects' =>       'abortedConnects',
         'Threads_connected' =>      'threadsConnected',
+        'Threads_running' => 	    'threadsRunning',
         'Open_files' =>             'openFiles',
         'Open_tables' =>            'openTables',
         'Opened_tables' =>          'openedTables',
