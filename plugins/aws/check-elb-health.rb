@@ -57,7 +57,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   option :instances,
     :short => '-i INSTANCES',
     :long => '--instances INSTANCES',
-    :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health',
+    :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health'
 
   option :verbose,
     :short => '-v',
