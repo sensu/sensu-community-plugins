@@ -5,6 +5,9 @@
 # Copyright 2013 github.com/foomatty
 # Basics from github.com/mantree/mongodb-graphite-metrics
 #
+# Depends on ruby mongo driver
+# gem install mongo
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
