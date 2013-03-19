@@ -1,3 +1,11 @@
+# Send event output to Redis
+# ===
+#
+# Copyright 2013 kcrayon <crayon@crayon.at>
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
+
 module Sensu
   module Extension
     class RedisOutput < Handler
@@ -6,7 +14,7 @@ module Sensu
       end
 
       def description
-        'outputs events output to a redis list or channel'
+        'sends event output to a redis list or channel'
       end
 
       def run(event, settings, &block)
