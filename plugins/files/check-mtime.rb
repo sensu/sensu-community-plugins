@@ -30,7 +30,7 @@ class Mtime < Sensu::Plugin::Check::CLI
     :short => '-f FILE',
     :long => '--file FILE'
 
-  option :warn_age,
+  option :warning_age,
     :description => 'Warn if mtime greater than provided age in seconds',
     :short => '-w SECONDS',
     :long => '--warn SECONDS'
@@ -49,7 +49,7 @@ class Mtime < Sensu::Plugin::Check::CLI
 
   def run
     unknown 'No file specified' unless config[:file]
-    unknown 'No warn or critical age specified' unless config[:warn_age] || config[:critical_age]
+    unknown 'No warn or critical age specified' unless config[:warning_age] || config[:critical_age]
     if(File.exists?(config[:file]))
       age = Time.now.to_i - File.mtime(config[:file]).to_i
       run_check(:critical, age) || run_check(:warning, age) || ok("file is #{age} seconds old")
