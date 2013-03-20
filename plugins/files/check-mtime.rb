@@ -33,7 +33,7 @@ class Mtime < Sensu::Plugin::Check::CLI
   option :warning_age,
     :description => 'Warn if mtime greater than provided age in seconds',
     :short => '-w SECONDS',
-    :long => '--warn SECONDS'
+    :long => '--warning SECONDS'
 
   option :critical_age,
     :description => 'Critical if mtime greater than provided age in seconds',
