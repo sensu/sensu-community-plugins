@@ -26,8 +26,6 @@ class Mailer < Sensu::Handler
   def handle
 
     settings['mailer'] ||= {}
-    puts "settings is %s" % settings.inspect
-    puts "settings[mailer] is %s" % settings['mailer']
 
     defaults = {
       :address => 'localhost',
@@ -36,8 +34,6 @@ class Mailer < Sensu::Handler
 
     # merge defaults and convert keys to symbols
     params = defaults.merge(settings['mailer'].inject({}) { |result, (k, v)| result[k.to_sym] = v; result })
-
-    puts "params is %s" % params.inspect
 
     # for backwards-compatibility
     mappings = {
@@ -83,8 +79,6 @@ class Mailer < Sensu::Handler
           subject subject
           body body
         end
-
-        puts 'mail -- sent alert for ' + short_name + ' to ' + params[:to]
       end
     rescue Timeout::Error
       puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
