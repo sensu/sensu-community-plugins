@@ -101,18 +101,27 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     # overview['message_stats']['publish']
     if overview['message_stats'].include?('publish') then 
       output "#{config[:scheme]}.message_stats.publish.count", overview['message_stats']['publish'], timestamp
+    end
+    if overview['message_stats'].include?('publish_details') and 
+       overview['message_stats']['publish_details'].include('rate') then
       output "#{config[:scheme]}.message_stats.publish.rate", overview['message_stats']['publish_details']['rate'], timestamp 
     end
 
     # overview['message_stats']['deliver_no_ack']
-    if overview['message_stats'].include?('deliver_no_ack_details') then 
+    if overview['message_stats'].include?('deliver_no_ack') then
       output "#{config[:scheme]}.message_stats.deliver_no_ack.count", overview['message_stats']['deliver_no_ack'], timestamp
+    end
+    if overview['message_stats'].include?('deliver_no_ack_details') and
+       overview['message_stats']['deliver_no_ack_details'].include?('rate') then
       output "#{config[:scheme]}.message_stats.deliver_no_ack.rate", overview['message_stats']['deliver_no_ack_details']['rate'], timestamp
     end
 
     # overview['message_stats']['deliver_get']
     if overview['message_stats'].include?('deliver_get') then
       output "#{config[:scheme]}.message_stats.deliver_get.count", overview['message_stats']['deliver_get'], timestamp
+    end
+    if overview['message_stats'].include?('deliver_get_details') and
+       overview['message_stats']['deliver_get_details'].include?('rate') then
       output "#{config[:scheme]}.message_stats.deliver_get.rate", overview['message_stats']['deliver_get_details']['rate'], timestamp
     end 
 
