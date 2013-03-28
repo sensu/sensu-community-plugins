@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 #
 # Checks a file's mtime
 # ===
