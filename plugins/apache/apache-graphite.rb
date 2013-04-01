@@ -23,6 +23,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
+require 'net/https'
 
 class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
@@ -61,6 +62,10 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def get_mod_status
     http = Net::HTTP.new(config[:host], config[:port])
+    if config[:port] == '443'
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.use_ssl = true
+    end
     req = Net::HTTP::Get.new(config[:path])
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
