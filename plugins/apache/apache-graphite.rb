@@ -63,9 +63,14 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
+ option :secure,
+    :short => "-s",
+    :long => "--secure",
+    :description => "Use SSL"
+
   def get_mod_status
     http = Net::HTTP.new(config[:host], config[:port])
-    if config[:port] == '443'
+    if config[:secure]
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.use_ssl = true
     end
