@@ -6,6 +6,8 @@
 # Copyright 2013 github.com/foomatty
 # Copyright 2012 Pal-Kristian Hamre (https://github.com/pkhamre | http://twitter.com/pkhamre)
 #
+# Requires aws-ses gem 'gem install aws-ses'
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
