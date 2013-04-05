@@ -3,6 +3,9 @@
 # Pull haproxy metrics for backends
 # ===
 #
+# If you are occassionally seeing "nil output" from this check, make sure you have
+# sensu-plugin >= 0.1.7. This will provide a better error message.
+#
 # TODO: backend pool single node stats.
 #
 # Copyright 2012 Pete Shima <me@peteshima.com>, Joe Miller <https://github.com/joemiller>
