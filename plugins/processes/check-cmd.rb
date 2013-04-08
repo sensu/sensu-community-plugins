@@ -20,7 +20,7 @@ class CheckCMDStatus < Sensu::Plugin::Check::CLI
     :required => true
 
   option :status,
-    :description => 'Exit code the check should get',
+    :description => 'exit status code the check should get',
     :short => '-s',
     :long => '--status STATUS',
     :default => '0'
