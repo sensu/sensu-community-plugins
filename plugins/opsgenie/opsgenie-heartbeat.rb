@@ -7,6 +7,8 @@
 # it will alert. Fails with a warning if heartbeat is not configured in the Opsgenie admin
 # interface.
 #
+# Recommended plugin interval: 200 and occurences: 3
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
@@ -24,9 +26,16 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
     :description => "Opsgenie Customer API key",
     :required => true
 
+  option :timeout, 
+    :short => '-t Secs',
+    :long => '--timeout Secs'
+    :description => "Plugin timeout",
+    :proc => proc { |a| a.to_i },
+    :default => 10
+
   def run
     begin
-      timeout(5) do
+      timeout(config[:timeout]) do
         response = opsgenie_heartbeat()
         case response['code']
         when 200
@@ -34,11 +43,11 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
         when 8
           warning 'heartbeat not enabled'
         else
-          critical 'unexpected response code ' + response.code.to_s
+          unknown 'unexpected response code ' + response.code.to_s
         end
       end
     rescue Timeout::Error
-      critical 'heartbeat timed out'
+      warning 'heartbeat timed out'
     end
   end
 
