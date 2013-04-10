@@ -28,7 +28,7 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
 
   option :timeout, 
     :short => '-t Secs',
-    :long => '--timeout Secs'
+    :long => '--timeout Secs',
     :description => "Plugin timeout",
     :proc => proc { |a| a.to_i },
     :default => 10
