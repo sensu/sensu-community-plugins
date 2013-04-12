@@ -49,7 +49,7 @@ class Opsgenie < Sensu::Handler
   def create_alert(description)
     tags = []
     tags << settings["opsgenie"]["tags"] if settings["opsgenie"]["tags"]
-    tags << "OverwriteQuietHours" if settings["opsgenie"]["overwrite_quiet_hours"] == true
+    tags << "OverwriteQuietHours" if event_status == 2 and settings["opsgenie"]["overwrite_quiet_hours"] == true
     tags << "unknown" if event_status >= 3
     tags << "critical" if event_status == 2
     tags << "warning" if event_status == 1
