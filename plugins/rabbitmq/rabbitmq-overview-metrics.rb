@@ -103,7 +103,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
       output "#{config[:scheme]}.message_stats.publish.count", overview['message_stats']['publish'], timestamp
     end
     if overview['message_stats'].include?('publish_details') and 
-       overview['message_stats']['publish_details'].include('rate') then
+       overview['message_stats']['publish_details'].include?('rate') then
       output "#{config[:scheme]}.message_stats.publish.rate", overview['message_stats']['publish_details']['rate'], timestamp 
     end
 
