@@ -89,7 +89,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
 
           if replication_delay > config[:warn] and
               replication_delay <= config[:crit]
-            warn message
+            warning message
           elsif replication_delay >= config[:crit]
             critical message
           else
@@ -97,6 +97,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
           end
 
         end
+        ok "show slave status was nil. This server is not a slave."
       end
 
     rescue Mysql::Error => e

@@ -43,7 +43,7 @@ class ESHeapUsage < Sensu::Plugin::Check::CLI
   end
 
   def get_heap_used
-    stats = get_es_resource('/_cluster/nodes/_local/stats')
+    stats = get_es_resource('/_cluster/nodes/_local/stats?jvm=true')
     node = stats['nodes'].keys.first
     begin
       stats['nodes'][node]['jvm']['mem']['heap_used_in_bytes']

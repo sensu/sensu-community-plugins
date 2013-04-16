@@ -39,7 +39,7 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
          :description => "Metric naming scheme, text to prepend to metric",
          :short       => "-s SCHEME",
          :long        => "--scheme SCHEME",
-         :default     => "#{::Socket.gethostname}.redis"
+         :default     => "#{::Socket.gethostname}.memcached"
 
   def run
     cache = Memcached.new("#{config[:host]}:#{config[:port]}")

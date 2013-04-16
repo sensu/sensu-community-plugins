@@ -6,6 +6,8 @@
 # Defaults to checking if ALL services in the given group are up; with
 # -1, checks if ANY service is up. with -A, checks all groups.
 #
+# Updated: To add -S to allow for different named sockets 
+#
 # Copyright 2011 Sonian, Inc.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -25,11 +27,33 @@ silent_require 'haproxy'
 
 class CheckHAProxy < Sensu::Plugin::Check::CLI
 
-  option :warn_percent, :short => '-w PERCENT', :boolean => true, :default => 50, :proc => proc {|a| a.to_i }
-  option :crit_percent, :short => '-c PERCENT', :boolean => true, :default => 25, :proc => proc {|a| a.to_i }
-  option :all_services, :short => '-A', :boolean => true
-  option :missing_ok, :short => '-m', :boolean => true
-  option :service, :short => '-s SVC'
+  option :warn_percent,
+    :short => '-w PERCENT',
+    :boolean => true,
+    :default => 50,
+    :proc => proc {|a| a.to_i },
+    :description => "Warning Percent, default: 50"
+  option :crit_percent,
+    :short => '-c PERCENT',
+    :boolean => true,
+    :default => 25,
+    :proc => proc {|a| a.to_i },
+    :description => "Critical Percent, default: 25"
+  option :all_services,
+    :short => '-A',
+    :boolean => true,
+    :description => "Check ALL Services, flag enables"
+  option :missing_ok,
+    :short => '-m',
+    :boolean => true,
+    :description => "Missing OK, flag enables"
+  option :service,
+    :short => '-s SVC',
+    :description => "Service Name to Check"
+  option :socket,
+    :short => '-S SOCKET',
+    :default => "/var/run/haproxy.sock",
+    :description => "Path to HAProxy Socket, default: /var/run/haproxy.sock"
 
   def run
     if config[:service]
@@ -60,7 +84,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
   end
 
   def get_services
-    haproxy = HAProxy.read_stats('/var/run/haproxy.sock')
+    haproxy = HAProxy.read_stats(config[:socket])
     if config[:all_services]
       haproxy.stats
     else
