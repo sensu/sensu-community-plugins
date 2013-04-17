@@ -56,7 +56,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
     :description => "Path to HAProxy Socket, default: /var/run/haproxy.sock"
 
   def run
-    if config[:service]
+    if config[:service] or config[:all_services]
       services = get_services
     else
       unknown 'No service specified'

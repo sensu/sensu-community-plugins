@@ -14,7 +14,7 @@ class Opsgenie < Sensu::Handler
 
 
   def handle
-    description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
+    description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output'].chomp].join(' : ')
     begin
       timeout(3) do
         response = case @event['action']
@@ -38,21 +38,33 @@ class Opsgenie < Sensu::Handler
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
+  def event_status
+    @event['check']['status']
+  end
+
   def close_alert
     post_to_opsgenie(:close, {:alias => event_id})
   end
 
   def create_alert(description)
-    post_to_opsgenie(:create, {:alias => event_id, :message => description})
+    tags = []
+    tags << settings["opsgenie"]["tags"] if settings["opsgenie"]["tags"]
+    tags << "OverwriteQuietHours" if settings["overwrite_quiet_hours"] == true
+    tags << "unknown" if event_status >= 3
+    tags << "critical" if event_status == 2
+    tags << "warning" if event_status == 1
+
+    post_to_opsgenie(:create, {:alias => event_id, :message => description, :tags => tags.join(",")})
   end
 
   def post_to_opsgenie(action = :create, params = {})
-
     params["customerKey"] = settings["opsgenie"]["customerKey"]
     params["recipients"]  = settings["opsgenie"]["recipients"]
+    
+    # override source if specified, default is ip
+    params["source"] = settings["opsgenie"]["source"] if settings["opsgenie"]["source"]
 
     uripath = (action == :create) ? "" : "close"
-
     uri = URI.parse("https://api.opsgenie.com/v1/json/alert/#{uripath}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -61,7 +73,6 @@ class Opsgenie < Sensu::Handler
     request.body = params.to_json
     response = http.request(request)
     JSON.parse(response.body)
-
   end
 
 end
