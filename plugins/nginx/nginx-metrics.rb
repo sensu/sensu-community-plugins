@@ -13,7 +13,6 @@ require 'sensu-plugin/metric/cli'
 require 'net/https'
 require 'uri'
 require 'socket'
-
 class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :url,
@@ -48,11 +47,11 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
     found = false
     attempts = 0
     until (found || attempts >= 10)
-      attempts+=1 
+      attempts+=1
       if config[:url]
         uri = URI.parse(config[:url])
         http = Net::HTTP.new(uri.host, uri.port)
-        if uri.scheme == 'https' then 
+        if uri.scheme == 'https' then
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
@@ -70,17 +69,19 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
       end
     end #untl
-
-    response.body.split(/\r?\n/).each do |line|
-      if connections = line.match(/^Active connections:\s+(\d+)/).to_a
+      response.body.split(/\r?\n/).each do |line|
+      connections = line.match(/^Active connections:\s+(\d+)/).to_a
+      unless connections.empty?
         output "#{config[:scheme]}.active_connections", connections[1]
       end
-      if requests = line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/).to_a
+      requests = line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/).to_a
+      unless requests.empty?
         output "#{config[:scheme]}.accepted", requests[1]
         output "#{config[:scheme]}.handled", requests[2]
         output "#{config[:scheme]}.handles", requests[3]
       end
-      if queue = line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/).to_a
+      queue = line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/).to_a
+      unless queue.empty?
         output "#{config[:scheme]}.reading", queue[1]
         output "#{config[:scheme]}.writing", queue[2]
         output "#{config[:scheme]}.waiting", queue[3]

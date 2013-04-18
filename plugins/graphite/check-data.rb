@@ -9,7 +9,6 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
 require 'open-uri'
-
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   option :target,
@@ -87,7 +86,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def retreive_data
     unless(@raw_data)
       begin
-        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}")
+        url = "http://#{config[:server]}/render?format=json&target=#{formatted_target}"
+        uri = URI.parse(URI.encode(url.strip))
+        handle = open(uri)
+        #FIXME
+        #This is not cool. only parse and process the first one, i could be getting an array back.
         @raw_data = JSON.parse(handle.gets).first
         @raw_data['datapoints'].delete(@raw_data['datapoints'].last) if @raw_data['datapoints'].last.first.nil?
         @data = @raw_data['datapoints'].map(&:first)
