@@ -31,4 +31,6 @@ class NetIFMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
   end
 
+  ok
+
 end
