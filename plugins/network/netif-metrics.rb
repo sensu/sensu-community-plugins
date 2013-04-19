@@ -29,8 +29,10 @@ class NetIFMetrics < Sensu::Plugin::Metric::CLI::Graphite
           output "#{config[:scheme]}.#{nic}.tx_kB_per_sec", stats[1].to_i.round
         end
     end
+
+    ok
+
   end
 
-  ok
 
 end
