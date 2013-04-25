@@ -91,7 +91,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     begin
       res = http.request(req)
     rescue
-      unknown $!
+      unknown "Script error: " + $!.to_s
     end
 
     case res.code
