@@ -87,7 +87,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       header, value = config[:header].split(':', 2)
       req[header] = value.strip
     end
-    res = http.request(req)
+
+    begin
+      res = http.request(req)
+    rescue
+      unknown $!
+    end
 
     case res.code
       when /^2/
