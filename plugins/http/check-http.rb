@@ -90,8 +90,8 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
 
     begin
       res = http.request(req)
-    rescue
-      unknown "Script error: " + $!.to_s
+    rescue => e
+      unknown "#{e.class}: #{e.message}"
     end
 
     case res.code
