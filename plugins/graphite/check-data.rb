@@ -15,12 +15,14 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   option :target,
     :description => 'Graphite data target',
     :short => '-t TARGET',
-    :long => '--target TARGET'
+    :long => '--target TARGET',
+    :required => true
 
   option :server,
     :description => 'Server host and port',
     :short => '-s SERVER:PORT',
-    :long => '--server SERVER:PORT'
+    :long => '--server SERVER:PORT',
+    :required => true
 
   option :warning,
     :description => 'Generate warning if given value is above received value',
@@ -43,12 +45,14 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   option :name,
     :description => 'Name used in responses',
     :short => '-n NAME',
-    :long => '--name NAME'
+    :long => '--name NAME',
+    :default => "graphite check"
 
   option :allowed_graphite_age,
     :description => 'Allowed number of seconds since last data update (default: 60 seconds)',
     :short => '-a SECONDS',
     :long => '--age SECONDS',
+    :default => 60,
     :proc => proc{|arg| arg.to_i }
 
   option :hostname_sub,
@@ -56,30 +60,36 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :short => '-s CHARACTER',
     :long => '--host-sub CHARACTER'
 
+  option :from,
+    :description => 'Get samples starting from FROM (default: -10mins)',
+    :short => '-f FROM',
+    :long => '--from FROM',
+    :default => "-10mins"
+
+  option :help,
+    :description => 'Show this message',
+    :short => '-h',
+    :long => '--help'
+
   # Run checks
   def run
-    check_config || retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
+    if config[:help]
+      puts opt_parser if config[:help]
+      exit
+    end
+    retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
   end
 
   # name used in responses
   def name
-    base = config[:name] || "graphite check"
+    base = config[:name]
     @formatted ? "#{base} (#{@formatted})" : base
-  end
-
-  # check we have required configuration
-  def check_config
-    [:server, :target].detect do |key|
-      unless(config[key])
-        unknown "No graphite #{key} provided"
-      end
-    end
   end
 
   # Check the age of the data being processed
   def check_age
-    if((Time.now.to_i - @end) > (config[:allowed_graphite_age] || 60))
-      critical "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age] || 60} seconds)"
+    if((Time.now.to_i - @end) > config[:allowed_graphite_age])
+      critical "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
     end
   end
 
@@ -87,9 +97,9 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def retreive_data
     unless(@raw_data)
       begin
-        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}")
+        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
         @raw_data = JSON.parse(handle.gets).first
-        @raw_data['datapoints'].delete(@raw_data['datapoints'].last) if @raw_data['datapoints'].last.first.nil?
+        @raw_data['datapoints'].delete_if{|v| v.first == nil}
         @data = @raw_data['datapoints'].map(&:first)
         @target = @raw_data['target']
         @start = @raw_data['datapoints'].first.last
