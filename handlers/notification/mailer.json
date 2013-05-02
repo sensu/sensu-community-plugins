@@ -4,6 +4,7 @@
     "mail_to": "monitor@example.com",
     "smtp_address": "smtp.example.org",
     "smtp_port": "25",
-    "smtp_domain": "example.org"
+    "smtp_domain": "example.org",
+    "smtp_starttls_auto": false
   }
 }

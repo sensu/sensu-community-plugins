@@ -55,6 +55,7 @@ class Mailer < Sensu::Handler
         :port    => params[:smtp_port],
         :domain  => params[:smtp_domain],
         :openssl_verify_mode => 'none'
+        :enable_starttls_auto => params[:smtp_starttls_auto]
       }
     end
 
