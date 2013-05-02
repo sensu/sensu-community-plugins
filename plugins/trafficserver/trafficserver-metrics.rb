@@ -3,7 +3,11 @@
 # Pull TrafficServer metrics through /_stats
 # ===
 #
-# Copyright 2012 Chris Read <chris.read@gmail.com>
+# Dependencies
+# ------------
+# - Ruby gem 'json'
+#
+# Copyright 2013 Chris Read <chris.read@gmail.com>
 #
 # Based on the riak metrics collector by Pete Shima <me@peteshima.com>
 #
