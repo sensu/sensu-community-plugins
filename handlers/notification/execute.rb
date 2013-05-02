@@ -5,7 +5,7 @@
 #
 # This handler will execute via mcollective on one or many servers, could be used for example
 # to restart a service
-# See # See http://imansson.wordpress.com/2012/11/26/why-sensu-is-a-monitoring-router-some-cool-handlers/
+# See http://imansson.wordpress.com/2012/11/26/why-sensu-is-a-monitoring-router-some-cool-handlers/
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -13,7 +13,7 @@ require 'sensu-handler'
 require 'net/http'
 require 'systemu'
 
-class Resolve < Sensu::Handler
+class Execute < Sensu::Handler
 
   def mco(application, cmd)
     cmd_line = "mco #{application} #{cmd}"
@@ -29,7 +29,7 @@ class Resolve < Sensu::Handler
       when "CLASS"
         "-C #{class_type}"
       else
-        raise "Scope #{scope} is unknown, valid scope is HOST"
+        raise "Scope #{scope} is unknown, valid scope is HOST or CLASS"
     end
   end
 
@@ -44,6 +44,7 @@ class Resolve < Sensu::Handler
   end
 
   def run_cmd(cmd)
+
     result, stdout, stderr = systemu cmd
     if result != 0
       return "Failed to run #{cmd} (exit code #{result}) error is #{stderr.strip}, output is #{stdout.strip}"

@@ -10,7 +10,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'simple-graphite'
 
-class Resolve < Sensu::Handler
+class GraphiteNotify < Sensu::Handler
 
   def handle
     port = settings["graphite_notify"]["port"] ? settings["graphite_notify"]["port"].to_s : "2003"
