@@ -4,13 +4,14 @@
 #
 # This handler formats alerts as mails and sends them off to a pre-defined recipient.
 #
-# Copyright 2012 Pål-Kristian Hamre (https://github.com/pkhamre | http://twitter.com/pkhamre)
+# Copyright 2012 Pal-Kristian Hamre (https://github.com/pkhamre | http://twitter.com/pkhamre)
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
+gem 'mail', '~> 2.4.0'
 require 'mail'
 require 'timeout'
 
@@ -36,7 +37,16 @@ class Mailer < Sensu::Handler
       :smtp_domain => smtp_domain
     }
 
-    body = "#{@event['check']['output']}"
+    body = <<-BODY.gsub(/^ {14}/, '')
+            #{@event['check']['output']}
+            Host: #{@event['client']['name']}
+            Timestamp: #{Time.at(@event['check']['issued'])}
+            Address:  #{@event['client']['address']}
+            Check Name:  #{@event['check']['name']}
+            Command:  #{@event['check']['command']}
+            Status:  #{@event['check']['status']}
+            Occurrences:  #{@event['occurrences']}
+          BODY
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     Mail.defaults do

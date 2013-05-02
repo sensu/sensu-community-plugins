@@ -53,6 +53,10 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.mysql"
 
+  option :socket,
+    :short => "-S SOCKET",
+    :long => "--socket SOCKET"
+
   def run
 
     # props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
@@ -166,7 +170,8 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         :host => config[:host],
         :port =>config[:port],
         :username => config[:username],
-        :password => config[:password]
+        :password => config[:password],
+        :socket => config[:socket]
         )
 
       results = mysql.query("SHOW GLOBAL STATUS")
@@ -177,7 +182,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     results.each do |row|
       metrics.each do |category, var_mapping|
         if var_mapping.has_key?(row["Variable_name"]) then
-          output "#{config[:scheme]}.mysql.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
+          output "#{config[:scheme]}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
         end
       end
     end

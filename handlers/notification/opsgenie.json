@@ -1,6 +1,9 @@
 {
   "opsgenie": {
     "customerKey": "the-key",
-    "recipients": "the-recipients"
+    "recipients": "the-recipients",
+    "source": "alert-source",
+    "overwrite_quiet_hours": true,
+    "tags": [ "sensu" ]
   }
 }
