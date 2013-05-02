@@ -13,7 +13,7 @@ require 'sensu-handler'
 require 'net/http'
 require 'systemu'
 
-class Execute < Sensu::Handler
+class MCollectiveExec < Sensu::Handler
 
   def mco(application, cmd)
     cmd_line = "mco #{application} #{cmd}"
