@@ -27,48 +27,48 @@ require 'snmp'
 class CheckSNMP < Sensu::Plugin::Check::CLI
 
 
-    option :host, 
-	:short => '-h host', 
-	:boolean => true, 
-	:default => "127.0.0.1"
+  option :host, 
+    :short => '-h host', 
+    :boolean => true, 
+    :default => "127.0.0.1"
 
-    option :community, 
-	:short => '-C snmp community', 
-	:boolean =>true, 
-	:default => "public"
+  option :community, 
+    :short => '-C snmp community', 
+    :boolean =>true, 
+    :default => "public"
    
-    option :objectid, 
-	:short => '-O OID', 
-	:default => "1.3.6.1.4.1.2021.10.1.3.1"
+  option :objectid, 
+    :short => '-O OID', 
+    :default => "1.3.6.1.4.1.2021.10.1.3.1"
 
-    option :warning, 
-	:short => '-w warning', 
-	:default => "10"
+  option :warning, 
+    :short => '-w warning', 
+    :default => "10"
 
-    option :critical, 
-	:short => '-c critical', 
-	:default => "20"
+  option :critical, 
+    :short => '-c critical', 
+    :default => "20"
 
-    def run
-      manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}" )
-      response = manager.get(["#{config[:objectid]}"])
-        response.each_varbind do |vb|
-	  if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
-    	    msg = "Critical state detected"
-  	    critical msg
-    	  end
+  def run
+    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}" )
+    response = manager.get(["#{config[:objectid]}"])
+      response.each_varbind do |vb|
+	if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
+    	  msg = "Critical state detected"
+  	  critical msg
+    	end
 
-       	  if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i)) 
-      	    msg = "Warning state detected"
-     	    warning msg
-          end
-
-	  if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
-            msg = "All is well Dude"
-	    ok msg
-   	  end
-	  
+       	if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i)) 
+      	  msg = "Warning state detected"
+     	  warning msg
         end
-      manager.close
-    end
+
+	if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
+          msg = "All is well Dude"
+	  ok msg
+   	end
+	  
+      end
+    manager.close
+  end
 end
