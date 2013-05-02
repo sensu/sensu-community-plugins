@@ -2,10 +2,10 @@
 # Handler GTalk
 # ===
 #
-# 
+#
 # This is a simple Gtalk Handler script for Sensu, Add the GMil credentials and
 # Recipient's Gmail id. Currently the message contains Event and Host
-# 
+#
 # Note:- Not compatible with Ruby Version > 1.9
 #
 #  Author Deepak Mohan Das   <deepakmdass88@gmail.com>
@@ -20,7 +20,7 @@ require 'timeout'
 include Jabber
 
 class GTALK < Sensu::Handler
- 
+
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -35,19 +35,19 @@ class GTALK < Sensu::Handler
     to_username = 'deepakmdass88'
     body = <<-BODY.gsub(/^ {14}/, '')
             #{@event['check']['output']}
-	    Host: #{@event['client']['name']}
-	   BODY
+            Host: #{@event['client']['name']}
+           BODY
 
     begin
       timeout 10 do
         puts "Connecting to jabber server.."
- 	jabber = Jabber::Simple.new(username+'@gmail.com',password)
+        jabber = Jabber::Simple.new(username+'@gmail.com',password)
         puts "Connected."
- 	jabber.deliver(to_username+"@gmail.com", "#{body}")
+        jabber.deliver(to_username+"@gmail.com", "#{body}")
         sleep(10)
- 	puts "Alert successfully sent to #{to_username}"
+        puts "Alert successfully sent to #{to_username}"
       end
-      rescue Timeout::Error
+    rescue Timeout::Error
       puts "timed out while attempting to sent message"
     end
   end
