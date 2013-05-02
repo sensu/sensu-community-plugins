@@ -8,7 +8,7 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 require 'mongo'
 
-class InterfaceGraphite < Sensu::Plugin::Metric::CLI::Graphite
+class MongoDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
