@@ -52,7 +52,6 @@ class CheckRabbitAMQP < Sensu::Plugin::Check::CLI
     if res["status"] == "ok"
       ok res["message"]
     elsif res["status"] == "critical"
-      puts "Blaaaaahh"
       critical res["message"]
     else
       unknown res["message"]
