@@ -50,26 +50,25 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
 	:default => "20"
 
     def run
-	manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}" )
-	response = manager.get(["#{config[:objectid]}"])
- 	  response.each_varbind do |vb|
+      manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}" )
+      response = manager.get(["#{config[:objectid]}"])
+        response.each_varbind do |vb|
+	  if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
+    	    msg = "Critical state detected"
+  	    critical msg
+    	  end
 
-	 	if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
-    			msg = "Critical state detected"
-  	  		critical msg
-    	 	end
+       	  if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i)) 
+      	    msg = "Warning state detected"
+     	    warning msg
+          end
 
-       	        if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i)) 
-      	  		 msg = "Warning state detected"
-     	         	warning msg
-            	end
-
-	        if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
-        	 	msg = "All is well Dude"
-	    	 	ok msg
-   	    	end
+	  if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
+            msg = "All is well Dude"
+	    ok msg
+   	  end
 	  
-     	    end
-  	manager.close
-      end
+        end
+      manager.close
+    end
 end

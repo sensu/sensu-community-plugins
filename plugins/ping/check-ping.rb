@@ -25,39 +25,39 @@ require 'net/ping'
 class CheckPING < Sensu::Plugin::Check::CLI
 
 
-	option :port, 
-	   :short => '-p port', 
-	   :default => "80"
+  option :port, 
+    :short => '-p port', 
+    :default => "80"
 
-	option :host, 
-	   :short => '-h host', 
-	   :default => "google.com"
+  option :host, 
+    :short => '-h host', 
+    :default => "google.com"
 
-	option :type, 
-	   :short => '-t type', 
-	   :default => 'HTTP'
+  option :type, 
+    :short => '-t type', 
+    :default => 'HTTP'
 
-	def run
-	    if "#{config[:type]}" == "HTTP"
-	  	   port_num = eval "#{config[:port]}"
-	           pt = Net::Ping::HTTP.new("http://#{config[:host]}", port="#{port_num}", timeout=10)
-			if pt.ping?
-  		   	     msg = "HTTP ping successful"
-			     ok msg
-			else
-  		   	     msg = "HTTP ping unsuccessful"
-		 	     critical msg 
-			end
+  def run
+    if "#{config[:type]}" == "HTTP"
+      port_num = eval "#{config[:port]}"
+      pt = Net::Ping::HTTP.new("http://#{config[:host]}", port="#{port_num}", timeout=10)
+        if pt.ping?
+  	  msg = "HTTP ping successful"
+	  ok msg
+	else
+          msg = "HTTP ping unsuccessful"
+	critical msg 
+	end
 
-	     else
-	    	   pn = Net::Ping::ICMP.new("#{config[:host]}")
-			if pn.ping?
-  		   	     msg = "ICMP ping successful"
-		 	     ok msg
-			else
-  		   	     msg = "ICMP ping unsuccessful"
-			     critical msg
-			end
-	      end
-  	  end
+    else
+      pn = Net::Ping::ICMP.new("#{config[:host]}")
+        if pn.ping?
+  	  msg = "ICMP ping successful"
+	  ok msg
+	else
+  	  msg = "ICMP ping unsuccessful"
+	  critical msg
+	end
+    end
+  end
 end
