@@ -106,8 +106,10 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         @end = @raw_data['datapoints'].last.last
         @step = ((@end - @start) / @raw_data['datapoints'].size.to_f).ceil
         nil
-      rescue
+      rescue OpenURI::HTTPError
         critical "Failed to connect to graphite server"
+      rescue NoMethodError
+        critical "No data for time period and/or target"
       end
     end
   end
