@@ -25,6 +25,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :path, :short => '-p PATH'
   option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
   option :header, :short => '-H HEADER', :long => '--header HEADER'
+  option :parameter, :long => '--parameter PARAMETER'
   option :ssl, :short => '-s', :boolean => true, :default => false
   option :insecure, :short => '-k', :boolean => true, :default => false
   option :user, :short => '-U', :long => '--username USER'
@@ -80,6 +81,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
 
     req = Net::HTTP::Get.new(config[:path])
+    if config[:parameter]
+      all_params = config[:parameter].split(',')
+      params = Hash.new
+      all_params.each do |p|
+        k,v = p.split(':', 2)
+        params[k] = v
+      end
+      req.set_form_data(params)
+      req = Net::HTTP::Get.new(config[:path] + '?' + req.body)
+    end
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
