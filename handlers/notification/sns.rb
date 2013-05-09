@@ -17,7 +17,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'aws-sdk'
 
-class DashingNotif < Sensu::Handler
+class SnsNotifier < Sensu::Handler
   def topic_arn
     settings['sns']['topic_arn']
   end
