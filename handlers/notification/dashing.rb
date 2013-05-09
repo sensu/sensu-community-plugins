@@ -25,7 +25,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'net/http'
 
-class DashingNotif < Sensu::Handler
+class DashingNotifier < Sensu::Handler
 
   def widget
     @event['client']['name'] + '-' + @event['check']['name']
