@@ -1,11 +1,17 @@
 #!/usr/bin/env ruby
 #
+# This handler assumes it runs on an ec2 instance with an iam role
+# that has permission to send to the sns topic specified in the config.
+# This removes the requirement to specify an access key and secret access key.
+# See http://docs.aws.amazon.com/IAM/latest/UserGuide/WorkingWithRoles.html
+#
+# Requires the aws-sdk gem.
+#
+# Setting required in sns.json
+#   topic_are  :  The arn for the destination sns topic
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details
-#
-# Assumes that the instance(s) that the handler runs on is setup with an ec2 iam role that has permission to send to the sns topic
-#
-# Requires the aws-sdk
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
