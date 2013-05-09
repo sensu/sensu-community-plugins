@@ -40,5 +40,7 @@ class SnsNotifier < Sensu::Handler
     else
       t.publish("ALERT - [#{event_name}] - #{message}.")
     end
+  rescue Exception => e
+    puts "Exception occured in SnsNotifier: #{e.message}", e.backtrace
   end
 end
