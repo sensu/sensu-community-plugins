@@ -52,7 +52,10 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['process.mem.resident_in_bytes']    = node['process']['mem']['resident_in_bytes']
     metrics['jvm.mem.heap_used_in_bytes']       = node['jvm']['mem']['heap_used_in_bytes']
     metrics['jvm.mem.non_heap_used_in_bytes']   = node['jvm']['mem']['non_heap_used_in_bytes']
-    metrics['jvm.mem.max_heap_size_in_bytes']   = node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes'] +  node['jvm']['mem']['pools']['Code Cache']['max_in_bytes'] +  node['jvm']['mem']['pools']['Eden Space']['max_in_bytes'] + node['jvm']['mem']['pools']['Survivor Space']['max_in_bytes'] + node['jvm']['mem']['pools']['CMS Perm Gen']['max_in_bytes']
+    metrics['jvm.mem.max_heap_size_in_bytes']   = 0
+    node['jvm']['mem']['pools'].keys do |k|
+      metrics['jvm.mem.max_heap_size_in_bytes'] += node['jvm']['mem']['pools'][k]['max_in_bytes']
+    end
     metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] +  node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
     metrics['jvm.threads.count']                = node['jvm']['threads']['count']
     metrics['jvm.threads.peak_count']           = node['jvm']['threads']['peak_count']
