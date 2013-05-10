@@ -4,7 +4,7 @@
 # ===
 #
 # DESCRIPTION:
-#   This check creates node metrics from the elasticsearch API 
+#   This check creates node metrics from the elasticsearch API
 #
 # OUTPUT:
 #   plain-text / graphite
@@ -46,14 +46,13 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     stats = JSON.parse(stats.get)
     timestamp = Time.now.to_i
     node = stats['nodes'].values.first
-#    node['jvm']['mem']['heap_max_in_bytes'] = ln['nodes'].values.first['jvm']['mem']['heap_max_in_bytes']
     metrics = {}
     metrics['os.load_average']                  = node['os']['load_average'][0]
     metrics['os.mem.free_in_bytes']             = node['os']['mem']['free_in_bytes']
     metrics['process.mem.resident_in_bytes']    = node['process']['mem']['resident_in_bytes']
     metrics['jvm.mem.heap_used_in_bytes']       = node['jvm']['mem']['heap_used_in_bytes']
     metrics['jvm.mem.non_heap_used_in_bytes']   = node['jvm']['mem']['non_heap_used_in_bytes']
-    metrics['jvm.mem.max_heap_size_in_bytes']   = node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes'] +  node['jvm']['mem']['pools']['Code Cache']['max_in_bytes'] +  node['jvm']['mem']['pools']['Par Eden Space']['max_in_bytes'] + node['jvm']['mem']['pools']['Par Survivor Space']['max_in_bytes'] + node['jvm']['mem']['pools']['CMS Perm Gen']['max_in_bytes']
+    metrics['jvm.mem.max_heap_size_in_bytes']   = node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes'] +  node['jvm']['mem']['pools']['Code Cache']['max_in_bytes'] +  node['jvm']['mem']['pools']['Eden Space']['max_in_bytes'] + node['jvm']['mem']['pools']['Survivor Space']['max_in_bytes'] + node['jvm']['mem']['pools']['CMS Perm Gen']['max_in_bytes']
     metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] +  node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
     metrics['jvm.threads.count']                = node['jvm']['threads']['count']
     metrics['jvm.threads.peak_count']           = node['jvm']['threads']['peak_count']
