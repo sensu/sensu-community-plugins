@@ -9,6 +9,7 @@
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
 # Updated by Lewis Preson 2012 to accept basic auth credentials
 # Updated by SweetSpot 2012 to require specified redirect
+# Updated by Chris Armstrong 2013 to accept multiple headers
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -84,8 +85,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
-      header, value = config[:header].split(':', 2)
-      req[header] = value.strip
+      config[:header].split(';').each do |header|
+        h, v = header.split(':', 2)
+        req[h] = v.strip
+      end
     end
     res = http.request(req)
 
