@@ -1,17 +1,17 @@
 #!/usr/bin/env ruby
 #
-# Sensu Logstash Handler 
+# Sensu Logstash Handler
 #
 # Heavily inspried (er, copied from) the GELF Handler writeen by
 # Joe Miller.
-# 
+#
 # Designed to take sensu events, transform them into logstah JSON events
 # and ship them to a redis server for logstash to index.  This also
 # generates a tag with either 'sensu-ALERT' or 'sensu-RECOVERY' so that
 # searching inside of logstash can be a little easier.
 #
 # Written by Zach Dunn -- @SillySophist or http://github.com/zadunn
-# 
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
@@ -39,9 +39,9 @@ class LogstashHandler < Sensu::Handler
       :@source => ::Socket.gethostname,
       :@type => settings['logstash']['type'],
       :@tags => ["sensu-#{action_to_string}"],
+      :@message => @event['check']['output'],
       :@fields => {
         :short_message => "#{action_to_string} - #{event_name}: #{@event['check']['notification']}",
-        :full_message  => @event['check']['output'],
         :host          => @event['client']['name'],
         :timestamp     => @event['check']['issued'],
         :address       => @event['client']['address'],
