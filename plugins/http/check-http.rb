@@ -85,7 +85,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
-      config[:header].split(';').each do |header|
+      config[:header].split(',').each do |header|
         h, v = header.split(':', 2)
         req[h] = v.strip
       end
