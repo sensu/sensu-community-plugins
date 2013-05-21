@@ -41,7 +41,6 @@ class LogstashHandler < Sensu::Handler
       :@tags => ["sensu-#{action_to_string}"],
       :@message => @event['check']['output'],
       :@fields => {
-        :short_message => "#{action_to_string} - #{event_name}: #{@event['check']['notification']}",
         :host          => @event['client']['name'],
         :timestamp     => @event['check']['issued'],
         :address       => @event['client']['address'],
