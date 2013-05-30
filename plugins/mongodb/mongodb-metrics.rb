@@ -2,6 +2,16 @@
 #
 # Source: https://github.com/needle-cookbooks/sensu-community-plugins/tree/needle/plugins/mongodb
 # 
+# MongoDB metrics
+# ===============
+#
+# Dependencies
+# ============
+# Gems
+#   - mongo
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
