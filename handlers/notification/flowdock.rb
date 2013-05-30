@@ -3,9 +3,16 @@
 # Sensu Flowdock (https://www.flowdock.com/api/chat) notifier
 # This handler sends event information to the Flowdock Push API: Chat.
 # The handler pushes event output to chat:
-# Two settings are required in flowdock.json
+# This setting is required in flowdock.json
 #   auth_token  :  The flowdock api token (flow_api_token)
 #
+# Dependencies
+# -----------
+# - flowdock
+#
+#
+# Author Ramez Hanna <rhanna@informatiq.org>
+
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details
 
