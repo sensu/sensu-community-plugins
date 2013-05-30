@@ -1,5 +1,19 @@
 #!/usr/bin/env ruby
 #
+# Amazon RDS cloudwatch sensu plugin
+# ===
+#
+# Dependencies
+# -----------
+# - http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/StartCLI.html
+#
+#
+# Authors: Micah Hoffmann <https://github.com/SeattleMicah> Kristopher Zentner <https://github.com/kaezi>
+#
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
+
 require 'aws-sdk'
 require 'optparse'
 require 'pp'
@@ -67,37 +81,36 @@ exit 2
 end
 average = latest[:average]
 unit = latest[:unit]
-    # Determine the unit for the average returned and convert if needed
-    if unit == "Bytes" && options[:stat] == "FreeStorageSpace"
-      average = (latest[:average]/1073741824).round(0)
-      unit = "GigaBytes"
-    elsif unit == "Bytes"
-      average = (latest[:average]/1048576).round(0)
-      unit = "MegaBytes"
-    else
+# Determine the unit for the average returned and convert if needed
+  if unit == "Bytes" && options[:stat] == "FreeStorageSpace"
+    average = (latest[:average]/1073741824).round(0)
+    unit = "GigaBytes"
+  elsif unit == "Bytes"
+    average = (latest[:average]/1048576).round(0)
+    unit = "MegaBytes"
+  else
       average = latest[:average]
-    end
-
-    # Depending on if the stat is less than or greater than use the -l option
-    if options[:lessthan] == true
+  end
+  # Depending on if the stat is less than or greater than use the -l option
+  if options[:lessthan] == true
     # Begin the check of the average and against the warn and crit parameters
-      if average.to_f < options[:crit].to_f
-	  puts "CRITICAL: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is below threshold #{options[:crit]} "
-	  exit 1
-      elsif average.to_f < options[:warn].to_f
-	  puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is below threshold #{options[:warn]}"
-	  exit 2
-      else 
-	  puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
-      end
-    else
-      if average.to_f > options[:crit].to_f
-	  puts "CRITICAL: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:crit]} "
-	  exit 1
-      elsif average.to_f > options[:warn].to_f
-	  puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:warn]}"
-	  exit 2
-      else 
-	  puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
-      end
+    if average.to_f < options[:crit].to_f
+      puts "CRITICAL: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is below threshold #{options[:crit]} #{unit}"
+      exit 1
+    elsif average.to_f < options[:warn].to_f
+      puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is below threshold #{options[:warn]} #{unit}"
+      exit 2
+    else 
+      puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
     end
+    else
+    if average.to_f > options[:crit].to_f
+      puts "CRITICAL: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:crit]} #{unit}"
+      exit 1
+    elsif average.to_f > options[:warn].to_f
+      puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:warn]} #{unit}"
+      exit 2
+    else 
+      puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
+    end
+  end
