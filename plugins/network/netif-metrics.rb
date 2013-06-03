@@ -22,12 +22,14 @@ class NetIFMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}"
 
   def run
-    `sar -n DEV 1 1 | grep Average | grep -v IFACE | awk '{ print $2 }'`.split("\n").each do |nic|
-      stats = `sar -n DEV 1 1 | grep Average | grep #{nic} | awk '{ print $5, $6 }'`.split(' ')
-        unless stats.empty?
-          output "#{config[:scheme]}.#{nic}.rx_kB_per_sec", stats[0].to_i.round
-          output "#{config[:scheme]}.#{nic}.tx_kB_per_sec", stats[1].to_i.round
-        end
+    `sar -n DEV 1 1 | grep Average | grep -v IFACE`.each_line do |line|
+      stats = line.split(/\s+/)
+      unless stats.empty?
+        stats.shift
+        nic = stats.shift
+        output "#{config[:scheme]}.#{nic}.rx_kB_per_sec", stats[2].to_f if stats[3]
+        output "#{config[:scheme]}.#{nic}.tx_kB_per_sec", stats[3].to_f if stats[3]
+      end
     end
 
     ok
