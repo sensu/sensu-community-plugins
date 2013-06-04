@@ -1,0 +1,6 @@
+{
+  "logevent": {
+    "eventdir": "/var/log/sensu/events",
+    "keep": 10
+  }
+}
