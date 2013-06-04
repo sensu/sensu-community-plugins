@@ -1,0 +1,8 @@
+{
+  "mailer-ses": {
+    "mail_from": "sensu@example.com",
+    "mail_to": "monitor@example.com",
+    "aws_access_key": "myawsaccesskey",
+    "aws_secret_key": "myawssecretkey"
+  }
+}
