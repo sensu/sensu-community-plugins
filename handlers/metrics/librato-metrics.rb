@@ -2,6 +2,9 @@
 #
 # Copyright 2013 FunGo Studios (team@fungostudios.com)
 #
+# Depends on librato-metrics gem
+# gem install librato-metrics
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
