@@ -1,5 +1,5 @@
 MethodLength:
-  Max: 30
+  Max: 60
 
 LineLength:
   Max: 120
@@ -36,4 +36,10 @@ EmptyLineBetweenDefs:
   Enabled: false
 
 SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+SymbolName:
+  Enabled: false
+
+ReduceArguments:
   Enabled: false
