@@ -58,3 +58,6 @@ RescueException:
 
 Syntax:
   Enabled: false
+
+WordArray:
+  Enabled: false
