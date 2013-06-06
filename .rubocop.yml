@@ -1,8 +1,17 @@
+###########################
+# Configuration for rubocop
+#
+# Most of these are disabling existing cops, primarily
+# due to a smattering of different styles and loose
+# guidlines for contributions.  
+#
+# Any of these may be changed.
+
 MethodLength:
   Max: 60
 
 LineLength:
-  Max: 120
+  Max: 160
 
 HashSyntax:
   Enabled: false
@@ -42,4 +51,7 @@ SymbolName:
   Enabled: false
 
 ReduceArguments:
+  Enabled: false
+
+RescueException:
   Enabled: false
