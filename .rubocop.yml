@@ -34,3 +34,6 @@ AndOr:
 
 EmptyLineBetweenDefs:
   Enabled: false
+
+SpaceInsideHashLiteralBraces:
+  Enabled: false
