@@ -29,4 +29,5 @@ SpaceAroundBraces:
 FavorPercentR:
   Enabled: false
 
-
+AndOr:
+  Enabled: false
