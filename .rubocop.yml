@@ -55,3 +55,6 @@ ReduceArguments:
 
 RescueException:
   Enabled: false
+
+Syntax:
+  Enabled: false
