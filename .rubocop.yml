@@ -16,3 +16,17 @@ AlignParameters:
 
 SpaceAroundOperators:
   Enabled: false
+
+Encoding:
+  Enabled: false
+
+PercentR:
+  Enbled: false
+
+SpaceAroundBraces:
+  Enabled: false
+
+FavorPercentR:
+  Enabled: false
+
+
