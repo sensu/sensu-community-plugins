@@ -30,7 +30,7 @@ Encoding:
   Enabled: false
 
 PercentR:
-  Enbled: false
+  Enabled: false
 
 SpaceAroundBraces:
   Enabled: false
@@ -60,4 +60,13 @@ Syntax:
   Enabled: false
 
 WordArray:
+  Enabled: false
+
+FavorModifier:
+  Enabled: false
+
+ParenthesesAroundCondition:
+  Enabled: false
+
+MethodAndVariableSnakeCase:
   Enabled: false
