@@ -1,0 +1,8 @@
+MethodLength:
+  Max: 30
+
+LineLength:
+  Max: 100
+
+HashSyntax:
+  Enabled: false
