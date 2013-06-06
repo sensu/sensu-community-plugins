@@ -31,3 +31,6 @@ FavorPercentR:
 
 AndOr:
   Enabled: false
+
+EmptyLineBetweenDefs:
+  Enabled: false
