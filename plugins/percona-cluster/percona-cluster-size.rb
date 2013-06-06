@@ -52,8 +52,8 @@ class CheckPerconaClusterSize < Sensu::Plugin::Check::CLI
             fetch_hash().
             fetch('Value').
             to_i
-	critical "Expected to find #{config[:expected]} nodes, found #{cluster_size}" if cluster_size != config[:expected].to_i
-	ok "Expected to find #{config[:expected]} nodes and found those #{cluster_size}" if cluster_size == config[:expected].to_i
+    critical "Expected to find #{config[:expected]} nodes, found #{cluster_size}" if cluster_size != config[:expected].to_i
+    ok "Expected to find #{config[:expected]} nodes and found those #{cluster_size}" if cluster_size == config[:expected].to_i
     rescue Mysql::Error => e
         critical "Percona MySQL check failed: #{e.error}"
     ensure

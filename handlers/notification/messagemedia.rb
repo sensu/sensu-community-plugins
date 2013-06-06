@@ -47,7 +47,7 @@ class MessageMedia < Sensu::Handler
     message = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     begin
-      if should_send then
+      if should_send
         timeout 10 do
           si = Rumeme::SmsInterface.new
           settings['messagemedia']['mobile_numbers'].each do |mobile_number|

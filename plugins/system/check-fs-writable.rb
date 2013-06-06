@@ -24,10 +24,10 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
       file.write("mops") or critical 'Could not write to filesystem'
       file.read or critical 'Could not read from filesystem'
     ensure
-      file.close 
-      file.unlink 
+      file.close
+      file.unlink
     end
-    ok "#{config[:dir]} is OK"      
+    ok "#{config[:dir]} is OK"
   end
 
 end
