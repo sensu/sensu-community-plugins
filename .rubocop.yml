@@ -2,7 +2,17 @@ MethodLength:
   Max: 30
 
 LineLength:
-  Max: 100
+  Max: 120
 
 HashSyntax:
+  Enabled: false
+
+# Prefer single-quotes
+StringLiterals:
+  Enabled: false
+
+AlignParameters:
+  Enabled: false
+
+SpaceAroundOperators:
   Enabled: false
