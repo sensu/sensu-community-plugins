@@ -48,11 +48,11 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
     found = false
     attempts = 0
     until (found || attempts >= 10)
-      attempts+=1 
+      attempts+=1
       if config[:url]
         uri = URI.parse(config[:url])
         http = Net::HTTP.new(uri.host, uri.port)
-        if uri.scheme == 'https' then 
+        if uri.scheme == 'https' then
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
@@ -61,7 +61,7 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
         if response.code=="200"
           found = true
         elsif response.header['location']!=nil
-	  config[:url] = response.header['location']
+    config[:url] = response.header['location']
         end
       else
         response= Net::HTTP.start(config[:hostname], config[:port]) do |http|

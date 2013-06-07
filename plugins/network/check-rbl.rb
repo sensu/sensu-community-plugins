@@ -14,7 +14,7 @@
 # blacklists as critical by
 # -C option in a similar way.
 #EXAMPLE USAGE:
-# check-rbl.rb -i 8.8.8.8 -C SORBS -I UCEPROTECT3 
+# check-rbl.rb -i 8.8.8.8 -C SORBS -I UCEPROTECT3
 # Copyright 2012 Sarguru Nathan  <sarguru90@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -66,18 +66,18 @@ client)"
         critical_bls_set = critical_bls.split(',').to_set
       end
 
-      dnsbl_ret   = c.lookup("#{ip_add}")     
+      dnsbl_ret   = c.lookup("#{ip_add}")
       msg_string  = ""
-      criticality = 0  
+      criticality = 0
 
-      dnsbl_ret.each do |dnsbl_result| 
+      dnsbl_ret.each do |dnsbl_result|
 
         if( dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~
 /blacklist/i)
-          unless ( ignored_bls_set.member?(dnsbl_result.dnsbl)) 
+          unless ( ignored_bls_set.member?(dnsbl_result.dnsbl))
             msg_string =  "#{msg_string} #{dnsbl_result.dnsbl}"
           end
-         
+
           if ( critical_bls_set.member?(dnsbl_result.dnsbl))
             criticality += 1
           end
@@ -89,12 +89,12 @@ client)"
         if (criticality > 0)
           critical "#{ip_add} Blacklisted in#{msg_string}"
         else
-          warning "#{ip_add} Blacklisted in#{msg_string}" 
+          warning "#{ip_add} Blacklisted in#{msg_string}"
         end
-      else        
+      else
           msg_txt = "All is well. #{ip_add} has good reputation."
           ok "#{msg_txt}"
       end
 
-    end    
+    end
 end

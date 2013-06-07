@@ -90,7 +90,7 @@ Node Subscriptions: #{@event['client']['subscriptions'].join(', ')}
                         puts 'mail -- sent alert for ' + short_name + ' to ' + to
                     end
                 rescue Timeout::Error
-                    puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name                        
+                    puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
                 end
             end
         end

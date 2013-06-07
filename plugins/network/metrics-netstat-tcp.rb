@@ -81,8 +81,8 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
         connection_state = TCP_STATES[connection_state]
         if config[:port] && config[:port] == connection_port
           state_counts[connection_state] += 1
-        elsif !config[:port] 
-          state_counts[connection_state] += 1          
+        elsif !config[:port]
+          state_counts[connection_state] += 1
         end
       end
     end
@@ -92,7 +92,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
     netstat('tcp').each do |state,count|
-      graphite_name = config[:port] ? "#{config[:scheme]}.#{config[:port]}.#{state}" : 
+      graphite_name = config[:port] ? "#{config[:scheme]}.#{config[:port]}.#{state}" :
         "#{config[:scheme]}.#{state}"
       output "#{graphite_name}", count, timestamp
     end
