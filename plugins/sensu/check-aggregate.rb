@@ -10,8 +10,7 @@
 # Copyright 2012 Sonian, Inc.
 #
 # Released under the same terms as Sensu (the MIT license); see
-#LICENSE
-# for details.
+# LICENSE for details.
 
 require "rubygems"
 require "sensu-plugin/check/cli"
@@ -144,7 +143,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
   def compare_pattern(aggregate)
     if config[:summarize] && config[:pattern]
       regex = Regexp.new(config[:pattern])
-      mappings = Hash.new
+      mappings = {}
       message = config[:message] || "One of these is not like the others!"
       aggregate[:outputs].each do |output, count|
         matched = regex.match(output.to_s)

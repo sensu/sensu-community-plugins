@@ -8,7 +8,7 @@
 # Any of these may be changed.
 
 MethodLength:
-  Max: 60
+  Max: 200
 
 LineLength:
   Max: 160
@@ -96,4 +96,10 @@ AvoidGlobalVars:
 # Probably some good ones in here.
 # Disabled for $? => $CHILD_STATUS
 AvoidPerlisms:
+  Enabled: false
+
+Lambda:
+  Enabled: false
+
+CollectionMethods:
   Enabled: false

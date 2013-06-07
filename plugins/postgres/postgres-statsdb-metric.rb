@@ -20,7 +20,6 @@ require 'sensu-plugin/metric/cli'
 require 'pg'
 require 'socket'
 
-
 class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :user,

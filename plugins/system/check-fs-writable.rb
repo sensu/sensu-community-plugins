@@ -18,7 +18,7 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
 
   def run
     unknown 'No directory specified' unless config[:dir]
-    critical "#{config[:dir]} does not exist " if !File.directory?(config[:dir])
+    critical "#{config[:dir]} does not exist " unless File.directory?(config[:dir])
     file = Tempfile.new('.sensu', config[:dir])
     begin
       file.write("mops") or critical 'Could not write to filesystem'

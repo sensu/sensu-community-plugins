@@ -47,7 +47,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
   def read_df
     `df -PT`.split("\n").drop(1).each do |line|
       begin
-        fs, type, blocks, used, avail, capacity, mnt = line.split
+        _fs, type, _blocks, _used, _avail, capacity, mnt = line.split
         next if config[:fstype] && !config[:fstype].include?(type)
         next if config[:ignoretype] && config[:ignoretype].include?(type)
         next if config[:ignoremnt] && config[:ignoremnt].include?(mnt)
@@ -68,8 +68,8 @@ class CheckDisk < Sensu::Plugin::Check::CLI
 
   def run
     read_df
-    critical usage_summary if !@crit_fs.empty?
-    warning usage_summary if !@warn_fs.empty?
+    critical usage_summary unless @crit_fs.empty?
+    warning usage_summary unless @warn_fs.empty?
     ok "All disk usage under #{config[:warn]}%"
   end
 

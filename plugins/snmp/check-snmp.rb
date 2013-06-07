@@ -47,7 +47,7 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :default => "20"
 
   def run
-    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}" )
+    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}")
     response = manager.get(["#{config[:objectid]}"])
     response.each_varbind do |vb|
       if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i

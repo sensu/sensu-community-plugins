@@ -59,7 +59,7 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
     stats_url = "http://#{config[:host]}:#{config[:port]}/solr#{core}/admin/stats.jsp"
 
-    xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n","")
+    xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n", "")
     stats  = Crack::XML.parse(xml_data)
 
     # this xml is an ugly beast.

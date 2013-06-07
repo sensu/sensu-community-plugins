@@ -51,7 +51,7 @@ class TelAPIBalanceCheck < Sensu::Plugin::Check::CLI
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    request = Net::HTTP::Get.new(uri.request_uri,initheader = {'Content-Type' =>'application/json'})
+    request = Net::HTTP::Get.new(uri.request_uri, _initheader = {'Content-Type' =>'application/json'})
     request.basic_auth(config[:accountSID], config[:authToken])
     response = http.request(request)
     info = JSON.parse(response.body)
