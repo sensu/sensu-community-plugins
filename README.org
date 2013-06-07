@@ -20,6 +20,21 @@ exec plugins and handlers on Windows.
 Dependencies (ruby gems, packages, etc) and other requirements should
 be declared in the header of the plugin/handler file.
 
+Only pull requests passing lint/tests will be merged.
+
+* Rubocop linting
+
+Rubocop is used to lint the style of the ruby plugins. This is done
+to standardize the style used within these plugins, and ensure high
+quality code.  Feel free to submit changes to .rubocop.yml with
+pull requests.
+
+
+```
+bundle install
+bundle exec rubocop
+```
+
 * License
 
 Copyright 2011 Sonian, Inc. and contributors.
