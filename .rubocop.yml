@@ -1,0 +1,72 @@
+###########################
+# Configuration for rubocop
+#
+# Most of these are disabling existing cops, primarily
+# due to a smattering of different styles and loose
+# guidlines for contributions.  
+#
+# Any of these may be changed.
+
+MethodLength:
+  Max: 60
+
+LineLength:
+  Max: 160
+
+HashSyntax:
+  Enabled: false
+
+# Prefer single-quotes
+StringLiterals:
+  Enabled: false
+
+AlignParameters:
+  Enabled: false
+
+SpaceAroundOperators:
+  Enabled: false
+
+Encoding:
+  Enabled: false
+
+PercentR:
+  Enabled: false
+
+SpaceAroundBraces:
+  Enabled: false
+
+FavorPercentR:
+  Enabled: false
+
+AndOr:
+  Enabled: false
+
+EmptyLineBetweenDefs:
+  Enabled: false
+
+SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+SymbolName:
+  Enabled: false
+
+ReduceArguments:
+  Enabled: false
+
+RescueException:
+  Enabled: false
+
+Syntax:
+  Enabled: false
+
+WordArray:
+  Enabled: false
+
+FavorModifier:
+  Enabled: false
+
+ParenthesesAroundCondition:
+  Enabled: false
+
+MethodAndVariableSnakeCase:
+  Enabled: false
