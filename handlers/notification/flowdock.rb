@@ -27,6 +27,6 @@ class FlowdockNotifier < Sensu::Handler
     data = @event['check']['output']
     flow = Flowdock::Flow.new(:api_token => token, :external_user_name => "Sensu")
     flow.push_to_chat(:content => data, :tags => ["sensu", "test"])
-   end
+  end
 
 end

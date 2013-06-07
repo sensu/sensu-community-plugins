@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby                                                                                                                                                                                                
+#!/usr/bin/env ruby
 #
 # This handler logs last settings['logevent']['keep'] json events in files as
 # settings['logevent']['eventdir']/client/check_name/timestamp.action
@@ -18,7 +18,7 @@ class LogEvent < Sensu::Handler
     eventdir = "#{settings['logevent']['eventdir']}/#{@event['client']['name']}/#{@event['check']['name']}"
     FileUtils.mkdir_p(eventdir)
 
-    File.open("#{eventdir}/#{@event['check']['executed']}.#{@event['action']}",'w') do |f|
+    File.open("#{eventdir}/#{@event['check']['executed']}.#{@event['action']}", 'w') do |f|
       f.write(JSON.pretty_generate(@event))
     end
 
