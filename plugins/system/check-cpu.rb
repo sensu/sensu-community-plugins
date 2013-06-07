@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Check CPU Plugin
-# 
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -23,7 +23,7 @@ class CheckCPU < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_f },
     :default => 1
 
-  [ :user, :nice, :system, :idle, :iowait, :irq, :softirq, :steal, :guest ].each do |metric|
+  [:user, :nice, :system, :idle, :iowait, :irq, :softirq, :steal, :guest].each do |metric|
     option metric,
       :long  => "--#{metric}",
       :description => "Check cpu #{metric} instead of total cpu usage",
@@ -40,20 +40,20 @@ class CheckCPU < Sensu::Plugin::Check::CLI
   end
 
   def run
-    metrics = [ :user, :nice, :system, :idle, :iowait, :irq, :softirq, :steal, :guest ]
+    metrics = [:user, :nice, :system, :idle, :iowait, :irq, :softirq, :steal, :guest]
 
     cpu_stats_before = get_cpu_stats
     sleep config[:sleep]
     cpu_stats_after = get_cpu_stats
 
     cpu_total_diff = 0.to_f
-    cpu_stats_diff = Array.new
+    cpu_stats_diff = []
     metrics.each_index do |i|
       cpu_stats_diff[i] = cpu_stats_after[i] - cpu_stats_before[i]
       cpu_total_diff += cpu_stats_diff[i]
     end
 
-    cpu_stats = Array.new
+    cpu_stats = []
     metrics.each_index do |i|
       cpu_stats[i] = 100*(cpu_stats_diff[i]/cpu_total_diff)
     end

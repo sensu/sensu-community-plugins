@@ -20,22 +20,10 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
-  def convert_integers(values)
-    values.each_with_index do |value, index|
-      begin
-        converted = Integer(value)
-        values[index] = converted
-      rescue ArgumentError
-      end
-    end
-    values
-  end
-
   def run
-    #result = convert_integers(`vmstat 1 2|tail -n1`.split(" "))
-    result = `uptime`.gsub(',','').split(' ') 
+    result = `uptime`.gsub(',', '').split(' ')
     result = result[-3..-1]
-    
+
     timestamp = Time.now.to_i
     metrics = {
       :load_avg => {

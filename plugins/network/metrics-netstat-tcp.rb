@@ -33,11 +33,12 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# rubocop:disable FavorUnlessOverNegatedIf
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
-
 
 TCP_STATES = {
   '00' => 'UNKNOWN',  # Bad state ... Impossible to achieve ...
@@ -69,9 +70,9 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--port PORT",
     :proc => proc {|a| a.to_i }
 
-  def netstat(protocol='tcp')
+  def netstat(protocol = 'tcp')
     state_counts = Hash.new(0)
-    TCP_STATES.each_pair { |hex,name| state_counts[name] = 0 }
+    TCP_STATES.each_pair { |hex, name| state_counts[name] = 0 }
 
     File.open('/proc/net/' + protocol).each do |line|
       line.strip!
@@ -91,7 +92,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     timestamp = Time.now.to_i
-    netstat('tcp').each do |state,count|
+    netstat('tcp').each do |state, count|
       graphite_name = config[:port] ? "#{config[:scheme]}.#{config[:port]}.#{state}" :
         "#{config[:scheme]}.#{state}"
       output "#{graphite_name}", count, timestamp

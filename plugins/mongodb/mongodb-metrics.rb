@@ -52,7 +52,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     @isMaster = {"isMaster" => 1}
     begin
       metrics = {}
-      @db.command(@isMaster)["ok"] == 1
+      _result = @db.command(@isMaster)["ok"] == 1
       serverStatus = @db.command('serverStatus' => 1)
       if serverStatus["ok"] == 1
         metrics.update(gatherReplicationMetrics(serverStatus))
