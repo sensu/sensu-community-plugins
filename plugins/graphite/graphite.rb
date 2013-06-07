@@ -71,7 +71,6 @@ class Graphite < Sensu::Plugin::Check::CLI
          :short => "-a MAX_VALUE",
          :long => "--average_value MAX_VALUE"
 
-
   def initialize
     super
     @graphite_cache = []
@@ -115,7 +114,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     data = JSON.parse(resp.body)
     if data.size > 0
       @graphite_cache << {:target => target, :period => @period, :value => data.first['datapoints']}
-      data.first['datapoints'] #.select { |t| !t.first.nil? }.last.first
+      data.first['datapoints']
     else
       nil
     end
@@ -165,7 +164,9 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_gv = last_graphite_value target
     if last_gv && max_gv
       if max_gv > last_gv * (1 + config[:acceptable_diff_percentage].to_f / 100)
-        critical_errors << "The metric #{target} with last value #{last_gv} is less than max value #{max_gv} during #{config[:period]} period, see #{graphite_url(target)}"
+        msg = "The metric #{target} with last value #{last_gv} is less than max value #{max_gv} during #{config[:period]} period"
+        msg += ", see #{graphite_url(target)}"
+        critical_errors << msg
       end
     else
       warnings << "Could not found any value in Graphite for metric #{target}, see #{graphite_url(target)}"
@@ -174,9 +175,9 @@ class Graphite < Sensu::Plugin::Check::CLI
     [warnings, critical_errors, nil]
   end
 
-  def check_average(target,max_values)
+  def check_average(target, max_values)
     values_pair = get_graphite_values target
-    return [[],[],[]] unless values_pair
+    return [[], [], []] unless values_pair
     values = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
     avg_value = values.inject{ |sum, el| sum + el if el }.to_f / values.size
     warnings = []
@@ -186,23 +187,23 @@ class Graphite < Sensu::Plugin::Check::CLI
       if avg_value < max_value.to_f
         text = "The average value of metric #{target} is #{avg_value} that is less than allowed average of #{max_value}"
         case type
-          when "warning"
-            warnings <<  text
-          when "error"
-            criticals << text
-          when "fatal"
-            fatal << text
-          else
-            raise "Unknown type #{type}"
+        when "warning"
+          warnings <<  text
+        when "error"
+          criticals << text
+        when "fatal"
+          fatal << text
+        else
+          raise "Unknown type #{type}"
         end
       end
     end
     [warnings, criticals, fatal]
   end
 
-  def check_greater_than(target,max_values)
+  def check_greater_than(target, max_values)
     last = last_graphite_metric(target)
-    return [[],[],[]] unless last
+    return [[], [], []] unless last
     warnings = []
     criticals = []
     fatal = []
@@ -211,23 +212,23 @@ class Graphite < Sensu::Plugin::Check::CLI
       if last_value > max_value.to_f
         text = "The metric #{target} is #{last_value} that is higher than max allowed #{max_value}"
         case type
-          when "warning"
-            warnings <<  text
-          when "error"
-            criticals << text
-          when "fatal"
-            fatal << text
-          else
-            raise "Unknown type #{type}"
+        when "warning"
+          warnings <<  text
+        when "error"
+          criticals << text
+        when "fatal"
+          fatal << text
+        else
+          raise "Unknown type #{type}"
         end
       end
     end
     [warnings, criticals, fatal]
   end
 
-  def check_less_than(target,min_values)
+  def check_less_than(target, min_values)
     last = last_graphite_metric(target)
-    return [[],[],[]] unless last
+    return [[], [], []] unless last
     warnings = []
     criticals = []
     fatal = []
@@ -236,14 +237,14 @@ class Graphite < Sensu::Plugin::Check::CLI
       if last_value < min_value.to_f
         text = "The metric #{target} is #{last_value} that is lower than min allowed #{min_value}"
         case type
-          when "warning"
-            warnings <<  text
-          when "error"
-            criticals << text
-          when "fatal"
-            fatal << text
-          else
-            raise "Unknown type #{type}"
+        when "warning"
+          warnings <<  text
+        when "error"
+          criticals << text
+        when "fatal"
+          fatal << text
+        else
+          raise "Unknown type #{type}"
         end
       end
     end

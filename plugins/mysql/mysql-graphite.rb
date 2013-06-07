@@ -107,7 +107,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Com_flush' =>          'flush',
         'Com_insert' =>         'insert',
         'Com_purge' =>          'purge',
-	'Com_replace' =>	'replace',
+    'Com_replace' =>    'replace',
         'Com_rollback' =>       'rollback',
         'Com_select' =>         'select',
         'Com_set_option' =>     'set_option',
@@ -190,7 +190,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     begin
       slave_results = mysql.query("SHOW SLAVE STATUS")
       # should return a single element array containing one hash
-      slave_results.first.each do |key,value|
+      slave_results.first.each do |key, value|
         if metrics['general'].include?(key) then
           # Replication lag being null is bad, very bad, so negativate it here
           if key == 'Seconds_Behind_Master' and value.nil?

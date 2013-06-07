@@ -23,39 +23,39 @@ secret_key=""
 
 options = {}
 optparse = OptionParser.new do|opts|
-  opts.on( '-h', '--help', '' ) do
+  opts.on('-h', '--help', '') do
     puts opts
     exit
   end
-  opts.on( '-H', '--host HOST','Warning threshold' ) do|host|
+  opts.on('-H', '--host HOST', 'Warning threshold') do |host|
     options[:host] = host
   end
-   opts.on( '-w', '--warn WARN','Warning threshold' ) do|warn|
+   opts.on('-w', '--warn WARN', 'Warning threshold') do |warn|
     options[:warn] = warn
   end
-  opts.on( '-c', '--crit CRIT','Critical threshold' ) do|crit|
+  opts.on('-c', '--crit CRIT', 'Critical threshold') do |crit|
     options[:crit] = crit
   end
-  opts.on( '-s', '--stat STAT','Statistic' ) do|stat|
+  opts.on('-s', '--stat STAT', 'Statistic') do|stat|
     options[:stat] = stat
   end
-  opts.on( '-l', '--lessthan','Threshold is less than' ) do|lessthan|
+  opts.on('-l', '--lessthan', 'Threshold is less than') do|lessthan|
     options[:lessthan] = lessthan
   end
 end
 begin
   optparse.parse!
-  mandatory = [:warn,:crit,:stat,:host]                                         # Enforce the presence of
+  mandatory = [:warn, :crit, :stat, :host]                         # Enforce the presence of
   missing = mandatory.select{ |param| options[param].nil? }        # the -t and -f switches
-  if not missing.empty?                                            #
+  unless missing.empty?                                               #
     puts "Missing options: #{missing.join(', ')}"                  #
     puts optparse                                                  #
     exit                                                           #
   end                                                              #
-rescue OptionParser::InvalidOption, OptionParser::MissingArgument      #
-  puts $!.to_s                                                           # Friendly output when parsing fails
-  puts optparse                                                          #
-  exit                                                                   #
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument  #
+  puts $!.to_s                                                     # Friendly output when parsing fails
+  puts optparse                                                    #
+  exit                                                             #
 end
 
 AWS.config({
@@ -64,29 +64,31 @@ AWS.config({
 })
 
 cw = AWS::CloudWatch.new
-metric = AWS::CloudWatch::Metric.new('AWS/RDS', "#{options[:stat]}", 
-	{:dimensions => [
-		{:name => "DBInstanceIdentifier", :value => "#{options[:host]}"}
-	]})
+metric = AWS::CloudWatch::Metric.new('AWS/RDS', "#{options[:stat]}",
+  {:dimensions => [
+    {:name => "DBInstanceIdentifier", :value => "#{options[:host]}"}
+  ]})
 stats = metric.statistics(
-	:start_time => Time.now - 600,
-	:end_time => Time.now,
-	:statistics => ['Average'])
+  :start_time => Time.now - 600,
+  :end_time => Time.now,
+  :statistics => ['Average'])
 latest = stats.first
-#puts "#{stats.metric.name}: #{latest[:average]} #{latest[:unit]}"
-#puts "#{options[:crit].to_f}"
+# puts "#{stats.metric.name}: #{latest[:average]} #{latest[:unit]}"
+# puts "#{options[:crit].to_f}"
 if latest.nil?
-  puts "WARNING: #{options[:host]} is not returning data! Is it deleted? Slave dead? It could possibly mean there is no data to return, but make sure host is alive!"
-exit 2
+  msg = "WARNING: #{options[:host]} is not returning data! Is it deleted? Slave dead? "
+  msg += "It could possibly mean there is no data to return, but make sure host is alive!"
+  puts msg
+  exit 2
 end
 average = latest[:average]
 unit = latest[:unit]
 # Determine the unit for the average returned and convert if needed
   if unit == "Bytes" && options[:stat] == "FreeStorageSpace"
-    average = (latest[:average]/1073741824).round(0)
+    average = (latest[:average]/1_073_741_824).round(0)
     unit = "GigaBytes"
   elsif unit == "Bytes"
-    average = (latest[:average]/1048576).round(0)
+    average = (latest[:average]/1_048_576).round(0)
     unit = "MegaBytes"
   else
       average = latest[:average]
@@ -100,7 +102,7 @@ unit = latest[:unit]
     elsif average.to_f < options[:warn].to_f
       puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is below threshold #{options[:warn]} #{unit}"
       exit 2
-    else 
+    else
       puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
     end
     else
@@ -110,7 +112,7 @@ unit = latest[:unit]
     elsif average.to_f > options[:warn].to_f
       puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:warn]} #{unit}"
       exit 2
-    else 
+    else
       puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
     end
   end

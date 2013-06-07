@@ -46,7 +46,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   option :aws_region,
     :short => '-r AWS_REGION',
     :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1 or us-west-1). If you do not specify a region, it will automatically be detected by the server the script is run on"
+    :description => "AWS Region (such as eu-west-1). If you do not specify a region, it will be detected by the server the script is run on"
 
   option :elb_name,
     :short => '-n ELB_NAME',
@@ -73,7 +73,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
         instance_az = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/placement/availability-zone/'))
       end
       instance_az[0...-1]
-    rescue Exception => e
+    rescue Exception
       raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?"
     end
   end
@@ -96,13 +96,13 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       critical "An issue occured while communicating with the AWS EC2 API: #{e.message}"
     end
     unless health.empty?
-      unhealthy_instances = Hash.new
+      unhealthy_instances = {}
       health.each do |instance|
         unhealthy_instances[instance[:instance_id]] = instance[:state] unless instance[:state].eql?('InService')
       end
       unless unhealthy_instances.empty?
         if config[:verbose]
-          critical "Unhealthy instances detected: #{unhealthy_instances.map{|id,state| '[' + id + '::' + state + ']' }.join(' ')}"
+          critical "Unhealthy instances detected: #{unhealthy_instances.map{|id, state| '[' + id + '::' + state + ']' }.join(' ')}"
         else
           critical "Detected [#{unhealthy_instances.size}] unhealthy instances"
         end

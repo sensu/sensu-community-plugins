@@ -33,9 +33,9 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
          :default     => "#{::Socket.gethostname}.memcached"
   def run
     begin
-      stats = Hash.new
-      metrics = Hash.new
-      Timeout::timeout(30) do
+      stats = {}
+      metrics = {}
+      Timeout.timeout(30) do
         TCPSocket.open("#{config[:host]}", "#{config[:port]}") do |socket|
           socket.print "stats\r\n"
           socket.close_write
@@ -59,9 +59,9 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
      exit(1)
     end
   end
-  
+
   def sortMetrics(stats)
-    memcachedMetrics = Hash.new
+    memcachedMetrics = {}
     memcachedMetrics['pointer_size'] = stats['pointer_size'].to_i
     memcachedMetrics['rusage_user'] = stats['rusage_user'].to_i
     memcachedMetrics['rusage_system'] = stats['rusage_system'].to_i

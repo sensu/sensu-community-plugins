@@ -40,7 +40,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['jvm.mem.heap_used_in_bytes'] = node['jvm']['mem']['heap_used_in_bytes']
     metrics['jvm.mem.non_heap_used_in_bytes'] = node['jvm']['mem']['non_heap_used_in_bytes']
     metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis']
-    metrics.each do |k,v|
+    metrics.each do |k, v|
       output([config[:scheme], k].join("."), v, timestamp)
     end
     ok

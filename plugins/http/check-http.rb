@@ -93,36 +93,36 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     res = http.request(req)
 
     case res.code
-      when /^2/
-        if config[:redirectto]
-          critical "expected redirect to #{config[:redirectto]} but got #{res.code}"
-        elsif config[:pattern]
-          if res.body =~ /#{config[:pattern]}/
-            ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes"
-          else
-            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
-          end
+    when /^2/
+      if config[:redirectto]
+        critical "expected redirect to #{config[:redirectto]} but got #{res.code}"
+      elsif config[:pattern]
+        if res.body =~ /#{config[:pattern]}/
+          ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes"
         else
+          critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
+        end
+      else
+        ok "#{res.code}, #{res.body.size} bytes"
+      end
+    when /^3/
+      if config[:redirectok] || config[:redirectto]
+        if config[:redirectok]
           ok "#{res.code}, #{res.body.size} bytes"
-        end
-      when /^3/
-        if config[:redirectok] || config[:redirectto]
-          if config[:redirectok]
-            ok "#{res.code}, #{res.body.size} bytes"
-          elsif config[:redirectto]
-            if config[:redirectto] == res['Location']
-              ok "#{res.code} found redirect to #{res['Location']}"
-            else
-              critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}"
-            end
+        elsif config[:redirectto]
+          if config[:redirectto] == res['Location']
+            ok "#{res.code} found redirect to #{res['Location']}"
+          else
+            critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}"
           end
-        else
-          warning res.code
         end
-      when /^4/, /^5/
-        critical res.code
       else
         warning res.code
       end
+    when /^4/, /^5/
+      critical res.code
+    else
+      warning res.code
+    end
   end
 end

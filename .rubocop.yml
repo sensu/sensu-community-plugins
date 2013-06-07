@@ -79,3 +79,21 @@ WhileUntilModifier:
 
 Semicolon:
   Enabled: false
+
+UnlessElse:
+  Enabled: false
+
+BlockNesting:
+  Enabled: false
+
+Proc:
+  Enabled: false
+
+# Global vars should be removed
+AvoidGlobalVars:
+  Enabled: false
+
+# Probably some good ones in here.
+# Disabled for $? => $CHILD_STATUS
+AvoidPerlisms:
+  Enabled: false
