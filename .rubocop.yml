@@ -62,11 +62,20 @@ Syntax:
 WordArray:
   Enabled: false
 
-FavorModifier:
+IfUnlessModifier:
   Enabled: false
 
 ParenthesesAroundCondition:
   Enabled: false
 
 MethodAndVariableSnakeCase:
+  Enabled: false
+
+AvoidClassVars:
+  Enabled: false
+
+WhileUntilModifier:
+  Enabled: false
+
+Semicolon:
   Enabled: false

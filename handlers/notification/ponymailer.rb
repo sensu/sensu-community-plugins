@@ -57,7 +57,6 @@ class PonyMailer < Sensu::Handler
             }
         }) if settings['ponymailer']['authenticate']
 
-
         mailOptions[:body] = %Q{Sensu has detected a failed check. Event analysis follows:
 
 Event Timestamp:    #{Time.at(@event['check']['issued'].to_i)}

@@ -41,7 +41,7 @@ class GTALK < Sensu::Handler
     begin
       timeout 10 do
         puts "Connecting to jabber server.."
-        jabber = Jabber::Simple.new(username+'@gmail.com',password)
+        jabber = Jabber::Simple.new(username+'@gmail.com', password)
         puts "Connected."
         jabber.deliver(to_username+"@gmail.com", "#{body}")
         sleep(10)
