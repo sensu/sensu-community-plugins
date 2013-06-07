@@ -10,14 +10,13 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'geckoboard-push'
 
 class GeckoboardPush < Sensu::Handler
 
-  # override filters from Sensu::Handler. not appropriate for metric handlers
+  # Override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
 
   def handle
@@ -29,7 +28,7 @@ class GeckoboardPush < Sensu::Handler
 
     all = []
 
-    #probably a better way to do this than loop over the output twice
+    # Probably a better way to do this than loop over the output twice
     metrics.split(/\n/).each do |m|
       v = m.split(/\t/)
       all << {:value => v[1], :label => v[0]}
@@ -40,12 +39,12 @@ class GeckoboardPush < Sensu::Handler
       if checks.has_key?(v[0])
         c = settings["geckoboard"]["checks"][v[0]]
         wk = c["widget_key"]
-        
+
         case c["type"]
         when "number_and_secondary_value"
           Geckoboard::Push.new(wk).number_and_secondary_value(v[1], v[1])
         when "geckometer"
-          Geckoboard::Push.new(wk).geckometer(v[1],c["min"],c["max"])
+          Geckoboard::Push.new(wk).geckometer(v[1], c["min"], c["max"])
         when "piechart"
           Geckoboard::Push.new(wk).pie(all)
         when "funnel"

@@ -6,7 +6,7 @@
 # This plugin uses df to collect disk capacity metrics
 # disk-metrics.rb looks at /proc/stat which doesnt hold capacity metricss.
 # could have intetrated this into disk-metrics.rb, but thought I'd leave it up to
-# whomever implements the checks. 
+# whomever implements the checks.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.

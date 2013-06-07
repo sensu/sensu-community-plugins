@@ -5,17 +5,17 @@
 # This handler sends metrics to a OpenTSDB server via
 # TCP socket.
 #
-# This takes graphite like metrics (sensu's default) 
+# This takes graphite like metrics (sensu's default)
 # converts them to the opentsdb format, and then sends
-# them to opentsdb.  Each metric is sent individually 
-# to work around a bug in netty. 
-# https://github.com/OpenTSDB/opentsdb/issues/100  
+# them to opentsdb.  Each metric is sent individually
+# to work around a bug in netty.
+# https://github.com/OpenTSDB/opentsdb/issues/100
 #
 # In the future this really should just be a mutator to a tcp pipe,
-# but at the moment you cannot chain mutators.  
+# but at the moment you cannot chain mutators.
 #
-# OpenTSDB 'server', 'port', and 'hostname_length'  must be 
-# specified in a config file in /etc/sensu/conf.d.  
+# OpenTSDB 'server', 'port', and 'hostname_length'  must be
+# specified in a config file in /etc/sensu/conf.d.
 # See opentsdb.json for an example.
 #
 # Written by Zach Dunn -- @SillySophist or http://github.com/zadunn
