@@ -94,7 +94,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     else
       res = Net::HTTP.start(config[:connection], config[:port]) do |http|
         req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
-        unless config[:username].nil? then
+        unless config[:username].nil?
           req.basic_auth config[:username], config[:password]
         end
         http.request(req)

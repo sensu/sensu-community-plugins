@@ -89,7 +89,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     timestamp = Time.now.to_i
-    stats = Hash.new
+    stats = {}
     get_mod_status.split("\n").each do |line|
       name, value = line.split(": ")
       case name
