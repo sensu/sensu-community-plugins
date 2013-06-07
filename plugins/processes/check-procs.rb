@@ -77,7 +77,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
         # blank. As of revision 1.35, the format is:
         # const char *lfmt = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
         state = line.slice!(0..0)
-        stime = line.slice!(45..53)
+        _stime = line.slice!(45..53)
         line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :command).merge(:state => state)
       end
     else

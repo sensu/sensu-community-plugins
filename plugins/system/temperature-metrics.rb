@@ -12,6 +12,8 @@
 # for details.
 #
 # Requires lm-sensors
+#
+# rubocop:disable AvoidPerlBackrefs
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -29,14 +31,14 @@ class Sensors < Sensu::Plugin::Metric::CLI::Graphite
 
   sections = raw.split("\n\n")
 
-  metrics = Hash.new
+  metrics = {}
 
   sections.each do |section|
     section.split("\n").drop(1).each do |line|
       begin
         key, value = line.split(":")
         key = key.downcase.gsub(/\s/, '')
-        if key[0 ..3] == "temp" or key[0 .. 3] == "core" then
+        if key[0 ..3] == "temp" or key[0 .. 3] == "core"
           value.strip =~ /[\+\-]?(\d+(\.\d)?)/
           value = $1
           metrics[key] = value

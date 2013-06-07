@@ -10,6 +10,8 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# rubocop:disable HandleExceptions
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -34,21 +36,21 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    #get capacity metrics from DF as they don't appear in /proc (to my knowledge anyway)
+    # Get capacity metrics from DF as they don't appear in /proc
     `df -PT`.split("\n").drop(1).each do |line|
       begin
-        fs, type, blocks, used, avail, capacity, mnt = line.split
+        fs, _type, _blocks, used, avail, capacity, mnt = line.split
         if mnt == "/"
           mnt = "root"
         end
         timestamp = Time.now.to_i
         if fs.match('/dev')
-          fs = fs.gsub('/dev/','')
+          fs = fs.gsub('/dev/', '')
           metrics = {
-              :disk=> {
+              :disk => {
                   "#{fs}.used" => used,
                   "#{fs}.avail" => avail,
-                  "#{fs}.capacity" => capacity.gsub('%','')
+                  "#{fs}.capacity" => capacity.gsub('%', '')
               }
           }
           metrics.each do |parent, children|
@@ -62,21 +64,21 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
       end
     end
 
-    #get inode capacity metrics
+    # Get inode capacity metrics
     `df -Pi`.split("\n").drop(1).each do |line|
       begin
-        fs, inodes, used, avail, capacity, mnt = line.split
+        fs, _inodes, used, avail, capacity, mnt = line.split
         if mnt == "/"
           mnt = "root"
         end
         timestamp = Time.now.to_i
         if fs.match('/dev')
-          fs = fs.gsub('/dev/','')
+          fs = fs.gsub('/dev/', '')
           metrics = {
               :disk=> {
                   "#{fs}.iused" => used,
                   "#{fs}.iavail" => avail,
-                  "#{fs}.icapacity" => capacity.gsub('%','')
+                  "#{fs}.icapacity" => capacity.gsub('%', '')
               }
           }
           metrics.each do |parent, children|

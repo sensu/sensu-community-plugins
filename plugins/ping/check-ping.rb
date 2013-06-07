@@ -38,8 +38,7 @@ class CheckPING < Sensu::Plugin::Check::CLI
 
   def run
     if "#{config[:type]}" == "HTTP"
-      port_num = eval "#{config[:port]}"
-      pt = Net::Ping::HTTP.new("http://#{config[:host]}", port="#{port_num}", timeout=10)
+      pt = Net::Ping::HTTP.new("http://#{config[:host]}", config[:port], 10)
       if pt.ping?
         ok "HTTP ping successful"
       else

@@ -57,6 +57,11 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :short => "-S SOCKET",
     :long => "--socket SOCKET"
 
+  option :verbose,
+    :short => "-v",
+    :long => "--verbose",
+    :boolean => true
+
   def run
 
     # props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
@@ -107,7 +112,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Com_flush' =>          'flush',
         'Com_insert' =>         'insert',
         'Com_purge' =>          'purge',
-    'Com_replace' =>    'replace',
+        'Com_replace' =>        'replace',
         'Com_rollback' =>       'rollback',
         'Com_select' =>         'select',
         'Com_set_option' =>     'set_option',
@@ -181,7 +186,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
 
     results.each do |row|
       metrics.each do |category, var_mapping|
-        if var_mapping.has_key?(row["Variable_name"]) then
+        if var_mapping.has_key?(row["Variable_name"])
           output "#{config[:scheme]}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
         end
       end
@@ -191,7 +196,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       slave_results = mysql.query("SHOW SLAVE STATUS")
       # should return a single element array containing one hash
       slave_results.first.each do |key, value|
-        if metrics['general'].include?(key) then
+        if metrics['general'].include?(key)
           # Replication lag being null is bad, very bad, so negativate it here
           if key == 'Seconds_Behind_Master' and value.nil?
             value = -1
@@ -199,9 +204,8 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
           output "#{config[:scheme]}.general.#{metrics['general'][key]}", value
         end
       end
-    rescue
-      # do nothing? often there is no slave status or user doesn't have proper perms
-      # so don't pollute the output.
+    rescue Exception => e
+      puts "Error querying slave status: #{e}" if config[:verbose]
     end
 
     ok

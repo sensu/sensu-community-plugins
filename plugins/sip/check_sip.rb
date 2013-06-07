@@ -10,7 +10,6 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'socket'
@@ -44,7 +43,6 @@ class SIP < Sensu::Plugin::Check::CLI
     :description => 'Host to connect to, will be found from sipuri if not specified',
     :required    => true
 
-
   def build_request(ourhost, ourport, dsturi)
     tag = Array.new(6){rand(36).to_s(36)}.join
     idtag = Array.new(6){rand(36).to_s(36)}.join
@@ -72,11 +70,11 @@ class SIP < Sensu::Plugin::Check::CLI
       hostname = Socket.gethostbyname(Socket.gethostname).first
       s = UDPSocket.new
       s.connect(config[:host], config[:port])
-      req = build_request(hostname,s.addr[1],config[:sipuri])
+      req = build_request(hostname, s.addr[1], config[:sipuri])
       start_time = Time.now
       response = ""
       timeout(config[:timeout]) do
-        s.send(req,0)
+        s.send(req, 0)
         response = s.recvfrom(1024)[0]
       end
     rescue Timeout::Error
