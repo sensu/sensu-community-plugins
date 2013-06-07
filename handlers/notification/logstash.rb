@@ -55,7 +55,7 @@ class LogstashHandler < Sensu::Handler
       },
       :@timestamp => time
     }
-    redis.lpush(settings['logstash']['list'],logstash_msg.to_json)
+    redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
   end
 end
 

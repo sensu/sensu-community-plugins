@@ -35,11 +35,12 @@ class Campfire < Sensu::Handler
   end
 
   def handle
-    description = @event['notification'] || [ @event['client']['name'],
-                                              @event['check']['name'],
-                                              @event['check']['output'],
-                                              @event['client']['address'],
-                                              @event['client']['subscriptions'].join(',')
+    description = @event['notification'] || [
+                                               @event['client']['name'],
+                                               @event['check']['name'],
+                                               @event['check']['output'],
+                                               @event['client']['address'],
+                                               @event['client']['subscriptions'].join(',')
                                             ].join(' : ')
     begin
       timeout(3) do

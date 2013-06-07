@@ -49,7 +49,7 @@ class Mailer < Sensu::Handler
       :access_key_id     => params[:aws_access_key],
       :secret_access_key => params[:aws_secret_key]
     )
-    
+
     begin
       timeout 10 do
         ses.send_email(

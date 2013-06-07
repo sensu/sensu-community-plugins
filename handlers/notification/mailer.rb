@@ -28,7 +28,7 @@ class Mailer < Sensu::Handler
     smtp_address = settings['mailer']['smtp_address'] || 'localhost'
     smtp_port = settings['mailer']['smtp_port'] || '25'
     smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
-    
+
     params = {
       :mail_to   => settings['mailer']['mail_to'],
       :mail_from => settings['mailer']['mail_from'],
