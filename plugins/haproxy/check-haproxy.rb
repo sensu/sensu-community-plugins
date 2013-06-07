@@ -6,7 +6,7 @@
 # Defaults to checking if ALL services in the given group are up; with
 # -1, checks if ANY service is up. with -A, checks all groups.
 #
-# Updated: To add -S to allow for different named sockets 
+# Updated: To add -S to allow for different named sockets
 #
 # Copyright 2011 Sonian, Inc.
 #

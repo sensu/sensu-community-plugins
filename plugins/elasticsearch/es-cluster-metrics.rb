@@ -43,7 +43,7 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def get_health
-    health = get_es_resource('/_cluster/health').reject {|k,v| %w[cluster_name timed_out].include?(k)}
+    health = get_es_resource('/_cluster/health').reject {|k, v| %w[cluster_name timed_out].include?(k)}
     health['status'] = ['red', 'yellow', 'green'].index(health['status'])
     health
   end
@@ -55,7 +55,7 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     if is_master
-      get_health.each do |k,v|
+      get_health.each do |k, v|
         output(config[:scheme] + '.' + k, v)
       end
       output(config[:scheme] + '.document_count', get_document_count)

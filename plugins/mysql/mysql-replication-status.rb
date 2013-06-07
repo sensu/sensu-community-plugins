@@ -68,12 +68,12 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
       unless results.nil?
         results.each_hash do |row|
           warn "couldn't detect replication status" unless
-            [ 'Slave_IO_State',
+            ['Slave_IO_State',
               'Slave_IO_Running',
               'Slave_SQL_Running',
               'Last_IO_Error',
               'Last_SQL_Error',
-              'Seconds_Behind_Master' ].all? do |key|
+              'Seconds_Behind_Master'].all? do |key|
             row.has_key? key
           end
 

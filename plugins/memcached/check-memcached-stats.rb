@@ -24,7 +24,7 @@ class MemcachedStats < Sensu::Plugin::Check::CLI
 
   def run
     begin
-      Timeout::timeout(30) do
+      Timeout.timeout(30) do
         TCPSocket.open("localhost", config[:port]) do |socket|
           socket.print "stats\r\n"
           socket.close_write

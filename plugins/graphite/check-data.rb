@@ -88,14 +88,14 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check the age of the data being processed
   def check_age
-    if((Time.now.to_i - @end) > config[:allowed_graphite_age])
+    if (Time.now.to_i - @end) > config[:allowed_graphite_age]
       critical "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
     end
   end
 
   # grab data from graphite
   def retreive_data
-    unless(@raw_data)
+    unless @raw_data
       begin
         handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
         @raw_data = JSON.parse(handle.gets).first
@@ -117,8 +117,8 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # type:: :warning or :critical
   # Return alert if required
   def check(type)
-    if(config[type])
-      if(@data.last > config[type] && !decreased?)
+    if config[type]
+      if @data.last > config[type] && !decreased?
         send(type, "#{name} has passed #{type} threshold")
       end
     end
@@ -126,7 +126,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check if values have decreased within interval if given
   def decreased?
-    if(config[:reset_on_decrease])
+    if config[:reset_on_decrease]
       slice = @data.slice(@data.size - config[:reset_on_decrease], @data.size)
       val = slice.shift until slice.empty? || val.to_f > slice.first
       !slice.empty?
@@ -137,7 +137,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Returns formatted target with hostname replacing any $ characters
   def formatted_target
-    if(config[:target].include?('$'))
+    if config[:target].include?('$')
       require 'socket'
       @formatted = Socket.gethostbyname(Socket.gethostname).first.gsub('.', config[:hostname_sub] || '_')
       config[:target].gsub('$', @formatted)

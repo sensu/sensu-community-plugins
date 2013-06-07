@@ -41,7 +41,19 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     ln = RestClient::Resource.new 'http://localhost:9200/_cluster/nodes/_local', :timeout => 30
-    stats = RestClient::Resource.new 'http://localhost:9200/_cluster/nodes/_local/stats?clear=true&indices=true&os=true&process=true&jvm=true&network=true&transport=true&http=true&fs=true&thread_pool=true', :timeout => 30
+    stats_query_string = [
+        'clear=true',
+        'indices=true',
+        'os=true',
+        'process=true',
+        'jvm=true',
+        'network=true',
+        'transport=true',
+        'http=true',
+        'fs=true',
+        'thread_pool=true'
+    ].join('&')
+    stats = RestClient::Resource.new "http://localhost:9200/_cluster/nodes/_local/stats?#{stats_query_string}", :timeout => 30
     ln = JSON.parse(ln.get)
     stats = JSON.parse(stats.get)
     timestamp = Time.now.to_i
@@ -78,7 +90,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['network.tcp.attempt_fails']        = node['network']['tcp']['attempt_fails']
     metrics['network.tcp.in_errs']              = node['network']['tcp']['in_errs']
     metrics['network.tcp.out_rsts']             = node['network']['tcp']['out_rsts']
-    metrics.each do |k,v|
+    metrics.each do |k, v|
       output([config[:scheme], k].join("."), v, timestamp)
     end
     ok

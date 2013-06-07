@@ -40,9 +40,12 @@ class CurlMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.curl_timings"
 
   def run
-    output = `curl --silent --output /dev/null #{config[:curl_args]} \
-              -w "%{time_total},%{time_namelookup},%{time_connect},%{time_pretransfer},%{time_redirect},%{time_starttransfer}" \
-             #{config[:url]}`
+    cmd = "curl --silent --output /dev/null #{config[:curl_args]} "
+    cmd += '-w "%{time_total},%{time_namelookup},%{time_connect},%{time_pretransfer},%{time_redirect},%{time_starttransfer}" '
+    cmd += config[:url]
+
+    output = `#{cmd}`
+
     (time_total, time_namelookup, time_connect, time_pretransfer, time_redirect, time_starttransfer) = output.split(',')
     output "#{config[:scheme]}.time_total", time_total
     output "#{config[:scheme]}.time_namelookup", time_namelookup

@@ -3,7 +3,7 @@
 # ===
 #
 # This is a simple check script for Sensu to check out the LXC's memory usage
-# 
+#
 #
 # Requires "lxc" gem
 #
@@ -42,15 +42,15 @@ class CheckLXCMemstat < Sensu::Plugin::Check::CLI
     conn = LXC.container("#{config[:name]}")
     if conn.exists?
       if conn.running?
-	used = conn.memory_usage
-	max = conn.memory_limit
-	if ( used > (max*("#{config[:critical]}".to_f/100)))
-  	  critical "container #{config[:name]} memory usage crossed the critical limit"
- 	elsif ( used > (max*("#{config[:warning]}".to_f/100)))
-  	  warning "container #{config[:name]} memory usage crossed the warning limit"
-	else
- 	  ok "container #{config[:name]} memory usage is normal"
-	end
+  used = conn.memory_usage
+  max = conn.memory_limit
+  if ( used > (max*("#{config[:critical]}".to_f/100)))
+      critical "container #{config[:name]} memory usage crossed the critical limit"
+  elsif ( used > (max*("#{config[:warning]}".to_f/100)))
+      warning "container #{config[:name]} memory usage crossed the warning limit"
+  else
+    ok "container #{config[:name]} memory usage is normal"
+  end
       else
         critical "container #{config[:name]} is not running"
       end
