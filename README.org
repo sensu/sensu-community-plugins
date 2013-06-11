@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)
+
 * Sensu Plugins
 
 This gem contains some example plugins and handlers for Sensu. Most of
