@@ -40,7 +40,7 @@ class SIP < Sensu::Plugin::Check::CLI
   option :host,
     :short       => '-H HOSTNAME',
     :long        => '--host HOSTNAME',
-    :description => 'Host to connect to, will be found from sipuri if not specified',
+    :description => 'Host to connect to',
     :required    => true
 
   def build_request(ourhost, ourport, dsturi)
@@ -58,10 +58,10 @@ class SIP < Sensu::Plugin::Check::CLI
     req += "Content-Length: 0\r\n\r\n"
   end
 
-  def check_response(response, response_time)
+  def check_response(response)
     header = response.split('\r\n')
     response_code = header[0].split(' ')[1]
-    message "#{response_code} #{response_time}s\n"
+    message "#{response_code}\n"
     response_code == "200" ? ok : warning
   end
 
@@ -71,7 +71,6 @@ class SIP < Sensu::Plugin::Check::CLI
       s = UDPSocket.new
       s.connect(config[:host], config[:port])
       req = build_request(hostname, s.addr[1], config[:sipuri])
-      start_time = Time.now
       response = ""
       timeout(config[:timeout]) do
         s.send(req, 0)
@@ -84,7 +83,6 @@ class SIP < Sensu::Plugin::Check::CLI
       critical ex.message
       exit 1
     end
-    response_time = (Time.now - start_time).round(2)
-    check_response(response, response_time)
+    check_response(response)
   end
 end
