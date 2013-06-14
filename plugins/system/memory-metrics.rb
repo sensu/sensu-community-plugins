@@ -17,12 +17,12 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
     mem = {}
     File.open("/proc/meminfo", "r").each_line do |line|
-      mem['total']     = line.split(/\s+/)[1].to_i * 1024 if line.match /^MemTotal/
-      mem['free']      = line.split(/\s+/)[1].to_i * 1024 if line.match /^MemFree/
-      mem['buffers']   = line.split(/\s+/)[1].to_i * 1024 if line.match /^Buffers/
-      mem['cached']    = line.split(/\s+/)[1].to_i * 1024 if line.match /^Cached/
-      mem['swapTotal'] = line.split(/\s+/)[1].to_i * 1024 if line.match /^SwapTotal/
-      mem['swapFree']  = line.split(/\s+/)[1].to_i * 1024 if line.match /^SwapFree/
+      mem['total']     = line.split(/\s+/)[1].to_i * 1024 if line.match(/^MemTotal/)
+      mem['free']      = line.split(/\s+/)[1].to_i * 1024 if line.match(/^MemFree/)
+      mem['buffers']   = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Buffers/)
+      mem['cached']    = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Cached/)
+      mem['swapTotal'] = line.split(/\s+/)[1].to_i * 1024 if line.match(/^SwapTotal/)
+      mem['swapFree']  = line.split(/\s+/)[1].to_i * 1024 if line.match(/^SwapFree/)
     end
 
     mem['swapUsed'] = mem['swapTotal'] - mem['swapFree']

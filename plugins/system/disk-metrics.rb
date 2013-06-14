@@ -22,7 +22,7 @@ class DiskGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
     File.open("/proc/diskstats", "r").each_line do |line|
       stats = line.strip.split(/\s+/)
-      major, minor, dev = stats.shift(3)
+      _major, _minor, dev = stats.shift(3)
       next if stats == ['0'].cycle.take(stats.size)
 
       metrics.size.times { |i| output "#{config[:scheme]}.#{dev}.#{metrics[i]}", stats[i] }

@@ -9,23 +9,22 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 
 class GraphiteOccurrences < Sensu::Handler
-  
+
   # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
-  
+
   def handle
     hostname = @event['client']['name'].split('.').first
     check_name = @event['check']['name'].gsub(%r|[ \.]|, '_')
-    metric = "sensu.events.#{hostname}.#{check_name}.occurrences"
     value = @event['action'] == 'create' ? @event['occurrences'] : 0
     now = Time.now.to_i
-    
+
     # Get graphite-like format for sensu events here
     check_occurences = "sensu.#{hostname}.#{check_name} #{value} #{now}"
-    
+
     graphite_server = settings['graphite']['server']
     graphite_port = settings['graphite']['port']
-    
+
     begin
       timeout(3) do
         sock = TCPSocket.new(graphite_server, graphite_port)

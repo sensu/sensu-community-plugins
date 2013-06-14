@@ -24,12 +24,12 @@ class Resolve < Sensu::Handler
     scope = execute['scope']
     class_type = execute['class']
     case scope.upcase
-      when "HOST"
-        "-I #{@event['client']['address']}"
-      when "CLASS"
-        "-C #{class_type}"
-      else
-        raise "Scope #{scope} is unknown, valid scope is HOST"
+    when "HOST"
+      "-I #{@event['client']['address']}"
+    when "CLASS"
+      "-C #{class_type}"
+    else
+      raise "Scope #{scope} is unknown, valid scope is HOST"
     end
   end
 

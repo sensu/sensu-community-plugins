@@ -2,8 +2,8 @@
 #
 # IOStat Extended Metrics Plugin
 #
-# This plugin collects extended iostat data (iowait -x) for a 
-# specified disk or all disks. Output is in Graphite format. 
+# This plugin collects extended iostat data (iowait -x) for a
+# specified disk or all disks. Output is in Graphite format.
 # See `man iostat` for detailed explaination of each field:
 #
 #   rrqms,wrqms,rs,ws,rsecs,wsecs,avgrq_sz,
@@ -30,10 +30,10 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Disk to gather stats for",
     :short => "-d DISK",
     :long => "--disk DISK",
-    :required => false 
+    :required => false
 
   option :interval,
-    :description => "Amount of time in seconds between each report", 
+    :description => "Amount of time in seconds between each report",
     :short => "-i interval",
     :long => "--interval interval",
     :default => 1
@@ -66,17 +66,16 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    disk = config[:disk]
+    requested_disk = config[:disk]
     interval = config[:interval]
-    if disk.nil?
+    if requested_disk.nil?
       raw = `iostat -x #{interval} 2`
       stats = parse_results(raw)
     else
-      disk_short = File.basename(disk)
-      raw = `iostat -xd #{disk} #{interval} 2`
+      raw = `iostat -xd #{requested_disk} #{interval} 2`
       stats = parse_results(raw)
     end
-     
+
     timestamp = Time.now.to_i
 
     stats.each do |disk, metrics|
@@ -85,6 +84,6 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
       end
     end
     ok
-  end 
+  end
 
 end

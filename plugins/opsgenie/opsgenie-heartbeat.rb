@@ -26,7 +26,7 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
     :description => "Opsgenie Customer API key",
     :required => true
 
-  option :timeout, 
+  option :timeout,
     :short => '-t Secs',
     :long => '--timeout Secs',
     :description => "Plugin timeout",
@@ -51,7 +51,7 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
     end
   end
 
-  def opsgenie_heartbeat()
+  def opsgenie_heartbeat
     params = {}
     params["customerKey"] = config[:customer_key]
 
@@ -59,7 +59,7 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    request = Net::HTTP::Post.new(uri.request_uri,initheader = {'Content-Type' =>'application/json'})
+    request = Net::HTTP::Post.new(uri.request_uri, {'Content-Type' =>'application/json'})
     request.body = params.to_json
     response = http.request(request)
     JSON.parse(response.body)

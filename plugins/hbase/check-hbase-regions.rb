@@ -3,7 +3,7 @@
 # HBase regions plugin
 # ===
 #
-# This plugin checks the number of regions on a regionserver 
+# This plugin checks the number of regions on a regionserver
 #
 # Copyright 2011 Runa Inc
 #
@@ -14,16 +14,15 @@ require 'java'
 require 'pp'
 
 include Java
-include_class('java.lang.Integer') { |package,name| "J#{name}" }
-include_class('java.lang.Long')    { |package,name| "J#{name}" }
-include_class('java.lang.Boolean') { |package,name| "J#{name}" }
+include_class('java.lang.Integer') { |package, name| "J#{name}" }
+include_class('java.lang.Long')    { |package, name| "J#{name}" }
+include_class('java.lang.Boolean') { |package, name| "J#{name}" }
 
 import org.apache.hadoop.hbase.client.HBaseAdmin
 import org.apache.hadoop.hbase.client.HTable
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.log4j.Logger
-
 
 packages = ["org.apache.zookeeper", "org.apache.hadoop", "org.apache.hadoop.hbase"]
 
@@ -34,7 +33,7 @@ end
 
 module SensuUtils
   # Copied from sensu-plugin
-  
+
   EXIT_CODES = {
     'OK' => 0,
     'WARNING' => 1,
@@ -45,7 +44,7 @@ module SensuUtils
   def output(fn, *args)
     puts "#{fn.upcase}: #{args}"
   end
-  
+
   EXIT_CODES.each do |status, code|
     define_method(status.downcase) do |*args|
       output(status, *args)
@@ -62,11 +61,11 @@ def regionserver_info
   admin = HBaseAdmin.new(conf)
 
   status = admin.getClusterStatus()
-  status.getServerInfo().map { |server|
+  status.getServerInfo().map do |server|
     { :hostname => server.getServerAddress().getHostname(),
       :regions => server.getLoad().getNumberOfRegions()
     }
-  }
+  end
 end
 
 def check_threshold(info)
@@ -94,7 +93,7 @@ end
 
 def run
   status = regionserver_info.map { |x| check_threshold(x) }
-  
+
   msg = "\n" + status.map { |x| x[:msg] }.join("\n")
 
   if status.any? { |x| x[:status] == :critical }
@@ -106,7 +105,6 @@ def run
   end
 
 end
-
 
 $config[:warning]  = ARGV.first.to_i if ARGV.first
 $config[:critical] = ARGV.second.to_i if ARGV.second

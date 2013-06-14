@@ -12,7 +12,6 @@ require "json"
 
 class Opsgenie < Sensu::Handler
 
-
   def handle
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output'].chomp].join(' : ')
     begin
@@ -60,7 +59,7 @@ class Opsgenie < Sensu::Handler
   def post_to_opsgenie(action = :create, params = {})
     params["customerKey"] = settings["opsgenie"]["customerKey"]
     params["recipients"]  = settings["opsgenie"]["recipients"]
-    
+
     # override source if specified, default is ip
     params["source"] = settings["opsgenie"]["source"] if settings["opsgenie"]["source"]
 
@@ -69,7 +68,7 @@ class Opsgenie < Sensu::Handler
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    request = Net::HTTP::Post.new(uri.request_uri,initheader = {'Content-Type' =>'application/json'})
+    request = Net::HTTP::Post.new(uri.request_uri, {'Content-Type' =>'application/json'})
     request.body = params.to_json
     response = http.request(request)
     JSON.parse(response.body)

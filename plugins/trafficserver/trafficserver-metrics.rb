@@ -53,17 +53,16 @@ class TrafficServerMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     if res.code == "200"
-      body = res.body
       stats = JSON.parse(res.body)["global"]
       process_stats(stats)
     else
       critical "Error #{res.code} connecting to trafficserver status. Please check configuration."
     end
-    
+
   end
 
   def process_stats(stats)
-    stats.select{|k,v| wanted(k)}.each do |k, v|
+    stats.select{|k, v| wanted(k)}.each do |k, v|
       output "#{config[:scheme]}.#{k.sub(/^proxy\.process\./, '')}", v
     end
     ok

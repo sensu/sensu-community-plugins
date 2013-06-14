@@ -68,7 +68,8 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
 
     begin
       resource = RestClient::Resource.new "http://#{host}:#{port}/api/aliveness-test/#{vhost}", username, password
-      JSON.parse(resource.get) == { "status" => "ok" }
+      # Attempt to parse response (just to trigger parse exception)
+      _response = JSON.parse(resource.get) == { "status" => "ok" }
       { "status" => "ok", "message" => "RabbitMQ server is alive" }
     rescue Errno::ECONNREFUSED => e
       { "status" => "critical", "message" => e.message }

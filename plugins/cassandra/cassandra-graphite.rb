@@ -252,7 +252,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       next if line.match(/^Message type/)
 
       if m = line.match(/^(\w+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/)
-        (thread, active, pending, completed, blocked, all_time_blocked) = m.captures
+        (thread, active, pending, completed, blocked, _) = m.captures
 
         output "#{config[:scheme]}.threadpool.#{thread}.active", active, @timestamp
         output "#{config[:scheme]}.threadpool.#{thread}.pending", pending, @timestamp
@@ -349,7 +349,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       elsif num_indents == 0
         # keyspace = nil
         cf = nil
-      elsif num_indents == 2 and not cf.nil?
+      elsif num_indents == 2 and !cf.nil?
         # a column family metric
         if config[:filter_regex]
           unless cf.match(config[:filter_regex])
@@ -358,7 +358,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
         (metric, value) = get_metric(line)
         output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp
-      elsif num_indents == 1 and not keyspace.nil?
+      elsif num_indents == 1 and !keyspace.nil?
         # a keyspace metric
         (metric, value) = get_metric(line)
         output "#{config[:scheme]}.#{keyspace}.#{metric}", value, @timestamp

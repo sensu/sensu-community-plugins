@@ -13,8 +13,8 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.cpu"
 
   def run
-    cpu_metrics = [ 'user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq', 'steal', 'guest' ]
-    other_metrics = [ 'ctxt', 'processes', 'procs_running', 'procs_blocked' ]
+    cpu_metrics = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq', 'steal', 'guest']
+    other_metrics = ['ctxt', 'processes', 'procs_running', 'procs_blocked']
 
     File.open("/proc/stat", "r").each_line do |line|
       info = line.split(/\s+/)

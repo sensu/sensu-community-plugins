@@ -57,7 +57,6 @@ class PonyMailer < Sensu::Handler
             }
         }) if settings['ponymailer']['authenticate']
 
-
         mailOptions[:body] = %Q{Sensu has detected a failed check. Event analysis follows:
 
 Event Timestamp:    #{Time.at(@event['check']['issued'].to_i)}
@@ -90,7 +89,7 @@ Node Subscriptions: #{@event['client']['subscriptions'].join(', ')}
                         puts 'mail -- sent alert for ' + short_name + ' to ' + to
                     end
                 rescue Timeout::Error
-                    puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name                        
+                    puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
                 end
             end
         end
