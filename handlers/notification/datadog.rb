@@ -2,6 +2,9 @@
 #
 # This handler creates and resolves incidents in Datadog.
 #
+# Depends on dogapi gem
+# gem install dogapi
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
