@@ -5,7 +5,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'rubygems'
 require 'dogapi'
 
 module Sensu
@@ -52,14 +52,12 @@ module Sensu
       incident_key = @event['client']['name'] + ' ' + @event['check']['name']
       description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' ')
       action = get_action
-      puts "#{incident_key}"
-      puts "#{description}"
       begin
         timeout(3) do
           response = @dog.emit_event(Dogapi::Event.new(
                                               description,
                                               :msg_title => incident_key,
-                                              :tags => ['test1', 'test2', 'sensu'],
+                                              :tags => ['sensu'],
                                               :alert_type => action,
                                               :priority => 'normal'
                                             ), :host => @event['client']['name']
@@ -68,7 +66,6 @@ module Sensu
           begin
             if response[0] == "202"
               puts "Submitted event to Datadog"
-              puts "#{response}"
             else
               puts "Unexpected response from Datadog: HTTP code #{response[0]}"
             end
@@ -77,9 +74,10 @@ module Sensu
           end
         end
       rescue Timeout::Error
-        puts 'datadog -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key
+        puts 'Datadog timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key
       end
     end
   end
 end
+
 Sensu::Handler.run
