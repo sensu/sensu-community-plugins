@@ -90,7 +90,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         req[h] = v.strip
       end
     end
-    res = http.request(req)
+
+    begin
+      res = http.request(req)
+    rescue => e
+      unknown "#{e.class}: #{e.message}"
+    end
 
     case res.code
     when /^2/
