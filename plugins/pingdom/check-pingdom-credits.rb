@@ -74,16 +74,11 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
   def run
     check_sms!
     check_checks! # LOL @ name clashes
-    ok 'Pingdom credits ok' if sms_ok? && checks_ok?
+    ok 'Pingdom credits ok' if sms_ok && checks_ok
   end
 
-  def sms_ok?
-    @sms_ok
-  end
-
-  def checks_ok?
-    @checks_ok
-  end
+  attr_reader :sms_ok
+  attr_reader :checks_ok
 
   def check_sms!
     message = "Only #{available_sms} Pingdom SMS left (threshold %{threshold})"
