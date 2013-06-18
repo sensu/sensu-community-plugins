@@ -18,15 +18,16 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
-require 'flowdock'
+require 'flowdock'
 
 class FlowdockNotifier < Sensu::Handler
 
   def handle
     token = settings['flowdock']['auth_token']
+    flowdock_tags = settings['flowdock']['tags']
     data = @event['check']['output']
     flow = Flowdock::Flow.new(:api_token => token, :external_user_name => "Sensu")
-    flow.push_to_chat(:content => data, :tags => ["sensu", "test"])
+    flow.push_to_chat(:content => data, :tags => flowdock_tags)
    end
 
 end
