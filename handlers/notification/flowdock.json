@@ -1,5 +1,6 @@
 {
   "flowdock": {
     "auth_token": "FLOWDOCK_API_TOKEN",
+    "tags": [ FLOWDOCK_TAGS_LIST ],
   }
 }
