@@ -1,4 +1,4 @@
-#!/usr/bin/env /opt/sensu/embedded/bin/ruby
+#!/usr/bin/env ruby
 #
 # RabbitMQ check alive plugin
 # ===
