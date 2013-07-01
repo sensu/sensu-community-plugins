@@ -42,17 +42,34 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     :description => 'The name of the SQS you want to check the number of messages for',
     :required => true
 
-  option :warning,
-    :short  => '-w WARN_NUM',
-    :long  => '--warnnum WARN_NUM',
+  option :warn_over,
+    :short  => '-w WARN_OVER',
+    :long  => '--warnnum WARN_OVER',
     :description => 'Number of messages in the queue considered to be a warning',
-    :required => true
+    :default => 1,
+    :proc => proc { |a| a.to_i }
 
-  option :critical,
-    :short  => '-c CRIT_NUM',
-    :long  => '--critnum CRIT_NUM',
+  option :crit_over,
+    :short  => '-c CRIT_OVER',
+    :long  => '--critnum CRIT_OVER',
     :description => 'Number of messages in the queue considered to be critical',
-    :required => true
+    :default => 1,
+    :proc => proc { |a| a.to_i }
+
+  option :warn_under,
+    :short  => '-W WARN_UNDER',
+    :long  => '--warnunder WARN_UNDER',
+    :description => 'Minimum number of messages in the queue considered to be a warning',
+    :default => 0,
+    :proc => proc { |a| a.to_i }
+
+  option :crit_under,
+    :short  => '-C CRIT_UNDER',
+    :long  => '--critunder CRIT_UNDER',
+    :description => 'Minimum number of messages in the queue considered to be critical',
+    :default => 0,
+    :proc => proc { |a| a.to_i }
+
 
   def run
     AWS.config(
@@ -62,10 +79,10 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     sqs = AWS::SQS.new
     messages = sqs.queues.named(config[:queue]).approximate_number_of_messages
 
-    if messages >= config[:critical].to_i
-      critical "#{messages} messages in #{config[:queue]} queue"
-    elsif messages >= config[:warning].to_i
-      warning "#{messages} messages in #{config[:queue]} queue"
+    if messages < config[:crit_under] || messages > config[:crit_over]
+      critical "#{messages} message(s) in #{config[:queue]} queue"
+    elsif messages < config[:warn_under] || messages > config[:warn_over]
+      warning "#{messages} message(s) in #{config[:queue]} queue"
     else
       ok "#{messages} messages in #{config[:queue]} queue"
     end
