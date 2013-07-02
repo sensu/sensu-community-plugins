@@ -46,28 +46,28 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     :short  => '-w WARN_OVER',
     :long  => '--warnnum WARN_OVER',
     :description => 'Number of messages in the queue considered to be a warning',
-    :default => 1,
+    :default => -1,
     :proc => proc { |a| a.to_i }
 
   option :crit_over,
     :short  => '-c CRIT_OVER',
     :long  => '--critnum CRIT_OVER',
     :description => 'Number of messages in the queue considered to be critical',
-    :default => 1,
+    :default => -1,
     :proc => proc { |a| a.to_i }
 
   option :warn_under,
     :short  => '-W WARN_UNDER',
     :long  => '--warnunder WARN_UNDER',
     :description => 'Minimum number of messages in the queue considered to be a warning',
-    :default => 0,
+    :default => -1,
     :proc => proc { |a| a.to_i }
 
   option :crit_under,
     :short  => '-C CRIT_UNDER',
     :long  => '--critunder CRIT_UNDER',
     :description => 'Minimum number of messages in the queue considered to be critical',
-    :default => 0,
+    :default => -1,
     :proc => proc { |a| a.to_i }
 
   def run
@@ -78,9 +78,9 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     sqs = AWS::SQS.new
     messages = sqs.queues.named(config[:queue]).approximate_number_of_messages
 
-    if messages < config[:crit_under] || messages > config[:crit_over]
+    if (config[:crit_under] >= 0 && messages < config[:crit_under]) || (config[:crit_over] >= 0 && messages > config[:crit_over])
       critical "#{messages} message(s) in #{config[:queue]} queue"
-    elsif messages < config[:warn_under] || messages > config[:warn_over]
+    elsif (config[:warn_under] >= 0 && messages < config[:warn_under]) || (config[:warn_over] >= 0 && messages > config[:warn_over])
       warning "#{messages} message(s) in #{config[:queue]} queue"
     else
       ok "#{messages} messages in #{config[:queue]} queue"
