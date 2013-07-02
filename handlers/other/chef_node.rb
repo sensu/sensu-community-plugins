@@ -69,12 +69,13 @@ class ChefNode < Sensu::Handler
   end
 
   def delete_sensu_client!
+    client_name = @event["client"]["name"]
     api_url = "http://"
     api_url << settings["api"]["host"]
     api_url << ":"
-    api_url << settings["api"]["port"]
+    api_url << settings["api"]["port"].to_s
     api_url << "/clients/"
-    api_url << @event["client"]["name"]
+    api_url << client_name
     begin
       timeout(8) do
         RestClient::Resource.new(
@@ -83,6 +84,7 @@ class ChefNode < Sensu::Handler
           :password => settings["api"]["password"]
         ).delete
       end
+      puts "Chef Node - Successfully deleted Sensu client: #{client_name}"
     rescue => error
       puts "Chef Node - Unexpected error: #{error.message}"
     end
