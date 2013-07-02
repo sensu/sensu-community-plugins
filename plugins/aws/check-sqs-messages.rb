@@ -70,7 +70,6 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     :default => 0,
     :proc => proc { |a| a.to_i }
 
-
   def run
     AWS.config(
       :access_key_id      => config[:aws_access_key],
