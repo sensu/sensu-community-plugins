@@ -55,11 +55,13 @@ class ChefNode < Sensu::Handler
       s.client_name  = settings["chef"]["client_name"]
       s.client_key   = Spice.read_key_file(settings["chef"]["client_key"])
       s.chef_version = settings["chef"]["version"] || "11.0.0"
-      s.connection_options = {
-        :ssl => {
-          :verify => settings["chef"]["verify_ssl"] || true
+      unless settings["chef"]["verify_ssl"].nil?
+        s.connection_options = {
+          :ssl => {
+            :verify => settings["chef"]["verify_ssl"]
+          }
         }
-      }
+      end
     end
     begin
       timeout(8) do
