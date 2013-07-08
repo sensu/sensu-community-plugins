@@ -2,6 +2,8 @@
 #
 # Check CPU Plugin
 #
+# Works on Ubuntu, but returns the following on CentOS/Rhel
+# Check failed to run: undefined method `-' for nil:NilClass
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
