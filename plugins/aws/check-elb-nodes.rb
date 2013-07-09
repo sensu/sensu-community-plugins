@@ -97,9 +97,13 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
       message << " (#{state['OutOfService'].join(', ')})"
     end
 
-    if (config[:crit_under] > 0 && config[:crit_under] >= state['InService'].count) || (config[:crit_percent] > 0 && config[:crit_percent] >= (num_instances / state['InService'].count) * 100 )
+    if config[:crit_under] > 0 && config[:crit_under] >= state['InService'].count
       critical message
-    elsif (config[:warn_under] > 0 && config[:warn_under] >= state['InService'].count) || (config[:warn_percent] > 0 && config[:warn_percent] >= (num_instances / state['InService'].count) * 100 )
+    elsif config[:crit_percent] > 0 && config[:crit_percent] >= (num_instances / state['InService'].count) * 100
+      critical message
+    elsif config[:warn_under] > 0 && config[:warn_under] >= state['InService'].count
+      warning message
+    elsif config[:warn_percent] > 0 && config[:warn_percent] >= (num_instances / state['InService'].count) * 100
       warning message
     else
       ok message
