@@ -61,7 +61,7 @@ class Mailer < Sensu::Handler
     end
 
     params[:contacts].each do |contact|
-      @match = @event['check']['subscribers'] & contact['subscribers']
+      @match = @event['check']['subscribers'] & contact['subscriptions']
       if @match.size > 0
         begin
           timeout 10 do

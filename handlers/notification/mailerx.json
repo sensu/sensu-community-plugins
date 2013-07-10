@@ -7,11 +7,11 @@
     "contacts": [
       {
         "mail": "oggy@example.com",
-        "subscribers": [ "test", "frontend" ]
+        "subscriptions": [ "test", "frontend" ]
       },
       {
         "mail": "jack@example.com",
-        "subscribers": [ "mysql", "system" ]
+        "subscriptions": [ "mysql", "system" ]
       }
     ]
   }
