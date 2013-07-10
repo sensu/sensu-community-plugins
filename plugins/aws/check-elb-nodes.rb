@@ -23,7 +23,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'aws-sdk'
 
-class SQSMsgs < Sensu::Plugin::Check::CLI
+class CheckELBNodes < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',
@@ -36,6 +36,12 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
     :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
     :required => true
+
+  option :aws_region,
+    :short => '-r AWS_REGION',
+    :long => '--aws-region REGION',
+    :description => "AWS Region (such as eu-west-1).",
+    :default => 'us-east-1'
 
   option :load_balancer,
     :short => '-n ELB_NAME',
@@ -74,7 +80,8 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
   def run
     elb = AWS::ELB.new(
       :access_key_id      => config[:aws_access_key],
-      :secret_access_key  => config[:aws_secret_access_key])
+      :secret_access_key  => config[:aws_secret_access_key],
+      :region             => config[:aws_region])
 
     begin
       instances = elb.load_balancers[config[:load_balancer]].instances.health
