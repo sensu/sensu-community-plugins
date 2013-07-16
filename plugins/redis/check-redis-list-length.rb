@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 #
-# Checks numberof items in a Redis list key
+# Checks number of items in a Redis list key
 # ===
+#
+# Depends on redis gem
+# gem install redis
 #
 # Copyright (c) 2013, Piavlo <lolitushka@gmail.com>
 #
@@ -63,9 +66,9 @@ class RedisChecks < Sensu::Plugin::Check::CLI
       length = redis.llen(config[:key])
 
       if (length >= config[:crit])
-        critical "Redis running on #{config[:host]}:#{config[:port]} has list #{config[:key]} with items above the CRITICAL limit: #{length} length / #{config[:crit]} limit"
+        critical "Redis list #{config[:key]} length is above the CRITICAL limit: #{length} length / #{config[:crit]} limit"
       elsif (length >= config[:warn])
-        warning "Redis running on #{config[:host]}:#{config[:port]} has list #{config[:key]} with items above the WARNING limit: #{length} length / #{config[:warn]} limit"
+        warning "Redis list #{config[:key]} length is above the WARNING limit: #{length} length / #{config[:warn]} limit"
       else
         ok "Redis list #{config[:key]} length is below thresholds"
       end
