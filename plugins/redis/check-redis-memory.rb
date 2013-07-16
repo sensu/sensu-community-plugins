@@ -50,22 +50,22 @@ class RedisChecks < Sensu::Plugin::Check::CLI
 
   def run
     begin
-       options = {:host => config[:host], :port => config[:port]}
-       options[:password] = config[:password] if config[:password]
-       redis = Redis.new(options)
+      options = {:host => config[:host], :port => config[:port]}
+      options[:password] = config[:password] if config[:password]
+      redis = Redis.new(options)
 
-        used_memory = redis.info.fetch('used_memory').to_i.div(1024)
-        warn_memory = config[:warn_mem]
-        crit_memory = config[:crit_mem]
-        if (used_memory >= crit_memory)
-            critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit: #{used_memory} KB used / #{crit_memory} KB limit"
-        elsif (used_memory >= warn_memory)
-            warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit: #{used_memory} KB used / #{warn_memory} KB limit"
-        else
-            ok 'Redis memory usage is below defined limits'
-        end
+      used_memory = redis.info.fetch('used_memory').to_i.div(1024)
+      warn_memory = config[:warn_mem]
+      crit_memory = config[:crit_mem]
+      if (used_memory >= crit_memory)
+        critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit: #{used_memory} KB used / #{crit_memory} KB limit"
+      elsif (used_memory >= warn_memory)
+        warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit: #{used_memory} KB used / #{warn_memory} KB limit"
+      else
+        ok 'Redis memory usage is below defined limits'
+      end
     rescue
-        warning "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
+      warning "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
     end
   end
 
