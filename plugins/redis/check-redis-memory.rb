@@ -29,6 +29,11 @@ class RedisChecks < Sensu::Plugin::Check::CLI
     :required => false,
     :default => 6379
 
+  option :password,
+    :short => "-P PASSWORD",
+    :long => "--password PASSWORD",
+    :description => "Redis Password to connect with"
+
   option :warn_mem,
     :short => "-w KB",
     :long => "--warnmem KB",
@@ -45,7 +50,9 @@ class RedisChecks < Sensu::Plugin::Check::CLI
 
   def run
     begin
-        redis = Redis.new(:host => config[:host], :port =>config[:port])
+       options = {:host => config[:host], :port => config[:port]}
+       options[:password] = config[:password] if config[:password]
+       redis = Redis.new(options)
 
         used_memory = redis.info.fetch('used_memory').to_i.div(1024)
         warn_memory = config[:warn_mem]

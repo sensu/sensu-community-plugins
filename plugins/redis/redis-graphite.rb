@@ -34,6 +34,11 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :proc => proc {|p| p.to_i },
     :default => 6379
 
+  option :password,
+    :short => "-P PASSWORD",
+    :long => "--password PASSWORD",
+    :description => "Redis Password to connect with"
+
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
@@ -41,7 +46,9 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.redis"
 
   def run
-    redis = Redis.new(:host => config[:host], :port => config[:port])
+    options = {:host => config[:host], :port => config[:port]}
+    options[:password] = config[:password] if config[:password]
+    redis = Redis.new(options)
 
     redis.info.each do |k, v|
       next unless SKIP_KEYS_REGEX.map { |re| k.match(/#{re}/)}.compact.empty?
