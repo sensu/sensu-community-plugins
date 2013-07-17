@@ -56,7 +56,6 @@ class MemcachedKeyStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
               output "#{config[:scheme]}.#{key}.del", del.to_i
             end
           end
-          
         end
       end
       ok
