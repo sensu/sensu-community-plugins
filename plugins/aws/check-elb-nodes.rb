@@ -106,7 +106,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
 
     if config[:crit_under] > 0 && config[:crit_under] >= state['InService'].count
       critical message
-    elsif config[:crit_percent] > 0 && config[:crit_percent] >= (num_instances / state['InService'].count) * 100
+    elsif config[:crit_percent] > 0 && (state['InService'] == 0 || config[:crit_percent] >= (num_instances / state['InService'].count) * 100)
       critical message
     elsif config[:warn_under] > 0 && config[:warn_under] >= state['InService'].count
       warning message
