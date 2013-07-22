@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Ceilometer API monitoring script for Nagios
+# Ceilometer API monitoring script for Sensu
 #
 # Copyright © 2013 eNovance <licensing@enovance.com>
 #

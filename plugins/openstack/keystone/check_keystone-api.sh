@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Keystone API monitoring script for Nagios
+# Keystone API monitoring script for Sensu
 #
 # Copyright © 2013 eNovance <licensing@enovance.com>
 #

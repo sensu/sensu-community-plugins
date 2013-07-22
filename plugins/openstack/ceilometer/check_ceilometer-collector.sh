@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Ceilometer Collector monitoring script for Nagios
+# Ceilometer Collector monitoring script for Sensu
 #
 # Copyright © 2013 eNovance <licensing@enovance.com>
 #
