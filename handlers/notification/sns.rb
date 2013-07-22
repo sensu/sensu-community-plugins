@@ -21,6 +21,10 @@ class SnsNotifier < Sensu::Handler
   def topic_arn
     settings['sns']['topic_arn']
   end
+  
+  def region
+    settings['sns']['region'] || 'us-east-1'
+  end
 
   def event_name
     "#{@event['client']['name']}/#{@event['check']['name']}"
@@ -31,6 +35,8 @@ class SnsNotifier < Sensu::Handler
   end
 
   def handle
+    AWS.config(:region => region)
+    
     sns = AWS::SNS.new
 
     t = sns.topics[topic_arn]
