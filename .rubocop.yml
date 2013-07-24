@@ -103,3 +103,7 @@ Lambda:
 
 CollectionMethods:
   Enabled: false
+
+AllCops:
+  Excludes:
+    - vendor/**
