@@ -366,7 +366,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       critical fatals_string if fatals.size > 0
       critical criticals_string if critical_errors.size > 0
       warning warnings_string if warnings.size > 0
-    else 
+    else
       critical fatals_string if fatals.size > 0
       critical criticals_string if critical_errors.size > 0
       warning warnings_string if warnings.size > 0
