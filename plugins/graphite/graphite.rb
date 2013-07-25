@@ -5,6 +5,7 @@
 #
 #
 # Copyright 2012 Ulf Mansson @ Recorded Future
+# Modifications by Chris Jansen to support wildcard targets
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -66,6 +67,20 @@ class Graphite < Sensu::Plugin::Check::CLI
          :long => "--less_than VALUE",
          :default => nil
 
+  option :ignore_nulls,
+         :description => "Do not error on null values, used in check_function_increasing",
+         :short => "-n",
+         :long => "--ignore_nulls",
+         :default => false,
+         :boolean => true
+
+  option :concat_output,
+         :description => "Include warning messages in output even if overall status is critical",
+         :short => "-c",
+         :long => "--concat_output",
+         :default => false,
+         :boolean => true
+
   option :check_greater_than_average,
          :description => "MAX_VALUE should be greater than the average of Graphite values from PERIOD",
          :short => "-a MAX_VALUE",
@@ -77,8 +92,8 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def graphite_cache
-    graphite_value = @graphite_cache.find {|value| value["target"]==@target && value["period"] == @period}
-    graphite_value[:value] if graphite_value
+    graphite_value = @graphite_cache.find_all {|value| value[:period] == @period}
+    graphite_value if graphite_value.size > 0
   end
 
   # Create a graphite url from params
@@ -113,8 +128,8 @@ class Graphite < Sensu::Plugin::Check::CLI
     resp = Net::HTTP.post_form(graphite_url, params)
     data = JSON.parse(resp.body)
     if data.size > 0
-      @graphite_cache << {:target => target, :period => @period, :value => data.first['datapoints']}
-      data.first['datapoints']
+      data.map { |d| @graphite_cache << {:target => d['target'], :period => @period, :datapoints => d['datapoints'] }}
+      graphite_cache
     else
       nil
     end
@@ -123,7 +138,18 @@ class Graphite < Sensu::Plugin::Check::CLI
 
   # Will give max values for [0..-2]
   def max_graphite_value(target)
+    max_values = {}
     values = get_graphite_values target
+    if values
+      values.each do | val |
+        max = get_max_value(val[:datapoints])
+        max_values[val[:target]] = max
+      end
+    end
+    return max_values
+  end
+
+  def get_max_value(values)
     if values
       values.map {|i| i[0] ? i[0] : 0}[0..-2].max
     else
@@ -132,7 +158,18 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def last_graphite_metric(target)
+    last_values = {}
     values = get_graphite_values target
+    if values
+      values.each do | val |
+        last = get_last_metric(val[:datapoints])
+        last_values[val[:target]] = last
+      end
+    end
+    return last_values
+  end
+
+  def get_last_metric(values)
     if values
       count = values.size
       while count > 0
@@ -146,55 +183,79 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def last_graphite_value(target)
-    last_metric = last_graphite_metric target
-    last_metric ? last_metric[0] : nil
+    last_metrics = last_graphite_metric target
+    last_values = {}
+    if last_metrics
+      last_metrics.each do | target_name, metric |
+        last_values[target_name] = metric[0]
+      end
+    end
+    return last_values
   end
 
-  def has_been_updated_since(target, time)
+  def has_been_updated_since(target, time, updated_since)
     last_time_stamp = last_graphite_metric target
-    last_time_stamp ? last_time_stamp[1] > time.to_i : false
+    warnings = []
+    if last_time_stamp
+      last_time_stamp.each do | target_name, value |
+        last_time_stamp_bool = value[1] > time.to_i ? true : false
+        warnings << "The metric #{target_name} has not been updated in #{updated_since.to_s} seconds" unless last_time_stamp_bool
+      end
+    end
+    return warnings
   end
 
   def check_increasing(target)
     updated_since = config[:updated_since].to_i
     time_to_be_updated_since = Time.now - updated_since
-    critical_errors = ""
-    warnings = ""
+    critical_errors = []
+    warnings = []
     max_gv = max_graphite_value target
     last_gv = last_graphite_value target
-    if last_gv && max_gv
-      if max_gv > last_gv * (1 + config[:acceptable_diff_percentage].to_f / 100)
-        msg = "The metric #{target} with last value #{last_gv} is less than max value #{max_gv} during #{config[:period]} period"
-        msg += ", see #{graphite_url(target)}"
-        critical_errors << msg
+    if last_gv.kind_of?(Hash) and max_gv.kind_of?(Hash)
+      last_gv.each do | target_name, value |
+        if value and max_gv[target_name]
+          last = value
+          max = max_gv[target_name]
+          if max > last * (1 + config[:acceptable_diff_percentage].to_f / 100)
+            msg = "The metric #{target} with last value #{last} is less than max value #{max} during #{config[:period]} period"
+            critical_errors << msg
+          end
+        end
       end
     else
       warnings << "Could not found any value in Graphite for metric #{target}, see #{graphite_url(target)}"
     end
-    warnings << "The metric #{target} has not been updated in #{updated_since.to_s} seconds" unless has_been_updated_since(target, time_to_be_updated_since)
-    [warnings, critical_errors, nil]
+    unless config[:ignore_nulls]
+      warnings.concat(has_been_updated_since(target, time_to_be_updated_since, updated_since))
+    end
+    [warnings, critical_errors, []]
   end
 
   def check_average(target, max_values)
-    values_pair = get_graphite_values target
-    return [[], [], []] unless values_pair
-    values = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
-    avg_value = values.inject{ |sum, el| sum + el if el }.to_f / values.size
+    values = get_graphite_values target
+    return [[], [], []] unless values
     warnings = []
     criticals = []
     fatal = []
-    max_values.each_pair do |type, max_value|
-      if avg_value < max_value.to_f
-        text = "The average value of metric #{target} is #{avg_value} that is less than allowed average of #{max_value}"
-        case type
-        when "warning"
-          warnings <<  text
-        when "error"
-          criticals << text
-        when "fatal"
-          fatal << text
-        else
-          raise "Unknown type #{type}"
+    values.each do | data |
+      target = data[:target]
+      values_pair = data[:datapoints]
+      values = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
+      avg_value = values.inject{ |sum, el| sum + el if el }.to_f / values.size
+      max_values.each_pair do |type, max_value|
+        if avg_value < max_value.to_f
+          text = "The average value of metric #{target} is #{avg_value} that is less than allowed average of #{max_value}"
+          case type
+          when "warning"
+            warnings <<  text
+          when "error"
+            criticals << text
+          when "fatal"
+            fatal << text
+          else
+            raise "Unknown type #{type}"
+          end
         end
       end
     end
@@ -202,24 +263,28 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def check_greater_than(target, max_values)
-    last = last_graphite_metric(target)
-    return [[], [], []] unless last
+    last_targets = last_graphite_metric target
+    return [[], [], []] unless last_targets
     warnings = []
     criticals = []
     fatal = []
-    last_value = last.first
-    max_values.each_pair do |type, max_value|
-      if last_value > max_value.to_f
-        text = "The metric #{target} is #{last_value} that is higher than max allowed #{max_value}"
-        case type
-        when "warning"
-          warnings <<  text
-        when "error"
-          criticals << text
-        when "fatal"
-          fatal << text
-        else
-          raise "Unknown type #{type}"
+    last_targets.each do | target_name, last |
+      last_value = last.first
+      unless last_value.nil?
+        max_values.each_pair do |type, max_value|
+          if last_value > max_value.to_f
+            text = "The metric #{target_name} is #{last_value} that is higher than max allowed #{max_value}"
+            case type
+            when "warning"
+              warnings <<  text
+            when "error"
+              criticals << text
+            when "fatal"
+              fatal << text
+            else
+              raise "Unknown type #{type}"
+            end
+          end
         end
       end
     end
@@ -227,24 +292,28 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def check_less_than(target, min_values)
-    last = last_graphite_metric(target)
-    return [[], [], []] unless last
+    last_targets = last_graphite_metric target
+    return [[], [], []] unless last_targets
     warnings = []
     criticals = []
     fatal = []
-    last_value = last.first
-    min_values.each_pair do |type, min_value|
-      if last_value < min_value.to_f
-        text = "The metric #{target} is #{last_value} that is lower than min allowed #{min_value}"
-        case type
-        when "warning"
-          warnings <<  text
-        when "error"
-          criticals << text
-        when "fatal"
-          fatal << text
-        else
-          raise "Unknown type #{type}"
+    last_targets.each do | target_name, last |
+      last_value = last.first
+      unless last_value.nil?
+        min_values.each_pair do |type, min_value|
+          if last_value < min_value.to_f
+            text = "The metric #{target_name} is #{last_value} that is lower than min allowed #{min_value}"
+            case type
+            when "warning"
+              warnings <<  text
+            when "error"
+              criticals << text
+            when "fatal"
+              fatal << text
+            else
+              raise "Unknown type #{type}"
+            end
+          end
         end
       end
     end
@@ -260,9 +329,9 @@ class Graphite < Sensu::Plugin::Check::CLI
     targets.each do |target|
       if config[:check_function_increasing]
         inc_warnings, inc_critical, inc_fatal = check_increasing target
-        warnings << inc_warnings
-        critical_errors << inc_critical
-        fatals << inc_fatal
+        warnings += inc_warnings
+        critical_errors += inc_critical
+        fatals += inc_fatal
       end
       if config[:check_greater_than]
         max_values = get_levels config[:check_greater_than]
@@ -286,9 +355,22 @@ class Graphite < Sensu::Plugin::Check::CLI
         fatals += avg_fatal
       end
     end
-    critical fatals.join("\n") if fatals.size > 0
-    critical critical_errors.join("\n") if critical_errors.size > 0
-    warning warnings.join("\n") if warnings.size > 0
+    fatals_string = fatals.size > 0 ? fatals.join("\n") : ""
+    criticals_string = critical_errors.size > 0 ? critical_errors.join("\n") : ""
+    warnings_string = warnings.size > 0 ? warnings.join("\n") : ""
+
+    if config[:concat_output]
+      fatals_string = fatals_string + "\n" + criticals_string if critical_errors.size > 0
+      fatals_string = fatals_string + "\nGraphite WARNING: " + warnings_string if warnings.size > 0
+      criticals_string = criticals_string + "\nGraphite WARNING: " + warnings_string if warnings.size > 0
+      critical fatals_string if fatals.size > 0
+      critical criticals_string if critical_errors.size > 0
+      warning warnings_string if warnings.size > 0
+    else 
+      critical fatals_string if fatals.size > 0
+      critical criticals_string if critical_errors.size > 0
+      warning warnings_string if warnings.size > 0
+    end
     ok
 
   end
