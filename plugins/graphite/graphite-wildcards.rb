@@ -74,6 +74,13 @@ class Graphite < Sensu::Plugin::Check::CLI
          :default => false,
          :boolean => true
 
+  option :concat_output,
+         :description => "Include warning messages in output even if overall status is critical",
+         :short => "-c",
+         :long => "--concat_output",
+         :default => false,
+         :boolean => true
+
   option :check_greater_than_average,
          :description => "MAX_VALUE should be greater than the average of Graphite values from PERIOD",
          :short => "-a MAX_VALUE",
@@ -186,9 +193,16 @@ class Graphite < Sensu::Plugin::Check::CLI
     return last_values
   end
 
-  def has_been_updated_since(target, time)
+  def has_been_updated_since(target, time, updated_since)
     last_time_stamp = last_graphite_metric target
-    last_time_stamp ? last_time_stamp[1] > time.to_i : false
+    warnings = []
+    if last_time_stamp
+      last_time_stamp.each do | target_name, value |
+        last_time_stamp_bool = value[1] > time.to_i ? true : false
+        warnings << "The metric #{target_name} has not been updated in #{updated_since.to_s} seconds" unless last_time_stamp_bool
+      end
+    end
+    return warnings
   end
 
   def check_increasing(target)
@@ -213,7 +227,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       warnings << "Could not found any value in Graphite for metric #{target}, see #{graphite_url(target)}"
     end
     unless config[:ignore_nulls]
-      warnings << "The metric #{target} has not been updated in #{updated_since.to_s} seconds" unless has_been_updated_since(target, time_to_be_updated_since)
+      warnings.concat(has_been_updated_since(target, time_to_be_updated_since, updated_since))
     end
     [warnings, critical_errors, []]
   end
@@ -341,9 +355,22 @@ class Graphite < Sensu::Plugin::Check::CLI
         fatals += avg_fatal
       end
     end
-    critical fatals.join("\n") if fatals.size > 0
-    critical critical_errors.join("\n") if critical_errors.size > 0
-    warning warnings.join("\n") if warnings.size > 0
+    fatals_string = fatals.size > 0 ? fatals.join("\n") : ""
+    criticals_string = critical_errors.size > 0 ? critical_errors.join("\n") : ""
+    warnings_string = warnings.size > 0 ? warnings.join("\n") : ""
+
+    if config[:concat_output]
+      fatals_string = fatals_string + "\n" + criticals_string if critical_errors.size > 0
+      fatals_string = fatals_string + "\nGraphite WARNING: " + warnings_string if warnings.size > 0
+      criticals_string = criticals_string + "\nGraphite WARNING: " + warnings_string if warnings.size > 0
+      critical fatals_string if fatals.size > 0
+      critical criticals_string if critical_errors.size > 0
+      warning warnings_string if warnings.size > 0
+    else 
+      critical fatals_string if fatals.size > 0
+      critical criticals_string if critical_errors.size > 0
+      warning warnings_string if warnings.size > 0
+    end
     ok
 
   end
