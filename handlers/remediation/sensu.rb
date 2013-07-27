@@ -15,6 +15,11 @@
 # where the strings are dash seperated integers or plus
 # suffixed integers.
 #
+# By default, the remediation checks will be triggered on the
+# the client where the check is failing.  An array of
+# subscriptions may be specified via a 'trigger_on' property
+# of the 'remediation' dictionary.
+#
 # Example:
 #
 # {
