@@ -85,7 +85,7 @@ class Remediator < Sensu::Handler
 
     remediation_checks = parse_remediations(remediations, occurrences, severity)
 
-    subscribers = remediations['trigger_on'] ? [remediations['trigger_on']].flatten || [client]
+    subscribers = remediations['trigger_on'] ? [remediations['trigger_on']].flatten : [client]
     remediation_checks.each do |remediation_check|
       puts "REMEDIATION: Triggering remediation check '#{remediation_check}' for #{[client].inspect}"
       response = trigger_remediation(remediation_check, subscribers)
@@ -127,7 +127,7 @@ class Remediator < Sensu::Handler
 
   # Issue a check via the API
   def trigger_remediation(check, subscribers)
-    result = api_request(:POST, '/checks/request') do |req|
+    api_request(:POST, '/checks/request') do |req|
       req.body = JSON.dump({"check" => check, "subscribers" => subscribers})
     end
   end
