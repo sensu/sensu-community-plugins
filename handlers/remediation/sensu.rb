@@ -78,7 +78,7 @@ class Remediator < Sensu::Handler
 
   def handle
     client = @event['client']['name']
-    remediations = @event['check']['remediate']
+    remediations = @event['check']['remediation']
     occurrences = @event['occurrences']
     severity = @event['check']['status'].to_i
     puts "REMEDIATION: Evaluating remediation: #{client} #{remediations.inspect} #=#{occurrences} sev=#{severity}"
