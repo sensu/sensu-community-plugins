@@ -15,6 +15,7 @@ require 'sensu-plugin/check/cli'
 require 'json'
 require 'net/http'
 require 'socket'
+require 'array_stats'
 
 class Graphite < Sensu::Plugin::Check::CLI
 
@@ -86,6 +87,15 @@ class Graphite < Sensu::Plugin::Check::CLI
          :short => "-a MAX_VALUE",
          :long => "--average_value MAX_VALUE"
 
+  option :percentile,
+         :description => "Percentile value, should be used in conjunction with percentile_value, defaults to 90",
+         :long => "--percentile PERCENTILE",
+         :defailt => 90
+
+  option :check_greater_than_percentile,
+         :description => "Values should not be greater than the VALUE of Graphite values from PERIOD",
+         :long => "--percentile_value VALUE"
+
   def initialize
     super
     @graphite_cache = []
@@ -128,7 +138,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     resp = Net::HTTP.post_form(graphite_url, params)
     data = JSON.parse(resp.body)
     if data.size > 0
-      data.map { |d| @graphite_cache << {:target => d['target'], :period => @period, :datapoints => d['datapoints'] }}
+      data.each { |d| @graphite_cache << {:target => d['target'], :period => @period, :datapoints => d['datapoints'] }}
       graphite_cache
     else
       nil
@@ -241,11 +251,44 @@ class Graphite < Sensu::Plugin::Check::CLI
     values.each do | data |
       target = data[:target]
       values_pair = data[:datapoints]
-      values = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
-      avg_value = values.inject{ |sum, el| sum + el if el }.to_f / values.size
+      values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
+      avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values.size
       max_values.each_pair do |type, max_value|
-        if avg_value < max_value.to_f
+        if avg_value < max_value.to_f and (values_array.size > 0 or !config[:ignore_nulls])
           text = "The average value of metric #{target} is #{avg_value} that is less than allowed average of #{max_value}"
+          case type
+          when "warning"
+            warnings <<  text
+          when "error"
+            criticals << text
+          when "fatal"
+            fatal << text
+          else
+            raise "Unknown type #{type}"
+          end
+        end
+      end
+    end
+    [warnings, criticals, fatal]
+  end
+
+  def check_percentile(target, max_values, percentile)
+    values = get_graphite_values target
+    last_values = last_graphite_value target
+    return [[], [], []] unless values
+    warnings = []
+    criticals = []
+    fatal = []
+    values.each do | data |
+      target = data[:target]
+      values_pair = data[:datapoints]
+      values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
+      percentile_value = values_array.percentile(percentile)
+      last_value = last_values[target]
+      max_values.each_pair do |type, max_value|
+        percent = last_value / percentile_value unless last_value.nil? and percentile_value.nil?
+        if !percentile_value.nil? and max_value.to_f < percent
+          text = "The percentile value of metric #{target} (#{last_value}) is greater than the #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
           case type
           when "warning"
             warnings <<  text
@@ -353,6 +396,13 @@ class Graphite < Sensu::Plugin::Check::CLI
         warnings += avg_warnings
         critical_errors += avg_critical
         fatals += avg_fatal
+      end
+      if config[:check_greater_than_percentile]
+        max_values = get_levels config[:check_greater_than_percentile]
+        pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile])
+        warnings += pct_warnings
+        critical_errors += pct_critical
+        fatals += pct_fatal
       end
     end
     fatals_string = fatals.size > 0 ? fatals.join("\n") : ""
