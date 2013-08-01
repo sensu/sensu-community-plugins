@@ -56,16 +56,16 @@ class Graphite < Sensu::Plugin::Check::CLI
          :default => false,
          :boolean => true
 
-  option :check_greater_than,
-         :description => "Check that last value in Graphite is not greater than VALUE",
-         :short => "-g VALUE",
-         :long => "--greater_than VALUE",
-         :default => nil
+  option :greater_than,
+         :description => "Change whether value is greater than or less than check",
+         :short => "-g",
+         :long => "--greater_than",
+         :default => false
 
-  option :check_less_than,
-         :description => "Check that the last value in GRAPHITE is less than VALUE",
+  option :check_last,
+         :description => "Check that the last value in GRAPHITE is greater/less than VALUE",
          :short => "-l VALUE",
-         :long => "--less_than VALUE",
+         :long => "--last VALUE",
          :default => nil
 
   option :ignore_nulls,
@@ -82,7 +82,7 @@ class Graphite < Sensu::Plugin::Check::CLI
          :default => false,
          :boolean => true
 
-  option :check_greater_than_average,
+  option :check_average,
          :description => "MAX_VALUE should be greater than the average of Graphite values from PERIOD",
          :short => "-a MAX_VALUE",
          :long => "--average_value MAX_VALUE"
@@ -90,9 +90,9 @@ class Graphite < Sensu::Plugin::Check::CLI
   option :percentile,
          :description => "Percentile value, should be used in conjunction with percentile_value, defaults to 90",
          :long => "--percentile PERCENTILE",
-         :defailt => 90
+         :default => 90
 
-  option :check_greater_than_percentile,
+  option :check_percentile,
          :description => "Values should not be greater than the VALUE of Graphite values from PERIOD",
          :long => "--percentile_value VALUE"
 
@@ -215,6 +215,11 @@ class Graphite < Sensu::Plugin::Check::CLI
     return warnings
   end
 
+  def greater_less
+    return "greater" if config[:greater_than]
+    return "less" unless config[:greater_than]
+  end
+
   def check_increasing(target)
     updated_since = config[:updated_since].to_i
     time_to_be_updated_since = Time.now - updated_since
@@ -254,8 +259,10 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values.size
       max_values.each_pair do |type, max_value|
-        if avg_value < max_value.to_f and (values_array.size > 0 or !config[:ignore_nulls])
-          text = "The average value of metric #{target} is #{avg_value} that is less than allowed average of #{max_value}"
+        var1 = config[:greater_than] ? avg_value : max_value.to_f
+        var2 = !config[:greater_than] ? avg_value : max_value.to_f
+        if var1 > var2 and (values_array.size > 0 or !config[:ignore_nulls])
+          text = "The average value of metric #{target} is #{avg_value} that is #{greater_less} than allowed average of #{max_value}"
           case type
           when "warning"
             warnings <<  text
@@ -287,8 +294,10 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last_values[target]
       max_values.each_pair do |type, max_value|
         percent = last_value / percentile_value unless last_value.nil? and percentile_value.nil?
-        if !percentile_value.nil? and max_value.to_f < percent
-          text = "The percentile value of metric #{target} (#{last_value}) is greater than the #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
+        var1 = config[:greater_than] ? percent : max_value.to_f
+        var2 = !config[:greater_than] ? percent : max_value.to_f
+        if !percentile_value.nil? and var1 > var2
+          text = "The percentile value of metric #{target} (#{last_value}) is #{greater_less} than the #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
           case type
           when "warning"
             warnings <<  text
@@ -305,7 +314,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     [warnings, criticals, fatal]
   end
 
-  def check_greater_than(target, max_values)
+  def check_last(target, max_values)
     last_targets = last_graphite_metric target
     return [[], [], []] unless last_targets
     warnings = []
@@ -315,37 +324,10 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last.first
       unless last_value.nil?
         max_values.each_pair do |type, max_value|
-          if last_value > max_value.to_f
-            text = "The metric #{target_name} is #{last_value} that is higher than max allowed #{max_value}"
-            case type
-            when "warning"
-              warnings <<  text
-            when "error"
-              criticals << text
-            when "fatal"
-              fatal << text
-            else
-              raise "Unknown type #{type}"
-            end
-          end
-        end
-      end
-    end
-    [warnings, criticals, fatal]
-  end
-
-  def check_less_than(target, min_values)
-    last_targets = last_graphite_metric target
-    return [[], [], []] unless last_targets
-    warnings = []
-    criticals = []
-    fatal = []
-    last_targets.each do | target_name, last |
-      last_value = last.first
-      unless last_value.nil?
-        min_values.each_pair do |type, min_value|
-          if last_value < min_value.to_f
-            text = "The metric #{target_name} is #{last_value} that is lower than min allowed #{min_value}"
+          var1 = config[:greater_than] ? last_value : max_value.to_f
+          var2 = !config[:greater_than] ? last_value : max_value.to_f
+          if  var1 > var2
+            text = "The metric #{target_name} is #{last_value} that is #{greater_less} than max allowed #{max_value}"
             case type
             when "warning"
               warnings <<  text
@@ -376,30 +358,23 @@ class Graphite < Sensu::Plugin::Check::CLI
         critical_errors += inc_critical
         fatals += inc_fatal
       end
-      if config[:check_greater_than]
-        max_values = get_levels config[:check_greater_than]
-        gt_warnings, gt_critical, gt_fatal = check_greater_than(target, max_values)
-        warnings += gt_warnings
-        critical_errors += gt_critical
-        fatals += gt_fatal
-      end
-      if config[:check_less_than]
-        max_values = get_levels config[:check_less_than]
-        lt_warnings, lt_critical, lt_fatal = check_less_than(target, max_values)
+      if config[:check_last]
+        max_values = get_levels config[:check_last]
+        lt_warnings, lt_critical, lt_fatal = check_last(target, max_values)
         warnings += lt_warnings
         critical_errors += lt_critical
         fatals += lt_fatal
       end
-      if config[:check_greater_than_average]
-        max_values = get_levels config[:check_greater_than_average]
+      if config[:check_average]
+        max_values = get_levels config[:check_average]
         avg_warnings, avg_critical, avg_fatal = check_average(target, max_values)
         warnings += avg_warnings
         critical_errors += avg_critical
         fatals += avg_fatal
       end
-      if config[:check_greater_than_percentile]
-        max_values = get_levels config[:check_greater_than_percentile]
-        pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile])
+      if config[:check_percentile]
+        max_values = get_levels config[:check_percentile]
+        pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile].to_i)
         warnings += pct_warnings
         critical_errors += pct_critical
         fatals += pct_fatal
