@@ -101,10 +101,10 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
       srv.write("show stat\n")
       out = srv.read
       srv.close
-            
+
       parsed = CSV.parse(out, {:skip_blanks => true})
       keys = parsed.shift.reject{|k| k.nil?}.map{|k| k.match(/(\w+)/)[0].to_sym}
-      haproxy_stats = parsed.map{|line| Hash[ keys.zip(line) ]}
+      haproxy_stats = parsed.map{|line| Hash[keys.zip(line)]}
     else
       critical "Not a valid HAProxy socket: #{config[:socket]}"
     end
