@@ -15,6 +15,13 @@ require 'timeout'
 
 class MemcachedStats < Sensu::Plugin::Check::CLI
 
+  option :host,
+         :short       => "-h HOST",
+         :long        => "--host HOST",
+         :description => "Memcached Host to connect to",
+         :required    => false,
+         :default     => '127.0.0.1'
+
   option :port,
          :short       => "-p PORT",
          :long        => "--port PORT",
@@ -25,7 +32,7 @@ class MemcachedStats < Sensu::Plugin::Check::CLI
   def run
     begin
       Timeout.timeout(30) do
-        TCPSocket.open("localhost", config[:port]) do |socket|
+        TCPSocket.open(config[:host], config[:port]) do |socket|
           socket.print "stats\r\n"
           socket.close_write
           socket.read
