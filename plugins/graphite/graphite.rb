@@ -87,6 +87,11 @@ class Graphite < Sensu::Plugin::Check::CLI
          :short => "-a MAX_VALUE",
          :long => "--average_value MAX_VALUE"
 
+  option :check_average_percent,
+         :description => "MAX_VALUE% should be greater than the average of Graphite values from PERIOD",
+         :short => "-b MAX_VALUE",
+         :long => "--average_percent_value MAX_VALUE"
+
   option :percentile,
          :description => "Percentile value, should be used in conjunction with percentile_value, defaults to 90",
          :long => "--percentile PERCENTILE",
@@ -247,6 +252,41 @@ class Graphite < Sensu::Plugin::Check::CLI
     [warnings, critical_errors, []]
   end
 
+  def check_average_percent(target, max_values)
+    values = get_graphite_values target
+    last_values = last_graphite_value target
+    return [[], [], []] unless values
+    warnings = []
+    criticals = []
+    fatal = []
+    values.each do | data |
+      target = data[:target]
+      values_pair = data[:datapoints]
+      values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
+      avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values.size
+      last_value = last_values[target]
+      percent = last_value / avg_value unless last_value.nil? or avg_value.nil?
+      max_values.each_pair do |type, max_value|
+        var1 = config[:greater_than] ? percent : max_value.to_f
+        var2 = !config[:greater_than] ? percent : max_value.to_f
+        if !percent.nil? and var1 > var2 and (values_array.size > 0 or !config[:ignore_nulls])
+          text = "The last value of metric #{target} is #{percent}% #{greater_less} than allowed #{max_value}% of the average value #{avg_value}"
+          case type
+          when "warning"
+            warnings <<  text
+          when "error"
+            criticals << text
+          when "fatal"
+            fatal << text
+          else
+            raise "Unknown type #{type}"
+          end
+        end
+      end
+    end
+    [warnings, criticals, fatal]
+  end
+
   def check_average(target, max_values)
     values = get_graphite_values target
     return [[], [], []] unless values
@@ -292,8 +332,8 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       percentile_value = values_array.percentile(percentile)
       last_value = last_values[target]
+      percent = last_value / percentile_value unless last_value.nil? or percentile_value.nil?
       max_values.each_pair do |type, max_value|
-        percent = last_value / percentile_value unless last_value.nil? and percentile_value.nil?
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = !config[:greater_than] ? percent : max_value.to_f
         if !percentile_value.nil? and var1 > var2
@@ -368,6 +408,13 @@ class Graphite < Sensu::Plugin::Check::CLI
       if config[:check_average]
         max_values = get_levels config[:check_average]
         avg_warnings, avg_critical, avg_fatal = check_average(target, max_values)
+        warnings += avg_warnings
+        critical_errors += avg_critical
+        fatals += avg_fatal
+      end
+      if config[:check_average_percent]
+        max_values = get_levels config[:check_average_percent]
+        avg_warnings, avg_critical, avg_fatal = check_average_percent(target, max_values)
         warnings += avg_warnings
         critical_errors += avg_critical
         fatals += avg_fatal
