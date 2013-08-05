@@ -38,6 +38,12 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--password PASSWORD",
     :default => nil
 
+  option :scheme,
+    :description => 'Metric naming scheme',
+    :long => "--scheme SCHEME",
+    :short => "-s SCHEME",
+    :default => "#{Socket.gethostname}.mongodb"
+
   def run
     host = config[:host]
     port = config[:port]
@@ -58,8 +64,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
         metrics.update(gatherReplicationMetrics(serverStatus))
         timestamp = Time.now.to_i
         metrics.each do |k, v|
-          name = "servers.#{host}.mongodb"
-          output [name, k].join("."), v, timestamp
+          output [config[:scheme], k].join("."), v, timestamp
         end
       end
       ok

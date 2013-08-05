@@ -67,7 +67,7 @@ class Mailer < Sensu::Handler
           body    body
         end
 
-        puts 'mail -- sent alert for ' + short_name + ' to ' + params[:mail_to]
+        puts 'mail -- sent alert for ' + short_name + ' to ' + params[:mail_to].to_s
       end
     rescue Timeout::Error
       puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
