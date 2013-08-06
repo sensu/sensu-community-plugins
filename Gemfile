@@ -8,4 +8,5 @@ end
 group :test do
   gem "sensu-plugin"
   gem "rubocop"
+  gem "rspec"
 end
