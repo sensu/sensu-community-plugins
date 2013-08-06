@@ -78,6 +78,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     :proc => proc { |a| a.to_i }
 
   def run
+    AWS.start_memoizing
     elb = AWS::ELB.new(
       :access_key_id      => config[:aws_access_key],
       :secret_access_key  => config[:aws_secret_access_key],
@@ -103,6 +104,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     if state['OutOfService'].count > 0
       message << " (#{state['OutOfService'].join(', ')})"
     end
+    AWS.stop_memoizing
 
     if config[:crit_under] > 0 && config[:crit_under] >= state['InService'].count
       critical message
