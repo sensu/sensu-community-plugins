@@ -49,8 +49,11 @@ class CheckCPU < Sensu::Plugin::Check::CLI
     cpu_total_diff = 0.to_f
     cpu_stats_diff = []
     metrics.each_index do |i|
-      cpu_stats_diff[i] = cpu_stats_after[i] - cpu_stats_before[i]
-      cpu_total_diff += cpu_stats_diff[i]
+      # Some OS's don't have a 'guest' values (RHEL)
+      unless cpu_stats_after[i].nil?
+        cpu_stats_diff[i] = cpu_stats_after[i] - cpu_stats_before[i]
+        cpu_total_diff += cpu_stats_diff[i]
+      end
     end
 
     cpu_stats = []
