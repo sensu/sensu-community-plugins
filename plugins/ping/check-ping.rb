@@ -40,17 +40,19 @@ class CheckPING < Sensu::Plugin::Check::CLI
     if config[:type].upcase == "HTTP"
       pt = Net::Ping::HTTP.new("http://#{config[:host]}", config[:port], 10)
       if pt.ping?
-        ok "HTTP ping successful"
+        ok "HTTP ping successful for host: #{config[:host]}"
       else
-        critical "HTTP ping unsuccessful"
+        critical "HTTP ping unsuccessful for host: #{config[:host]}"
       end
     elsif config[:type].upcase == "ICMP"
       pn = Net::Ping::ICMP.new(config[:host])
       if pn.ping?
-        ok "ICMP ping successful"
+        ok "ICMP ping successful for host: #{config[:host]}"
       else
-        critical "ICMP ping unsuccessful"
+        critical "ICMP ping unsuccessful for host: #{config[:host]}"
       end
+    else
+      unknown "Unknown type specified: #{config[:type]}"
     end
   end
 end
