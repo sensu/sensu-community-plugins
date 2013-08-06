@@ -87,6 +87,12 @@ class Graphite < Sensu::Plugin::Check::CLI
          :short => "-a MAX_VALUE",
          :long => "--average_value MAX_VALUE"
 
+  option :data_points,
+         :description => "Number of data points to include in average check (smooths out spikes)",
+         :short => "-d VALUE",
+         :long => "--data_points VALUE",
+         :default => 1
+
   option :check_average_percent,
          :description => "MAX_VALUE% should be greater than the average of Graphite values from PERIOD",
          :short => "-b MAX_VALUE",
@@ -172,37 +178,40 @@ class Graphite < Sensu::Plugin::Check::CLI
     end
   end
 
-  def last_graphite_metric(target)
+  def last_graphite_metric(target, count = 1)
     last_values = {}
     values = get_graphite_values target
     if values
       values.each do | val |
-        last = get_last_metric(val[:datapoints])
+        last = get_last_metric(val[:datapoints], count)
         last_values[val[:target]] = last
       end
     end
     return last_values
   end
 
-  def get_last_metric(values)
+  def get_last_metric(values, count = 1)
     if values
-      count = values.size
+      ret = []
+      values_size = values.size
+      count = values_size if count > values_size
       while count > 0
-        count -= 1
-        break if values[count][0]
+        values_size -= 1
+        count -= 1 if values[values_size][0]
+        ret.push(values[values_size]) if values[values_size][0]
       end
-      values[count]
+      ret
     else
       nil
     end
   end
 
-  def last_graphite_value(target)
-    last_metrics = last_graphite_metric target
+  def last_graphite_value(target, count = 1)
+    last_metrics = last_graphite_metric(target, count)
     last_values = {}
     if last_metrics
-      last_metrics.each do | target_name, metric |
-        last_values[target_name] = metric[0]
+      last_metrics.each do | target_name, metrics |
+        last_values[target_name] = metrics.map { | metric |  metric[0] }.mean
       end
     end
     return last_values
@@ -252,9 +261,9 @@ class Graphite < Sensu::Plugin::Check::CLI
     [warnings, critical_errors, []]
   end
 
-  def check_average_percent(target, max_values)
+  def check_average_percent(target, max_values, data_points = 1)
     values = get_graphite_values target
-    last_values = last_graphite_value target
+    last_values = last_graphite_value(target, data_points)
     return [[], [], []] unless values
     warnings = []
     criticals = []
@@ -319,9 +328,9 @@ class Graphite < Sensu::Plugin::Check::CLI
     [warnings, criticals, fatal]
   end
 
-  def check_percentile(target, max_values, percentile)
+  def check_percentile(target, max_values, percentile, data_points = 1)
     values = get_graphite_values target
-    last_values = last_graphite_value target
+    last_values = last_graphite_value(target, data_points)
     return [[], [], []] unless values
     warnings = []
     criticals = []
@@ -415,14 +424,14 @@ class Graphite < Sensu::Plugin::Check::CLI
       end
       if config[:check_average_percent]
         max_values = get_levels config[:check_average_percent]
-        avg_warnings, avg_critical, avg_fatal = check_average_percent(target, max_values)
+        avg_warnings, avg_critical, avg_fatal = check_average_percent(target, max_values, config[:data_points].to_i)
         warnings += avg_warnings
         critical_errors += avg_critical
         fatals += avg_fatal
       end
       if config[:check_percentile]
         max_values = get_levels config[:check_percentile]
-        pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile].to_i)
+        pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile].to_i, config[:data_points].to_i)
         warnings += pct_warnings
         critical_errors += pct_critical
         fatals += pct_fatal
