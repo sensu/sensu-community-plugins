@@ -197,6 +197,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       count = values_size if count > values_size
       while count > 0
         values_size -= 1
+        break if values[values_size].nil?
         count -= 1 if values[values_size][0]
         ret.push(values[values_size]) if values[values_size][0]
       end
