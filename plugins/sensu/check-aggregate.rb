@@ -90,6 +90,8 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
         :password => config[:password]
       })
       JSON.parse(request.get, :symbolize_names => true)
+    rescue RestClient::ResourceNotFound
+      warning "Resource not found: #{resource}"
     rescue Errno::ECONNREFUSED
       warning "Connection refused"
     rescue RestClient::RequestFailed
