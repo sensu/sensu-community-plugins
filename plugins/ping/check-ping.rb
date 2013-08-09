@@ -3,7 +3,7 @@
 # ===
 #
 # This is a simple Ping check script for Sensu, Currently works with
-#  ICMP as well as HTTP ping.
+#  ICMP, HTTP and TCP.
 #
 # Requires "net-ping" gem
 #
