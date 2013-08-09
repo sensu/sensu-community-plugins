@@ -49,7 +49,7 @@ class CheckPING < Sensu::Plugin::Check::CLI
     else
       unknown "Unknown type specified: #{config[:type]}"
     end
-    if !pt.nil?
+    if pt != nil
       if pt.ping?
         ok "#{ping_type} ping successful for host: #{config[:host]}"
       else
