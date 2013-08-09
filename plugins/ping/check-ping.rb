@@ -30,29 +30,31 @@ class CheckPING < Sensu::Plugin::Check::CLI
 
   option :host,
     :short => '-h host',
-    :default => "google.com"
+    :default => 'google.com'
 
   option :type,
     :short => '-t type',
     :default => 'HTTP'
 
   def run
-    if config[:type].upcase == "HTTP"
-      pt = Net::Ping::HTTP.new("http://#{config[:host]}", config[:port], 10)
-      if pt.ping?
-        ok "HTTP ping successful for host: #{config[:host]}"
-      else
-        critical "HTTP ping unsuccessful for host: #{config[:host]}"
-      end
-    elsif config[:type].upcase == "ICMP"
-      pn = Net::Ping::ICMP.new(config[:host])
-      if pn.ping?
-        ok "ICMP ping successful for host: #{config[:host]}"
-      else
-        critical "ICMP ping unsuccessful for host: #{config[:host]}"
-      end
+    pt = nil
+    ping_type = config[:type].upcase
+    case ping_type
+    when 'HTTP'
+      pt = Net::Ping::HTTP.new(config[:host], config[:port], 10)
+    when 'ICMP'
+      pt = Net::Ping::ICMP.new(config[:host], config[:port], 10)
+    when 'TCP'
+      pt = Net::Ping::TCP.new(config[:host], config[:port], 10)
     else
       unknown "Unknown type specified: #{config[:type]}"
+    end
+    if !pt.nil?
+      if pt.ping?
+        ok "#{ping_type} ping successful for host: #{config[:host]}"
+      else
+        critical "#{ping_type} ping unsuccessful for host: #{config[:host]}"
+      end
     end
   end
 end
