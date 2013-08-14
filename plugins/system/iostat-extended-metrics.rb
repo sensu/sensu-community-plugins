@@ -1,15 +1,12 @@
 #!/usr/bin/env ruby
 #
-# IOStat Extended Metrics Plugin
+# IOStatExtended Metrics Plugin
 #
-# This plugin collects extended iostat data (iowait -x) for a
-# specified disk or all disks. Output is in Graphite format.
-# See `man iostat` for detailed explaination of each field:
+# This plugin collects iostat data for a specified disk or all disks.
+# Output is in Graphite format. See `man iostat` for detailed
+# explaination of each field.
 #
-#   rrqms,wrqms,rs,ws,rsecs,wsecs,avgrq_sz,
-#   avgqu_sz,await,svctm,percent_util
-#
-# Bethany Erskine <bethany@paperlesspost.com>
+# Peter Fern <ruby@0xc0dedbad.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -22,9 +19,8 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+    :default => "#{Socket.gethostname}.iostat"
 
   option :disk,
     :description => "Disk to gather stats for",
@@ -32,58 +28,54 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--disk DISK",
     :required => false
 
-  option :interval,
-    :description => "Amount of time in seconds between each report",
-    :short => "-i interval",
-    :long => "--interval interval",
-    :default => 1
+  def parse_results(raw)
+    stats = {}
+    key = nil
+    headers = nil
+    stage = :initial
+    raw.each_line do |line|
+      line.chomp!
+      next if line.empty?
 
-  def parse_results(output)
-    metrics = {}
-    res = output.split("Device:")
-    result = res[2].split("\n")
-    result.each do |line|
-      line.strip!
-      parts = line.split(" ")
-      next unless parts.size == 12
-      next if parts[0] == "rrqm/s:"
-      key = parts[0]
-      metrics[key] = {
-        :rrqms => parts[1],
-        :wrqms => parts[2],
-        :rs => parts[3],
-        :ws => parts[4],
-        :rsecs => parts[5],
-        :wsec_s => parts[6],
-        :avgrq_sz => parts[7],
-        :avgqu_sz => parts[8],
-        :await => parts[9],
-        :svctm => parts[10],
-        :percent_util => parts[11]
-        }
+      case line
+      when /^(avg-cpu):/
+        stage = :cpu
+        key = Regexp.last_match[1].gsub(/%/, 'pct_')
+        headers = line.split(/\s+/)
+        headers.shift
+        next
+      when /^(Device):/
+        stage = :device
+        headers = line.split(/\s+/).map{|h| h.gsub(/\//, '_per_')}
+        headers.shift
+        next
+      end
+      next if stage == :initial
+
+      fields = line.split(/\s+/)
+
+      if stage == :device
+        key = fields.shift
+      end
+      stats[key] = Hash[headers.zip(fields.map{|f| f.to_f})]
     end
-    metrics
+    stats
   end
 
   def run
-    requested_disk = config[:disk]
-    interval = config[:interval]
-    if requested_disk.nil?
-      raw = `iostat -x #{interval} 2`
-      stats = parse_results(raw)
-    else
-      raw = `iostat -xd #{requested_disk} #{interval} 2`
-      stats = parse_results(raw)
+    cmd = 'iostat -x 1 2'
+    if config[:disk]
+      cmd += " #{File.basename(config[:disk])}"
     end
+    stats = parse_results(`#{cmd}`)
 
     timestamp = Time.now.to_i
 
     stats.each do |disk, metrics|
       metrics.each do |metric, value|
-        output [config[:scheme], "iostat", disk, metric].join("."), value, timestamp
+        output [config[:scheme], disk, metric].join("."), value, timestamp
       end
     end
     ok
   end
-
 end
