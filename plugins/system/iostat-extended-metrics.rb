@@ -40,13 +40,13 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
       case line
       when /^(avg-cpu):/
         stage = :cpu
-        key = Regexp.last_match[1].gsub(/%/, 'pct_')
-        headers = line.split(/\s+/)
+        key = Regexp.last_match[1]
+        headers = line.gsub(/%/, 'pct_').split(/\s+/)
         headers.shift
         next
       when /^(Device):/
         stage = :device
-        headers = line.split(/\s+/).map{|h| h.gsub(/\//, '_per_')}
+        headers = line.gsub(/%/, 'pct_').split(/\s+/).map{|h| h.gsub(/\//, '_per_')}
         headers.shift
         next
       end
