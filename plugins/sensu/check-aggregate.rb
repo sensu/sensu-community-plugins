@@ -113,10 +113,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
       issued_sorted = issued.sort
       time = nil
       until issued_sorted.empty?
-        popped = issued_sorted.pop
-        if popped.to_i <= Time.now.to_i - config[:age]
-          time = popped
-        end
+        time = issued_sorted.pop
       end
       unless time.nil?
         uri += "/#{time}"
