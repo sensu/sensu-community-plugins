@@ -111,7 +111,6 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     issued = api_request(uri + "?age=#{config[:age]}")
     unless issued.empty?
       issued_sorted = issued.sort
-      time = nil
       time = issued_sorted.pop
       unless time.nil?
         uri += "/#{time}"
