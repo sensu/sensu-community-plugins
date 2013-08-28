@@ -73,9 +73,9 @@ class CheckLog < Sensu::Plugin::Check::CLI
     n_warns, n_crits = search_log
     message "#{n_warns} warnings, #{n_crits} criticals"
     if n_crits > 0
-      critical
+      critical "Encountered #{config[:pattern]} in #{config[:log_file]}"
     elsif n_warns > 0
-      warning
+      warning "Encountered #{config[:pattern]} in #{config[:log_file]}"
     else
       ok
     end
