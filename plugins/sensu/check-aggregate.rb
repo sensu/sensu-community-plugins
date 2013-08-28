@@ -51,7 +51,8 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     :short => "-A SECONDS",
     :long => "--age SECONDS",
     :description => "Minimum aggregate age in SECONDS, time since check request issued",
-    :default => 30
+    :default => 30,
+    :proc => proc {|a| a.to_i }
 
   option :summarize,
     :short => "-s",
@@ -107,7 +108,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
 
   def get_aggregate
     uri = "/aggregates/#{config[:check]}"
-    issued = api_request(uri)
+    issued = api_request(uri + "?age=#{config[:age]}")
     unless issued.empty?
       issued_sorted = issued.sort
       time = nil
