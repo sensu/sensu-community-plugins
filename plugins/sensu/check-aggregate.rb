@@ -112,9 +112,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     unless issued.empty?
       issued_sorted = issued.sort
       time = nil
-      until issued_sorted.empty?
-        time = issued_sorted.pop
-      end
+      time = issued_sorted.pop
       unless time.nil?
         uri += "/#{time}"
         if config[:summarize]
