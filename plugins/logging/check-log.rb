@@ -62,6 +62,13 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :long => '--warn-only',
          :boolean => true
 
+  option :case_insensitive,
+         :description => "Run a case insensitive match",
+         :short => '-i',
+         :long => '--icase',
+         :boolean => true,
+         :default => false
+
   def run
     unknown "No log file specified" unless config[:log_file]
     unknown "No pattern specified" unless config[:pattern]
@@ -107,7 +114,12 @@ class CheckLog < Sensu::Plugin::Check::CLI
     end
     @log.each_line do |line|
       bytes_read += line.size
-      if m = line.match(config[:pattern])
+      if config[:case_insensitive]
+         m = line.downcase.match(config[:pattern].downcase)
+      else
+         m = line.match(config[:pattern])
+      end
+      if m
         if m[1]
           if config[:crit] && m[1].to_i > config[:crit]
             n_crits += 1
