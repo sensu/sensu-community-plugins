@@ -273,7 +273,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
-      avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values.size
+      avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values_array.size
       last_value = last_values[target]
       percent = last_value / avg_value unless last_value.nil? or avg_value.nil?
       max_values.each_pair do |type, max_value|
@@ -307,7 +307,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
-      avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values.size
+      avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values_array.size
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? avg_value : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : avg_value
