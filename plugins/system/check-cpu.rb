@@ -16,7 +16,7 @@ class CheckCPU < Sensu::Plugin::Check::CLI
   option :crit,
     :short => '-c CRIT',
     :proc => proc {|a| a.to_f },
-    :default => 10
+    :default => 100
 
   option :sleep,
     :long => '--sleep SLEEP',
