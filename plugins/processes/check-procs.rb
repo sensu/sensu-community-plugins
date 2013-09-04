@@ -116,9 +116,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
       count = procs.size
     end
 
-    if count < config[:crit_under] || count > config[:crit_over]
+    if config[:crit_under] != -1 && count < config[:crit_under]
       critical msg
-    elsif count < config[:warn_under] || count > config[:warn_over]
+    elsif config[:crit_over] != -1 && count > config[:crit_over]
+      critical msg
+    elsif config[:warn_under] != -1 && count < config[:warn_under]
+      warning msg
+    elsif config[:warn_over] != -1 && count > config[:warn_over]
       warning msg
     else
       ok msg

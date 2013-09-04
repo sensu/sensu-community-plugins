@@ -31,7 +31,11 @@ class Campfire < Sensu::Handler
   end
 
   def room
-    campfire.find_room_by_name(settings["campfire"]["room"])
+    unless settings["campfire"]["room_id"].nil?
+      return campfire.find_room_by_id(settings["campfire"]["room_id"])
+    else
+      return campfire.find_room_by_name(settings["campfire"]["room"])
+    end
   end
 
   def handle
