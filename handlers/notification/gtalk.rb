@@ -7,11 +7,11 @@
 # Recipient's Gmail id. Currently the message contains Event and Host
 #
 # Notes:
-#   - for Ruby Version > 1.9 compatibility you need to install "xmpp4r-simple-19" gem 
+#   - for Ruby Version > 1.9 compatibility you need to install "xmpp4r-simple-19" gem
 #   - if sender is registered for Google Hangouts he can't send message. Maybe it is a
 #     problem with XMPP and Hangouts. In this case you need to register a new gmail
 #     account and don't register it for Hangouts
-#   - If client is registered for Hangouts he will not get the message. Client has to 
+#   - If client is registered for Hangouts he will not get the message. Client has to
 #     change IM settings to Old version in Gmail page (left side)
 #
 #  Author Deepak Mohan Das   <deepakmdass88@gmail.com>
@@ -25,6 +25,7 @@ require 'xmpp4r-simple'
 require 'timeout'
 include Jabber
 
+# Sensu handler for Google Talk
 class GTALK < Sensu::Handler
 
   def short_name

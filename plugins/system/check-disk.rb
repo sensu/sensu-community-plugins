@@ -14,6 +14,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
+# Sensu check class for checking disks
 class CheckDisk < Sensu::Plugin::Check::CLI
 
   option :fstype,
@@ -27,7 +28,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
   option :ignoremnt,
     :short => '-i MNT',
     :proc => proc {|a| a.split(',') }
-    
+
   option :ignoreline,
     :short => '-l TEXT',
     :proc => proc {|a| a.to_s }
