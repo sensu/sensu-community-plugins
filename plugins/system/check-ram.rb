@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Check RAM Plugin
+# Check free RAM Plugin
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
