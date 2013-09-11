@@ -14,10 +14,11 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     cpu_metrics = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq', 'steal', 'guest']
-    other_metrics = ['ctxt', 'processes', 'procs_running', 'procs_blocked']
+    other_metrics = ['ctxt', 'processes', 'procs_running', 'procs_blocked', 'btime', 'intr']
 
     File.open("/proc/stat", "r").each_line do |line|
       info = line.split(/\s+/)
+      next if info.empty?
       name = info.shift
 
       if name.match(/cpu([0-9]+|)/)
