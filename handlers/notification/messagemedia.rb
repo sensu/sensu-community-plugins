@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/opt/sensu/embedded/bin/ruby
 #
 # Sensu Handler: messagemedia
 #
@@ -20,18 +20,16 @@ class MessageMedia < Sensu::Handler
   end
 
   def action_to_string
-   @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
-  end
-
-  def should_send
-    lower_limit = settings['messagemedia']['min_occurrences'].to_i * 10
-    case
-    when @event['occurrences'] < lower_limit
-      return false
-    when @event['occurrences'] >= lower_limit
-      return true
+    case @event['check']['status']
+    when 0
+      "RESOLVED"
+    when 1
+      "WARNING"
+    when 2
+      "CRITICAL"
+    else
+      "UNKNOWN"
     end
-    return false
   end
 
   def handle
@@ -40,25 +38,24 @@ class MessageMedia < Sensu::Handler
       config.password = settings['messagemedia']['password'] || 'yyy'
       config.use_message_id = true
       config.secure = true
-      # config.allow_splitting = false
-      # config.allow_long_messages = true
     end
 
     message = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     begin
-      if should_send
-        timeout 10 do
-          si = Rumeme::SmsInterface.new
-          settings['messagemedia']['mobile_numbers'].each do |mobile_number|
+      timeout 10 do
+        si = Rumeme::SmsInterface.new
+        settings['messagemedia']['mobile_numbers'].each do |mobile_number|
+          puts 'sms -- preparing alert(s) for ' + mobile_number
+          begin
             si.add_message :phone_number => mobile_number, :message => message
+          rescue ArgumentError
+            puts 'sms -- failed sending alert(s) for ' + mobile_number
           end
-          si.send_messages
-
-          puts 'sms -- sent alert(s) for ' + short_name
         end
-      else
-        puts 'sms -- not enough occurrences (' + @event['occurrences'].to_s + ') to send alerts -- ' + short_name
+        si.send_messages
+
+        puts 'sms -- sent alert(s) for ' + short_name
       end
     rescue Timeout::Error
       puts 'sms -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
