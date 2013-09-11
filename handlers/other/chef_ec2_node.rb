@@ -112,7 +112,7 @@ class ChefEc2Node < Sensu::Handler
       :aws_secret_access_key => ENV['AWS_SECRET_ACCESS_KEY']
     })
     running_instances = ec2.servers.reject { |s| s.state == 'terminated' }
-    instance_ids = running_instances.collect { |s| s.id }.collect
+    instance_ids = running_instances.collect { |s| s.id }
     instance_ids.each do |id|
       return true if id == @event['client']['name']
     end
