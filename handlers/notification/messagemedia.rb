@@ -1,4 +1,4 @@
-#!/opt/sensu/embedded/bin/ruby
+#!/usr/bin/env ruby
 #
 # Sensu Handler: messagemedia
 #
