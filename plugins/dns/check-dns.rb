@@ -5,6 +5,8 @@
 #
 # DESCRIPTION:
 #   This plugin checks DNS resolution using `dig`.
+#   Note: if testing reverse DNS with -t PTR option,
+#   results will end with trailing '.' (dot)
 #
 # OUTPUT:
 #   plain-text
@@ -25,12 +27,12 @@ require 'sensu-plugin/check/cli'
 class DNS < Sensu::Plugin::Check::CLI
 
   option :domain,
-    :description => "Domain to resolve",
+    :description => "Domain to resolve (or ip if type PTR)",
     :short => '-d DOMAIN',
     :long => '--domain DOMAIN'
 
   option :type,
-    :description => "Record type to resolve (A, AAAA, TXT, etc)",
+    :description => "Record type to resolve (A, AAAA, TXT, etc) use PTR for reverse lookup",
     :short => '-t RECORD',
     :long => '--type RECORD',
     :default => 'A'
@@ -57,7 +59,11 @@ class DNS < Sensu::Plugin::Check::CLI
     :boolean => true
 
   def resolve_domain
-    cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} #{config[:domain]} #{config[:type]} +short +time=1"
+    if config[:type] == 'PTR'
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} -x #{config[:domain]} +short +time=1"
+    else
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} #{config[:domain]} #{config[:type]} +short +time=1"
+    end
     puts cmd if config[:debug]
     output = `#{cmd}`
     puts output if config[:debug]
