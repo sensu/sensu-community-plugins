@@ -67,7 +67,7 @@
 #
 # Copyleft 2013 Yet Another Clever Name
 #
-# Based off of the `chef_node` handler by Heavy Water Operations, LLC 
+# Based off of the `chef_node` handler by Heavy Water Operations, LLC
 #
 # Released under the same terms as Sensu (the MIT license); see
 # LICENSE for details
@@ -85,7 +85,7 @@ class ChefEc2Node < Sensu::Handler
   end
 
   def filter; end
-  
+
   def handle
     if chef_node_exists?
       delete_chef_node! unless ec2_node_exists?
@@ -118,7 +118,7 @@ class ChefEc2Node < Sensu::Handler
     end
     return false # no match found, node doesn't exist
   end
-  
+
   def delete_chef_node!
     cmd = "/nodes/#{@event['client']['name']}"
     Spice.delete(cmd)
@@ -131,9 +131,9 @@ class ChefEc2Node < Sensu::Handler
       s.client_key   = Spice.read_key_file(settings['chef']['client_key'])
       s.chef_version = settings['chef']['version'] || '11.0.0'
       unless settings['chef']['verify_ssl'].nil?
-        s.connection_options = { 
-          :ssl => { 
-            :verify => settings['chef']['verify_ssl'] 
+        s.connection_options = {
+          :ssl => {
+            :verify => settings['chef']['verify_ssl']
           }
         }
       end
