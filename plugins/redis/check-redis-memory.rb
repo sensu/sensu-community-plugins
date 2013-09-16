@@ -48,6 +48,12 @@ class RedisChecks < Sensu::Plugin::Check::CLI
     :proc => proc {|p| p.to_i },
     :required => true
 
+  option :crit_conn,
+    :long => "--crit-conn-failure",
+    :boolean => true,
+    :description => "Critical instead of warning on connection failure",
+    :default => false
+
   def run
     begin
       options = {:host => config[:host], :port => config[:port]}
@@ -65,7 +71,12 @@ class RedisChecks < Sensu::Plugin::Check::CLI
         ok 'Redis memory usage is below defined limits'
       end
     rescue
-      warning "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
+      message = "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
+      if config[:crit_conn]
+        critical message
+      else
+        warning message
+      end
     end
   end
 
