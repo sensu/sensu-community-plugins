@@ -72,8 +72,11 @@ class RedisChecks < Sensu::Plugin::Check::CLI
       end
     rescue
       message = "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
-      critical message if config[:crit_conn]
-      warning message
+      if config[:crit_conn]
+        critical message
+      else
+        warning message
+      end
     end
   end
 
