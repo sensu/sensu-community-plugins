@@ -36,10 +36,10 @@
 #     "filters": {
 #       "ghost_nodes": {
 #         "attributes": {
-#           "event": {
-#             "check": "keepalive",
-#             "occurences": "eval: value > 2"
-#           }
+#           "check": {
+#             "name": "keepalive"
+#           },
+#           "occurences": "eval: value > 2"
 #         }
 #       }
 #     },
