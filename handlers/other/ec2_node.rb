@@ -80,7 +80,11 @@ class Ec2Node < Sensu::Handler
   def filter; end
 
   def handle
-    delete_sensu_client! unless ec2_node_exists?
+    unless ec2_node_exists?
+      delete_sensu_client!
+    else
+      puts "EC2 Node - #{@event['client']['name']} appears to exist in EC2"
+    end
   end
 
   def delete_sensu_client!
@@ -116,11 +120,11 @@ class Ec2Node < Sensu::Handler
     when '202'
       puts "EC2 Node - [202] Successfully deleted Sensu client: #{node}"
     when '404'
-      puts "Chef EC2 Node - [404] Unable to delete #{node}, doesn't exist!"
+      puts "EC2 Node - [404] Unable to delete #{node}, doesn't exist!"
     when '500'
-      puts "Chef EC2 Node - [500] Miscellaneous error when deleting #{node}"
+      puts "EC2 Node - [500] Miscellaneous error when deleting #{node}"
     else
-      puts "Chef EC2 Node - [#{res}] Completely unsure of what happened!"
+      puts "EC2 Node - [#{res}] Completely unsure of what happened!"
     end
   end
 
