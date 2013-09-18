@@ -13,22 +13,41 @@
 #   - sensu-plugin
 #   - fog
 #
-# Requires the following environment variables to be set:
+# Requires a Sensu configuration snippet:
+#   {
+#     "aws": {
+#       "access_key_id": "adsafdafda",
+#       "secret_access_key": "qwuieohajladsafhj23nm",
+#       "region": "us-east-1c"
+#     }
+#   }
+#
+# Or you can set the following environment variables:
 #   - AWS_ACCESS_KEY_ID
 #   - AWS_SECRET_ACCESS_KEY
 #   - EC2_REGION
 #
-# Or you can use a Sensu configuration snippet:
+#
+# To use, you can set it as the keepalive handler for a client:
 #   {
+#     "client": {
+#       "name": "i-424242",
+#       "address": "127.0.0.1",
+#       "keepalive": {
+#         "handler": "ec2_node"
+#       },
+#       "subscriptions": ["all"]
+#     }
 #   }
 #
-# You can use this handler with a filter:
+# You can also use this handler with a filter:
 #   {
 #     "filters": {
 #       "ghost_nodes": {
 #         "attributes": {
 #           "check": {
-#             "name": "keepalive"
+#             "name": "keepalive",
+#             "status": 2
 #           },
 #           "occurences": "eval: value > 2"
 #         }
@@ -38,21 +57,9 @@
 #       "ec2_node": {
 #         "type": "pipe",
 #         "command": "/etc/sensu/handlers/ec2_node.rb",
+#         "severities": ["warning","critical"],
 #         "filter": "ghost_nodes"
 #       }
-#     }
-#   }
-#
-# You could also use it by assigning it as (one of) the keepalive handler(s) for
-# clients:
-#   {
-#     "client": {
-#       "name": "i-424242",
-#       "address": "127.0.0.1",
-#       "keepalive": {
-#         "handler": "ec2_node"
-#       },
-#       "subscriptions": ["all"]
 #     }
 #   }
 #
@@ -73,20 +80,48 @@ class Ec2Node < Sensu::Handler
   def filter; end
 
   def handle
+    delete_sensu_client! unless ec2_node_exists?
+  end
+
+  def delete_sensu_client!
+    response = api_request(:DELETE, '/clients/' + @event['client']['name']).code
+    deletion_status(response)
   end
 
   def ec2_node_exists?
-    ec2 = Fog::Compute.new({
-      :provider => 'AWS',
-      :aws_access_key_id => ENV['AWS_ACCESS_KEY_ID'],
-      :aws_secret_access_key => ENV['AWS_SECRET_ACCESS_KEY']
-    })
     running_instances = ec2.servers.reject { |s| s.state == 'terminated' }
     instance_ids = running_instances.collect { |s| s.id }
     instance_ids.each do |id|
       return true if id == @event['client']['name']
     end
     return false # no match found, node doesn't exist
+  end
+
+  def ec2
+    @ec2 ||= begin
+      key = settings['aws']['access_key_id'] || ENV['AWS_ACCESS_KEY_ID']
+      secret = settings['aws']['secret_access_key'] || ENV['AWS_SECRET_ACCESS_KEY']
+      region = settings['aws']['region'] || ENV['EC2_REGION']
+      Fog::Compute.new({
+        :provider => 'AWS',
+        :aws_access_key_id => key,
+        :aws_secret_access_key => secret,
+        :region => region
+      })
+    end
+  end
+
+  def deletion_status(code)
+    case code
+    when '202'
+      puts "EC2 Node - [202] Successfully deleted Sensu client: #{node}"
+    when '404'
+      puts "Chef EC2 Node - [404] Unable to delete #{node}, doesn't exist!"
+    when '500'
+      puts "Chef EC2 Node - [500] Miscellaneous error when deleting #{node}"
+    else
+      puts "Chef EC2 Node - [#{res}] Completely unsure of what happened!"
+    end
   end
 
 end
