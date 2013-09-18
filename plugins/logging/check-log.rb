@@ -78,7 +78,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
       unknown "Could not open log file: #{e}"
     end
     n_warns, n_crits = search_log
-    message "#{n_warns} warnings, #{n_crits} criticals"
+    message "#{n_warns} warnings, #{n_crits} criticals for pattern #{config[:pattern]} in #{config[:log_file]}"
     if n_crits > 0
       critical
     elsif n_warns > 0
