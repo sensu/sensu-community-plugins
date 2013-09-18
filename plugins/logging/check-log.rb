@@ -69,29 +69,53 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :boolean => true,
          :default => false
 
+  option :file_pattern,
+         :description => "Check a pattern of files, instead of one file",
+         :short => '-F FILE',
+         :long => '--filepattern FILE'
+
   def run
-    unknown "No log file specified" unless config[:log_file]
+    unknown "No log file specified" unless config[:log_file] or config[:file_pattern]
     unknown "No pattern specified" unless config[:pattern]
-    begin
-      open_log
-    rescue => e
-      unknown "Could not open log file: #{e}"
+    file_list = []
+    file_list << config[:log_file] if config[:log_file]
+    if config[:file_pattern]
+        dir_str = config[:file_pattern].slice(0, config[:file_pattern].to_s.rindex('/'))
+        file_pat = config[:file_pattern].slice((config[:file_pattern].to_s.rindex('/') + 1), config[:file_pattern].length)
+        Dir.foreach(dir_str) do |file|
+            if config[:case_insensitive]
+                file_list << "#{dir_str}/#{file}" if file.to_s.downcase.match(file_pat.downcase)
+            else
+                file_list << "#{dir_str}/#{file}" if file.to_s.match(file_pat)
+            end
+        end
     end
-    n_warns, n_crits = search_log
-    message "#{n_warns} warnings, #{n_crits} criticals for pattern #{config[:pattern]} in #{config[:log_file]}"
-    if n_crits > 0
+    n_warns_overall = 0
+    n_crits_overall = 0
+    file_list.each do |log_file|
+        begin
+          open_log log_file
+        rescue => e
+          unknown "Could not open log file: #{e}"
+        end
+        n_warns, n_crits = search_log
+        n_warns_overall += n_warns
+        n_crits_overall += n_crits
+    end
+    message "#{n_warns_overall} warnings, #{n_crits_overall} criticals for pattern #{config[:pattern]}"
+    if n_crits_overall > 0
       critical
-    elsif n_warns > 0
+    elsif n_warns_overall > 0
       warning
     else
       ok
     end
   end
 
-  def open_log
+  def open_log(log_file)
     state_dir = config[:state_auto] || config[:state_dir]
-    @log = File.open(config[:log_file])
-    @state_file = File.join(state_dir, File.expand_path(config[:log_file]))
+    @log = File.open(log_file)
+    @state_file = File.join(state_dir, File.expand_path(log_file))
     @bytes_to_skip = begin
       File.open(@state_file) do |file|
         file.readline.to_i
