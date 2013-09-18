@@ -28,6 +28,12 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--disk DISK",
     :required => false
 
+  option :interval,
+    :description => "Period over which statistics are calculated (in seconds)",
+    :short => "-i SECONDS",
+    :long => "--interval SECONDS",
+    :default => 1
+
   def parse_results(raw)
     stats = {}
     key = nil
@@ -63,7 +69,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    cmd = 'iostat -x 1 2'
+    cmd = "iostat -x #{config[:interval]} 2"
     if config[:disk]
       cmd += " #{File.basename(config[:disk])}"
     end
