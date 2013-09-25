@@ -67,7 +67,7 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
     `df -PBM`.split("\n").drop(1).each do |line|
       _, _, used, avail, used_p, mnt = line.split
 
-      unless %r{/sys|/dev|/run/}.match(mnt)
+      unless %r{/sys|/dev|/run}.match(mnt)
         next if config[:ignore_mnt] && config[:ignore_mnt].find { |x| mnt.match(x) }
         next if config[:include_mnt] && !config[:include_mnt].find { |x| mnt.match(x) }
         if config[:flatten]
