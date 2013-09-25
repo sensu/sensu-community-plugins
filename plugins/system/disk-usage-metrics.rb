@@ -38,8 +38,8 @@ require 'socket'
 class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :scheme,
-         :description => "Metric naming scheme, text to prepend to .$parent.$child",
-         :long => "--scheme SCHEME",
+         :description => 'Metric naming scheme, text to prepend to .$parent.$child',
+         :long => '--scheme SCHEME',
          :default => "#{Socket.gethostname}.disk_usage"
 
   option :ignore_mnt,
@@ -65,12 +65,11 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
     delim = config[:flatten] == true ? '_' : '.'
     # Get disk usage from df with used and avail in megabytes
     `df -PBM`.split("\n").drop(1).each do |line|
-      timestamp = Time.now.to_i
       _, _, used, avail, used_p, mnt = line.split
 
-      unless /\/sys|\/dev|\/run/.match(mnt)
+      unless %r{/sys|/dev|/run/}.match(mnt)
         next if config[:ignore_mnt] && config[:ignore_mnt].find { |x| mnt.match(x) }
-        next if config[:include_mnt] and !config[:include_mnt].find { |x| mnt.match(x) }
+        next if config[:include_mnt] && !config[:include_mnt].find { |x| mnt.match(x) }
         if config[:flatten]
           mnt = mnt.eql?('/') ? 'root' : mnt.gsub(/^\//, '')
         else
@@ -80,9 +79,9 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
         # Fix subsequent slashes
         mnt = mnt.gsub '/', delim
-        output [config[:scheme], mnt, 'used'].join("."), used.gsub('M', ''), timestamp
-        output [config[:scheme], mnt, 'avail'].join("."), avail.gsub('M', ''), timestamp
-        output [config[:scheme], mnt, 'used_percentage'].join("."), used_p.gsub('%', ''), timestamp
+        output [config[:scheme], mnt, 'used'].join('.'), used.gsub('M', '')
+        output [config[:scheme], mnt, 'avail'].join('.'), avail.gsub('M', '')
+        output [config[:scheme], mnt, 'used_percentage'].join('.'), used_p.gsub('%', '')
       end
     end
     ok
