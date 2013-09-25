@@ -57,7 +57,7 @@ class CheckSilenced < Sensu::Plugin::Metric::CLI::Graphite
     :description => 'Do not delete expired stashes',
     :default => false
 
-  def api()
+  def api
     endpoint = URI.parse("http://#{@config[:host]}:#{@config[:port]}")
     @config[:use_ssl?] ? endpoint.scheme = 'https' : endpoint.scheme = 'http'
     @api ||= RestClient::Resource.new(endpoint, :timeout => 45)
