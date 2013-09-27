@@ -4,6 +4,12 @@
 #
 # Walks the /aggregates API to return metrics for
 # the aggregated output states of each check.
+#
+# sensu.aggregates.some_aggregated_check.ok 125 1380251999
+# sensu.aggregates.some_aggregated_check.warning  0 1380251999
+# sensu.aggregates.some_aggregated_check.critical 0 1380251999
+# sensu.aggregates.some_aggregated_check.unknown  0 1380251999
+# sensu.aggregates.some_aggregated_check.total  125 1380251999
 # ===
 #
 # Authors
@@ -18,7 +24,7 @@
 # LICENSE for details.
 
 require "rubygems"
-require "sensu-plugin/check/cli"
+require "sensu-plugin/metric/cli"
 require "rest-client"
 require "json"
 
@@ -78,7 +84,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.sensu.aggregates"
 
   option :verbose,
-    :short => "-v"
+    :long => "--debug",
     :description => "Verbose output"
 
   def api_request(resource)
@@ -122,7 +128,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
         if config[:summarize]
           uri += "?summarize=output"
         end
-        time, api_request(uri)
+        [time, api_request(uri)]
       else
         warning "No aggregates older than #{config[:age]} seconds"
       end
@@ -133,11 +139,12 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     get_checks.each do |check|
-      timestamp, aggregate = get_aggregate(check)
-      puts "#{check} aggregates: #{aggregate}" if config[:verbose]
+      timestamp, aggregate = get_aggregate(check[:check])
+      puts "#{check[:check]} aggregates: #{aggregate}" if config[:verbose]
       aggregate.each do |result, count|
-        output "#{config[:scheme]}.#{check}.#{result}", count, timestamp
+        output "#{config[:scheme]}.#{check[:check]}.#{result}", count, timestamp
       end
     end
+    ok
   end
 end
