@@ -59,25 +59,6 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => 30,
     :proc => proc {|a| a.to_i }
 
-  option :summarize,
-    :short => "-s",
-    :long => "--summarize",
-    :boolean => true,
-    :description => "Summarize check result output",
-    :default => false
-
-  option :warning,
-    :short => "-W PERCENT",
-    :long => "--warning PERCENT",
-    :description => "PERCENT non-ok before warning",
-    :proc => proc {|a| a.to_i }
-
-  option :critical,
-    :short => "-C PERCENT",
-    :long => "--critical PERCENT",
-    :description => "PERCENT non-ok before critical",
-    :proc => proc {|a| a.to_i }
-
   option :scheme,
     :description => "Metric naming scheme",
     :long => "--scheme SCHEME",
@@ -125,9 +106,6 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
       time = issued_sorted.pop
       unless time.nil?
         uri += "/#{time}"
-        if config[:summarize]
-          uri += "?summarize=output"
-        end
         [time, api_request(uri)]
       else
         warning "No aggregates older than #{config[:age]} seconds"
