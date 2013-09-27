@@ -8,6 +8,9 @@
 #   Based on bucket usage pattern you might want to get alerted then couchbase
 #   bucket ram quota is getting close to high watermark and items will get evicted to disk.
 #
+# COMPATIBILITY:
+#   This plugin is tested against couchbase 1.8.x
+#
 # DEPENDENCIES:
 #   sensu-plugin Ruby gem
 #   rest-client Ruby gem
