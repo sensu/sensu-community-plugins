@@ -83,7 +83,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.sensu.aggregates"
 
-  option :verbose,
+  option :debug,
     :long => "--debug",
     :description => "Verbose output"
 
@@ -113,7 +113,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def get_checks
     uri = "/aggregates"
     checks = api_request(uri)
-    puts "Checks: #{checks.inspect}" if config[:verbose]
+    puts "Checks: #{checks.inspect}" if config[:debug]
     return checks
   end
 
@@ -140,7 +140,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     get_checks.each do |check|
       timestamp, aggregate = get_aggregate(check[:check])
-      puts "#{check[:check]} aggregates: #{aggregate}" if config[:verbose]
+      puts "#{check[:check]} aggregates: #{aggregate}" if config[:debug]
       aggregate.each do |result, count|
         output "#{config[:scheme]}.#{check[:check]}.#{result}", count, timestamp
       end
