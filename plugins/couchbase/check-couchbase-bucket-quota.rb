@@ -80,7 +80,7 @@ class CheckCouchbase < Sensu::Plugin::Check::CLI
     rescue RestClient::RequestTimeout
       unknown 'Connection timed out'
     rescue RestClient::Unauthorized
-      warning "Missing or incorrect Couchbase REST API credentials"
+      unknown "Missing or incorrect Couchbase REST API credentials"
     rescue JSON::ParserError
       unknown 'couchbase REST API returned invalid JSON'
     end
