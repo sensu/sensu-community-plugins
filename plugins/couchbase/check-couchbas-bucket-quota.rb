@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Check Couchbase Plugin
+# Check Couchbase Bucket RAM Quota Plugin
 # ===
 # 
 # DESCRIPTION:
