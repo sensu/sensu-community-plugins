@@ -40,8 +40,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :repo,
     :short => "-r REPO",
     :long => "--repo REPO",
-    :description => "Github Repository",
-    :required => true
+    :description => "Github Repository. Defaults to all visible"
 
   option :owner,
     :short => "-o OWNER",
@@ -65,12 +64,8 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--debug",
     :description => "Verbose output"
 
-  def repo_identifier
-    "#{config[:owner]}/#{config[:repo]}"
-  end
-
-  def repo_api_request(subresource)
-    api_request("/repos/#{repo_identifier}/#{subresource}")
+  def repo_api_request(repo, subresource)
+    api_request("/repos/#{config[:owner]}/#{repo}/#{subresource}")
   end
 
   def api_request(resource)
@@ -86,8 +81,10 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
       warning "Resource not found (or not accessible): #{resource}"
     rescue Errno::ECONNREFUSED
       warning "Connection refused"
-    rescue RestClient::RequestFailed
-      warning "Request failed"
+    rescue RestClient::RequestFailed => e
+      # TODO: Better handle github rate limiting case
+      # (with data from e.response.headers)
+      warning "Request failed: #{e.inspect}"
     rescue RestClient::RequestTimeout
       warning "Connection timed out"
     rescue RestClient::Unauthorized
@@ -97,20 +94,26 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
   end
 
+  def get_org_repos
+    api_request("/orgs/#{config[:owner]}/repos?type=sources").map{|r| r[:name]}
+  end
+
   def run
-    schema = "#{config[:scheme]}.#{config[:owner]}.#{config[:repo]}"
-    now = Time.now.to_i
-    %w(pulls branches tags contributors languages).each do |resource|
-      output "#{schema}.stats.#{resource}", repo_api_request(resource).count, now
-    end
+    ([config[:repo] || get_org_repos].flatten).each do |repo|
+      schema = "#{config[:scheme]}.#{config[:owner]}.#{repo}"
+      now = Time.now.to_i
+      %w(pulls branches tags contributors languages).each do |resource|
+        output "#{schema}.stats.#{resource}", repo_api_request(repo, resource).count, now
+      end
 
-    repo_api_request('languages').each_pair do |language, line_count|
-      output "#{schema}.languages.#{language.downcase}", line_count, now
-    end
+      repo_api_request(repo, 'languages').each_pair do |language, line_count|
+        output "#{schema}.languages.#{language.downcase}", line_count, now
+      end
 
-    repo_api_request('contributors').each do |contributor|
-      output "#{schema}.contributors.#{contributor[:login]}",
-             contributor[:contributions], now
+      repo_api_request(repo, 'contributors').each do |contributor|
+        output "#{schema}.contributors.#{contributor[:login]}",
+               contributor[:contributions], now
+      end
     end
 
     ok
