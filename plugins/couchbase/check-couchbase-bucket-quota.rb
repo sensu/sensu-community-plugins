@@ -35,18 +35,11 @@ class CheckCouchbase < Sensu::Plugin::Check::CLI
     :short       => '-P PASSWORD',
     :long        => '--password PASSWORD'
 
-  option :host,
-    :description => 'Couchbase Admin Rest API host',
-    :short       => '-h HOSTNAME',
-    :long        => '--host HOSTNAME',
-    :default     => 'localhost'
-
-  option :port,
-    :description => 'Couchbase Admin Rest API port',
-    :short       => '-p PORT',
-    :long        => '--port PORT',
-    :proc        => proc {|a| a.to_i },
-    :default     => 8091
+  option :api,
+    :description => 'Couchbase Admin Rest API base URL',
+    :short => "-a URL",
+    :long => "--api URL",
+    :default => "http://localhost:8091"
 
   option :warn,
     :description => 'Warning threshold of bucket ram quota usage',
@@ -68,14 +61,29 @@ class CheckCouchbase < Sensu::Plugin::Check::CLI
     :long        => '--bucket BUCKET'
 
   def run
-    response = RestClient::Request.new(
-      :method   => :get,
-      :url      => "http://#{config[:host]}:#{config[:port]}/pools/default/buckets",
-      :user     => config[:user],
-      :password => config[:password],
-      :headers  => { :accept => :json, :content_type => :json }
-    ).execute
-    results = JSON.parse(response.to_str, :symbolize_names => true)
+    begin
+      resource = "/pools/default/buckets"
+      response = RestClient::Request.new(
+        :method   => :get,
+        :url      => "#{config[:api]}/#{resource}",
+        :user     => config[:user],
+        :password => config[:password],
+        :headers  => { :accept => :json, :content_type => :json }
+      ).execute
+      results = JSON.parse(response.to_str, :symbolize_names => true)
+    rescue Errno::ECONNREFUSED
+      unknown 'Connection refused'
+    rescue RestClient::ResourceNotFound
+      unknown "Resource not found: #{resource}"
+    rescue RestClient::RequestFailed
+      unknown "Request failed"
+    rescue RestClient::RequestTimeout
+      unknown 'Connection timed out'
+    rescue RestClient::Unauthorized
+      warning "Missing or incorrect Couchbase REST API credentials"
+    rescue JSON::ParserError
+      unknown 'couchbase REST API returned invalid JSON'
+    end
 
     results.each do |bucket|
       next if config[:bucket] && bucket[:name] != config[:bucket]
