@@ -2,7 +2,7 @@
 #
 # Check Couchbase Bucket RAM Quota Plugin
 # ===
-# 
+#
 # DESCRIPTION:
 #   This plugin checks Couchbase bucket RAM usage quotas.
 #   Based on bucket usage pattern you might want to get alerted then couchbase
