@@ -104,6 +104,9 @@ Lambda:
 CollectionMethods:
   Enabled: false
 
+CaseIndentation:
+  Enabled: false
+
 AllCops:
   Excludes:
     - vendor/**
