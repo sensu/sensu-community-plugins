@@ -8,6 +8,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
+require 'openssl'
 require 'open-uri'
 
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
@@ -66,6 +67,30 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :long => '--from FROM',
     :default => "-10mins"
 
+  option :username,
+    :description => 'Username to be used with basic auth',
+    :short => '-u USERNAME',
+    :long => '--username USERNAME',
+    :default => false 
+
+  option :password,
+    :description => 'Password to be used with basic auth',
+    :short => '-p PASSWORD',
+    :long => '--password PASSWORD',
+    :default => false 
+
+  option :ssl,
+    :description => 'Whether to use https',
+    :long => '--ssl',
+    :boolean => true,
+    :default => false
+
+  option :ssl_ignore_certs,
+    :description => 'Whether to ignore cert checking for SSL',
+    :long => '--ssl-ignore-certs',
+    :boolean => true,
+    :default => false
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -97,7 +122,17 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def retreive_data
     unless @raw_data
       begin
-        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
+        protocol = config[:ssl] ? 'https' : 'http'
+        verify_mode = config[:ssl_ignore_certs] ? OpenSSL::SSL::VERIFY_NONE : OpenSSL::SSL::VERIFY_PEER 
+
+        if config[:username] != false && config[:password] != false
+          handle = open(protocol + "://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}",
+                       :ssl_verify_mode => verify_mode, :http_basic_authentication => [config[:username], config[:password]])
+        else
+          handle = open(protocol + "://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}",
+                       :ssl_verify_mode => verify_mode)
+        end
+
         @raw_data = JSON.parse(handle.gets).first
         @raw_data['datapoints'].delete_if{|v| v.first == nil}
         @data = @raw_data['datapoints'].map(&:first)
