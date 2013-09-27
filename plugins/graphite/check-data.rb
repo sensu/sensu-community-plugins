@@ -24,6 +24,24 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :long => '--server SERVER:PORT',
     :required => true
 
+  option :username,
+    :description => 'username for basic http authentication',
+    :short => '-u USERNAME',
+    :long => '--user USERNAME',
+    :required => false
+
+  option :password,
+    :description => 'user password for basic http authentication',
+    :short => '-p PASSWORD',
+    :long => '--pass PASSWORD',
+    :required => false
+
+  option :passfile,
+    :description => 'password file path for basic http authentication',
+    :short => '-P PASSWORDFILE',
+    :long => '--passfile PASSWORDFILE',
+    :required => false
+
   option :warning,
     :description => 'Generate warning if given value is above received value',
     :short => '-w VALUE',
@@ -77,6 +95,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       puts opt_parser if config[:help]
       exit
     end
+
     retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
   end
 
@@ -97,7 +116,20 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def retreive_data
     unless @raw_data
       begin
-        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
+
+        if ( config[:username] && ( config[:password] || config[:passfile] ) )
+          if config[:passfile]
+            pass = File.open(config[:passfile]).readline
+          elsif config[:password]
+            pass = config[:password]
+          end
+
+          handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}",
+                        :http_basic_authentication =>[ "#{config[:username]}", pass.chomp ])
+        else # we don't have both username and password trying without
+          handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
+        end
+    
         @raw_data = JSON.parse(handle.gets).first
         @raw_data['datapoints'].delete_if{|v| v.first == nil}
         @data = @raw_data['datapoints'].map(&:first)
