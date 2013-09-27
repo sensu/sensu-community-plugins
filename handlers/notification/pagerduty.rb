@@ -22,7 +22,7 @@ class Pagerduty < Sensu::Handler
     description = @event['check']['notification']
     description ||= [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     begin
-      timeout(5) do
+      timeout(10) do
         response = case @event['action']
         when 'create'
           Redphone::Pagerduty.trigger_incident(
