@@ -34,7 +34,7 @@ class CheckSilenced < Sensu::Plugin::Metric::CLI::Graphite
     :default => 4567
 
   option :use_ssl,
-    :short => '-k',
+    :short => '--ssl',
     :long => '--use-ssl',
     :description => 'Use ssl when connecting to sensu-api endpoint',
     :default => false
