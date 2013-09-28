@@ -37,7 +37,7 @@ class Mailer < Sensu::Handler
       :smtp_domain => smtp_domain
     }
 
-    body = <<-BODY.gsub(/^ {14}/, '')
+    body = <<-BODY.gsub(/^ {12}/, '')
             #{@event['check']['output']}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
