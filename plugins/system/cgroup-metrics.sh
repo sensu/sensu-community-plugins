@@ -1,6 +1,10 @@
 #!/bin/bash
-#Julian Prokay
-#Sensu plugin to find the specified cgroup data
+#
+# Retrive cgroup metrics on Linux systems
+# 
+# Author: Julian Prokay -- jprokay@gmail.com
+
+
 usage()
 {
 	cat <<EOF
@@ -77,7 +81,7 @@ get_cgroup_stats()
     fi
 }
 
-#Gets the cgroup data for the specified component and metric. Echoes the output for sensu
+#Gets the cgroup data for the specified component and metric
 get_cgroup_stat()
 {
     for component in "${COMPONENTS[@]}"; do
@@ -109,7 +113,6 @@ fi
 
 if [ -z "$SCHEME" ]; then
     SCHEME="stats.`hostname -s`.cgroups"
-    echo $SCHEME
 fi
 
 get_cgroup_stats 
