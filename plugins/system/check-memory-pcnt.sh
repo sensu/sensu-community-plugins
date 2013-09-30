@@ -44,7 +44,7 @@ TotalMem=$(free -m | grep Mem | awk '{ print $2 }')
 #Determine amount of free memory on the machine
 FreeMem=$(free -m | grep buffers/cache | awk '{ print $4 }')
 #Get percentage of free memory
-FreePer=$(echo "scale=2; $FreeMem / $TotalMem * 100" | bc -l| tr -d ".00")
+FreePer=$(echo "scale=3; $FreeMem / $TotalMem * 100" | bc -l| cut -d "." -f1)
 #Get actual memory usage percentage by subtracting free memory percentage from 100
 UsedPer=$((100-$FreePer))
 
