@@ -86,7 +86,12 @@ get_cgroup_stat()
             metric_val=`cgget -g $component "$1" | grep $metric | cut -d ' ' -f 2`
             if ! [ -z $metric_val ]; then
                 timestamp=`date +%s`
-                echo "$SCHEME.$1.$component.$metric $metric_val $timestamp"
+                if [ "$1" = "/" ]; then
+                    echo "$SCHEME.$component.$metric $metric_val $timestamp"
+                else
+                    path="${1//\//.}"
+                    echo "$SCHEME.$path.$component.$metric $metric_val $timestamp"
+                fi
             fi
             counter=$counter+1
         done
@@ -97,7 +102,7 @@ if [ "${#COMPONENTS[@]}" -eq 0 ]; then
     echo "Component required"
     exit 1
 fi
-if [  "${#METRICS[@]}" -eq "0" ]; then
+if [  "${#METRICS[@]}" -eq 0 ]; then
     echo "Metric required"
     exit 1
 fi
