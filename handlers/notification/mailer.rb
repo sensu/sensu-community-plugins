@@ -37,6 +37,7 @@ class Mailer < Sensu::Handler
       :smtp_domain => smtp_domain
     }
 
+    runbook = "Runbook:  #{@event['check']['runbook']}" if @event['check']['runbook']
     body = <<-BODY.gsub(/^ {14}/, '')
             #{@event['check']['output']}
             Host: #{@event['client']['name']}
@@ -46,6 +47,7 @@ class Mailer < Sensu::Handler
             Command:  #{@event['check']['command']}
             Status:  #{@event['check']['status']}
             Occurrences:  #{@event['occurrences']}
+            #{runbook}
           BODY
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 

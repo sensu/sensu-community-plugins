@@ -14,7 +14,23 @@ class HipChatNotif < Sensu::Handler
   def handle
     hipchatmsg = HipChat::Client.new(settings["hipchat"]["apikey"])
     room = settings["hipchat"]["room"]
+
     message = @event['check']['notification'] || @event['check']['output']
+
+    # If the runbook attribute exists and is a URL, "[<a href='url'>Runbook</a>]" will be output.
+    # To control the link name, set the runbook value to the HTML output you would like.
+    if @event['check']['runbook']
+      begin
+        uri = URI.parse(@event['check']['runbook'])
+        if %w( http https ).include?(uri.scheme)
+          message << "  [<a href='#{@event['check']['runbook']}'>Runbook</a>]"
+        else
+          message << "  Runbook:  #{@event['check']['runbook']}"
+        end
+      rescue
+        message << "  Runbook:  #{@event['check']['runbook']}"
+      end
+    end
 
     begin
       timeout(3) do
