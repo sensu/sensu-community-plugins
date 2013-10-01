@@ -75,17 +75,25 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
 
   def gatherReplicationMetrics(serverStatus)
     serverMetrics = {}
-    serverMetrics['lock.ratio'] = "#{sprintf("%.5f", serverStatus['globalLock']['ratio']) unless serverStatus['globalLock']['ratio'].nil?}"
+    if not serverStatus['globalLock']['ration'].nil?
+      serverMetrics['lock.ratio'] = "#{sprintf("%.5f", serverStatus['globalLock']['ratio'])}"
+    end
     serverMetrics['lock.queue.total'] = serverStatus['globalLock']['currentQueue']['total']
     serverMetrics['lock.queue.readers'] = serverStatus['globalLock']['currentQueue']['readers']
     serverMetrics['lock.queue.writers'] = serverStatus['globalLock']['currentQueue']['writers']
 
     serverMetrics['connections.current'] = serverStatus['connections']['current']
     serverMetrics['connections.available'] = serverStatus['connections']['available']
-
-    serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['btree']['missRatio'])}"
-    serverMetrics['indexes.hits'] = serverStatus['indexCounters']['btree']['hits']
-    serverMetrics['indexes.misses'] = serverStatus['indexCounters']['btree']['misses']
+    
+    if serverStatus['indexCounters']['btree'].nil?
+      serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['btree']['missRatio'])}"
+      serverMetrics['indexes.hits'] = serverStatus['indexCounters']['btree']['hits']
+      serverMetrics['indexes.misses'] = serverStatus['indexCounters']['btree']['misses']
+    else
+      serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['missRatio'])}"
+      serverMetrics['indexes.hits'] = serverStatus['indexCounters']['hits']
+      serverMetrics['indexes.misses'] = serverStatus['indexCounters']['misses']
+    end
 
     serverMetrics['cursors.open'] = serverStatus['cursors']['totalOpen']
     serverMetrics['cursors.timedOut'] = serverStatus['cursors']['timedOut']

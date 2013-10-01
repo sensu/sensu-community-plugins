@@ -30,7 +30,17 @@ class JbossThreads < Sensu::Plugin::Metric::CLI
         full_cmd = "./%s --commands=%s" % [script, jboss_cli_cmds]
         all_thread_stats = `#{full_cmd}`
         return all_thread_stats
+    end
 
     def jboss_format_to_json(jboss_cli_output)
-        arrow_replace = jboss_cli_output.gsub(/\s=>/, ':')
-        long_replace = jboss_cli_o
+        jboss_cli_output.gsub!(/( =>)|L/, 'L' => '', ' =>' => ':')
+        return JSON.parse(jboss_cli_output)
+    end
+
+    def run
+        thread_stats = get_thread_stats(config[:jboss], config[:url])
+        json_thread = jboss_format_to_json(thread_stats)
+        puts json_thread
+    end
+
+end
