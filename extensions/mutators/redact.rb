@@ -1,7 +1,7 @@
 # Redacts sensitive event information
 #
-# Requires a Sensu setting snippet 'redact', containing the list of keys 
-# with sensitive values that need redacting, or for clients to have their 
+# Requires a Sensu setting snippet 'redact', containing the list of keys
+# with sensitive values that need redacting, or for clients to have their
 # own redact attribute. If both exist, the client's setting will be preferred.
 # If neither exist, a base set is used.
 #
@@ -14,7 +14,7 @@
 
 module Sensu::Extension
   class Redact < Mutator
-    
+
     def definition
       {
         type: 'extension',
@@ -40,10 +40,10 @@ module Sensu::Extension
       end
       redacted = redact_sensitive(event, keys)
       event = JSON.dump(redacted)
-      yield(event,0)
+      yield(event, 0)
     end
 
-    def redact_sensitive(hash, keys=nil)
+    def redact_sensitive(hash, keys = nil)
       keys ||= %w[
         password passwd pass
         api_key api_token
