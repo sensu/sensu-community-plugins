@@ -8,6 +8,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
+require 'openssl'
 require 'open-uri'
 
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
@@ -28,13 +29,13 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :description => 'Generate warning if given value is above received value',
     :short => '-w VALUE',
     :long => '--warn VALUE',
-    :proc => proc{|arg| arg.to_f }
+    :proc => proc{|arg| CheckGraphiteData.parse_range(arg)  }
 
   option :critical,
     :description => 'Generate critical if given value is above received value',
     :short => '-c VALUE',
     :long => '--critical VALUE',
-    :proc => proc{|arg| arg.to_f }
+    :proc => proc{|arg| CheckGraphiteData.parse_range(arg) }
 
   option :reset_on_decrease,
     :description => 'Send OK if value has decreased on any values within END-INTERVAL to END',
@@ -65,6 +66,30 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :short => '-f FROM',
     :long => '--from FROM',
     :default => "-10mins"
+
+  option :username,
+    :description => 'Username to be used with basic auth',
+    :short => '-u USERNAME',
+    :long => '--username USERNAME',
+    :default => false 
+
+  option :password,
+    :description => 'Password to be used with basic auth',
+    :short => '-p PASSWORD',
+    :long => '--password PASSWORD',
+    :default => false 
+
+  option :ssl,
+    :description => 'Whether to use https',
+    :long => '--ssl',
+    :boolean => true,
+    :default => false
+
+  option :ssl_ignore_certs,
+    :description => 'Whether to ignore cert checking for SSL',
+    :long => '--ssl-ignore-certs',
+    :boolean => true,
+    :default => false
 
   option :help,
     :description => 'Show this message',
@@ -97,7 +122,17 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def retreive_data
     unless @raw_data
       begin
-        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
+        protocol = config[:ssl] ? 'https' : 'http'
+        verify_mode = config[:ssl_ignore_certs] ? OpenSSL::SSL::VERIFY_NONE : OpenSSL::SSL::VERIFY_PEER 
+
+        if config[:username] != false && config[:password] != false
+          handle = open(protocol + "://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}",
+                       :ssl_verify_mode => verify_mode, :http_basic_authentication => [config[:username], config[:password]])
+        else
+          handle = open(protocol + "://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}",
+                       :ssl_verify_mode => verify_mode)
+        end
+
         @raw_data = JSON.parse(handle.gets).first
         @raw_data['datapoints'].delete_if{|v| v.first == nil}
         @data = @raw_data['datapoints'].map(&:first)
@@ -118,7 +153,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Return alert if required
   def check(type)
     if config[type]
-      if @data.last > config[type] && !decreased?
+      if !does_range_include?(config[type],@data.last) && !decreased?
         send(type, "#{name} has passed #{type} threshold (#{@data.last})")
       end
     end
@@ -144,6 +179,31 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     else
       config[:target]
     end
+  end
+
+
+  def does_range_include?(range,value)
+    result = (range["min"].nil? || value >= range["min"]) && (range["max"].nil? || value <= range["max"])
+    range["inverse"] ? not(result) : result
+  end
+
+  def self.parse_range(string_range)
+    if string_range.nil? || string_range.empty?
+      raise RuntimeError, "Pattern should not be nil"
+    end
+    tokens = string_range.scan(/^(@)?(([-.0-9]+|~)?:)?([-.0-9]+)?$/).first
+    unless tokens
+      raise RuntimeError, "Pattern should be of form [@][~][min]:max"
+    end
+    parsed_range= {"string range"=>string_range}
+    parsed_range["inverse"] = true if tokens.include? "@"
+    case tokens[2]
+      when nil, "" then parsed_range["min"] = 0
+      when '~' then parsed_range["min"] = nil
+      else parsed_range["min"] = tokens[2].to_f
+    end
+    parsed_range["max"] = tokens[3].nil? || tokens[3] == "" ? nil : tokens[3].to_f
+    return parsed_range
   end
 
 end
