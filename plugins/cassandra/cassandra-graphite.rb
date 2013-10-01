@@ -320,7 +320,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     def get_metric(string)
       string.strip!
-      (metric, value) = string.split(':')
+      (metric, value) = string.split(': ')
       if metric.nil? or value.nil?
         return [nil, nil]
       else
@@ -357,7 +357,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
         (metric, value) = get_metric(line)
-        output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp
+        output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp unless value == "disabled"
       elsif num_indents == 1 and !keyspace.nil?
         # a keyspace metric
         (metric, value) = get_metric(line)
