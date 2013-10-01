@@ -75,7 +75,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
 
   def gatherReplicationMetrics(serverStatus)
     serverMetrics = {}
-    if not serverStatus['globalLock']['ration'].nil?
+    if not serverStatus['globalLock']['ratio'].nil?
       serverMetrics['lock.ratio'] = "#{sprintf("%.5f", serverStatus['globalLock']['ratio'])}"
     end
     serverMetrics['lock.queue.total'] = serverStatus['globalLock']['currentQueue']['total']
