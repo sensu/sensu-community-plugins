@@ -17,18 +17,18 @@ class HipChatNotif < Sensu::Handler
 
     message = @event['check']['notification'] || @event['check']['output']
 
-    # If the runbook attribute exists and is a URL, "[<a href='url'>Runbook</a>]" will be output.
-    # To control the link name, set the runbook value to the HTML output you would like.
-    if @event['check']['runbook']
+    # If the playbook attribute exists and is a URL, "[<a href='url'>playbook</a>]" will be output.
+    # To control the link name, set the playbook value to the HTML output you would like.
+    if @event['check']['playbook']
       begin
-        uri = URI.parse(@event['check']['runbook'])
+        uri = URI.parse(@event['check']['playbook'])
         if %w( http https ).include?(uri.scheme)
-          message << "  [<a href='#{@event['check']['runbook']}'>Runbook</a>]"
+          message << "  [<a href='#{@event['check']['playbook']}'>Playbook</a>]"
         else
-          message << "  Runbook:  #{@event['check']['runbook']}"
+          message << "  Playbook:  #{@event['check']['playbook']}"
         end
       rescue
-        message << "  Runbook:  #{@event['check']['runbook']}"
+        message << "  Playbook:  #{@event['check']['playbook']}"
       end
     end
 
