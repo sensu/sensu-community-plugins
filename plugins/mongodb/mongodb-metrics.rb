@@ -86,13 +86,13 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     serverMetrics['connections.available'] = serverStatus['connections']['available']
     
     if serverStatus['indexCounters']['btree'].nil?
-      serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['btree']['missRatio'])}"
-      serverMetrics['indexes.hits'] = serverStatus['indexCounters']['btree']['hits']
-      serverMetrics['indexes.misses'] = serverStatus['indexCounters']['btree']['misses']
-    else
       serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['missRatio'])}"
       serverMetrics['indexes.hits'] = serverStatus['indexCounters']['hits']
       serverMetrics['indexes.misses'] = serverStatus['indexCounters']['misses']
+    else
+      serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['btree']['missRatio'])}"
+      serverMetrics['indexes.hits'] = serverStatus['indexCounters']['btree']['hits']
+      serverMetrics['indexes.misses'] = serverStatus['indexCounters']['btree']['misses']
     end
 
     serverMetrics['cursors.open'] = serverStatus['cursors']['totalOpen']
