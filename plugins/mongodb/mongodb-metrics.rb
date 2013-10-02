@@ -75,16 +75,15 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
 
   def gatherReplicationMetrics(serverStatus)
     serverMetrics = {}
-    if not serverStatus['globalLock']['ratio'].nil?
-      serverMetrics['lock.ratio'] = "#{sprintf("%.5f", serverStatus['globalLock']['ratio'])}"
-    end
+    serverMetrics['lock.ratio'] = "#{sprintf("%.5f", serverStatus['globalLock']['ratio'])}" unless serverStatus['globalLock']['ratio'].nil?
+    
     serverMetrics['lock.queue.total'] = serverStatus['globalLock']['currentQueue']['total']
     serverMetrics['lock.queue.readers'] = serverStatus['globalLock']['currentQueue']['readers']
     serverMetrics['lock.queue.writers'] = serverStatus['globalLock']['currentQueue']['writers']
 
     serverMetrics['connections.current'] = serverStatus['connections']['current']
     serverMetrics['connections.available'] = serverStatus['connections']['available']
-    
+
     if serverStatus['indexCounters']['btree'].nil?
       serverMetrics['indexes.missRatio'] = "#{sprintf("%.5f", serverStatus['indexCounters']['missRatio'])}"
       serverMetrics['indexes.hits'] = serverStatus['indexCounters']['hits']
