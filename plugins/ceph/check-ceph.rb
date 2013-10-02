@@ -25,7 +25,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'timeout'
+require 'sensu/io'
 
 class CheckCephHealth < Sensu::Plugin::Check::CLI
 
@@ -33,26 +33,26 @@ class CheckCephHealth < Sensu::Plugin::Check::CLI
          :description => 'Path to cephx authentication keyring file',
          :short => '-k KEY',
          :long => '--keyring',
-         :proc => proc { |k| ['-k', k] }
+         :proc => proc { |k| " -k #{k}" }
 
   option :monitor,
          :description => 'Optional monitor IP',
          :short => '-m MON',
          :long => '--monitor',
-         :proc => proc { |m| ['-m', m] }
+         :proc => proc { |m| " -m #{m}" }
 
   option :cluster,
          :description => 'Optional cluster name',
          :short => '-c NAME',
          :long => '--cluster',
-         :proc => proc { |c| "--cluster=#{c}" }
+         :proc => proc { |c| " --cluster=#{c}" }
 
   option :timeout,
-         :description => 'Timeout (default 5)',
+         :description => 'Timeout (default 10)',
          :short => '-t SEC',
          :long => '--timeout',
          :proc => proc { |t| t.to_i },
-         :default => 5
+         :default => 10
 
   option :ignore_flags,
          :description => 'Optional ceph warning flags to ignore',
@@ -74,24 +74,18 @@ class CheckCephHealth < Sensu::Plugin::Check::CLI
          :boolean => true,
          :default => false
 
-  def run_cmd(args)
-    cmd = ['ceph']
-    cmd << config[:cluster] if config[:cluster]
-    cmd.concat(config[:keyring]) if config[:keyring]
-    cmd.concat(config[:monitor]) if config[:monitor]
-    cmd << args if args.is_a?(String)
-    cmd.concat(args) if args.is_a?(Array)
+  def run_cmd(cmd)
     begin
-      Timeout.timeout(config[:timeout]) do
-        pipe = IO.popen(cmd)
-        Process.wait pipe.pid
-        pipe.read
-      end
-    rescue Timeout::Error
-      Process.kill 9, pipe.pid
-      Process.wait pipe.pid
-      critical "Timeout occurred after #{config[:timeout]}s"
+      cmd += config[:cluster] if config[:cluster]
+      cmd += config[:keyring] if config[:keyring]
+      cmd += config[:monitor] if config[:monitor]
+      output, status = Sensu::IO.popen(cmd, 'r', config[:timeout])
+    rescue => error
+      critical "Error: #{error.to_s}"
     end
+    critical "Command '#{cmd}' returned no output" if output.to_s == ''
+    critical output unless status == 0
+    output
   end
 
   def strip_warns(result)
@@ -110,20 +104,18 @@ class CheckCephHealth < Sensu::Plugin::Check::CLI
   end
 
   def run
-    result = run_cmd('health')
+    result = run_cmd('ceph health')
     unless result.start_with?('HEALTH_OK')
       result = strip_warns(result) if config[:ignore_flags]
     end
     ok result if result.start_with?('HEALTH_OK')
-    result = run_cmd(%w(health detail)) if config[:show_detail]
-    result = result + run_cmd(%w(osd tree)) if config[:osd_tree]
-    case
-    when result.start_with?('HEALTH_WARN')
+
+    result = run_cmd('ceph health detail') if config[:show_detail]
+    result += run_cmd('ceph osd tree') if config[:osd_tree]
+    if result.start_with?('HEALTH_WARN')
       warning result
-    when result.start_with?('HEALTH_ERR')
-      critical result
     else
-      unknown result
+      critical result
     end
   end
 
