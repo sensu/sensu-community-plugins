@@ -11,7 +11,7 @@
 #
 #   check-snmp -h host -C community -O oid -p prefix -s suffix
 #
-#   Author: Johan van den Dorpe
+#   Copyright (c) 2013 Double Negative Limited
 #   Based on check-snmp.rb by Deepak Mohan Das   <deepakmdass88@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
