@@ -94,7 +94,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Check the age of the data being processed
   def check_age(value)
     if((Time.now.to_i - value['end']) > config[:allowed_graphite_age])
-      critical "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
+      unknown "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
     end
   end
 
