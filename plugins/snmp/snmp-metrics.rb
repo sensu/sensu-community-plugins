@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# SNMP Metrics 
+# SNMP Metrics
 # ===
 #
 # This is a simple script to collect metrics from a SNMP OID value
@@ -50,7 +50,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :required => true
 
   def run
-    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}" )
+    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}")
     response = manager.get(["#{config[:objectid]}"])
     response.each_varbind do |vb|
       output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f
