@@ -91,7 +91,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     end
 
     num_instances = instances.count
-    state = { 'OutOfService' => [], 'InService' => []}
+    state = { 'OutOfService' => [], 'InService' => [], 'Unknown' => []}
     instances.each do |instance|
       state[instance[:state]] << instance[:instance].id
     end
@@ -104,11 +104,18 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     if state['OutOfService'].count > 0
       message << " (#{state['OutOfService'].join(', ')})"
     end
+    if state['Unknown'].count > 0
+      message << " (#{state['Unknown'].join(', ')})"
+    end
     AWS.stop_memoizing
 
-    if config[:crit_under] > 0 && config[:crit_under] >= state['InService'].count
+    if state['Unknown'].count == num_instances
+      unknown "All nodes in unknown state"
+    elsif state['InService'].count == 0
       critical message
-    elsif config[:crit_percent] > 0 && (state['InService'] == 0 || config[:crit_percent] >= (num_instances / state['InService'].count) * 100)
+    elsif config[:crit_under] > 0 && config[:crit_under] >= state['InService'].count
+      critical message
+    elsif config[:crit_percent] > 0 && config[:crit_percent] >= (num_instances / state['InService'].count) * 100
       critical message
     elsif config[:warn_under] > 0 && config[:warn_under] >= state['InService'].count
       warning message
