@@ -12,6 +12,8 @@
 # You must have openjdk-7-jdk and openjdk-7-jre packages installed
 # http://openjdk.java.net/install/
 
+# Also make sure the user "sensu" can sudo without password
+
 while getopts 'w:c:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
@@ -41,13 +43,13 @@ WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 #Get PID of JVM. 
 #At this point grep for the name of the java process running your jvm.
-PID=$(jps | grep Bootstrap | awk '{ print $1}')
+PID=$(sudo jps | grep Bootstrap | awk '{ print $1}')
 
 #Get heap capacity of JVM
-TotalHeap=$(jstat -gccapacity $PID  | tail -n 1 | awk '{ print ($4 + $5 + $6 + $10) / 1024 }')
+TotalHeap=$(sudo jstat -gccapacity $PID  | tail -n 1 | awk '{ print ($4 + $5 + $6 + $10) / 1024 }')
 
 #Determine amount of used heap JVM is using
-UsedHeap=$(jstat -gc $PID  | tail -n 1 | awk '{ print ($3 + $4 + $6 + $10) / 1024 }')
+UsedHeap=$(sudo jstat -gc $PID  | tail -n 1 | awk '{ print ($3 + $4 + $6 + $10) / 1024 }')
 
 #Get heap usage percentage 
 HeapPer=$(echo "scale=3; $UsedHeap / $TotalHeap * 100" | bc -l| cut -d "." -f1)
