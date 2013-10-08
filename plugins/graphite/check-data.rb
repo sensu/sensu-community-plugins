@@ -117,13 +117,13 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     unless @raw_data
       begin
 
+        url = "http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
         if (config[:username] && (config[:password] || config[:passfile]))
           if config[:passfile]
             pass = File.open(config[:passfile]).readline
           elsif config[:password]
             pass = config[:password]
           end
-          url = "http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
           handle = open(url, :http_basic_authentication =>["#{config[:username]}", pass.chomp])
         else # we don't have both username and password trying without
           handle = open(url)
