@@ -84,6 +84,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :long => '--from FROM',
     :default => "-10mins"
 
+  option :below,
+    :description => 'warnings/critical if values below specified thresholds',
+    :short => '-b',
+    :long => '--below'
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -149,7 +154,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Return alert if required
   def check(type)
     if config[type]
-      if @data.last > config[type] && !decreased?
+      if( (config[:below] && @data.last < config[type]) || ( !config[:below] && @data.last > config[type] && !decreased?) )
         send(type, "#{name} has passed #{type} threshold (#{@data.last})")
       end
     end
