@@ -49,7 +49,7 @@ PID=$(sudo jps | grep Bootstrap | awk '{ print $1}')
 TotalHeap=$(sudo jstat -gccapacity $PID  | tail -n 1 | awk '{ print ($4 + $5 + $6 + $10) / 1024 }')
 
 #Determine amount of used heap JVM is using
-UsedHeap=$(sudo jstat -gc $PID  | tail -n 1 | awk '{ print ($3 + $4 + $6 + $10) / 1024 }')
+UsedHeap=$(sudo jstat -gc $PID  | tail -n 1 | awk '{ print ($3 + $4 + $6 + $8 + $10) / 1024 }')
 
 #Get heap usage percentage 
 HeapPer=$(echo "scale=3; $UsedHeap / $TotalHeap * 100" | bc -l| cut -d "." -f1)
@@ -63,7 +63,7 @@ fi
 if [ "$perform" = "yes" ]; then
   output="jvm heap usage: $HeapPer% | heap usage="$HeapPer"%;$WARN;$CRIT;0"
 else
-  output="jvm heap usage: $HeapPer%"
+  output="jvm heap usage: $HeapPer% | $UsedHeap MB out of $TotalHeap MB"
 fi
 
 if (( $HeapPer >= $CRIT )); then
