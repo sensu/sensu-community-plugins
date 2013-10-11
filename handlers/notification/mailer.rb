@@ -45,7 +45,7 @@ class Mailer < Sensu::Handler
     }
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
-    body = <<-BODY.gsub(/^ {14}/, '')
+    body = <<-BODY.gsub(/^\s+/, '')
             #{@event['check']['output']}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
