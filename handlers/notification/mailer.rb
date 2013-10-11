@@ -52,7 +52,7 @@ class Mailer < Sensu::Handler
 
     Mail.defaults do
       delivery_options = {
-        :address    => smtp_addr,
+        :address    => smtp_address,
         :port       => smtp_port,
         :domain     => smtp_domain,
         :openssl_verify_mode => 'none',
