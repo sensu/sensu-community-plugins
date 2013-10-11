@@ -11,7 +11,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
-gem 'mail', '~> 2.4.0'
+gem 'mail', '~> 2.5.4'
 require 'mail'
 require 'timeout'
 
@@ -29,16 +29,23 @@ class Mailer < Sensu::Handler
     smtp_port = settings['mailer']['smtp_port'] || '25'
     smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
 
+    smtp_username = settings['mailer']['smtp_username'] || nil
+    smtp_password = settings['mailer']['smtp_password'] || nil
+    smtp_authentication = settings['mailer']['smtp_authentication'] || :plain
+
     params = {
       :mail_to   => settings['mailer']['mail_to'],
       :mail_from => settings['mailer']['mail_from'],
       :smtp_addr => smtp_address,
       :smtp_port => smtp_port,
-      :smtp_domain => smtp_domain
+      :smtp_domain => smtp_domain,
+      :smtp_username => smtp_username,
+      :smtp_password => smtp_password,
+      :smtp_authenticaiton => smtp_authentication
     }
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
-    body = <<-BODY.gsub(/^\s+/, '')
+    body = <<-BODY.gsub(/^ {14}/, '')
             #{@event['check']['output']}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
@@ -52,12 +59,23 @@ class Mailer < Sensu::Handler
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     Mail.defaults do
-      delivery_method :smtp, {
-        :address => params[:smtp_addr],
-        :port    => params[:smtp_port],
-        :domain  => params[:smtp_domain],
-        :openssl_verify_mode => 'none'
+      delivery_options = {
+        :address    => params[:smtp_addr],
+        :port       => params[:smtp_port],
+        :domain     => params[:smtp_domain],
+        :openssl_verify_mode => 'none',
+        :enable_starttls_auto => true
       }
+
+      if !params[:smtp_username].nil?
+        delivery_options.merge! ({
+          :user_name        => params[:smtp_username],
+          :password         => params[:smtp_password],
+          :authentication   => params[:smtp_authentication]
+        })
+      end
+
+      delivery_method :smtp, delivery_options
     end
 
     begin
