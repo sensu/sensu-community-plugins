@@ -67,12 +67,13 @@ class Mailer < Sensu::Handler
         :enable_starttls_auto => true
       }
 
-      if !params[:smtp_username].nil?
-        delivery_options.merge! ({
-          :user_name        => params[:smtp_username],
-          :password         => params[:smtp_password],
-          :authentication   => params[:smtp_authentication]
-        })
+      unless params[:smtp_username]
+        auth_options = {
+        :user_name        => params[:smtp_username],
+        :password         => params[:smtp_password],
+        :authentication   => params[:smtp_authentication]
+        }
+        delivery_options.merge! auth_options
       end
 
       delivery_method :smtp, delivery_options
