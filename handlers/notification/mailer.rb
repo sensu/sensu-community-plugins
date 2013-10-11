@@ -67,7 +67,7 @@ class Mailer < Sensu::Handler
         :enable_starttls_auto => true
       }
 
-      unless params[:smtp_username]
+      unless params[:smtp_username].nil?
         auth_options = {
         :user_name        => params[:smtp_username],
         :password         => params[:smtp_password],
