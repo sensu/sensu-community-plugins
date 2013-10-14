@@ -90,7 +90,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
       unknown "A load balancer with the name '#{config[:load_balancer]}' was not found"
     end
 
-    num_instances = instances.count
+    num_instances = instances.count.to_f
     state = { 'OutOfService' => [], 'InService' => [], 'Unknown' => []}
     instances.each do |instance|
       state[instance[:state]] << instance[:instance].id
