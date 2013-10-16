@@ -2,7 +2,7 @@
 #
 # Get the length of a list and push it to graphite
 #
-# 
+#
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
