@@ -19,7 +19,7 @@ class RedisSlaveChecks < Sensu::Plugin::Check::CLI
     :short => "-p PORT",
     :long => "--port PORT",
     :description => "Redis Port to connect to",
-    :proc => proc {|p| p.to_i },
+    :proc => proc { |p| p.to_i },
     :required => false,
     :default => 6379
 
@@ -32,28 +32,28 @@ class RedisSlaveChecks < Sensu::Plugin::Check::CLI
     :short => "-c KB",
     :long => "--critlinkdown SEC",
     :description => "Seconds for the link down to issue CRITICAL",
-    :proc => proc {|p| p.to_i },
+    :proc => proc { |p| p.to_i },
     :required => true
 
   option :warn_link_down,
     :short => "-c KB",
     :long => "--warnlinkdown SEC",
     :description => "Seconds for the link down to issue WARN",
-    :proc => proc {|p| p.to_i },
+    :proc => proc { |p| p.to_i },
     :required => true
 
   option :crit_left_bytes,
     :short => "-c KB",
     :long => "--critleftbytes BYTES",
     :description => "Bytes to reach to issue CRITICAL on slave sync",
-    :proc => proc {|p| p.to_i },
+    :proc => proc { |p| p.to_i },
     :required => true
 
   option :warn_left_bytes,
     :short => "-c KB",
     :long => "--warnleftbytes BYTES",
     :description => "Bytes to reach to issue WARN on slave sync",
-    :proc => proc {|p| p.to_i },
+    :proc => proc { |p| p.to_i },
     :required => true
 
   def run
@@ -72,20 +72,20 @@ class RedisSlaveChecks < Sensu::Plugin::Check::CLI
 
       if (master_link_down_seconds >= crit_master_link_down_seconds)
         critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit:\
-		  Link has been down for #{master_link_down_seconds} seconds / #{crit_master_link_down_seconds} limit"
+                  Link has been down for #{master_link_down_seconds} seconds / #{crit_master_link_down_seconds} limit"
       elsif (master_link_down_seconds >= warn_master_link_down_seconds)
         warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit:\
-		 Link has been down for #{master_link_down_seconds} seconds / #{warn_master_link_down_seconds} limit"
+                 Link has been down for #{master_link_down_seconds} seconds / #{warn_master_link_down_seconds} limit"
       else
         ok 'Redis link down seconds is below defined limits'
       end
 
       if (master_sync_left_bytes >= crit_master_sync_left_bytes)
         critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit:\
-		  Link has been down for #{master_sync_left_bytes} seconds / #{crit_master_sync_left_bytes} limit"
+                  Link has been down for #{master_sync_left_bytes} seconds / #{crit_master_sync_left_bytes} limit"
       elsif (master_sync_left_bytes >= warn_master_sync_left_bytes)
         warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit:\
-		 Link has been down for #{master_sync_left_bytes} seconds / #{warn_master_sync_left_bytes} limit"
+                  Link has been down for #{master_sync_left_bytes} seconds / #{warn_master_sync_left_bytes} limit"
       else
         ok 'Redis sync left bytes is below defined limits'
       end
