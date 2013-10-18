@@ -71,17 +71,21 @@ class RedisSlaveChecks < Sensu::Plugin::Check::CLI
       warn_master_sync_left_bytes = config[:warn_left_bytes]
 
       if (master_link_down_seconds >= crit_master_link_down_seconds)
-        critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit: Link has been down for #{master_link_down_seconds} seconds / #{crit_master_link_down_seconds} limit"
+        critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit:\
+		  Link has been down for #{master_link_down_seconds} seconds / #{crit_master_link_down_seconds} limit"
       elsif (master_link_down_seconds >= warn_master_link_down_seconds)
-        warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit: Link has been down for #{master_link_down_seconds} seconds / #{warn_master_link_down_seconds} limit"
+        warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit:\
+		 Link has been down for #{master_link_down_seconds} seconds / #{warn_master_link_down_seconds} limit"
       else
         ok 'Redis link down seconds is below defined limits'
       end
 
       if (master_sync_left_bytes >= crit_master_sync_left_bytes)
-        critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit: Link has been down for #{master_sync_left_bytes} seconds / #{crit_master_sync_left_bytes} limit"
+        critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit:\
+		  Link has been down for #{master_sync_left_bytes} seconds / #{crit_master_sync_left_bytes} limit"
       elsif (master_sync_left_bytes >= warn_master_sync_left_bytes)
-        warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit: Link has been down for #{master_sync_left_bytes} seconds / #{warn_master_sync_left_bytes} limit"
+        warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit:\
+		 Link has been down for #{master_sync_left_bytes} seconds / #{warn_master_sync_left_bytes} limit"
       else
         ok 'Redis sync left bytes is below defined limits'
       end
