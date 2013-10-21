@@ -15,18 +15,15 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def get_mpstats
     kstat = Linux::Kstat.new
-    # The first 7 columns as described in PROC(5)
-    columns = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq']
     mpstat = {}
-    i = 0
+    i = ""
     until kstat[:"cpu#{i}"].nil? do
       mpstat[:"cpu#{i}"] = kstat[:"cpu#{i}"]
-      total_cpu_time = 0
-      columns.each do |column|
-        total_cpu_time += kstat[:"cpu#{i}"][:"#{column}"]
+      if i == ""
+        i = 0
+      else
+        i +=1
       end
-      mpstat[:"cpu#{i}"][:total] = total_cpu_time
-      i +=1
     end
     return mpstat
   end
@@ -44,17 +41,18 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     baseline_cpus = get_mpstats()
-    # measure for a second then get the delta
+    # measure for a second then get the deltas in jiffies
     sleep(1)
     sample_cpus = get_mpstats()
     delta_cpus = delta_cpu_metrics(baseline_cpus, sample_cpus)
+    cpu_count = sample_cpus.length - 1
     delta_cpus.each_pair do |cpu, columns|
-      # work out how long each cpu spent in jiffies
+      # assumes architecture's jiffie is 1/100th of a second
       columns.each_pair do |task, time|
-        if task != "total"
-          # Assumes architecture has jiffies as 1/100th of a second
-          output "#{config[:scheme]}.#{cpu}.#{task}", time
+        if "#{cpu}" == "cpu"
+          time = time/cpu_count
         end
+        output "#{config[:scheme]}.#{cpu}.#{task}", time
       end
     end
     ok
