@@ -4,6 +4,10 @@
 # ===
 #
 # Checks the status of bluepill process
+# Returns CRITICAL if proccess are down
+# Returns WARNING if processes are starting or unmonitored (unless one or more
+# process are down in which case CRITICAL is returned)
+# Returns OK if all is well or bluepill is not in $PATH
 #
 # James Legg mail@jameslegg.co.uk
 #
@@ -19,6 +23,13 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
     bluepill_groups = []
     warning_apps = []
     critical_apps = []
+
+    # Check if Bluepill is installed
+   `which bluepill`
+    unless $?.success?
+      ok "bluepill not installed"
+    end
+
     # Bluepill groups
     bluepill_status = `bluepill status 2>&1`
     bluepill_status.each_line do |line|
