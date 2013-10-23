@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# This handler removes Sensu client if it has been terminated in EC2.
+# This handler removes a Sensu client if it has been terminated in EC2.
 #
 # NOTE: The implementation for correlating Sensu clients to EC2 instances may
 # need to be modified to fit your organization. The current implementation
@@ -16,8 +16,8 @@
 # Requires a Sensu configuration snippet:
 #   {
 #     "aws": {
-#       "access_key_id": "adsafdafda",
-#       "secret_access_key": "qwuieohajladsafhj23nm",
+#       "access_key": "adsafdafda",
+#       "secret_key": "qwuieohajladsafhj23nm",
 #       "region": "us-east-1c"
 #     }
 #   }
@@ -103,8 +103,8 @@ class Ec2Node < Sensu::Handler
 
   def ec2
     @ec2 ||= begin
-      key = settings['aws']['access_key_id'] || ENV['AWS_ACCESS_KEY_ID']
-      secret = settings['aws']['secret_access_key'] || ENV['AWS_SECRET_ACCESS_KEY']
+      key = settings['aws']['access_key'] || ENV['AWS_ACCESS_KEY_ID']
+      secret = settings['aws']['secret_key'] || ENV['AWS_SECRET_ACCESS_KEY']
       region = settings['aws']['region'] || ENV['EC2_REGION']
       Fog::Compute.new({
         :provider => 'AWS',
