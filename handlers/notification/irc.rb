@@ -33,10 +33,14 @@ class IRC < Sensu::Handler
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
+  def action_to_string
+   @event['action'].eql?('resolve') ? "\x0300,03RESOLVED\x03" : "\x0301,04ALERT\x03"
+  end
+
   def handle
     params = {
       :uri => settings["irc"]["irc_server"],
-      :message => "#{event_name}: #{@event['check']['output']}",
+      :message => "#{action_to_string} #{event_name}: #{@event['check']['output']}",
       :ssl => settings["irc"]["irc_ssl"],
       :join => true,
     }

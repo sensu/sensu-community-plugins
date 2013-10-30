@@ -18,7 +18,7 @@ module Sensu::Extension
     def definition
       {
         type: 'extension',
-        name: 'redaction',
+        name: 'redact',
       }
     end
 
