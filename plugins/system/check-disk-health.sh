@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Check the SMART health status of physicla disks
+# Check the SMART health status of physical disks
 #
 # Date: 30/10/13
 # Author: Nick Barrett - EDITD
