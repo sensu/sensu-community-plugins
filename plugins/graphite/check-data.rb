@@ -100,8 +100,8 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       puts opt_parser if config[:help]
       exit
     end
-
-    retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
+    
+    retrieve_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
   end
 
   # name used in responses
@@ -118,7 +118,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   end
 
   # grab data from graphite
-  def retreive_data
+  def retrieve_data
     unless @raw_data
       begin
 
