@@ -32,8 +32,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :description => 'Elasticsearch server',
     :short => '-s SERVER',
     :long => '--server SERVER',
-    :default => 'localhost',
-    :required => false
+    :default => 'localhost'
 
   def get_es_resource(resource)
     begin
