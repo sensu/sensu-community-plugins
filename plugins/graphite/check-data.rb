@@ -84,6 +84,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :long => '--from FROM',
     :default => "-10mins"
 
+  option :below,
+    :description => 'warnings/critical if values below specified thresholds',
+    :short => '-b',
+    :long => '--below'
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -96,7 +101,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       exit
     end
 
-    retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
+    retrieve_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
   end
 
   # name used in responses
@@ -113,7 +118,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   end
 
   # grab data from graphite
-  def retreive_data
+  def retrieve_data
     unless @raw_data
       begin
 
@@ -149,10 +154,18 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Return alert if required
   def check(type)
     if config[type]
-      if @data.last > config[type] && !decreased?
-        send(type, "#{name} has passed #{type} threshold (#{@data.last})")
-      end
+      send(type, "#{name} has passed #{type} threshold (#{@data.last})") if (below?(type) || above?(type))
     end
+  end
+
+  # Check if value is below defined threshold
+  def below?(type)
+    config[:below] && @data.last < config[type]
+  end
+
+  # Check is value is above defined threshold
+  def above?(type)
+    (!config[:below]) and (@data.last > config[type]) and (!decreased?)
   end
 
   # Check if values have decreased within interval if given
