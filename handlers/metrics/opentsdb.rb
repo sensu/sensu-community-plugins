@@ -39,7 +39,7 @@ class OpenTSDB < Sensu::Handler
     host_name_len = settings['opentsdb']['hostname_length']
     metrics = @event['check']['output']
     check_name = @event['check']['name']
-    fqdn = %[hostname -f]
+    host_name = @event['client']['name']
     sock = TCPSocket.new(tsd_server, tsd_port)
   begin
     metrics.split("\n").each do |output_line|
@@ -52,6 +52,7 @@ class OpenTSDB < Sensu::Handler
       mutated_output = "put #{short_metric} #{epoch_time} #{metric_value} check=#{check_name} host=#{host_name} metric=#{long_metric}"
       timeout(3) do
         sock.puts mutated_output
+        puts mutated_output
       end
     end
     ensure
