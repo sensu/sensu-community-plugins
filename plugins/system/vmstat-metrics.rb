@@ -36,7 +36,7 @@ class VMStat < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    result = convert_integers(`vmstat 1 2|tail -n1`.split(" "))
+    result = convert_integers(`vmstat -S B 1 2|tail -n1`.split(" "))
     timestamp = Time.now.to_i
     metrics = {
       :procs => {
