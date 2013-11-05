@@ -91,6 +91,12 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :boolean => true,
     :default => false
 
+  option :ignore_no_data,
+    :description => 'Whether to ignore no data error from Graphite',
+    :long => '--ignore-no-data',
+    :boolean => true,
+    :default => false
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -144,7 +150,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       rescue OpenURI::HTTPError
         critical "Failed to connect to graphite server"
       rescue NoMethodError
-        critical "No data for time period and/or target"
+        if config[:ignore_no_data]
+          ok "No data, but we don't mind"
+        else
+          critical "No data for time period and/or target"
+        end
       end
     end
   end
