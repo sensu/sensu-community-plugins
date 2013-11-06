@@ -44,6 +44,11 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :short => '-q PAT',
          :long => '--pattern PAT'
 
+  option :encoding,
+         :description => "Explicit encoding page to read log file with",
+         :short => '-e ENCODING-PAGE',
+         :long => '--encoding ENCODING-PAGE'
+
   option :warn,
          :description => "Warning level if pattern has a group",
          :short => '-w N',
@@ -114,7 +119,14 @@ class CheckLog < Sensu::Plugin::Check::CLI
 
   def open_log(log_file)
     state_dir = config[:state_auto] || config[:state_dir]
-    @log = File.open(log_file)
+
+    # Opens file using optional encoding page.  ex: 'iso8859-1'
+    if config[:encoding]
+      @log = File.open(log_file, "r:#{config[:encoding]}")
+    else
+      @log = File.open(log_file)
+    end
+
     @state_file = File.join(state_dir, File.expand_path(log_file))
     @bytes_to_skip = begin
       File.open(@state_file) do |file|
