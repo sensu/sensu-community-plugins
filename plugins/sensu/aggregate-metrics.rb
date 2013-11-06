@@ -2,8 +2,9 @@
 #
 # Aggregate Metrics
 #
-# Walks the /aggregates API to return metrics for
-# the aggregated output states of each check.
+# If a check is specified, returns aggregate metrics
+# for it. Else, it walks the /aggregates API to return
+# metrics for each check found.
 #
 # sensu.aggregates.some_aggregated_check.ok 125 1380251999
 # sensu.aggregates.some_aggregated_check.warning  0 1380251999
@@ -68,6 +69,10 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--debug",
     :description => "Verbose output"
 
+  option :check,
+    :long => "--check CHECK",
+    :description => "Name of CHECK to return aggregated metrics for"
+
   def api_request(resource)
     begin
       request = RestClient::Resource.new(config[:api] + resource, {
@@ -115,13 +120,19 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
   end
 
+  def push_metrics(check)
+    timestamp, aggregate = get_aggregate(check)
+    puts "#{check} aggregates: #{aggregate}" if config[:debug]
+    aggregate.each do |result, count|
+      output "#{config[:scheme]}.#{check[:check]}.#{result}", count, timestamp
+    end
+  end
+
   def run
-    get_checks.each do |check|
-      timestamp, aggregate = get_aggregate(check[:check])
-      puts "#{check[:check]} aggregates: #{aggregate}" if config[:debug]
-      aggregate.each do |result, count|
-        output "#{config[:scheme]}.#{check[:check]}.#{result}", count, timestamp
-      end
+    if config[:check]
+      push_metrics(config[:check])
+    else
+      get_checks.each {|check| push_metrics(check)}
     end
     ok
   end
