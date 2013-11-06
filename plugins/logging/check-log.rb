@@ -120,9 +120,9 @@ class CheckLog < Sensu::Plugin::Check::CLI
   def open_log(log_file)
     state_dir = config[:state_auto] || config[:state_dir]
     
-    # Opens file using optional encoding page.  ex: 'r:iso8859-1'
+    # Opens file using optional encoding page.  ex: 'iso8859-1'
     if config[:encoding]
-      @log = File.open(log_file, config[:encoding])
+      @log = File.open(log_file, "r:#{config[:encoding]}")
     else
       @log = File.open(log_file)
     end
