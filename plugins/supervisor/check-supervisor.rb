@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+require 'rubygems' if RUBY_VERSION > "1.9"
+require 'sensu-plugin/check/cli'
+require 'ruby-supervisor'
+
+class CheckSupervisor < Sensu::Plugin::Check::CLI
+
+  option :host,
+    :description  => 'Hostname to check',
+    :short        => '-H HOST',
+    :long         => '--host HOST',
+    :default      => 'localhost'
+    
+  option :port,
+    :description  => 'Supervisor port',
+    :short        => '-p PORT',
+    :long         => '--port PORT',
+    :default      => 9001
+
+  option :help,
+    :description  => 'Show this message',
+    :short        => '-h',
+    :long         => '--help'
+    
+ 
+  def run
+
+    if config[:help]
+      puts opt_parser
+      exit
+    end
+
+    begin
+      @super = RubySupervisor::Client.new(config[:host], config[:port])
+    rescue
+      critical "Tried to access #{config[:host]} but failed"
+    end
+
+    @super.processes.each do |process|
+      critical "#{process["name"]} not running" if process["statename"] != "RUNNING"
+    end
+
+    ok "All processes running"
+
+
+  end #def run
+
+end # class CheckSupervisor
