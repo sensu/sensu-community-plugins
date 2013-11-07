@@ -24,7 +24,7 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
     :short        => '-H HOST',
     :long         => '--host HOST',
     :default      => 'localhost'
-    
+
   option :port,
     :description  => 'Supervisor port',
     :short        => '-p PORT',
@@ -35,8 +35,7 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
     :description  => 'Show this message',
     :short        => '-h',
     :long         => '--help'
-    
- 
+
   def run
 
     if config[:help]
@@ -56,7 +55,6 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
 
     ok "All processes running"
 
-
-  end #def run
+  end # def run
 
 end # class CheckSupervisor
