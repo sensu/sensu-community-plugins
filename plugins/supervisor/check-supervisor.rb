@@ -5,7 +5,7 @@
 #
 # Check all supervisor processes are running
 #
-# Requires SNMP gem
+# Requires ruby-supervisor gem
 #
 #   Author: Johan van den Dorpe
 #   Copyright (c) 2013 Double Negative Limited
