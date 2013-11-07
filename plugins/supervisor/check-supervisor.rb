@@ -1,4 +1,17 @@
 #!/usr/bin/env ruby
+#
+# Check Supervisor
+# ===
+#
+# Check all supervisor processes are running
+#
+# Requires SNMP gem
+#
+#   Author: Johan van den Dorpe
+#   Copyright (c) 2013 Double Negative Limited
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 require 'rubygems' if RUBY_VERSION > "1.9"
 require 'sensu-plugin/check/cli'
