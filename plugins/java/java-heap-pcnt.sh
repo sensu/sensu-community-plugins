@@ -11,10 +11,11 @@
 
 # Also make sure the user "sensu" can sudo without password
 
-while getopts 'w:c:hp' OPT; do
+while getopts 'w:c:n:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
     c)  CRIT=$OPTARG;;
+    n)  NAME=$OPTARG;;
     h)  hlp="yes";;
     p)  perform="yes";;
     *)  unknown="yes";;
@@ -23,8 +24,9 @@ done
 
 # usage
 HELP="
-    usage: $0 [ -w value -c value -p -h ]
+    usage: $0 [ -n value -w value -c value -p -h ]
 
+        -n --> Name of JVM process < value
         -w --> Warning Percentage < value
         -c --> Critical Percentage < value
         -p --> print out performance data
@@ -38,9 +40,11 @@ fi
 
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
+NAME=$(NAME:=0}
+
 #Get PID of JVM. 
 #At this point grep for the name of the java process running your jvm.
-PID=$(sudo jps | grep Bootstrap | awk '{ print $1}')
+PID=$(sudo jps | grep $NAME | awk '{ print $1}')
 
 #Get heap capacity of JVM
 TotalHeap=$(sudo jstat -gccapacity $PID  | tail -n 1 | awk '{ print ($4 + $5 + $6 + $10) / 1024 }')
