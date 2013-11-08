@@ -40,7 +40,7 @@ fi
 
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
-NAME=$(NAME:=0}
+NAME=${NAME:=0}
 
 #Get PID of JVM. 
 #At this point grep for the name of the java process running your jvm.
