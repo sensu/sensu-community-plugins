@@ -2,12 +2,9 @@
 #
 # Evaluate percentage of heap usage on specfic Tomcat backed JVM from Linux based systems based on percentage
 # This was forked from Sensu Community Plugins
-# Date: 2007-11-12
-# Author: Thomas Borger - ESG
-# Date: 2012-04-02
-# Modified: Norman Harman - norman.harman@mutualmobile.com
+
 # Date: 2013-9-30
-# Modified: Mario Harvey - Zumetrics
+# Modified: Mario Harvey - badmadrad.com
 
 # You must have openjdk-7-jdk and openjdk-7-jre packages installed
 # http://openjdk.java.net/install/
