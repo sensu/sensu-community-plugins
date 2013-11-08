@@ -10,7 +10,8 @@
 # ------------------
 #
 # Optionally, with `--load-per-proc`, this plugin will calculate load per
-# processor from the raw load average by dividing by the number of processors.
+# processor from the raw load average by dividing load average by the number
+# of processors.
 #
 # The number of CPUs is determined by reading `/proc/cpuinfo`. This makes the
 # feature Linux specific. Other OSs can be supported by adding OS # detection
