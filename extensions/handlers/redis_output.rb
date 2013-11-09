@@ -20,7 +20,7 @@ module Sensu::Extension
       opts = @settings["redis_output"]
 
       output = Oj.load(event)[:check][:output]
-      output = output.split("\m") if opts["split"]
+      output = output.split("\n") if opts["split"]
 
       Array(output).each do |e|
         case opts["data_type"]
