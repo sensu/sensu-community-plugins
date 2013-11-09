@@ -1,31 +1,28 @@
 module Sensu::Extension
   class RedisOutput < Handler
-    def definition
-      {
-        type: 'extension',
-        name: 'redis_output',
-      }
-    end
-
     def name
-      definition[:name]
+      'redis_output'
     end
 
     def description
       'outputs events output to a redis list or channel'
     end
 
+    def post_init
+      @redis = Sensu::Redis.connect({
+        :host => @settings["redis_output"]["host"],
+        :port => @settings["redis_output"]["port"] || 6379,
+        :database => @settings["redis_output"]["db"] || 0,
+      })
+    end
+
     def run(event)
       opts = @settings["redis_output"]
 
-      opts["db"]   ||= 0
-      opts["port"] ||= 6379
-      @redis ||= Sensu::Redis.connect(:host => opts["host"], :port => opts["port"], :db => opts["db"])
-
       output = Oj.load(event)[:check][:output]
-      output = opts["split"] ? output.split("\n") : Array(output)
+      output = output.split("\m") if opts["split"]
 
-      output.each do |e|
+      Array(output).each do |e|
         case opts["data_type"]
         when "list"
           @redis.lpush(opts["key"], e)
