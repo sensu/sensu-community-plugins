@@ -41,9 +41,10 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
-  option :load_per_processor,
-    :description => "Calculate load per processor instead of raw load averages.",
-    :long => "--load-per-proc",
+  option :per_core,
+    :description => 'Divide load average results by cpu/core count',
+    :short => "-p",
+    :long => "--per-core",
     :boolean => true,
     :default => false
 
@@ -56,7 +57,7 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
     result = result[-3..-1]
 
     timestamp = Time.now.to_i
-    if config[:load_per_processor]
+    if config[:per_core]
       metrics = {
         :load_avg => {
           :one => (result[0].to_f / number_of_cores).round(2),
