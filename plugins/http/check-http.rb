@@ -21,6 +21,7 @@ require 'net/https'
 
 class CheckHTTP < Sensu::Plugin::Check::CLI
 
+  option :ua, :short => '-x USER-AGENT', :long => '--user-agent USER-AGENT', :default => 'Sensu-HTTP-Check'
   option :url, :short => '-u URL'
   option :host, :short => '-h HOST'
   option :path, :short => '-p PATH'
@@ -80,7 +81,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       end
     end
 
-    req = Net::HTTP::Get.new(config[:path])
+    req = Net::HTTP::Get.new(config[:path], {'User-Agent' => config[:ua]})
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
