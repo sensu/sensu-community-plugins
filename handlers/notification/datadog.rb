@@ -20,7 +20,7 @@ class DatadogNotif < Sensu::Handler
     end
   end
 
-  #Return a low priotiry for resolve and warn events, normal for critical and unkown
+  # Return a low priotiry for resolve and warn events, normal for critical and unkown
   def get_priority
     case @event['status']
     when '0', '1'
@@ -43,9 +43,9 @@ class DatadogNotif < Sensu::Handler
     priority = get_priority
     tags = []
     tags.push('sensu')
-    #allow for tags to be set in the configuration, this could be used to indicate environment
+    # allow for tags to be set in the configuration, this could be used to indicate environment
     tags.concat(settings['datadog']['tags']) unless settings['datadog']['tags'].nil? and !settings['datadog']['tags'].kind_of(Array)
-    #add the subscibers for the event to the tags
+    # add the subscibers for the event to the tags
     tags.concat(@event['check']['subscribers']) unless @event['check']['subscribers'].nil?
     begin
       timeout(3) do
@@ -56,7 +56,7 @@ class DatadogNotif < Sensu::Handler
                                             :tags => tags,
                                             :alert_type => action,
                                             :priority => priority,
-                                            :source_type_name => 'nagios', #make events appear as nagios alerts so the weekly nagios report can be produced
+                                            :source_type_name => 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
                                             :aggregation_key => @event['check']['name']
                                           ), :host => @event['client']['name']
                         )
