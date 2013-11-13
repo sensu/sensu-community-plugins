@@ -41,7 +41,7 @@ class CheckPorts < Sensu::Plugin::Check::CLI
 
   def run
 
-    stdout, stderr, exit_status = Open3.capture3(
+    stdout, stderr = Open3.capture3(
       ENV,
       "nmap -Pn -p #{ config[:ports] } #{ config[:host] }"
     )
@@ -59,7 +59,7 @@ class CheckPorts < Sensu::Plugin::Check::CLI
       line.scan(/(\d+).tcp\s+(\w+)\s+(\w+)/).each do |status|
         port_checks[status[1]] ||= []
         port_checks[status[1]].push status[0]
-        check_pass = false if !status[1]['open']
+        check_pass = false unless status[1]['open']
       end
 
     end
