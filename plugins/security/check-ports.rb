@@ -1,29 +1,32 @@
 #!/usr/bin/env ruby
 #
-# Check to see the status of port(s) with nmap.
+# check-ports.rb
+#   Check to see the status of port(s) with nmap.
 # ===
 #
-# Fetch port status using nmap. This check is good for catching bad network ACLs
+# Description
+#   Fetch port status using nmap. This check is good for catching bad network ACLs
 #   or service down events for network resources.
 #
-# Example
+# Dependancies
+# - nmap (tested with Nmap 6.25)
+#
+# Examples
 # -------
 #
-# $ ./check-ports.rb --host some_server --ports 5671,5672
+#   $ ./check-ports.rb --host some_server --ports 5671,5672
 #
 # Pass condition
-# CheckPorts OK: open:5671,5672
+#   CheckPorts OK: open:5671,5672
 #
 # Fail condition
-# CheckPorts WARNING: open:5671 filtered:5672
+#   CheckPorts WARNING: open:5671 filtered:5672
 #
 # Copyright 2013 GoDaddy.com, LLC <jjmanzer@godaddy.com>
-#
 # Released under the same terms as Sensu (the MIT license); see LICENSE for details.
 
 require 'open3'
 require 'sensu-plugin/check/cli'
-require 'socket'
 require 'json'
 
 class CheckPorts < Sensu::Plugin::Check::CLI
