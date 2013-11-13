@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# Evaluate percentage of heap usage on specfic Tomcat backed JVM from Linux based systems based on percentage
+# Collect metrics on your JVM and allow you to trace usage in graphite
+
 # Modified: Mario Harvey - badmadrad.com
 
 # You must have openjdk-7-jdk and openjdk-7-jre packages installed
