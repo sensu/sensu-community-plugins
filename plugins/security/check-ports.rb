@@ -46,7 +46,7 @@ class CheckPorts < Sensu::Plugin::Check::CLI
 
     stdout, stderr = Open3.capture3(
       ENV,
-      "nmap -Pn -p #{ config[:ports] } #{ config[:host] }"
+      "nmap -P0 -p #{ config[:ports] } #{ config[:host] }"
     )
 
     case stderr
