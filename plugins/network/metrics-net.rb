@@ -1,20 +1,20 @@
 #!/usr/bin/env ruby
 #
-# Linux network interface packet metrics
+# Linux network interface metrics
 # ====
 #
-# Simple plugin that fetchs packet metrics from all interfaces
-# on the box.
+# Simple plugin that fetchs metrics from all interfaces
+# on the box using the /sys/class interface.
 #
-# Use with graphite and the `nonNegativeDerivative()` function
-# to construct 'packets-per-second' graphs for your hosts.
+# Use the data with graphite's `nonNegativeDerivative()` function
+# to construct per-second graphs for your hosts.
 #
 # Loopback iface (`lo`) is ignored.
 #
 # Compat
 # ------
 #
-# This plugin uses the `/sys/class/net/<iface>/statistics/{rx,tx}_packets`
+# This plugin uses the `/sys/class/net/<iface>/statistics/{rx,tx}_*`
 # files to fetch stats. On older linux boxes without /sys, this same
 # info can be fetched from /proc/net/dev but additional parsing
 # will be required.
