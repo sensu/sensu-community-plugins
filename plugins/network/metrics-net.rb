@@ -54,8 +54,16 @@ class LinuxPacketMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       tx_pkts = File.open(iface_path + '/statistics/tx_packets').read.strip
       rx_pkts = File.open(iface_path + '/statistics/rx_packets').read.strip
+      tx_bytes = File.open(iface_path + '/statistics/tx_bytes').read.strip
+      rx_bytes = File.open(iface_path + '/statistics/rx_bytes').read.strip
+      tx_errors = File.open(iface_path + '/statistics/tx_errors').read.strip
+      rx_errors = File.open(iface_path + '/statistics/rx_errors').read.strip
       output "#{config[:scheme]}.#{iface}.tx_packets", tx_pkts, timestamp
       output "#{config[:scheme]}.#{iface}.rx_packets", rx_pkts, timestamp
+      output "#{config[:scheme]}.#{iface}.tx_bytes", tx_bytes, timestamp
+      output "#{config[:scheme]}.#{iface}.rx_bytes", rx_bytes, timestamp
+      output "#{config[:scheme]}.#{iface}.tx_errors", tx_errors, timestamp
+      output "#{config[:scheme]}.#{iface}.rx_errors", rx_errors, timestamp
     end
     ok
   end
