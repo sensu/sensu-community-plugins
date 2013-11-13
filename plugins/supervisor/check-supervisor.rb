@@ -30,13 +30,13 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
     :short        => '-p PORT',
     :long         => '--port PORT',
     :default      => 9001
-    
+
   option :critical,
     :description  => 'Supervisor states to consider critical',
     :short        => '-c STATE[,STATE...]',
     :long         => '--critical STATE[,STATE...]',
     :proc         => Proc.new { |v| v.upcase.split(",") },
-    :default      => ['FATAL'] 
+    :default      => ['FATAL']
 
   option :help,
     :description  => 'Show this message',
@@ -54,10 +54,10 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
       @super = RubySupervisor::Client.new(config[:host], config[:port])
     rescue
       critical "Tried to access #{config[:host]} but failed"
-    end    
+    end
 
     @super.processes.each do |process|
-      critical "#{process["name"]} not running" if config[:critical].include?(process["statename"])
+      critical "#{process["name"]} not running: #{process["statename"].downcase}" if config[:critical].include?(process["statename"])
     end
 
     ok "All processes running"
