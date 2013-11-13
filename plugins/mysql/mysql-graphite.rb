@@ -83,6 +83,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Open_files' =>             'openFiles',
         'Open_tables' =>            'openTables',
         'Opened_tables' =>          'openedTables',
+        'Prepared_stmt_count' =>    'preparedStmtCount',
         'Seconds_Behind_Master' =>  'slaveLag',
         'Select_full_join' =>       'fullJoins',
         'Select_full_range_join' => 'fullRangeJoins',
@@ -167,6 +168,9 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Innodb_rows_read' =>                 'rowsRead',
         'Innodb_rows_deleted' =>              'rowsDeleted',
         'Innodb_rows_inserted' =>             'rowsInserted'
+      },
+      'configuration' => {
+        'Max_prepared_stmt_count' =>          'MaxPreparedStmtCount'
       }
     }
 
@@ -206,6 +210,21 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       end
     rescue Exception => e
       puts "Error querying slave status: #{e}" if config[:verbose]
+    end
+
+    begin
+      variables_results = mysql.query("SHOW GLOBAL VARIABLES")
+
+      category = 'configuration'
+      variables_results.each do |row|
+        metrics[category].each do |metric, desc|
+          if metric.casecmp(row["Variable_name"]) == 0
+            output "#{config[:scheme]}.#{category}.#{desc}", row["Value"]
+          end
+        end
+      end
+    rescue => e
+      puts e.message
     end
 
     ok

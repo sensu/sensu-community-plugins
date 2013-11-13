@@ -24,19 +24,25 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
     :short        => '-H HOST',
     :long         => '--host HOST',
     :default      => 'localhost'
-    
+
   option :port,
     :description  => 'Supervisor port',
     :short        => '-p PORT',
     :long         => '--port PORT',
     :default      => 9001
 
+  option :critical,
+    :description  => 'Supervisor states to consider critical',
+    :short        => '-c STATE[,STATE...]',
+    :long         => '--critical STATE[,STATE...]',
+    :proc         => Proc.new { |v| v.upcase.split(",") },
+    :default      => ['FATAL']
+
   option :help,
     :description  => 'Show this message',
     :short        => '-h',
     :long         => '--help'
-    
- 
+
   def run
 
     if config[:help]
@@ -51,12 +57,11 @@ class CheckSupervisor < Sensu::Plugin::Check::CLI
     end
 
     @super.processes.each do |process|
-      critical "#{process["name"]} not running" if process["statename"] != "RUNNING"
+      critical "#{process["name"]} not running: #{process["statename"].downcase}" if config[:critical].include?(process["statename"])
     end
 
     ok "All processes running"
 
-
-  end #def run
+  end # def run
 
 end # class CheckSupervisor

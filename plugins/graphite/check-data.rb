@@ -100,7 +100,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       puts opt_parser if config[:help]
       exit
     end
-    
+
     retrieve_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
   end
 
@@ -165,7 +165,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check is value is above defined threshold
   def above?(type)
-    (not config[:below]) and (@data.last > config[type]) and (not decreased?)
+    (!config[:below]) and (@data.last > config[type]) and (!decreased?)
   end
 
   # Check if values have decreased within interval if given
