@@ -4,9 +4,7 @@
 # no longer exists.
 #
 # Requires the following Rubygems (`gem install $GEM`):
-#   - sensu-plugin
-#   - spice (~> 1.0.6)
-#   - rest-client
+#   - ridley
 #
 # Requires a Sensu configuration snippet:
 #   {
@@ -42,58 +40,46 @@
 # Released under the same terms as Sensu (the MIT license); see
 # LICENSE for details.
 
-require "rubygems"
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require "sensu-handler"
-require "spice"
-require "rest_client"
-require "timeout"
+require "ridley"
 
 class ChefNode < Sensu::Handler
   def chef_node_exists?
-    Spice.setup do |s|
-      s.server_url   = settings["chef"]["server_url"]
-      s.client_name  = settings["chef"]["client_name"]
-      s.client_key   = Spice.read_key_file(settings["chef"]["client_key"])
-      s.chef_version = settings["chef"]["version"] || "11.0.0"
-      unless settings["chef"]["verify_ssl"].nil?
-        s.connection_options = {
-          :ssl => {
-            :verify => settings["chef"]["verify_ssl"]
-          }
-        }
-      end
-    end
+    retried = 0
     begin
-      timeout(8) do
-        !!Spice.node(@event["client"]["name"])
+      Ridley.open(
+        server_url: settings['chef']['server_url'],
+        client_name: settings['chef']['client_name'],
+        client_key: settings['chef']['client_key'],
+        ssl: {
+          verify: settings['chef']['client_key'].nil? ? true : settings["chef"]["verify_ssl"]
+        }
+      ) do |r|
+        r.node.find(@event['client']['name']) ? true : false
       end
-    rescue Spice::Error::NotFound
-      false
+    # FIXME: Why is this necessary?  Ridley works fine outside of Sensu
+    rescue Celluloid::Error
+      Celluloid.boot
+      retried += 1
+      if retried < 2
+        retry
+      else
+        puts "CHEF-NODE: Ridley is broken: #{error.inspect}"
+        true
+      end
     rescue => error
-      puts "Chef Node - Unexpected error: #{error.message}"
+      puts "CHEF-NODE: Unexpected error: #{error.inspect}"
       true
     end
   end
 
   def delete_sensu_client!
-    client_name = @event["client"]["name"]
-    api_url = "http://"
-    api_url << settings["api"]["host"]
-    api_url << ":"
-    api_url << settings["api"]["port"].to_s
-    api_url << "/clients/"
-    api_url << client_name
     begin
-      timeout(8) do
-        RestClient::Resource.new(
-          api_url,
-          :user     => settings["api"]["user"],
-          :password => settings["api"]["password"]
-        ).delete
-      end
-      puts "Chef Node - Successfully deleted Sensu client: #{client_name}"
+      api_request(:DELETE, '/clients/' + @event['client']['name'])
+      puts "CHEF-NODE: Successfully deleted Sensu client #{@event['client']['name']}"
     rescue => error
-      puts "Chef Node - Unexpected error: #{error.message}"
+      puts "CHEF-NODE: Unexpected error: #{error.inspect}"
     end
   end
 
