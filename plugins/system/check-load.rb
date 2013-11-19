@@ -17,7 +17,7 @@ if RUBY_VERSION < '1.9.0'
 
   # round(n) doesn't exist in ruby < 1.9
   class Float
-    alias oldround:round
+    alias_method :oldround, :round
       def round(precision = nil)
           if precision.nil?
               return self
