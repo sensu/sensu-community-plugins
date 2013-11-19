@@ -10,8 +10,6 @@
 
 # rubocop:disable HandleExceptions
 
-require 'sensu-plugin/check/cli'
-
 if RUBY_VERSION < '1.9.0'
   require 'rubygems'
 
@@ -27,6 +25,8 @@ if RUBY_VERSION < '1.9.0'
       end
   end
 end
+
+require 'sensu-plugin/check/cli'
 
 class LoadAverage
   def initialize(per_core = false)
