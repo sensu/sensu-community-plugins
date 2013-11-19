@@ -97,6 +97,12 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :boolean => true,
     :default => false
 
+  option :ignore_http_error,
+    :description => 'Whether to ignore HTTP errors from Graphite',
+    :long => '--ignore-http-error',
+    :boolean => true,
+    :default => false
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -148,7 +154,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         @step = ((@end - @start) / @raw_data['datapoints'].size.to_f).ceil
         nil
       rescue OpenURI::HTTPError
-        critical "Failed to connect to graphite server"
+        if config[:ignore_http_error]
+          ok "HTTP error, but we don't mind"
+        else
+          critical "Failed to connect to graphite server"
+        end
       rescue NoMethodError
         if config[:ignore_no_data]
           ok "No data, but we don't mind"
