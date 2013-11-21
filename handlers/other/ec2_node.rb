@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# This handler removes a Sensu client if it has been terminated in EC2.
+# This handler deletes a Sensu client if it's been stopped or terminated in EC2
 #
 # NOTE: The implementation for correlating Sensu clients to EC2 instances may
 # need to be modified to fit your organization. The current implementation
