@@ -93,7 +93,7 @@ class Ec2Node < Sensu::Handler
   end
 
   def ec2_node_exists?
-    running_instances = ec2.servers.reject { |s| s.state == 'terminated' }
+    running_instances = ec2.servers.select { |s| s.state == 'running' }
     instance_ids = running_instances.collect { |s| s.id }
     instance_ids.each do |id|
       return true if id == @event['client']['name']
