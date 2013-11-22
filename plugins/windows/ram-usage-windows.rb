@@ -32,7 +32,11 @@ class RamMetric < Sensu::Plugin::Metric::CLI::Graphite
     temp = tempArr1[2].split(",")[1]
     ramAvailableInBytes = temp[1, temp.length - 3].to_f
     timestamp = Time.now.utc.to_i
-    IO.popen("wmic OS get TotalVisibleMemorySize /Value"){|io| while (line=io.gets) do tempArr2.push(line) end }
+    IO.popen("wmic OS get TotalVisibleMemorySize /Value"){
+      |io| while (line=io.gets) do
+          tempArr2.push(line)
+          end
+    }
     totalRam = tempArr2[4].split('=')[1].to_f
     totalRamInBytes = totalRam*1000.0
     ramUsePercent=(totalRamInBytes - ramAvailableInBytes)*100.0/(totalRamInBytes)
