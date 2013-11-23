@@ -24,19 +24,17 @@ class RamMetric < Sensu::Plugin::Metric::CLI::Graphite
   def getRamUsage
     tempArr1=[]
     tempArr2=[]
-    IO.popen("typeperf -sc 1 \"Memory\\Available bytes\" "){
-        |io| while (line=io.gets) do
-                tempArr1.push(line)
-            end
-    }
+    result1 = IO.popen("typeperf -sc 1 \"Memory\\Available bytes\" ")
+    while (line=result1.gets) do
+      tempArr1.push(line)
+    end
     temp = tempArr1[2].split(",")[1]
     ramAvailableInBytes = temp[1, temp.length - 3].to_f
     timestamp = Time.now.utc.to_i
-    IO.popen("wmic OS get TotalVisibleMemorySize /Value"){
-      |io| while (line=io.gets) do
-          tempArr2.push(line)
-          end
-    }
+    result2 = IO.popen("wmic OS get TotalVisibleMemorySize /Value")
+    while (line=result2.gets) do
+      tempArr2.push(line)
+    end
     totalRam = tempArr2[4].split('=')[1].to_f
     totalRamInBytes = totalRam*1000.0
     ramUsePercent=(totalRamInBytes - ramAvailableInBytes)*100.0/(totalRamInBytes)

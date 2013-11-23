@@ -23,13 +23,10 @@ class CpuMetric < Sensu::Plugin::Metric::CLI::Graphite
   def getcpuLoad
     tempArr=[]
     timestamp = Time.now.utc.to_i
-    IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\" "){
-        |io| while (line = io.gets) do
-            if line != ""
-                tempArr.push(line)
-            end
-        end
-    }
+    io= IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\" ") # { |io|
+    while (line = io.gets) do
+        tempArr.push(line)
+    end
     temp = tempArr[2].split(",")[1]
     cpuMetric = temp[1, temp.length - 3].to_f
     return [cpuMetric, timestamp]
