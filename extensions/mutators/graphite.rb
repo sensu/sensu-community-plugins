@@ -37,7 +37,7 @@ module Sensu::Extension
     def post_init
       @reverse_mode = false
       if settings['graphite']
-        if settings['graphite']['reverse']
+        if settings['graphite']['reverse'] == true
           @reverse_mode = true
         end
       end
