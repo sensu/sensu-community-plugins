@@ -45,9 +45,11 @@ module Sensu::Extension
 
     def run(event, &block)
       client_name = event[:client][:name]
-      renamed_client_name = @reverse_mode ?
-        client_name.split('.').reverse.join('.') :
-        client_name.gsub('.', '_')
+      if @reverse_mode
+        renamed_client_name = client_name.split('.').reverse.join('.')
+      else
+        renamed_client_name = client_name.gsub('.', '_')
+      end
       mutated = event[:check][:output].gsub(client_name, renamed_client_name)
       block.call(mutated, 0)
     end
