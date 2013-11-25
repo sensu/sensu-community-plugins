@@ -5,17 +5,18 @@
 #
 # It transforms parameter name if it's a hostname.
 #
-# There are two transforms you can choose:
-#    * Replace dots in FQDN to underscores (default)
+# There are two transforms you can apply separately:
+#    * Replace dots in FQDN to user specified strings.
 #      e.g. foo.example.com -> foo_example_com
-#    * Output the hostname in reverse order. (reverse mode)
+#    * Output the hostname in reverse order.
 #      e.g. foo.example.com -> com.example.foo
 #
-# To enable the reverse mode, put this snippet in your configurations:
+# The default configuration is:
 #
 #    {
 #      "graphite": {
-#        "reverse": true
+#        "reverse": false,
+#        "replace": "_"
 #      }
 #    }
 #
@@ -35,21 +36,27 @@ module Sensu::Extension
     end
 
     def post_init
-      @reverse_mode = false
+      @reverse = false
+      @replace = '_'
+
       if settings['graphite']
         if settings['graphite']['reverse'] == true
-          @reverse_mode = true
+          @reverse = true
+        end
+        if settings['graphite']['replace']
+          @replace = settings['graphite']['replace']
         end
       end
     end
 
     def run(event, &block)
       client_name = event[:client][:name]
-      if @reverse_mode
+      if @reverse
         renamed_client_name = client_name.split('.').reverse.join('.')
       else
-        renamed_client_name = client_name.gsub('.', '_')
+        renamed_client_name = client_name
       end
+      renamed_client_name = renamed_client_name.gsub('.', @replace)
       mutated = event[:check][:output].gsub(client_name, renamed_client_name)
       block.call(mutated, 0)
     end
