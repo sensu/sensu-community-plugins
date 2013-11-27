@@ -9,6 +9,7 @@ require 'sensu-handler'
 require 'uri'
 require 'net/http'
 require 'net/https'
+require 'json'
 
 class VictorOps < Sensu::Handler
 
@@ -30,22 +31,20 @@ class VictorOps < Sensu::Handler
           message_type = 'RECOVERY'
         end
 
-payload = <<-eos
-{
-  "message_type": "#{message_type}",
-  "state_message": "#{state_message.chomp}",
-  "entity_id": "#{entity_id}",
-  "host_name": "#{host}",
-  "monitoring_tool": "sensu"
-}
-eos
+        payload = Hash.new
+        payload[:message_type] = message_type
+        payload[:state_message] = state_message.chomp
+        payload[:entity_id] = entity_id
+        payload[:host_name] = host
+        payload[:monitoring_tool] = "sensu"
+
         uri   = URI("#{config['api_url']}/#{config['routing_key']}")
         https = Net::HTTP.new(uri.host, uri.port)
 
         https.use_ssl = true
 
         request      = Net::HTTP::Post.new(uri.path)
-        request.body = payload
+        request.body = payload.to_json
         response     = https.request(request)
 
         if response.code == '200'
