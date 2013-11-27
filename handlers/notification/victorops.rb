@@ -22,7 +22,6 @@ class VictorOps < Sensu::Handler
     description = @event['check']['notification']
     description ||= [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     host = @event['client']['name']
-    check = @event['check']['name']
     entity_id = incident_key
     state_message = description
     begin
