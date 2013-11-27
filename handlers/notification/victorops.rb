@@ -47,7 +47,7 @@ eos
 
         https.use_ssl = true
 
-        request      = Net::HTTP::Post.new(uri.path, initheader = {'Content-Type' =>'application/json'})
+        request      = Net::HTTP::Post.new(uri.path)
         request.body = payload
         response     = https.request(request)
 
