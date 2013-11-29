@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+#
+# mpstat style output for each CPU on system
+# ===
+#
+# Uses the linux/kstat rubygem to do the hard work in /proc/stat
+# includes individual cpu and overall cpu usage
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
