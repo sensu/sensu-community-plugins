@@ -36,7 +36,7 @@ class Mailer < Sensu::Handler
     smtp_username = settings['mailer']['smtp_username'] || nil
     smtp_password = settings['mailer']['smtp_password'] || nil
     smtp_authentication = settings['mailer']['smtp_authentication'] || :plain
-    smtp_enable_starttls_auto = settings['mailer']['smtp_enable_starttls_auto'] == "false" ? false:true
+    smtp_enable_starttls_auto = settings['mailer']['smtp_enable_starttls_auto'] == "false" ? false : true
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
