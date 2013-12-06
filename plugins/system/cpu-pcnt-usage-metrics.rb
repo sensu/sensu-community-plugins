@@ -16,6 +16,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
     cpu_metrics = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq', 'steal', 'guest']
     File.open("/proc/stat", "r").each_line do |line|
       info = line.split(/\s+/)
+      next if info.empty?
       name = info.shift
 
       # we are matching TOTAL stats and returning a hash of values
