@@ -10,7 +10,7 @@
 
 
 # get devices (capture /dev/sd* and /dev/hd*)
-DEVICES=$( lsblk | awk '/^[sh]/ {print $1}' )
+DEVICES=$( lsblk | awk '/ disk *$/ {print $1}' )
 # store fails
 FAILS=()
 

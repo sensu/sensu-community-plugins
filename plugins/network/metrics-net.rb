@@ -1,20 +1,20 @@
 #!/usr/bin/env ruby
 #
-# Linux network interface packet metrics
+# Linux network interface metrics
 # ====
 #
-# Simple plugin that fetchs packet metrics from all interfaces
-# on the box.
+# Simple plugin that fetchs metrics from all interfaces
+# on the box using the /sys/class interface.
 #
-# Use with graphite and the `nonNegativeDerivative()` function
-# to construct 'packets-per-second' graphs for your hosts.
+# Use the data with graphite's `nonNegativeDerivative()` function
+# to construct per-second graphs for your hosts.
 #
 # Loopback iface (`lo`) is ignored.
 #
 # Compat
 # ------
 #
-# This plugin uses the `/sys/class/net/<iface>/statistics/{rx,tx}_packets`
+# This plugin uses the `/sys/class/net/<iface>/statistics/{rx,tx}_*`
 # files to fetch stats. On older linux boxes without /sys, this same
 # info can be fetched from /proc/net/dev but additional parsing
 # will be required.
@@ -49,13 +49,22 @@ class LinuxPacketMetrics < Sensu::Plugin::Metric::CLI::Graphite
     timestamp = Time.now.to_i
 
     Dir.glob('/sys/class/net/*').each do |iface_path|
+      next if File.file?(iface_path)
       iface = File.basename(iface_path)
       next if iface == 'lo'
 
       tx_pkts = File.open(iface_path + '/statistics/tx_packets').read.strip
       rx_pkts = File.open(iface_path + '/statistics/rx_packets').read.strip
+      tx_bytes = File.open(iface_path + '/statistics/tx_bytes').read.strip
+      rx_bytes = File.open(iface_path + '/statistics/rx_bytes').read.strip
+      tx_errors = File.open(iface_path + '/statistics/tx_errors').read.strip
+      rx_errors = File.open(iface_path + '/statistics/rx_errors').read.strip
       output "#{config[:scheme]}.#{iface}.tx_packets", tx_pkts, timestamp
       output "#{config[:scheme]}.#{iface}.rx_packets", rx_pkts, timestamp
+      output "#{config[:scheme]}.#{iface}.tx_bytes", tx_bytes, timestamp
+      output "#{config[:scheme]}.#{iface}.rx_bytes", rx_bytes, timestamp
+      output "#{config[:scheme]}.#{iface}.tx_errors", tx_errors, timestamp
+      output "#{config[:scheme]}.#{iface}.rx_errors", rx_errors, timestamp
     end
     ok
   end

@@ -59,6 +59,8 @@ class CheckBanner < Sensu::Plugin::Check::CLI
       critical "Connection refused by #{config[:host]}:#{config[:port]}"
     rescue Timeout::Error
       critical "Connection or read timed out"
+    rescue Errno::EHOSTUNREACH
+      critical "Check failed to run: No route to host"
     end
   end
 
