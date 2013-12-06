@@ -2,7 +2,6 @@
   "messagemedia": {
     "username": "username",
     "password": "password",
-    "min_occurrences": 3,
     "mobile_numbers": ["+123456789", "+987654321"]
   }
 }

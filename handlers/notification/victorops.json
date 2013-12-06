@@ -1,0 +1,6 @@
+{
+	"victorops": {
+		"api_url": "YOUR_API_URL_WHITOUT_ROUTING_KEY",
+		"routing_key": "everyone"
+	}
+}

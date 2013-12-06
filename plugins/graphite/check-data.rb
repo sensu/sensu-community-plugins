@@ -24,6 +24,24 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :long => '--server SERVER:PORT',
     :required => true
 
+  option :username,
+    :description => 'username for basic http authentication',
+    :short => '-u USERNAME',
+    :long => '--user USERNAME',
+    :required => false
+
+  option :password,
+    :description => 'user password for basic http authentication',
+    :short => '-p PASSWORD',
+    :long => '--pass PASSWORD',
+    :required => false
+
+  option :passfile,
+    :description => 'password file path for basic http authentication',
+    :short => '-P PASSWORDFILE',
+    :long => '--passfile PASSWORDFILE',
+    :required => false
+
   option :warning,
     :description => 'Generate warning if given value is above received value',
     :short => '-w VALUE',
@@ -66,6 +84,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :long => '--from FROM',
     :default => "-10mins"
 
+  option :below,
+    :description => 'warnings/critical if values below specified thresholds',
+    :short => '-b',
+    :long => '--below'
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -77,7 +100,8 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       puts opt_parser if config[:help]
       exit
     end
-    retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
+
+    retrieve_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
   end
 
   # name used in responses
@@ -89,15 +113,27 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Check the age of the data being processed
   def check_age
     if (Time.now.to_i - @end) > config[:allowed_graphite_age]
-      critical "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
+      unknown "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
     end
   end
 
   # grab data from graphite
-  def retreive_data
+  def retrieve_data
     unless @raw_data
       begin
-        handle = open("http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}")
+
+        url = "http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
+        if (config[:username] && (config[:password] || config[:passfile]))
+          if config[:passfile]
+            pass = File.open(config[:passfile]).readline
+          elsif config[:password]
+            pass = config[:password]
+          end
+          handle = open(url, :http_basic_authentication =>["#{config[:username]}", pass.chomp])
+        else # we don't have both username and password trying without
+          handle = open(url)
+        end
+
         @raw_data = JSON.parse(handle.gets).first
         @raw_data['datapoints'].delete_if{|v| v.first == nil}
         @data = @raw_data['datapoints'].map(&:first)
@@ -107,9 +143,9 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         @step = ((@end - @start) / @raw_data['datapoints'].size.to_f).ceil
         nil
       rescue OpenURI::HTTPError
-        critical "Failed to connect to graphite server"
+        unknown "Failed to connect to graphite server"
       rescue NoMethodError
-        critical "No data for time period and/or target"
+        unknown "No data for time period and/or target"
       end
     end
   end
@@ -118,10 +154,18 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Return alert if required
   def check(type)
     if config[type]
-      if @data.last > config[type] && !decreased?
-        send(type, "#{name} has passed #{type} threshold (#{@data.last})")
-      end
+      send(type, "#{name} has passed #{type} threshold (#{@data.last})") if (below?(type) || above?(type))
     end
+  end
+
+  # Check if value is below defined threshold
+  def below?(type)
+    config[:below] && @data.last < config[type]
+  end
+
+  # Check is value is above defined threshold
+  def above?(type)
+    (!config[:below]) and (@data.last > config[type]) and (!decreased?)
   end
 
   # Check if values have decreased within interval if given

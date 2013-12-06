@@ -51,7 +51,8 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     :short => "-A SECONDS",
     :long => "--age SECONDS",
     :description => "Minimum aggregate age in SECONDS, time since check request issued",
-    :default => 30
+    :default => 30,
+    :proc => proc {|a| a.to_i }
 
   option :summarize,
     :short => "-s",
@@ -90,6 +91,8 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
         :password => config[:password]
       })
       JSON.parse(request.get, :symbolize_names => true)
+    rescue RestClient::ResourceNotFound
+      warning "Resource not found: #{resource}"
     rescue Errno::ECONNREFUSED
       warning "Connection refused"
     rescue RestClient::RequestFailed
@@ -105,16 +108,10 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
 
   def get_aggregate
     uri = "/aggregates/#{config[:check]}"
-    issued = api_request(uri)
+    issued = api_request(uri + "?age=#{config[:age]}")
     unless issued.empty?
       issued_sorted = issued.sort
-      time = nil
-      until issued_sorted.empty?
-        popped = issued_sorted.pop
-        if popped.to_i <= Time.now.to_i - config[:age]
-          time = popped
-        end
-      end
+      time = issued_sorted.pop
       unless time.nil?
         uri += "/#{time}"
         if config[:summarize]

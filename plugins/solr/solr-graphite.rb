@@ -45,92 +45,108 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.solr"
 
   def run
-    core = ""
+    cores = []
     if config[:core]
-        core = "/#{config[:core]}"
+        cores = [config[:core]]
+    else
+      # If no core is specified, provide statistics for all cores
+      status_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/cores?action=STATUS&wt=json"
+      status_resp = Net::HTTP.get_response(URI.parse(status_url))
+      status = JSON.parse(status_resp.body)
+      cores = status['status'].keys
     end
-    ping_url = "http://#{config[:host]}:#{config[:port]}/solr#{core}/admin/ping?wt=json"
 
-    resp = Net::HTTP.get_response(URI.parse(ping_url))
-    ping = JSON.parse(resp.body)
+    cores.each do |core|
 
-    output "#{config[:scheme]}.solr.QueryTime", ping["responseHeader"]["QTime"]
-    output "#{config[:scheme]}.solr.Status", ping["responseHeader"]["status"]
+      if config[:core]
+        # Don't include core name in scheme to match previous functionality
+        graphitepath = config[:scheme]
+      else
+        graphitepath = "#{config[:scheme]}.#{core}"
+      end
+      ping_url = "http://#{config[:host]}:#{config[:port]}/solr/#{core}/admin/ping?wt=json"
 
-    stats_url = "http://#{config[:host]}:#{config[:port]}/solr#{core}/admin/stats.jsp"
+      resp = Net::HTTP.get_response(URI.parse(ping_url))
+      ping = JSON.parse(resp.body)
 
-    xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n", "")
-    stats  = Crack::XML.parse(xml_data)
+      output "#{graphitepath}.solr.QueryTime", ping["responseHeader"]["QTime"]
+      output "#{graphitepath}.solr.Status", ping["responseHeader"]["status"]
 
-    # this xml is an ugly beast.
-    core_searcher = stats["solr"]["solr_info"]["CORE"]["entry"].find_all {|v| v["name"].strip! == "searcher"}.first["stats"]["stat"]
-    standard = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"].strip! == "standard"}.first["stats"]["stat"]
-    update = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"] == "/update"}.first["stats"]["stat"]
-    updatehandler = stats["solr"]["solr_info"]["UPDATEHANDLER"]["entry"]["stats"]["stat"]
-    querycache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"].strip! == "queryResultCache"}.first["stats"]["stat"]
-    documentcache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "documentCache"}.first["stats"]["stat"]
-    filtercache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "filterCache"}.first["stats"]["stat"]
+      stats_url = "http://#{config[:host]}:#{config[:port]}/solr/#{core}/admin/stats.jsp"
 
-    output "#{config[:scheme]}.core.maxdocs", core_searcher[2].strip!
-    output "#{config[:scheme]}.core.maxdocs", core_searcher[3].strip!
-    output "#{config[:scheme]}.core.warmuptime", core_searcher[9].strip!
+      xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n", "")
+      stats  = Crack::XML.parse(xml_data)
 
-    output "#{config[:scheme]}.queryhandler.standard.requests", standard[1].strip!
-    output "#{config[:scheme]}.queryhandler.standard.errors", standard[2].strip!
-    output "#{config[:scheme]}.queryhandler.standard.timeouts", standard[3].strip!
-    output "#{config[:scheme]}.queryhandler.standard.totaltime", standard[4].strip!
-    output "#{config[:scheme]}.queryhandler.standard.timeperrequest", standard[5].strip!
-    output "#{config[:scheme]}.queryhandler.standard.requestspersecond", standard[6].strip!
+      # this xml is an ugly beast.
+      core_searcher = stats["solr"]["solr_info"]["CORE"]["entry"].find_all {|v| v["name"].strip! == "searcher"}.first["stats"]["stat"]
+      standard = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"].strip! == "standard"}.first["stats"]["stat"]
+      update = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"] == "/update"}.first["stats"]["stat"]
+      updatehandler = stats["solr"]["solr_info"]["UPDATEHANDLER"]["entry"]["stats"]["stat"]
+      querycache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"].strip! == "queryResultCache"}.first["stats"]["stat"]
+      documentcache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "documentCache"}.first["stats"]["stat"]
+      filtercache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "filterCache"}.first["stats"]["stat"]
 
-    output "#{config[:scheme]}.queryhandler.update.requests", update[1].strip!
-    output "#{config[:scheme]}.queryhandler.update.errors", update[2].strip!
-    output "#{config[:scheme]}.queryhandler.update.timeouts", update[3].strip!
-    output "#{config[:scheme]}.queryhandler.update.totaltime", update[4].strip!
-    output "#{config[:scheme]}.queryhandler.update.timeperrequest", update[5].strip!
-    output "#{config[:scheme]}.queryhandler.update.requestspersecond", standard[6].strip!
+      output "#{graphitepath}.core.maxdocs", core_searcher[2].strip!
+      output "#{graphitepath}.core.maxdocs", core_searcher[3].strip!
+      output "#{graphitepath}.core.warmuptime", core_searcher[9].strip!
 
-    output "#{config[:scheme]}.queryhandler.updatehandler.commits", updatehandler[0].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.autocommits", updatehandler[3].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.optimizes", updatehandler[4].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.rollbacks", updatehandler[5].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.docspending", updatehandler[7].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.adds", updatehandler[8].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.errors", updatehandler[11].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.cumulativeadds", updatehandler[12].strip!
-    output "#{config[:scheme]}.queryhandler.updatehandler.cumulativeerrors", updatehandler[15].strip!
+      output "#{graphitepath}.queryhandler.standard.requests", standard[1].strip!
+      output "#{graphitepath}.queryhandler.standard.errors", standard[2].strip!
+      output "#{graphitepath}.queryhandler.standard.timeouts", standard[3].strip!
+      output "#{graphitepath}.queryhandler.standard.totaltime", standard[4].strip!
+      output "#{graphitepath}.queryhandler.standard.timeperrequest", standard[5].strip!
+      output "#{graphitepath}.queryhandler.standard.requestspersecond", standard[6].strip!
 
-    output "#{config[:scheme]}.queryhandler.querycache.lookups", querycache[0].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.hits", querycache[1].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.hitRatio", querycache[2].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.inserts", querycache[3].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.size", querycache[5].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.warmuptime", querycache[6].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.cumulativelookups", querycache[7].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.cumulativehits", querycache[8].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.cumulativehitratio", querycache[9].strip!
-    output "#{config[:scheme]}.queryhandler.querycache.cumulativeinserts", querycache[10].strip!
+      output "#{graphitepath}.queryhandler.update.requests", update[1].strip!
+      output "#{graphitepath}.queryhandler.update.errors", update[2].strip!
+      output "#{graphitepath}.queryhandler.update.timeouts", update[3].strip!
+      output "#{graphitepath}.queryhandler.update.totaltime", update[4].strip!
+      output "#{graphitepath}.queryhandler.update.timeperrequest", update[5].strip!
+      output "#{graphitepath}.queryhandler.update.requestspersecond", standard[6].strip!
 
-    output "#{config[:scheme]}.queryhandler.documentcache.lookups", documentcache[0].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.hits", documentcache[1].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.hitRatio", documentcache[2].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.inserts", documentcache[3].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.size", documentcache[5].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.warmuptime", documentcache[6].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.cumulativelookups", documentcache[7].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.cumulativehits", documentcache[8].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.cumulativehitratio", documentcache[9].strip!
-    output "#{config[:scheme]}.queryhandler.documentcache.cumulativeinserts", documentcache[10].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.commits", updatehandler[0].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.autocommits", updatehandler[3].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.optimizes", updatehandler[4].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.rollbacks", updatehandler[5].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.docspending", updatehandler[7].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.adds", updatehandler[8].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.errors", updatehandler[11].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.cumulativeadds", updatehandler[12].strip!
+      output "#{graphitepath}.queryhandler.updatehandler.cumulativeerrors", updatehandler[15].strip!
 
-    output "#{config[:scheme]}.queryhandler.filtercache.lookups", filtercache[0].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.hits", filtercache[1].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.hitRatio", filtercache[2].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.inserts", filtercache[3].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.size", filtercache[5].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.warmuptime", filtercache[6].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.cumulativelookups", filtercache[7].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.cumulativehits", filtercache[8].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.cumulativehitratio", filtercache[9].strip!
-    output "#{config[:scheme]}.queryhandler.filtercache.cumulativeinserts", documentcache[10].strip!
+      output "#{graphitepath}.queryhandler.querycache.lookups", querycache[0].strip!
+      output "#{graphitepath}.queryhandler.querycache.hits", querycache[1].strip!
+      output "#{graphitepath}.queryhandler.querycache.hitRatio", querycache[2].strip!
+      output "#{graphitepath}.queryhandler.querycache.inserts", querycache[3].strip!
+      output "#{graphitepath}.queryhandler.querycache.size", querycache[5].strip!
+      output "#{graphitepath}.queryhandler.querycache.warmuptime", querycache[6].strip!
+      output "#{graphitepath}.queryhandler.querycache.cumulativelookups", querycache[7].strip!
+      output "#{graphitepath}.queryhandler.querycache.cumulativehits", querycache[8].strip!
+      output "#{graphitepath}.queryhandler.querycache.cumulativehitratio", querycache[9].strip!
+      output "#{graphitepath}.queryhandler.querycache.cumulativeinserts", querycache[10].strip!
+
+      output "#{graphitepath}.queryhandler.documentcache.lookups", documentcache[0].strip!
+      output "#{graphitepath}.queryhandler.documentcache.hits", documentcache[1].strip!
+      output "#{graphitepath}.queryhandler.documentcache.hitRatio", documentcache[2].strip!
+      output "#{graphitepath}.queryhandler.documentcache.inserts", documentcache[3].strip!
+      output "#{graphitepath}.queryhandler.documentcache.size", documentcache[5].strip!
+      output "#{graphitepath}.queryhandler.documentcache.warmuptime", documentcache[6].strip!
+      output "#{graphitepath}.queryhandler.documentcache.cumulativelookups", documentcache[7].strip!
+      output "#{graphitepath}.queryhandler.documentcache.cumulativehits", documentcache[8].strip!
+      output "#{graphitepath}.queryhandler.documentcache.cumulativehitratio", documentcache[9].strip!
+      output "#{graphitepath}.queryhandler.documentcache.cumulativeinserts", documentcache[10].strip!
+
+      output "#{graphitepath}.queryhandler.filtercache.lookups", filtercache[0].strip!
+      output "#{graphitepath}.queryhandler.filtercache.hits", filtercache[1].strip!
+      output "#{graphitepath}.queryhandler.filtercache.hitRatio", filtercache[2].strip!
+      output "#{graphitepath}.queryhandler.filtercache.inserts", filtercache[3].strip!
+      output "#{graphitepath}.queryhandler.filtercache.size", filtercache[5].strip!
+      output "#{graphitepath}.queryhandler.filtercache.warmuptime", filtercache[6].strip!
+      output "#{graphitepath}.queryhandler.filtercache.cumulativelookups", filtercache[7].strip!
+      output "#{graphitepath}.queryhandler.filtercache.cumulativehits", filtercache[8].strip!
+      output "#{graphitepath}.queryhandler.filtercache.cumulativehitratio", filtercache[9].strip!
+      output "#{graphitepath}.queryhandler.filtercache.cumulativeinserts", documentcache[10].strip!
+    end
 
     ok
   end

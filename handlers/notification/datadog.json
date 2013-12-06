@@ -1,6 +1,7 @@
 {
   "datadog": {
     "api_key": "12345",
-    "app_key": "54321"
+    "app_key": "54321",
+    "tags": []
   }
 }
