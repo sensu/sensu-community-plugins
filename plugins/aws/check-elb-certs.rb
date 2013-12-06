@@ -3,7 +3,7 @@
 # ===
 #
 # DESCRIPTION:
-#   This plugin looks up all ELBs in the organization and checks https 
+#   This plugin looks up all ELBs in the organization and checks https
 #   endpoints for expiring certificates
 #
 # PLATFORMS:
@@ -64,10 +64,10 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
     :description => 'Provide SSL/TLS certificate expiration details even when OK',
     :default => false
 
-  def cert_message(count, descriptor, limit) 
-    message = ( count == 1 ? "1 ELB cert is " : "#{count} ELB certs are " )
+  def cert_message(count, descriptor, limit)
+    message = (count == 1 ? "1 ELB cert is " : "#{count} ELB certs are ")
     message += "#{descriptor} #{limit} day"
-    message += ( limit == 1 ? "" : "s" )
+    message += (limit == 1 ? "" : "s")
   end
 
   def run
@@ -82,11 +82,10 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
       :secret_access_key  => config[:aws_secret_access_key],
       :region             => config[:aws_region])
 
-
     begin
-      elbs = elb.load_balancers.each do |lb|
+      elb.load_balancers.each do |lb|
         lb.listeners.each do |listener|
-          if ( listener.protocol.to_s == 'https' )
+          if (listener.protocol.to_s == 'https')
             url = URI.parse("https://#{lb.dns_name}:#{listener.port}")
             http = Net::HTTP.new(url.host, url.port)
             http.use_ssl = true
@@ -94,9 +93,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
             cert = ""
 
             begin
-              http.start {
-                cert = http.peer_cert
-              }
+              http.start { cert = http.peer_cert }
             rescue Exception => e
               critical "An issue occurred attempting to get cert: #{e.message}"
             end
@@ -112,12 +109,12 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
               ok_message << message
             end
           end
-        end 
-      end 
+        end
+      end
     rescue Exception => e
       unknown "An error occurred processing AWS ELB API: #{e.message}"
     end
-    
+
     if critical_message.length > 0
       message = cert_message(critical_message.length, "expiring within", config[:crit_under])
       message += ": " + critical_message.sort.join(' ')
@@ -128,7 +125,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
       warning message
     else
       message = cert_message(ok_message.length, "valid for at least", config[:warn_under])
-      message += ": " +ok_message.sort.join(' ') if config[:verbose]
+      message += ": " + ok_message.sort.join(' ') if config[:verbose]
       ok message
     end
   end
