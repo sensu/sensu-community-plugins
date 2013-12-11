@@ -45,6 +45,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       config[:host] = uri.host
       config[:path] = uri.path
       config[:port] = uri.port
+      config[:request_uri] = uri.request_uri
       config[:ssl] = uri.scheme == 'https'
     else
       unless config[:host] and config[:path]
@@ -82,7 +83,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       end
     end
 
-    req = Net::HTTP::Get.new(config[:path], {'User-Agent' => config[:ua]})
+    req = Net::HTTP::Get.new(config[:request_uri], {'User-Agent' => config[:ua]})
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
