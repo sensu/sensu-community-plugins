@@ -3,6 +3,7 @@
 # Check Named Process Plugin
 # This plugin checks whether a User-inputted process is running or not
 # This checks users tasklist tool to find any process is running or not.
+#
 # Copyright 2013 <jashishtech@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
