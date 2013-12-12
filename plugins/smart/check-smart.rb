@@ -106,7 +106,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     :required => false
 
   def run
-    @smartAttributes = JSON.parse( IO.read('smart.json'), symbolize_names: true )[:smart][:attributes]
+    @smartAttributes = JSON.parse( IO.read(File.dirname(__FILE__) + '/smart.json'), symbolize_names: true )[:smart][:attributes]
     @smartDebug = config[:debug] == 'on'
     
     # Set default threshold
