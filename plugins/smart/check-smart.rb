@@ -192,7 +192,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     
     # check the result
     if criticals.size != 0
-      critical criticals.join("\n")
+      critical criticals.concat(warnings).join("\n")
     elsif warnings.size != 0
       warning warnings.join("\n")
     else
