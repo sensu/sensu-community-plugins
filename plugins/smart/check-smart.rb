@@ -30,9 +30,13 @@
 # PLATFORMS:
 #   linux
 #
-# DEPENDENCIES: json, smartmontools, smart.json file
+# DEPENDENCIES: json, smartmontools, smart.json file, suduers
 # 
 # USAGE:
+# You need to add 'sensu' user to suduers or you can't use 'smartctl'
+# sensu   ALL=(ALL) NOPASSWD:ALL
+#
+# PARAMETERS:
 # -b: smartctl binary to use, in case you hide yours (default: /usr/sbin/smartctl)
 # -d: default threshold for crit_min,warn_min,warn_max,crit_max (default: 0,0,0,0)
 # -a: SMART attributes to check (default: all)
@@ -154,7 +158,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       puts "#{config[:binary]} #{parameters} /dev/#{dev}" if @smartDebug
       # check if debug file specified
       if config[:debug_file].nil?
-        output[dev] = `#{config[:binary]} #{parameters} /dev/#{dev}`
+        output[dev] = `sudo #{config[:binary]} #{parameters} /dev/#{dev}`
       else
         test_file = File.open(config[:debug_file], "rb")
         output[dev] = test_file.read
