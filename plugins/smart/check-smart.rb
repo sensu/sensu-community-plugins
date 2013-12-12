@@ -173,10 +173,10 @@ class SmartCheck < Sensu::Plugin::Check::CLI
           attValue = fields[9].to_i
           attValue = self.send(smartAtt[:read], attValue) unless smartAtt[:read].nil?
           if attValue < smartAtt[:crit_min] || attValue > smartAtt[:crit_max]
-            criticals << "#{smartAtt[:name]}: #{attValue}"
+            criticals << "#{dev} #{smartAtt[:name]}: #{attValue}"
             puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (critical)" if @smartDebug
           elsif attValue < smartAtt[:warn_min] || attValue > smartAtt[:warn_max]
-            warnings << "#{smartAtt[:name]}: #{attValue}"
+            warnings << "#{dev} #{smartAtt[:name]}: #{attValue}"
             puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (warning)" if @smartDebug
           else
             puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (ok)" if @smartDebug
