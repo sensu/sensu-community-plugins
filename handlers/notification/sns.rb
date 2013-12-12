@@ -47,7 +47,7 @@ class SnsNotifier < Sensu::Handler
   end
 
   def handle
-    if(useAmiRole)
+    if (useAmiRole)
       AWS.config(:region => region)
     else
       AWS.config({
