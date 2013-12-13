@@ -113,7 +113,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
           line
       end
       data = l.join("\n")
-      haproxy_stats = FasterCSV.parse(data, { :headers => true, :converters => :all })
+      haproxy_stats = CSV.parse(data, { :headers => true, :converters => :all })
     else
       critical "Not a valid HAProxy socket: #{config[:socket]}"
     end
