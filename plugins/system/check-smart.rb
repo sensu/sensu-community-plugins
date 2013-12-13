@@ -37,7 +37,6 @@ class Disk
   end
 
   def check_health!
-    puts "check_health"
     output = `smartctl -H #{@device_path}`
     @smart_healthy = !output.scan(/PASSED/).empty?
     @health_output = output
@@ -45,6 +44,12 @@ class Disk
 end
 
 class CheckSMART < Sensu::Plugin::Check::CLI
+  option :smart_incapable_disks,
+    :long => '--smart-incapable-disks EXIT_CODE',
+    :description => 'Exit code when SMART is unavailable/disabled on a disk (ok, warn, critical, unknown)',
+    :proc => proc {|exit_code| exit_code.to_sym },
+    :default => :unknown
+
   def initialize
     super
     @devices = []
@@ -73,9 +78,25 @@ class CheckSMART < Sensu::Plugin::Check::CLI
     end
 
     if unknown_disks.length > 0
-      unknown unknown_disks.map {|disk| disk.capability_output }.join("\n")
+      exit_with(
+        config[:smart_incapable_disks],
+        unknown_disks.map {|disk| disk.capability_output }.join("\n")
+      )
     end
 
     ok "PASSED"
+  end
+
+  def exit_with(sym, message)
+    case sym
+    when :ok
+      ok message
+    when :warn
+      warn message
+    when :critical
+      critical message
+    else
+      unknown message
+    end
   end
 end
