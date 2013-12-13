@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)
 
-## Community plugins, extenions, and handlers
+## Community plugins, extensions, and handlers
 
 This gem contains some example plugins and handlers for Sensu. Most of
 them are implemented in Ruby and use the `sensu-plugin` framework (a
