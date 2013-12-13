@@ -39,7 +39,7 @@ class SnsNotifier < Sensu::Handler
   end
 
   def awsAccessSecret
-    settings['sns']['access_key'] || ''
+    settings['sns']['secret_key'] || ''
   end
 
   def message
