@@ -24,7 +24,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :ua, :short => '-x USER-AGENT', :long => '--user-agent USER-AGENT', :default => 'Sensu-HTTP-Check'
   option :url, :short => '-u URL'
   option :host, :short => '-h HOST'
-  option :path, :short => '-p PATH'
+  option :request_uri, :short => '-p PATH'
   option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
   option :header, :short => '-H HEADER', :long => '--header HEADER'
   option :ssl, :short => '-s', :boolean => true, :default => false
@@ -43,12 +43,11 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     if config[:url]
       uri = URI.parse(config[:url])
       config[:host] = uri.host
-      config[:path] = uri.path
       config[:port] = uri.port
       config[:request_uri] = uri.request_uri
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] and config[:path]
+      unless config[:host] and config[:request_uri]
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -84,6 +83,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
 
     req = Net::HTTP::Get.new(config[:request_uri], {'User-Agent' => config[:ua]})
+
     if (config[:user] != nil and config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
