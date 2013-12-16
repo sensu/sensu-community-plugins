@@ -10,7 +10,11 @@
 # Unlike check-log.rb or other file-based log checks, we do not need to keep state
 # since we can query the journal using hints such as `--since=-5minutes`. The check
 # interval and the `--since` argument should match in order to ensure adequate
-# and efficient coverage of the journal.
+# and efficient coverage of the journal. See `journalctl(1)` man page for additional
+# details on valid values for the `--since` parameters.
+#
+# Journalctl params
+# -----------------
 #
 # By default, all available journal entries are queried. Any valid journalctl(1)
 # argument can be passed using `--journalctl_args="ARGS ..."`. For example, to
@@ -49,7 +53,7 @@ class CheckJournal < Sensu::Plugin::Check::CLI
          :default => ''
 
   option :since,
-         :description => 'Query journal entries on or newer than the specified date/time. See the description for "--since" in journalctl(1) man page for acceptable values.',
+         :description => 'Query journal entries on or newer than the specified date/time.',
          :default => '-1minutes',
          :short => '-s TIMESPEC',
          :long => '--since TIMESPEC'
