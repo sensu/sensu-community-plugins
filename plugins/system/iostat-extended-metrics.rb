@@ -28,6 +28,12 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--disk DISK",
     :required => false
 
+  option :excludedisk,
+    :description => "List of disks to exclude",
+    :short => "-x DISK[,DISK]",
+    :long => "--exclude-disk",
+    :proc => proc { |a| a.split(',') }
+
   option :interval,
     :description => "Period over which statistics are calculated (in seconds)",
     :short => "-i SECONDS",
@@ -72,6 +78,11 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     cmd = "iostat -x #{config[:interval]} 2"
     if config[:disk]
       cmd += " #{File.basename(config[:disk])}"
+    end
+    if config[:excludedisk]
+      config[:excludedisk].each do |disk|
+        cmd += " | grep -v #{disk}"
+      end
     end
     stats = parse_results(`#{cmd}`)
 

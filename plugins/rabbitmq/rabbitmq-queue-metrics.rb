@@ -45,13 +45,20 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Regular expression for filtering queues",
     :long => "--filter REGEX"
 
+  option :ssl,
+    :description => "Enable SSL for connection to the API",
+    :long => "--ssl",
+    :boolean => true,
+    :default => false
+
   def get_rabbitmq_queues
     begin
       rabbitmq_info = CarrotTop.new(
         :host => config[:host],
         :port => config[:port],
         :user => config[:user],
-        :password => config[:password]
+        :password => config[:password],
+        :ssl => config[:ssl]
       )
     rescue
       warning "could not get rabbitmq queue info"

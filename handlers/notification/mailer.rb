@@ -28,6 +28,7 @@ class Mailer < Sensu::Handler
     mail_to = settings['mailer']['mail_to']
     mail_from =  settings['mailer']['mail_from']
 
+    delivery_method = settings['mailer']['delivery_method'] || 'smtp'
     smtp_address = settings['mailer']['smtp_address'] || 'localhost'
     smtp_port = settings['mailer']['smtp_port'] || '25'
     smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
@@ -68,7 +69,7 @@ class Mailer < Sensu::Handler
         delivery_options.merge! auth_options
       end
 
-      delivery_method :smtp, delivery_options
+      delivery_method delivery_method.intern, delivery_options
     end
 
     begin
