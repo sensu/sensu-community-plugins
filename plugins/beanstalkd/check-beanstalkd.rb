@@ -3,7 +3,7 @@
 # Check beanstalkd queues
 # Requires the beaneater and json Gems
 # ===
-# 
+#
 #
 # DESCRIPTION:
 #   This plugin checks the beanstalkd queue, using the beaneater gem
