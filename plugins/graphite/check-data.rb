@@ -146,6 +146,14 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         unknown "Failed to connect to graphite server"
       rescue NoMethodError
         unknown "No data for time period and/or target"
+      rescue Errno::ECONNREFUSED
+        unknown "Connection refused when connecting to graphite server"
+      rescue Errno::ECONNRESET
+        unknown "Connection reset by peer when connecting to graphite server"
+      rescue EOFError
+        unknown "End of file error when reading from graphite server"
+      rescue Exception => e
+        unknown "An unknown error occured: #{e.inspect}"
       end
     end
   end
