@@ -3,6 +3,21 @@
 # Check beanstalkd queues
 # Requires the beaneater and json Gems
 # ===
+# 
+#
+# DESCRIPTION:
+#   This plugin checks the beanstalkd queue, using the beaneater gem
+#
+#
+# OUTPUT:
+#   OK
+#   WARN - queues that have surpassed the warning threshold
+#   CRITICAL - queues that have surpassed the critical threshold
+#
+# DEPENDENCIES:
+#   sensu-plugin Ruby gem
+#   json Ruby gem
+#   beaneater Ruby gem
 #
 # Copyright 2014 99designs, Inc <devops@99designs.com>
 #
