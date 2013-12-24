@@ -28,9 +28,15 @@ require 'json'
 
 class ESClusterStatus < Sensu::Plugin::Check::CLI
 
+  option :server,
+    :description => 'Elasticsearch server',
+    :short => '-s SERVER',
+    :long => '--server SERVER',
+    :default => 'localhost'
+
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://localhost:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:server]}:9200/#{resource}", :timeout => 45)
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
