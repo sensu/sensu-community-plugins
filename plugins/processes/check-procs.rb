@@ -90,8 +90,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   end
 
   def etime_to_esec(etime)
-    etime=~/(\d+-)?(\d\d:)?(\d\d):(\d\d)/
-    esec = ($1||0).to_i*86400 + ($2||0).to_i*3600 + ($3||0).to_i*60 + ($4||0).to_i
+    m = /(\d+-)?(\d\d:)?(\d\d):(\d\d)/.match(etime)
+    (m[1]||0).to_i*86400 + (m[2]||0).to_i*3600 + (m[3]||0).to_i*60 + (m[4]||0).to_i
   end
 
   def run
