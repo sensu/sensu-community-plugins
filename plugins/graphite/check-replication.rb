@@ -5,7 +5,7 @@
 # Check to ensure data gets posted and is retrievable by graphite.
 # We post to each server in config[:relays] then sleep config[:sleep]
 # seconds then check each of config[:graphites] to see if the data made it
-# to each one. OK if all servers have the data we expected, WARN if 
+# to each one. OK if all servers have the data we expected, WARN if
 # config[:warning] or fewer have it. CRITICAL if config[:critical]
 # or fewer have it. config[:check_id] allows you to have many of these
 # checks running in different places without any conflicts. Customize it
@@ -17,7 +17,7 @@
 # carbon-relays are configured to post to. This check ensures that replication
 # is actually happening in a timely manner.
 
-# How it works: We generate a large random number for each of these servers 
+# How it works: We generate a large random number for each of these servers
 # Then we post that number to each server via a key in the form of:
 # checks.graphite.check_id.replication.your_graphite_server.ip It's safe
 # to throw this data away quickly. A day retention ought to be more
@@ -178,11 +178,15 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
       critical "Unexpected error getting data from #{server}: #{e.to_s}"
     end
 
+    success = false
+
     # we get all the data points for the last 10 minutes, so see if our value
     # appeared in any of them
     graphite_data[0]['datapoints'].each do |v|
       success = true if v[0] == value
     end
+
+    success
   end
 
   def graphite_key(key)
@@ -191,10 +195,10 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
 
   def time_out(activity, &block)
     begin
-      status = Timeout::timeout(config[:timeout]) {
+      Timeout.timeout(config[:timeout]) do
         yield block
-      }
-    rescue Timeout::Error => e
+      end
+    rescue Timeout::Error
       critical "Timed out while #{activity}"
     end
   end
