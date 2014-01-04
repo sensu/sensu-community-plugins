@@ -78,7 +78,6 @@ class CheckFTP < Sensu::Plugin::Check::CLI
     require 'net/ftp'
     begin
       ftp = Net::FTP.new(config[:host])
-      ftp.debug_mode = true
       ftp.login(config[:user], config[:pass])
       ftp.quit
     rescue => e
