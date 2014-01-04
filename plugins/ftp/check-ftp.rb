@@ -15,7 +15,7 @@ require 'net/http'
 
 class CheckFTP < Sensu::Plugin::Check::CLI
   option :host,
-    :short   => '-h HOST',
+    :short   => '-H HOST',
     :default => 'localhost'
   option :tls,
     :short   => '-s',
