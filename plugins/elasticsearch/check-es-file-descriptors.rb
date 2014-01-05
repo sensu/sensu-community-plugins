@@ -38,7 +38,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :proc        => proc { |a| a.to_i },
     :default     => 90
   option :warning,
-    :description => 'Critical percentage of FD usage',
+    :description => 'Warning percentage of FD usage',
     :short       => '-w PERCENTAGE',
     :proc        => proc { |a| a.to_i },
     :default     => 80
