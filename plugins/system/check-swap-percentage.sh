@@ -24,7 +24,7 @@ CRIT=${CRIT:=100}
 # get swap details
 USED=`free -m | grep 'Swap:' | awk '{ print $3 }'`
 TOTAL=`free -m | grep 'Swap:' | awk '{ print $2 }'`
-PERCENT=`echo "scale=3;$USED/$TOTAL*100" | bc -l`
+PERCENT=`echo "scale=3;$USED/$TOTAL*100" | bc -l | awk '{printf "%f", $0}'`
 PERCENT=${PERCENT%.*}
 
 OUTPUT="Swap usage: $PERCENT%, $USED/$TOTAL"
