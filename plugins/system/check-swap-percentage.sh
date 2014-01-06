@@ -24,6 +24,7 @@ CRIT=${CRIT:=100}
 # get swap details
 USED=`free -m | grep 'Swap:' | awk '{ print $3 }'`
 TOTAL=`free -m | grep 'Swap:' | awk '{ print $2 }'`
+PERCENT=`echo "scale=3;$USED/$TOTAL*100" | bc -l | awk '{printf "%f", $0}'`
 
 if [[ $TOTAL -eq 0 ]] ; then
   echo "There is no SWAP on this machine"
