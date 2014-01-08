@@ -3,7 +3,7 @@
 # In order for Flapjack to keep its entities up to date, it is necssary to set
 # metric to "true" for each check that is using the flapjack handler.
 #
-# Here is an example of what the Sensu configuration for flapjack should 
+# Here is an example of what the Sensu configuration for flapjack should
 # look like, assuming your Flapjack's redis service is running on the same server
 # as Sensu:
 #
@@ -13,7 +13,7 @@
 #      "port": 6379,
 #      "db": "0"
 #   }
-# } 
+# }
 #
 # Copyright 2014 Jive Software and contributors.
 #
@@ -22,7 +22,6 @@
 require 'json'
 require 'rubygems'
 require 'sensu/redis'
-
 
 module Sensu::Extension
   class Flapjack < Handler
@@ -50,7 +49,7 @@ module Sensu::Extension
 
     def run(event)
       event = Oj.load(event)
-      state = event[:check][:status] 
+      state = event[:check][:status]
       if state == 0
         check_state = "ok"
       elsif state == 2
@@ -59,10 +58,10 @@ module Sensu::Extension
         check_state = "unknown"
       end
       timestamp = event[:check][:issued]
-      entity = event[:client][:name] 
-      check = event[:check][:name] 
-      check_output = event[:check][:output] 
-      details = '' 
+      entity = event[:client][:name]
+      check = event[:check][:name]
+      check_output = event[:check][:output]
+      details = ''
 
       begin
         check_output = JSON.parse(check_output)
