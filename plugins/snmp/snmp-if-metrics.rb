@@ -37,7 +37,6 @@ def graphite_safe_name(name)
   name.gsub(/\W/, '_')
 end
 
-
 class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   option :host,
@@ -102,7 +101,7 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
   def run
     ifTable_columns = %w[ifIndex ifOperStatus ifName ifDescr ifHCInOctets ifHCOutOctets ifHCInUcastPkts
                          ifHCOutUcastPkts ifHCInMulticastPkts ifHCOutMulticastPkts ifHCInBroadcastPkts
-                         ifHCOutBroadcastPkts ifInErrors ifOutErrors ifInDiscards ifOutDiscards ifSpeed] 
+                         ifHCOutBroadcastPkts ifInErrors ifOutErrors ifInDiscards ifOutDiscards ifSpeed]
 
     SNMP::Manager.open(:host => "#{config[:host]}", :community => "#{config[:community]}") do |manager|
       manager.walk(ifTable_columns) do |row_array|
@@ -111,7 +110,7 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
         puts row.inspect if config[:verbose]
         if_name = config[:include_name] ? "#{row['ifIndex'].value.to_s}__#{graphite_safe_name(row['ifName'].value.to_s)}" : row['ifIndex'].value.to_s
 
-        next if row['ifOperStatus'].value != 1 and not config[:include_down_interfaces]
+        next if row['ifOperStatus'].value != 1 and !config[:include_down_interfaces]
 
         output "#{config[:scheme]}.#{if_name}.ifHCInOctets", row['ifHCInOctets'].value
         output "#{config[:scheme]}.#{if_name}.ifHCOutOctets", row['ifHCOutOctets'].value
