@@ -3,14 +3,14 @@
 # Checks SWAP usage as a % of the total swap
 #
 # Date: 05/12/13
-# Author: Nick Barrett - EDITD
+# Author: Nick Barrett - EDITED
 # License: MIT
 #
 # Usage: check-swap-percentage.sh -w warn_percent -c critical_percent
 # Uses free (Linux-only) & bc
 
 # input options
-while getopts 'w:c' OPT; do
+while getopts ':w:c:' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
     c)  CRIT=$OPTARG;;
