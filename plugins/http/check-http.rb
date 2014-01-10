@@ -44,6 +44,11 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :description => 'Select another port',
     :default => 80
 
+  option :request_uri,
+    :short => '-p PATH',
+    :long => '--resquest-uri PATH',
+    :description => 'Specify a uri path'
+
   option :header,
     :short => '-H HEADER',
     :long => '--header HEADER',
