@@ -21,6 +21,12 @@ require 'net/https'
 
 class CheckHTTP < Sensu::Plugin::Check::CLI
 
+  option :ua,
+    :short => '-x USER-AGENT',
+    :long => '--user-agent USER-AGENT',
+    :description => 'Specify a USER-AGENT',
+    :default => 'Sensu-HTTP-Check'
+
   option :url,
     :short => '-u URL',
     :long => '--url URL',
@@ -30,11 +36,6 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :short => '-h HOST',
     :long => '--hostname HOSTNAME',
     :description => 'A HOSTNAME to connect to'
-
-  option :path,
-    :short => '-p PATH',
-    :long => '--path PATH',
-    :description => 'Check a PATH'
 
   option :port,
     :short => '-P PORT',
