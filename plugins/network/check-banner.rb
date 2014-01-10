@@ -50,8 +50,8 @@ class CheckBanner < Sensu::Plugin::Check::CLI
 
   def get_banner
     begin
-      sock = TCPSocket.new(config[:host], config[:port])
       timeout(config[:timeout]) do
+        sock = TCPSocket.new(config[:host], config[:port])
         sock.puts config[:write] if config[:write]
         sock.readline
       end
