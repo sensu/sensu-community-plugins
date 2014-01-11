@@ -2,7 +2,7 @@
 # SNMP Interface Metrics
 # ===
 #
-# Collect device network interface metrics using the IF-MIB (RFC 1537) interface.
+# Collect device network interface metrics using the IF-MIB (RFC 2863) interface.
 #
 # This script uses the 64-bit "HC" (high capacity) metrics which I am assuming most
 # modern devices probably support.
