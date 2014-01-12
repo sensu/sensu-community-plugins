@@ -129,11 +129,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
   option :esec_over,
     :short => '-e SECONDS',
-    :proc => proc {|a| a.to_i }
+    :proc => proc {|a| a.to_i },
+    :description => 'Match processes that older that this, in SECONDS'
 
   option :esec_under,
     :short => '-E SECONDS',
-    :proc => proc {|a| a.to_i }
+    :proc => proc {|a| a.to_i },
+    :description => 'Match process that are younger than this, in SECONDS'
 
   def read_lines(cmd)
     IO.popen(cmd + ' 2>&1') do |child|
