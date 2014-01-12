@@ -46,8 +46,13 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :short => '-c critical',
     :default => "20"
 
+  option :snmp_version,
+    :short => '-v version',
+    :description => 'SNMP version to use (SNMPv1, SNMPv2c (default))',
+    :default => 'SNMPv2c'
+
   def run
-    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}")
+    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
     response = manager.get(["#{config[:objectid]}"])
     response.each_varbind do |vb|
       if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
