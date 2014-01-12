@@ -54,11 +54,18 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :description => 'SNMP version to use (SNMPv1, SNMPv2c (default))',
     :default => 'SNMPv2c'
 
+  option :scale,
+    :short => '-S scale',
+    :description => 'scaling factor (divisor) to apply to returned data',
+    :default => nil
+
   def run
     manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
     response = manager.get(["#{config[:objectid]}"])
     response.each_varbind do |vb|
-      output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f
+      value = vb.value.to_f
+      value = (value / config[:scale].to_f).to_f if config[:scale]
+      output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", value
     end
     manager.close
     ok
