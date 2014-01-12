@@ -127,12 +127,12 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     :description => 'Trigger on a specific user',
     :proc => proc {|a| a.split(',') }
 
-  option :esec_over, 
-    :short => '-e SECONDS', 
+  option :esec_over,
+    :short => '-e SECONDS',
     :proc => proc {|a| a.to_i }
 
-  option :esec_under, 
-    :short => '-E SECONDS', 
+  option :esec_under,
+    :short => '-E SECONDS',
     :proc => proc {|a| a.to_i }
 
   def read_lines(cmd)
