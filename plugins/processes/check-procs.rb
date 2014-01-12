@@ -129,11 +129,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
   option :esec_over,
     :short => '-e SECONDS',
+    :long => '--esec-over SECONDS',
     :proc => proc {|a| a.to_i },
     :description => 'Match processes that older that this, in SECONDS'
 
   option :esec_under,
     :short => '-E SECONDS',
+    :long => '--esec-under SECONDS',
     :proc => proc {|a| a.to_i },
     :description => 'Match process that are younger than this, in SECONDS'
 
