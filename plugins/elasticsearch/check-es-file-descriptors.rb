@@ -32,11 +32,13 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :short => '-s SERVER',
     :long => '--server SERVER',
     :default => 'localhost'
+
   option :critical,
     :description => 'Critical percentage of FD usage',
     :short       => '-c PERCENTAGE',
     :proc        => proc { |a| a.to_i },
     :default     => 90
+
   option :warning,
     :description => 'Warning percentage of FD usage',
     :short       => '-w PERCENTAGE',
