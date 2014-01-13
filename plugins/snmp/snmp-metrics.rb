@@ -49,8 +49,13 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :description => 'suffix to attach to graphite path',
     :required => true
 
+  option :snmp_version,
+    :short => '-v version',
+    :description => 'SNMP version to use (SNMPv1, SNMPv2c (default))',
+    :default => 'SNMPv2c'
+
   def run
-    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}")
+    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
     response = manager.get(["#{config[:objectid]}"])
     response.each_varbind do |vb|
       output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f

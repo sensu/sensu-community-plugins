@@ -21,24 +21,104 @@ require 'net/https'
 
 class CheckHTTP < Sensu::Plugin::Check::CLI
 
-  option :ua, :short => '-x USER-AGENT', :long => '--user-agent USER-AGENT', :default => 'Sensu-HTTP-Check'
-  option :url, :short => '-u URL'
-  option :host, :short => '-h HOST'
-  option :request_uri, :short => '-p PATH'
-  option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
-  option :header, :short => '-H HEADER', :long => '--header HEADER'
-  option :ssl, :short => '-s', :boolean => true, :default => false
-  option :insecure, :short => '-k', :boolean => true, :default => false
-  option :user, :short => '-U', :long => '--username USER'
-  option :password, :short => '-a', :long => '--password PASS'
-  option :cert, :short => '-c FILE'
-  option :cacert, :short => '-C FILE'
-  option :pattern, :short => '-q PAT'
-  option :timeout, :short => '-t SECS', :proc => proc { |a| a.to_i }, :default => 15
-  option :redirectok, :short => '-r', :boolean => true, :default => false
-  option :redirectto, :short => '-R URL'
-  option :response_bytes, :long => '--response-bytes BYTES', :proc => proc { |a| a.to_i }
-  option :response_code, :long => '--response-code CODE'
+  option :ua,
+    :short => '-x USER-AGENT',
+    :long => '--user-agent USER-AGENT',
+    :description => 'Specify a USER-AGENT',
+    :default => 'Sensu-HTTP-Check'
+
+  option :url,
+    :short => '-u URL',
+    :long => '--url URL',
+    :description => 'A URL to connect to'
+
+  option :host,
+    :short => '-h HOST',
+    :long => '--hostname HOSTNAME',
+    :description => 'A HOSTNAME to connect to'
+
+  option :port,
+    :short => '-P PORT',
+    :long => '--port PORT',
+    :proc => proc { |a| a.to_i },
+    :description => 'Select another port',
+    :default => 80
+
+  option :request_uri,
+    :short => '-p PATH',
+    :long => '--resquest-uri PATH',
+    :description => 'Specify a uri path'
+
+  option :header,
+    :short => '-H HEADER',
+    :long => '--header HEADER',
+    :description => 'Check for a HEADER'
+
+  option :ssl,
+    :short => '-s',
+    :boolean => true,
+    :description => 'Enabling SSL connections',
+    :default => false
+
+  option :insecure,
+    :short => '-k',
+    :boolean => true,
+    :description => 'Enabling insecure connections',
+    :default => false
+
+  option :user,
+    :short => '-U',
+    :long => '--username USER',
+    :description => 'A username to connect as'
+
+  option :password,
+    :short => '-a',
+    :long => '--password PASS',
+    :description => 'A password to use for the username'
+
+  option :cert,
+    :short => '-c FILE',
+    :long => '--cert FILE',
+    :description => 'Cert to use'
+
+  option :cacert,
+    :short => '-C FILE',
+    :long => '--cacert FILE',
+    :description => 'A CA Cert to use'
+
+  option :pattern,
+    :short => '-q PAT',
+    :long => '--query PAT',
+    :description => 'Query for a specific pattern'
+
+  option :timeout,
+    :short => '-t SECS',
+    :long => '--timeout SECS',
+    :proc => proc { |a| a.to_i },
+    :description => 'Set the timeout',
+    :default => 15
+
+  option :redirectok,
+    :short => '-r',
+    :boolean => true,
+    :description => 'Check if a redirect is ok',
+    :default => false
+
+  option :redirectto,
+    :short => '-R URL',
+    :long => '--redirect-to URL',
+    :description => 'Redirect to another page'
+
+  option :response_bytes,
+    :short => '-bytes BYTES',
+    :long => '--response-bytes BYTES',
+    :description => 'Check for a specific amount of response bytes',
+    :proc => proc { |a| a.to_i }
+
+  option :response_code, 
+    :long => '--response-code CODE',
+    :description => 'Check for a specific response code'
+
 
   def run
     if config[:url]
