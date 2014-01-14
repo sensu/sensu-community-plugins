@@ -39,7 +39,6 @@ class Checksum < Sensu::Plugin::Check::CLI
     files.each do |file|
       if File.exists?(file)
         file_hash = Digest::SHA2.file(file).hexdigest
-
         errors << "#{file} does not match" if file_hash != hash
       else
         errors << "#{file} does not exist"
