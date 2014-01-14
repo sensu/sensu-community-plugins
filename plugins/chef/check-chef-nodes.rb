@@ -77,5 +77,3 @@ class ChefNodesStatusChecker < Sensu::Plugin::Check::CLI
     end
 
 end
-
-
