@@ -10,7 +10,7 @@ UPSTREAM="https://github.com/sensu/sensu-community-plugins.git"
 git remote -v | grep upstream | grep $UPSTREAM >& /dev/null
 if test $? -eq 1
 then
-  git remote add upstream https://github.com/sensu/sensu-community-plugins.git
+  git remote add upstream $UPSTREAM
 fi
 
 BRANCH=$1
