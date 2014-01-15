@@ -38,21 +38,106 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     end
   end
 
-  option :warn_over, :short => '-w N', :proc => proc {|a| a.to_i }, :default => 1
-  option :crit_over, :short => '-c N', :proc => proc {|a| a.to_i }, :default => 1
-  option :warn_under, :short => '-W N', :proc => proc {|a| a.to_i }, :default => 0
-  option :crit_under, :short => '-C N', :proc => proc {|a| a.to_i }, :default => 0
-  option :metric, :short => '-t METRIC', :proc => proc {|a| a.to_sym }
+  option :warn_over,
+    :short => '-w N',
+    :long => '--warn-over N',
+    :description => 'Trigger a warning if over a number',
+    :proc => proc {|a| a.to_i },
+    :default => 1
 
-  option :match_self, :short => '-m', :boolean => true, :default => false
-  option :match_parent, :short => '-M', :boolean => true, :default => false
-  option :cmd_pat, :short => '-p PATTERN'
-  option :file_pid, :short => '-f PATH', :proc => proc {|a| read_pid(a) }
-  option :vsz, :short => '-z VSZ', :proc => proc {|a| a.to_i }
-  option :rss, :short => '-r RSS', :proc => proc {|a| a.to_i }
-  option :pcpu, :short => '-P PCPU', :proc => proc {|a| a.to_f }
-  option :state, :short => '-s STATE', :proc => proc {|a| a.split(',') }
-  option :user, :short => '-u USER', :proc => proc {|a| a.split(',') }
+  option :crit_over,
+    :short => '-c N',
+    :long => '--critical-over N',
+    :description => 'Trigger a critical if over a number',
+    :proc => proc {|a| a.to_i },
+    :default => 1
+
+  option :warn_under,
+    :short => '-W N',
+    :long => '--warn-under N',
+    :description => 'Trigger a warning if under a number',
+    :proc => proc {|a| a.to_i },
+    :default => 0
+
+  option :crit_under,
+    :short => '-C N',
+    :long => '--critical-under N',
+    :description => 'Trigger a critial if under a number',
+    :proc => proc {|a| a.to_i },
+    :default => 0
+
+  option :metric,
+    :short => '-t METRIC',
+    :long => '--metric METRIC',
+    :description => 'Trigger a critical if there are METRIC procs',
+    :proc => proc {|a| a.to_sym }
+
+  option :match_self,
+    :short => '-m',
+    :long => '--match-self',
+    :description => 'Match itself',
+    :boolean => true,
+    :default => false
+
+  option :match_parent,
+    :short => '-M',
+    :long => '--match-parent',
+    :description => 'Match parent process it uses ruby {process.ppid}',
+    :boolean => true,
+    :default => false
+
+  option :cmd_pat,
+    :short => '-p PATTERN',
+    :long => '--pattern PATTERN',
+    :description => 'Match a command against this pattern'
+
+  option :file_pid,
+    :short => '-f PID',
+    :long => '--file-pid PID',
+    :description => 'Check against a specific PID',
+    :proc => proc {|a| read_pid(a) }
+
+  option :vsz,
+    :short => '-z VSZ',
+    :long => '--virtual-memory-size VSZ',
+    :description => 'Trigger on a Virtual Memory size is bigger than this',
+    :proc => proc {|a| a.to_i }
+
+  option :rss,
+    :short => '-r RSS',
+    :long => '--resident-set-size RSS',
+    :description => 'Trigger on a Resident Set size is bigger than this',
+    :proc => proc {|a| a.to_i }
+
+  option :pcpu,
+    :short => '-P PCPU',
+    :long => '--proportional-set-size PCPU',
+    :description => 'Trigger on a Proportional Set Size is bigger than this',
+    :proc => proc {|a| a.to_f }
+
+  option :state,
+    :short => '-s STATE',
+    :long => '--state STATE',
+    :description => 'Trigger on a specific state, example: Z for zombie',
+    :proc => proc {|a| a.split(',') }
+
+  option :user,
+    :short => '-u USER',
+    :long => '--user USER',
+    :description => 'Trigger on a specific user',
+    :proc => proc {|a| a.split(',') }
+
+  option :esec_over,
+    :short => '-e SECONDS',
+    :long => '--esec-over SECONDS',
+    :proc => proc {|a| a.to_i },
+    :description => 'Match processes that older that this, in SECONDS'
+
+  option :esec_under,
+    :short => '-E SECONDS',
+    :long => '--esec-under SECONDS',
+    :proc => proc {|a| a.to_i },
+    :description => 'Match process that are younger than this, in SECONDS'
 
   def read_lines(cmd)
     IO.popen(cmd + ' 2>&1') do |child|
@@ -78,13 +163,18 @@ class CheckProcs < Sensu::Plugin::Check::CLI
         # const char *lfmt = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
         state = line.slice!(0..0)
         _stime = line.slice!(45..53)
-        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :command).merge(:state => state)
+        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :etime, :command).merge(:state => state)
       end
     else
-      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,command').drop(1).map do |line|
-        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :command)
+      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,etime,command').drop(1).map do |line|
+        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :etime, :command)
       end
     end
+  end
+
+  def etime_to_esec(etime)
+    m = /(\d+-)?(\d\d:)?(\d\d):(\d\d)/.match(etime)
+    (m[1]||0).to_i*86400 + (m[2]||0).to_i*3600 + (m[3]||0).to_i*60 + (m[4]||0).to_i
   end
 
   def run
@@ -97,6 +187,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! {|p| p[:vsz].to_f < config[:vsz] } if config[:vsz]
     procs.reject! {|p| p[:rss].to_f < config[:rss] } if config[:rss]
     procs.reject! {|p| p[:pcpu].to_f < config[:pcpu] } if config[:pcpu]
+    procs.reject! {|p| etime_to_esec(p[:etime]) >= config[:esec_under] } if config[:esec_under]
+    procs.reject! {|p| etime_to_esec(p[:etime]) <= config[:esec_over] } if config[:esec_over]
     procs.reject! {|p| !config[:state].include?(p[:state]) } if config[:state]
     procs.reject! {|p| !config[:user].include?(p[:user]) } if config[:user]
 
@@ -107,6 +199,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     msg += "; vsz > #{config[:vsz]}" if config[:vsz]
     msg += "; rss > #{config[:rss]}" if config[:rss]
     msg += "; pcpu > #{config[:pcpu]}" if config[:pcpu]
+    msg += "; esec < #{config[:esec_under]}" if config[:esec_under]
+    msg += "; esec > #{config[:esec_over]}" if config[:esec_over]
     msg += "; pid #{config[:file_pid]}" if config[:file_pid]
 
     if config[:metric]
