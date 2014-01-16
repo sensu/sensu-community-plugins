@@ -115,10 +115,9 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :description => 'Check for a specific amount of response bytes',
     :proc => proc { |a| a.to_i }
 
-  option :response_code, 
+  option :response_code,
     :long => '--response-code CODE',
     :description => 'Check for a specific response code'
-
 
   def run
     if config[:url]
