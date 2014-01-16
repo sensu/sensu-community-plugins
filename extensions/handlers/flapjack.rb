@@ -52,6 +52,8 @@ module Sensu::Extension
       state = event[:check][:status]
       if state == 0
         check_state = "ok"
+      elsif state == 1
+        check_state = "warning"
       elsif state == 2
         check_state = "critical"
       else
