@@ -3,6 +3,8 @@
 # Author: AJ Bourg <aj@ajbourg.com>
 #
 # Checks the checksums of files.
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -15,10 +17,12 @@ class Checksum < Sensu::Plugin::Check::CLI
     :short => '-f FILES',
     :long => '--files FILES',
     :required => true
+
   option :hash,
     :description => "The hash these files must hash as. If unspecified the files will be compared to the first file.",
     :short => '-h SHA2HASH',
     :long => '--hash SHA2HASH'
+
   option :warn_only,
     :description => "Warn instead of critical if they don't match",
     :short => '-w',
@@ -26,9 +30,10 @@ class Checksum < Sensu::Plugin::Check::CLI
     :boolean => true
 
   def run
+    
     files = config[:files].split(',')
 
-    if files.length == 1 and !config[:hash]
+    if files.length == 1 && !config[:hash]
       unknown "We have nothing to compare this file with."
     end
 
@@ -55,3 +60,4 @@ class Checksum < Sensu::Plugin::Check::CLI
   end
 
 end
+
