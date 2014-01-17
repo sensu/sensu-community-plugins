@@ -107,6 +107,9 @@ CollectionMethods:
 CaseIndentation:
   Enabled: false
 
+FinalNewline:
+  Enabled: true  
+      
 AllCops:
   Excludes:
     - vendor/**
