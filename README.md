@@ -39,6 +39,12 @@ bundle install
 bundle exec rubocop
 ```
 
+## RSpec Testing
+
+Currently we have RSpec as a test framework. Please add coverage for your check.
+This is ~~little bit hard~~ almost impossible for non-ruby checks. But don't be afraid on pushing your PR with non-ruby code. Just let someone from [team](https://github.com/sensu?tab=members) know. Maybe we can help you to rewrite your check to Ruby or even we can invent something completely new to test your work. Just don't hesitate to contact us.
+
+
 ## License
 
 Copyright 2011 Sonian, Inc. and contributors.
