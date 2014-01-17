@@ -57,7 +57,6 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
     :short => '-i IPADDR',
     :long => '--ipaddr IPADDR'
 
-
   def dhcp_discover
 
     request = DHCP::Discover.new
