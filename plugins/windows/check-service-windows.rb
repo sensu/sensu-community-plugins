@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 #
-# Check Named Service Plugin
-# This plugin checks whether a User-inputted service is running or not
-# This checks users tasklist tool to find any service is running or not.
+# Check Named Windows Service Plugin
+# This plugin checks whether a User-inputted service on Windows is running or not
+# This checks users tasklist tool to find any service on Windows is running or not.
 #
 # Edited from  <jashishtech@gmail.com>
 # Copyright 2014 <jj.asghar@peopleadmin.com>
@@ -22,7 +22,6 @@ class CheckDatabase < Sensu::Plugin::Check::CLI
 
   def run
     temp = system("tasklist /svc|findstr /i "+config[:service])
-    puts temp
     if temp == false
       message config[:service]+ " is not running"
       critical
