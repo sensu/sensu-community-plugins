@@ -46,14 +46,14 @@ class CheckCPU < Sensu::Plugin::Check::CLI
     sleep config[:sleep]
     cpu_stats_after = get_cpu_stats
 
+    # Some kernels don't have a 'guest' value (RHEL5).
+    metrics = metrics.slice(0, cpu_stats_after.length)
+
     cpu_total_diff = 0.to_f
     cpu_stats_diff = []
     metrics.each_index do |i|
-      # Some OS's don't have a 'guest' values (RHEL)
-      unless cpu_stats_after[i].nil?
-        cpu_stats_diff[i] = cpu_stats_after[i] - cpu_stats_before[i]
-        cpu_total_diff += cpu_stats_diff[i]
-      end
+      cpu_stats_diff[i] = cpu_stats_after[i] - cpu_stats_before[i]
+      cpu_total_diff += cpu_stats_diff[i]
     end
 
     cpu_stats = []
