@@ -81,7 +81,7 @@ module Sensu::Extension
         'check'     => check,
         'type'      => 'service',
         'state'     => check_state,
-        'summary'   => check_output_parsed.to_s,
+        'summary'   => check_output_parsed,
         'details'   => details,
         'time'      => timestamp,
       }
