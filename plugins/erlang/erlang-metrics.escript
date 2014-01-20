@@ -6,7 +6,7 @@
 %% for metrics gathering (great for Graphite)
 %%
 %% Usage:
-%% ./erlang-metrics.escript -c epic_erlang_cookie -n stats@127.0.0.1 -r epic_erlang_app@127.0.0.1 -s prod.epic_erlang_app
+%% ./erlang_stats.erl -c epic_erlang_cookie -n metrics@127.0.0.1 -r epic_erlang_app@127.0.0.1 -s prod.epic_erlang_app
 %%
 %% Copyright 2013 Panagiotis Papadomitsos <pj@ezgr.net>.
 %%
@@ -49,7 +49,7 @@ parse_options([Option|Options], ParsedOptions) ->
             parse_options(NewOptions, [{remote, Remote}|ParsedOptions]);
         "-h" ->
             usage(),
-            halt(1);
+            halt(0);
         _ ->
             usage(),
             io:format(standard_error, "Invalid option specified!~n", []),
@@ -59,7 +59,7 @@ parse_options([], ParsedOptions) ->
     ParsedOptions.
 
 set_local_node_name(ParsedOptions) ->
-    Node = proplists:get_value(node, ParsedOptions, "erlang@localhost.localdomain"),
+    Node = proplists:get_value(node, ParsedOptions, "metrics@localhost.localdomain"),
     case lists:member($@, Node) of
         true ->
             net_kernel:start([list_to_atom(Node), longnames]);
@@ -74,7 +74,7 @@ set_cookie(ParsedOptions) ->
     ok.
 
 connect_to_remote_node(ParsedOptions) ->
-    RemoteNode = proplists:get_value(remote, ParsedOptions, "erlang@localhost"),
+    RemoteNode = proplists:get_value(remote, ParsedOptions, "erlang@localhost.localdomain"),
     case net_adm:ping(list_to_atom(RemoteNode)) of
         pong ->
             ok;
@@ -86,23 +86,68 @@ connect_to_remote_node(ParsedOptions) ->
 
 collect_stats(ParsedOptions) ->
     Scheme = proplists:get_value(scheme, ParsedOptions, element(2, inet:gethostname()) ++ ".erlang"),
-    RemoteNode = proplists:get_value(remote, ParsedOptions, "erlang@localhost"),
+    RemoteNode = proplists:get_value(remote, ParsedOptions, "erlang@localhost.localdomain"),
     {Mega, Secs, _Micro} = erlang:now(),
     Timestamp = Mega * 1000000 + Secs,
+    % Memory statistics
     case rpc:call(list_to_atom(RemoteNode), erlang, memory, []) of
-        {badrpc, Reason} ->
-            io:format(standard_error, "Could not fetch remote metrics with reason: ~p", [Reason]);
-        MemoryStats when is_list(MemoryStats) ->
+        MemoryMetrics when is_list(MemoryMetrics) ->
             lists:foreach(fun({Key, Value}) ->
                 ActualKey = Scheme ++ ".memory." ++ atom_to_list(Key),
                 io:format("~s ~B ~B~n", [ActualKey, Value, Timestamp])
-            end, MemoryStats)
+            end, MemoryMetrics);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
     end,
+    % Total number of processes
     case rpc:call(list_to_atom(RemoteNode), erlang, processes, []) of
-        {badrpc, NReason} ->
-            io:format(standard_error, "Could not fetch remote metrics with reason: ~p", [NReason]);
         Processes when is_list(Processes) ->
-            io:format("~s ~B ~B~n", [Scheme ++ ".processes", erlang:length(Processes), Timestamp])
+            io:format("~s ~B ~B~n", [Scheme ++ ".processes", erlang:length(Processes), Timestamp]);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
     end,
-
+    % Context switches
+    case rpc:call(list_to_atom(RemoteNode), erlang, statistics, [context_switches]) of
+        {Switches, 0} when is_integer(Switches) ->
+            io:format("~s ~B ~B~n", [Scheme ++ ".context_switches", Switches, Timestamp]);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
+    end,
+    % GC Metrics
+    case rpc:call(list_to_atom(RemoteNode), erlang, statistics, [garbage_collection]) of
+        {NumberofGCs, WordsReclaimed, 0} when is_integer(NumberofGCs), is_integer(WordsReclaimed) ->
+            io:format("~s ~B ~B~n", [Scheme ++ ".number_of_gcs", NumberofGCs, Timestamp]),
+            io:format("~s ~B ~B~n", [Scheme ++ ".words_reclaimed", WordsReclaimed, Timestamp]);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
+    end,
+    % I/O Metrics
+    case rpc:call(list_to_atom(RemoteNode), erlang, statistics, [io]) of
+        {{input, Input}, {output, Output}} when is_integer(Input), is_integer(Output) ->
+            io:format("~s ~B ~B~n", [Scheme ++ ".input_io_bytes", Input, Timestamp]),
+            io:format("~s ~B ~B~n", [Scheme ++ ".output_io_bytes", Output, Timestamp]);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
+    end,
+    % Total number of scheduler reductions
+    case rpc:call(list_to_atom(RemoteNode), erlang, statistics, [reductions]) of
+         {TotalReductions, _ReductionsSinceLastCall} when is_integer(TotalReductions) ->
+            io:format("~s ~B ~B~n", [Scheme ++ ".reductions", TotalReductions, Timestamp]);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
+    end,
+    % Total nubmer of processes in the run_queue of each scheduler
+    case rpc:call(list_to_atom(RemoteNode), erlang, statistics, [run_queue]) of
+         RunQueue when is_integer(RunQueue) ->
+            io:format("~s ~B ~B~n", [Scheme ++ ".run_queue", RunQueue, Timestamp]);
+        _ ->
+            % Catch-all state, we don't want to pollute metrics output
+            ok
+    end,
     ok.
