@@ -16,7 +16,7 @@
 main(Options) ->
     ParsedOptions = parse_options(Options),
     ok = set_local_node_name(ParsedOptions),
-    ok = set_cookie(ParsedOptions),
+    ok = set_connection_cookie(ParsedOptions),
     ok = connect_to_remote_node(ParsedOptions),
     ok = collect_stats(ParsedOptions),
     halt(0).
@@ -53,7 +53,7 @@ parse_options([Option|Options], ParsedOptions) ->
         _ ->
             usage(),
             io:format(standard_error, "Invalid option specified!~n", []),
-            halt(1)
+            halt(3)
     end;
 parse_options([], ParsedOptions) ->
     ParsedOptions.
@@ -68,7 +68,7 @@ set_local_node_name(ParsedOptions) ->
     end,
     ok.
 
-set_cookie(ParsedOptions) ->
+set_connection_cookie(ParsedOptions) ->
     Cookie = proplists:get_value(cookie, ParsedOptions, "secret"),
     erlang:set_cookie(node(), list_to_atom(Cookie)),
     ok.
@@ -81,7 +81,7 @@ connect_to_remote_node(ParsedOptions) ->
         _OtherAnswer ->
             usage(),
             io:format(standard_error, "Invalid remote node specified or a connection could not be made!~n", []),
-            halt(1)
+            halt(3)
     end.
 
 collect_stats(ParsedOptions) ->
