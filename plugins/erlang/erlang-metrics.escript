@@ -8,6 +8,11 @@
 %% Usage:
 %% ./erlang_stats.erl -c epic_erlang_cookie -n metrics@127.0.0.1 -r epic_erlang_app@127.0.0.1 -s prod.epic_erlang_app
 %%
+%% If the script does not work, create a test cookie like:
+%% echo -n secret > /opt/sensu/.erlang.cookie
+%% chmod 600 /opt/sensu/.erlang.cookie
+%% chown sensu:sensu /opt/sensu/.erlang.cookie
+%%
 %% Copyright 2013 Panagiotis Papadomitsos <pj@ezgr.net>.
 %%
 %% Released under the same terms as Sensu (the MIT license); see LICENSE
