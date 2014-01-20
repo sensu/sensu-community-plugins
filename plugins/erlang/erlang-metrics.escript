@@ -6,7 +6,7 @@
 %% for metrics gathering (great for Graphite)
 %%
 %% Usage:
-%% ./erlang_stats.erl -c epic_erlang_cookie -n stats@127.0.0.1 -r epic_erlang_app@127.0.0.1 -s prod.epic_erlang_app
+%% ./erlang-metrics.escript -c epic_erlang_cookie -n stats@127.0.0.1 -r epic_erlang_app@127.0.0.1 -s prod.epic_erlang_app
 %%
 %% Copyright 2013 Panagiotis Papadomitsos <pj@ezgr.net>.
 %%
