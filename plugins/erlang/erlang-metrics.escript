@@ -85,7 +85,7 @@ connect_to_remote_node(ParsedOptions) ->
     end.
 
 collect_stats(ParsedOptions) ->
-    Scheme = proplists:get_value(scheme, ParsedOptions, element(2, inet:gethostname()) ++ ".erlang"),
+    Scheme = lists:flatten(proplists:get_value(scheme, ParsedOptions, element(2, inet:gethostname())), ".erlang"),
     RemoteNode = proplists:get_value(remote, ParsedOptions, "erlang@localhost.localdomain"),
     {Mega, Secs, _Micro} = erlang:now(),
     Timestamp = Mega * 1000000 + Secs,
