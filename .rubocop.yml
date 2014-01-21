@@ -102,6 +102,9 @@ Documentation:
 AlignHash:
   Enabled: false
 
+SpaceAroundBlockBraces:
+  Enabled: false
+
 AllCops:
   Excludes:
     - vendor/**
