@@ -18,7 +18,7 @@ HashSyntax:
 
 # Prefer single-quotes
 StringLiterals:
-  Enabled: true
+  Enabled: false
 
 AlignParameters:
   Enabled: false
@@ -82,6 +82,19 @@ FinalNewline:
 
 AssignmentInCondition:
   Enabled: true
+
+EmptyLinesAroundBody:
+  Enabled: false
+
+IndentationWidth:
+  Enabled: false
+
+# That would be nice to have - check for long methods
+CyclomaticComplexity:
+  Enabled: false
+
+Documentation:
+  Enabled: false
 
 AllCops:
   Excludes:
