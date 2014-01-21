@@ -63,7 +63,6 @@ AWS.config({
   :secret_access_key => secret_key
 })
 
-cw = AWS::CloudWatch.new
 metric = AWS::CloudWatch::Metric.new('AWS/RDS', "#{options[:stat]}",
   {:dimensions => [
     {:name => "DBInstanceIdentifier", :value => "#{options[:host]}"}
