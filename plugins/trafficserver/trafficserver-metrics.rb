@@ -69,8 +69,8 @@ class TrafficServerMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def wanted(k)
-    k =~ /^proxy\.process\.http\.cache/ or
-    k =~ /^proxy\.process\.http\..*_responses/ or
+    k =~ /^proxy\.process\.http\.cache/ ||
+    k =~ /^proxy\.process\.http\..*_responses/ ||
     k =~ /^proxy\.process\.cache/
   end
 end
