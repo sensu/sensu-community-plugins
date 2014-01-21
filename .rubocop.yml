@@ -96,6 +96,9 @@ CyclomaticComplexity:
 Documentation:
   Enabled: false
 
+AlignHash:
+  Enabled: false
+
 AllCops:
   Excludes:
     - vendor/**
