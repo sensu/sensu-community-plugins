@@ -23,25 +23,32 @@ secret_key=""
 
 options = {}
 optparse = OptionParser.new do|opts|
+
   opts.on('-h', '--help', '') do
     puts opts
     exit
   end
+
   opts.on('-H', '--host HOST', 'Warning threshold') do |host|
     options[:host] = host
   end
-   opts.on('-w', '--warn WARN', 'Warning threshold') do |warn|
+
+  opts.on('-w', '--warn WARN', 'Warning threshold') do |warn|
     options[:warn] = warn
   end
+
   opts.on('-c', '--crit CRIT', 'Critical threshold') do |crit|
     options[:crit] = crit
   end
+
   opts.on('-s', '--stat STAT', 'Statistic') do|stat|
     options[:stat] = stat
   end
+
   opts.on('-l', '--lessthan', 'Threshold is less than') do|lessthan|
     options[:lessthan] = lessthan
   end
+
 end
 begin
   optparse.parse!

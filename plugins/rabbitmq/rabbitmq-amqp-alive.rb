@@ -69,9 +69,9 @@ class CheckRabbitAMQP < Sensu::Plugin::Check::CLI
       conn = Bunny.new("amqp://#{username}:#{password}@#{host}:#{port}/#{vhost}")
       conn.start
       { "status" => "ok", "message" => "RabbitMQ server is alive" }
-    rescue Bunny::PossibleAuthenticationFailureError => e
+    rescue Bunny::PossibleAuthenticationFailureError
       { "status" => "critical", "message" => "Possible authentication failure" }
-    rescue Bunny::TCPConnectionFailed => e
+    rescue Bunny::TCPConnectionFailed
       { "status" => "critical", "message" => "TCP connection refused" }
     rescue Exception => e
       { "status" => "unknown", "message" => e.message }
