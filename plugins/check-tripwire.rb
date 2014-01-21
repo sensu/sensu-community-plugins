@@ -121,7 +121,7 @@ class TripwireCheck < Sensu::Plugin::Check::CLI
     current_violation = nil
     current_list = nil
     report.each do |line|
-      if m = line.match(rule_match)
+      if m = line.match(rule_match) # rubocop:disable AssignmentInCondition
         name = m[1]
         current_violation = {name: name}
         violations[:name] = current_violation
@@ -131,7 +131,7 @@ class TripwireCheck < Sensu::Plugin::Check::CLI
         current_violation[:level] = m[1].to_i
       end
 
-      if (m = line.match(violation_type)) && current_violation
+      if (m = line.match(violation_type)) && current_violation # rubocop:disable AssignmentInCondition
         current_list = []
         current_violation[m[1]] = current_list
       end

@@ -18,7 +18,7 @@ HashSyntax:
 
 # Prefer single-quotes
 StringLiterals:
-  Enabled: false
+  Enabled: true
 
 AlignParameters:
   Enabled: false
@@ -29,28 +29,13 @@ SpaceAroundOperators:
 Encoding:
   Enabled: false
 
-PercentR:
-  Enabled: false
-
-SpaceAroundBraces:
-  Enabled: false
-
-FavorPercentR:
-  Enabled: false
-
 AndOr:
-  Enabled: false
+  Enabled: true
 
 EmptyLineBetweenDefs:
   Enabled: false
 
 SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-SymbolName:
-  Enabled: false
-
-ReduceArguments:
   Enabled: false
 
 RescueException:
@@ -68,12 +53,6 @@ IfUnlessModifier:
 ParenthesesAroundCondition:
   Enabled: false
 
-MethodAndVariableSnakeCase:
-  Enabled: false
-
-AvoidClassVars:
-  Enabled: false
-
 WhileUntilModifier:
   Enabled: false
 
@@ -89,15 +68,6 @@ BlockNesting:
 Proc:
   Enabled: false
 
-# Global vars should be removed
-AvoidGlobalVars:
-  Enabled: false
-
-# Probably some good ones in here.
-# Disabled for $? => $CHILD_STATUS
-AvoidPerlisms:
-  Enabled: false
-
 Lambda:
   Enabled: false
 
@@ -109,6 +79,12 @@ ColonMethodCall:
 
 CaseIndentation:
   Enabled: false
+
+FinalNewline:
+  Enabled: true
+
+AssignmentInCondition:
+  Enabled: true
 
 AllCops:
   Excludes:

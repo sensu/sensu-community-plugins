@@ -67,7 +67,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
   def cert_message(count, descriptor, limit)
     message = (count == 1 ? "1 ELB cert is " : "#{count} ELB certs are ")
     message += "#{descriptor} #{limit} day"
-    message += (limit == 1 ? "" : "s")
+    message += (limit == 1 ? "" : "s") # rubocop:disable UselessAssignment
   end
 
   def run
