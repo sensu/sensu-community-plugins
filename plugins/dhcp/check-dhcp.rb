@@ -125,10 +125,9 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
   def run
     response = dhcp_discover
     if response
-      if config[:debug]
-        puts response
-      end
-      if config[:offer] or config[:ipaddr]
+      puts response if config[:debug]
+
+      if config[:offer] || config[:ipaddr]
         # Is the response an DHCP Offer?
         if response.is_a?(DHCP::Offer)
           if config[:ipaddr]
