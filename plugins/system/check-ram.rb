@@ -40,7 +40,7 @@ class CheckRAM < Sensu::Plugin::Check::CLI
       warning if free_ram < config[:warn]
       ok
     else
-      unknown "invalid percentage" if config[:crit] > 100 or config[:warn] > 100
+      unknown "invalid percentage" if config[:crit] > 100 || config[:warn] > 100
 
       percents_left = free_ram*100/total_ram
       message "#{percents_left}% free RAM left"

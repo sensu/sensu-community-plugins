@@ -80,7 +80,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :long => '--filepattern FILE'
 
   def run
-    unknown "No log file specified" unless config[:log_file] or config[:file_pattern]
+    unknown "No log file specified" unless config[:log_file] || config[:file_pattern]
     unknown "No pattern specified" unless config[:pattern]
     file_list = []
     file_list << config[:log_file] if config[:log_file]
