@@ -228,7 +228,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       devices << partition unless partition.nil?
     end
 
-    return devices
+    devices
   end
 
   # find all attribute id from parameter or json file
@@ -240,6 +240,6 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       attributes << att[:id]
     end
 
-    return attributes
+    attributes
   end
 end
