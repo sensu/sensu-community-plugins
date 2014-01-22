@@ -167,7 +167,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         max_values[val[:target]] = max
       end
     end
-    return max_values
+    max_values
   end
 
   def get_max_value(values)
@@ -187,7 +187,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         last_values[val[:target]] = last
       end
     end
-    return last_values
+    last_values
   end
 
   def get_last_metric(values, count = 1)
@@ -215,7 +215,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         last_values[target_name] = metrics.map { | metric |  metric[0] }.mean
       end
     end
-    return last_values
+    last_values
   end
 
   def has_been_updated_since(target, time, updated_since)
@@ -227,7 +227,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         warnings << "The metric #{target_name} has not been updated in #{updated_since.to_s} seconds" unless last_time_stamp_bool
       end
     end
-    return warnings
+    warnings
   end
 
   def greater_less

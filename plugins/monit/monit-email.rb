@@ -67,7 +67,7 @@ class ParseEmail
   end
 
   def body
-    return "#{@token.subject}  ERROR BODY:#{@token.body} ALERT:#{@alert}"
+    "#{@token.subject}  ERROR BODY:#{@token.body} ALERT:#{@alert}"
   end
   def service
     service_string = @token.body.match(/Service: .*/).to_s

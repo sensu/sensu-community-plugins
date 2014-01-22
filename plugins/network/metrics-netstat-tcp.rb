@@ -87,7 +87,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
       end
     end
-    return state_counts
+    state_counts
   end
 
   def run

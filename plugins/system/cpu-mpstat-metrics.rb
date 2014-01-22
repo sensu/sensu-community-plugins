@@ -31,7 +31,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
         i +=1
       end
     end
-    return mpstat
+    mpstat
   end
 
   def delta_cpu_metrics(baseline_cpus, sample_cpus)
@@ -42,7 +42,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
         delta_cpus[:"#{cpu}"][:"#{task}"] = sample_cpus[:"#{cpu}"][:"#{task}"] - time
       end
     end
-    return delta_cpus
+    delta_cpus
   end
 
   def run
