@@ -40,7 +40,7 @@ class Sensors < Sensu::Plugin::Metric::CLI::Graphite
         key = key.downcase.gsub(/\s/, '')
         if key[0 ..3] == "temp" or key[0 .. 3] == "core"
           value.strip =~ /[\+\-]?(\d+(\.\d)?)/
-          value = $1
+          value = $1 # rubocop:disable PerlBackrefs
           metrics[key] = value
         end
       rescue
