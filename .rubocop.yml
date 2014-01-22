@@ -102,6 +102,12 @@ AlignHash:
 SpaceAroundBlockBraces:
   Enabled: false
 
+SingleLineBlockParams:
+  Enabled: false
+
+RedundantSelf:
+  Enabled: false
+
 AllCops:
   Excludes:
     - vendor/**

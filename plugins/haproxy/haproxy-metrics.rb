@@ -109,7 +109,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     out = nil
     1.upto(config[:retries]) do |i|
-      out = get_stats();
+      out = get_stats;
       break unless out.to_s.length.zero?
       sleep(config[:retry_interval])
     end

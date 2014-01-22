@@ -147,9 +147,9 @@ class TripwireCheck < Sensu::Plugin::Check::CLI
     begin
       report = run_tripwire.split("\n")
       violations = parse_violations report
-      cleanup()
+      cleanup
     rescue Exception => e
-      cleanup()
+      cleanup
       warning "Error running tripwire. #{e. message}"
       exit 1
     end
