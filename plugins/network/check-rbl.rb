@@ -73,8 +73,7 @@ client)"
 
       dnsbl_ret.each do |dnsbl_result|
 
-        if (dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~
-/blacklist/i)
+        if (dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~ /blacklist/i)
           unless (ignored_bls_set.member?(dnsbl_result.dnsbl))
             msg_string =  "#{msg_string} #{dnsbl_result.dnsbl}"
           end
@@ -84,7 +83,7 @@ client)"
           end
         end
 
-       end
+      end
 
       unless msg_string.empty?
         if (criticality > 0)

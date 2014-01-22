@@ -49,7 +49,7 @@ class CheckPerconaClusterSize < Sensu::Plugin::Check::CLI
         db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database])
         cluster_size = db.
             query("SHOW GLOBAL STATUS LIKE 'wsrep_cluster_size'").
-            fetch_hash().
+            fetch_hash.
             fetch('Value').
             to_i
     critical "Expected to find #{config[:expected]} nodes, found #{cluster_size}" if cluster_size != config[:expected].to_i

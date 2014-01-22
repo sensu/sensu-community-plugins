@@ -31,7 +31,7 @@ require 'sensu-plugin/check/cli'
 class LoadAverage
   def initialize(per_core = false)
     @cores = per_core ? cpu_count : 1
-    @avg = File.read('/proc/loadavg').split.take(3).map {|a| (a.to_f / @cores).round(2) } rescue nil
+    @avg = File.read('/proc/loadavg').split.take(3).map {|a| (a.to_f / @cores).round(2) } rescue nil # rubocop:disable RescueModifier
   end
   def cpu_count
     `grep -sc ^processor /proc/cpuinfo`.to_i rescue 0

@@ -61,7 +61,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :short => "-f BACKEND1[,BACKEND2]",
     :long => "--backends BACKEND1[,BACKEND2]",
     :proc => Proc.new { |l| l.split(',') },
-    :default => Array.new()  # an empty list means show all backends
+    :default => Array.new  # an empty list means show all backends
 
   option :server_metrics,
     :description => "Add metrics for backend servers",
@@ -109,7 +109,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     out = nil
     1.upto(config[:retries]) do |i|
-      out = get_stats();
+      out = get_stats;
       break unless out.to_s.length.zero?
       sleep(config[:retry_interval])
     end

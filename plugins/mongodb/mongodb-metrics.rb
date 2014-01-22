@@ -104,7 +104,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
 
     serverMetrics['asserts.warnings'] = serverStatus['asserts']['warning']
     serverMetrics['asserts.errors'] = serverStatus['asserts']['msg']
-    return serverMetrics
+    serverMetrics
   end
 
 end
