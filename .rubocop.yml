@@ -111,6 +111,9 @@ SingleLineBlockParams:
 RedundantSelf:
   Enabled: false
 
+BracesAroundHashParameters:
+  Enabled: false
+
 AllCops:
   Excludes:
     - vendor/**
