@@ -37,7 +37,7 @@ class StatusPage < Sensu::Handler
                     )
                     when 'resolve'
                       incident_id = nil
-                      statuspage.get_all_incidents().each do |incident|
+                      statuspage.get_all_incidents.each do |incident|
                         if incident['name'] == incident_key
                           incident_id = incident['id']
                           break

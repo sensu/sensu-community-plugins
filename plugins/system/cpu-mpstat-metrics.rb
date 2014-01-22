@@ -46,10 +46,10 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    baseline_cpus = get_mpstats()
+    baseline_cpus = get_mpstats
     # measure for a second then get the deltas in jiffies
     sleep(1)
-    sample_cpus = get_mpstats()
+    sample_cpus = get_mpstats
     delta_cpus = delta_cpu_metrics(baseline_cpus, sample_cpus)
     cpu_count = sample_cpus.length - 1
     delta_cpus.each_pair do |cpu, columns|

@@ -98,7 +98,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
               critical "An issue occurred attempting to get cert: #{e.message}"
             end
 
-            cert_days_remaining = ((cert.not_after - Time.now()) / 86400).to_i
+            cert_days_remaining = ((cert.not_after - Time.now) / 86400).to_i
             message = sprintf '%s(%d)', lb.name, cert_days_remaining
 
             if config[:crit_under] > 0 && config[:crit_under] >= cert_days_remaining

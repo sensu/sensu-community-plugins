@@ -20,7 +20,7 @@ class CheckNTP < Sensu::Plugin::Check::CLI
 
   def run
     begin
-      offset = `ntpq -c "rv 0 offset"`.split('=')[1].strip().to_i()
+      offset = `ntpq -c "rv 0 offset"`.split('=')[1].strip.to_i
     rescue
       unknown "NTP command Failed"
     end

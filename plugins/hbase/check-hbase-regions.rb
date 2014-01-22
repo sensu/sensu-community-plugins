@@ -60,10 +60,10 @@ def regionserver_info
   conf  = HBaseConfiguration.new
   admin = HBaseAdmin.new(conf)
 
-  status = admin.getClusterStatus()
-  status.getServerInfo().map do |server|
-    { :hostname => server.getServerAddress().getHostname(),
-      :regions => server.getLoad().getNumberOfRegions()
+  status = admin.getClusterStatus
+  status.getServerInfo.map do |server|
+    { :hostname => server.getServerAddress.getHostname,
+      :regions => server.getLoad.getNumberOfRegions
     }
   end
 end
