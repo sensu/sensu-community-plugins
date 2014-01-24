@@ -36,7 +36,7 @@ class ParseEmail
       "UID failed",
       "Uptime failed"
     ]
-   array_failure.include?(@alert)
+    array_failure.include?(@alert)
   end
 
   def recover?
@@ -49,7 +49,7 @@ class ParseEmail
       "Filesystem flags succeeded",
       "GID succeeded",
       "ICMP succeeded",
-     "Monit instance changed not",
+      "Monit instance changed not",
       "Type succeeded",
       "Exists",
       "Permission succeeded",

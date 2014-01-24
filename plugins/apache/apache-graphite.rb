@@ -63,7 +63,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
- option :secure,
+  option :secure,
     :short => "-s",
     :long => "--secure",
     :description => "Use SSL"
