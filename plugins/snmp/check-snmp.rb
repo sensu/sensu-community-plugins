@@ -26,12 +26,10 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
 
   option :host,
     :short => '-h host',
-    :boolean => true,
     :default => "127.0.0.1"
 
   option :community,
     :short => '-C snmp community',
-    :boolean =>true,
     :default => "public"
 
   option :objectid,
