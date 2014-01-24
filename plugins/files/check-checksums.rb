@@ -30,7 +30,6 @@ class Checksum < Sensu::Plugin::Check::CLI
     :boolean => true
 
   def run
-    
     files = config[:files].split(',')
 
     if files.length == 1 && !config[:hash]
@@ -60,4 +59,3 @@ class Checksum < Sensu::Plugin::Check::CLI
   end
 
 end
-
