@@ -50,12 +50,15 @@ module Sensu::Extension
     def run(event)
       event = Oj.load(event)
       state = event[:check][:status]
-      if state == 0
-        check_state = "ok"
-      elsif state == 2
-        check_state = "critical"
+      check_state = case state
+      when 0
+        'ok'
+      when 1
+        'warning'
+      when 2
+        'critical'
       else
-        check_state = "unknown"
+        'unknown'
       end
       timestamp = event[:check][:issued]
       entity = event[:client][:name]
@@ -79,7 +82,7 @@ module Sensu::Extension
         'check'     => check,
         'type'      => 'service',
         'state'     => check_state,
-        'summary'   => check_output_parsed,
+        'summary'   => check_output_parsed.to_s,
         'details'   => details,
         'time'      => timestamp,
       }
