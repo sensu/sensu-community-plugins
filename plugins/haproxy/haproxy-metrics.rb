@@ -86,7 +86,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def get_stats
     uri = URI.parse(config[:connection])
 
-    if uri.is_a?(URI::Generic) and File.socket?(uri.path)
+    if uri.is_a?(URI::Generic) && File.socket?(uri.path)
       socket = UNIXSocket.new(config[:connection])
       socket.puts("show stat")
       out = socket.read

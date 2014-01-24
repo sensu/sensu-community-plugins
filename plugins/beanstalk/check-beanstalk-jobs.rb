@@ -56,9 +56,9 @@ class CheckBeanstalkWorkers < Sensu::Plugin::Check::CLI
     end
     jobs = stats['current-jobs-ready'] + stats['current-jobs-delayed']
 
-    if config[:crit_high] and jobs > config[:crit_high]
+    if config[:crit_high] && jobs > config[:crit_high]
       critical "High threshold is #{config[:crit_high]} jobs (#{jobs} active jobs)"
-    elsif config[:warn_high] and jobs > config[:warn_high]
+    elsif config[:warn_high] && jobs > config[:warn_high]
       warning "High threshold is #{config[:warn_high]} jobs (#{jobs} active jobs)"
     elsif jobs < config[:crit_low]
       warning "Low threshold is #{config[:crit_low]} jobs (#{jobs} active jobs)"
