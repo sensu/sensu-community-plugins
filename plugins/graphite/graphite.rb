@@ -275,11 +275,11 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values_array.size
       last_value = last_values[target]
-      percent = last_value / avg_value unless last_value.nil? or avg_value.nil?
+      percent = last_value / avg_value unless last_value.nil? || avg_value.nil?
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
-        if !percent.nil? and var1 > var2 and (values_array.size > 0 or !config[:ignore_nulls])
+        if !percent.nil? and var1 > var2 and (values_array.size > 0 || !config[:ignore_nulls])
           text = "The last value of metric #{target} is #{percent}% #{greater_less} than allowed #{max_value}% of the average value #{avg_value}"
           case type
           when "warning"
@@ -311,7 +311,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? avg_value : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : avg_value
-        if var1 > var2 and (values_array.size > 0 or !config[:ignore_nulls])
+        if var1 > var2 and (values_array.size > 0 || !config[:ignore_nulls])
           text = "The average value of metric #{target} is #{avg_value} that is #{greater_less} than allowed average of #{max_value}"
           case type
           when "warning"
@@ -342,7 +342,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       percentile_value = values_array.percentile(percentile)
       last_value = last_values[target]
-      percent = last_value / percentile_value unless last_value.nil? or percentile_value.nil?
+      percent = last_value / percentile_value unless last_value.nil? || percentile_value.nil?
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent

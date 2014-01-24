@@ -323,7 +323,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
     def get_metric(string)
       string.strip!
       (metric, value) = string.split(': ')
-      if metric.nil? or value.nil?
+      if metric.nil? || value.nil?
         return [nil, nil]
       else
         # sanitize metric names for graphite
