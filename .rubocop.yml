@@ -13,13 +13,6 @@ MethodLength:
 LineLength:
   Max: 160
 
-HashSyntax:
-  Enabled: false
-
-# Prefer single-quotes
-StringLiterals:
-  Enabled: false
-
 AlignParameters:
   Enabled: false
 
@@ -32,16 +25,93 @@ Encoding:
 AndOr:
   Enabled: true
 
-EmptyLineBetweenDefs:
+FinalNewline:
+  Enabled: true
+
+AssignmentInCondition:
+  Enabled: true
+
+AllCops:
+  Excludes:
+    - vendor/**
+
+ClassLength:
   Enabled: false
 
-SpaceInsideHashLiteralBraces:
+##
+# TODO: enable and check everything below
+
+RegexpLiteral:
   Enabled: false
 
-RescueException:
+AccessorMethodName:
   Enabled: false
 
-Syntax:
+NilComparison:
+  Enabled: false
+
+WhileUntilDo:
+  Enabled: false
+
+TrailingComma:
+  Enabled: false
+
+SpecialGlobalVars:
+  Enabled: false
+
+RedundantBegin:
+  Enabled: false
+
+VariableName:
+  Enabled: false
+
+MethodName:
+  Enabled: false
+
+SignalException:
+  Enabled: false
+
+HashMethods:
+  Enabled: false
+
+NumericLiterals:
+  Enabled: false
+
+SpaceAfterMethodName:
+  Enabled: false
+
+DotPosition:
+  Enabled: false
+
+AlignArray:
+  Enabled: false
+
+ConditionPosition:
+  Enabled: false
+
+EmptyLiteral:
+  Enabled: false
+
+TrivialAccessors:
+  Enabled: false
+
+MultilineBlockChain:
+  Enabled: false
+
+PredicateName:
+  Enabled: false
+
+HashSyntax:
+  Enabled: false
+
+# Single Quotes
+StringLiterals:
+  Enabled: false
+
+UnlessElse:
+  Enabled: false
+
+RedundantSelf:
   Enabled: false
 
 WordArray:
@@ -59,9 +129,6 @@ WhileUntilModifier:
 Semicolon:
   Enabled: false
 
-UnlessElse:
-  Enabled: false
-
 BlockNesting:
   Enabled: false
 
@@ -74,17 +141,17 @@ Lambda:
 CollectionMethods:
   Enabled: false
 
-ColonMethodCall:
+EmptyLineBetweenDefs:
+  Enabled: false
+
+SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+RescueException:
   Enabled: false
 
 CaseIndentation:
   Enabled: false
-
-FinalNewline:
-  Enabled: true
-
-AssignmentInCondition:
-  Enabled: true
 
 EmptyLinesAroundBody:
   Enabled: false
@@ -108,12 +175,5 @@ SpaceAroundBlockBraces:
 SingleLineBlockParams:
   Enabled: false
 
-RedundantSelf:
-  Enabled: false
-
 BracesAroundHashParameters:
   Enabled: false
-
-AllCops:
-  Excludes:
-    - vendor/**

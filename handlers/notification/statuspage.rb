@@ -29,7 +29,7 @@ class StatusPage < Sensu::Handler
       timeout(3) do
         response = case @event['action']
                    when 'create'
-                    response = statuspage.create_realtime_incident( # rubocop:disable UselessAssignment
+                    response = statuspage.create_realtime_incident(# rubocop:disable UselessAssignment
                       :name => incident_key,
                       :status => "investigating",
                       :wants_twitter_update => "f",
@@ -43,7 +43,7 @@ class StatusPage < Sensu::Handler
                           break
                         end
                       end
-                      response = statuspage.update_incident( # rubocop:disable UselessAssignment
+                      response = statuspage.update_incident(# rubocop:disable UselessAssignment
                         :name => "Problem with #{incident_key} has been resolved.",
                         :wants_twitter_update => "f",
                         :status => "resolved",

@@ -166,4 +166,3 @@ class TripwireCheck < Sensu::Plugin::Check::CLI
     end
   end
 end
-
