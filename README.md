@@ -26,6 +26,10 @@ be declared in the header of the plugin/handler file.
 
 Only pull requests passing lint/tests will be merged.
 
+Please do not not abandon your PR. Because only you can help us merge
+if there some issues withing it. If PR have no feedback in month - we 
+close it. Anyway - you can always open a new one.
+
 ## Rubocop linting
 
 Rubocop is used to lint the style of the ruby plugins. This is done
