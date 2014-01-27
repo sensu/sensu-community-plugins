@@ -143,7 +143,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         @raw_data = JSON.parse(handle.gets)
         output = {}
         @raw_data.each do |raw|
-          raw['datapoints'].delete_if{|v| v.first == nil}
+          raw['datapoints'].delete_if{|v| v.first.nil? }
           next if raw['datapoints'].empty?
           target = raw['target']
           data = raw['datapoints'].map(&:first)
