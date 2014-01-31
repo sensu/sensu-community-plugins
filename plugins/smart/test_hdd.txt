@@ -1,3 +1,9 @@
+smartctl 5.43 2012-06-30 r3573 [x86_64-linux-2.6.32-042stab083.2] (local build)
+Copyright (C) 2002-12 by Bruce Allen, http://smartmontools.sourceforge.net
+
+=== START OF READ SMART DATA SECTION ===
+SMART overall-health self-assessment test result: PASSED
+
 ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
   1 Raw_Read_Error_Rate     0x000f   073   063   044    Pre-fail  Always       -       23975308
   3 Spin_Up_Time            0x0003   096   096   000    Pre-fail  Always       -       0

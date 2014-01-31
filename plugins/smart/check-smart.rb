@@ -40,9 +40,16 @@
 # -b: smartctl binary to use, in case you hide yours (default: /usr/sbin/smartctl)
 # -d: default threshold for crit_min,warn_min,warn_max,crit_max (default: 0,0,0,0)
 # -a: SMART attributes to check (default: all)
+# -i: SMART attributes to ignore (default: none) perfect for ignoring incorrect attribute 9 easily on Intel 520 SSDs
 # -t: Custom threshold for SMART attributes. (id,crit_min,warn_min,warn_max,crit_max)
 # -o: Overall SMART health check (default: on)
 # -d: Devices to check (default: all)
+# --megaraid: Checks drives behind megaraid (default: off)
+# --megaraidadapters: Allows you to specify which adapters to check (default: 0)
+# --megaraidbinary: Allows you to specify the location of MegaCli for determining the megaraid device ids
+# --cciss: Checks drives behind cciss HP Smart Array RAID, this only supports the hpsa or hpahcisr drivers (default: off)
+# --ccissadapters: Allows you to specify which adapters to check, for HPs tool starts at 1, so use 0 (default: 0)
+# --ccissbinary: Allows you to specify the location of hpacucli for determining the cciss device ids
 # --debug: turn debug output on (default: off)
 # --debug_file: process this file instead of smartctl output for testing
 #
@@ -78,6 +85,13 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     :required => false,
     :default => 'all'
 
+  option :ignore_attributes,
+    :short => "-i 9",
+    :long => "--ignoreattributes 9",
+    :description => "SMART attributes to ignore",
+    :required => false,
+    :default => 'none'
+
   option :threshold,
     :short => "-t 194,5,10,50,60",
     :long => "--threshold 194,5,10,50,60",
@@ -98,6 +112,42 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     :required => false,
     :default => 'all'
 
+  option :megaraid,
+    :long => "--megaraid on",
+    :description => "Interrogate MegaRAID CLI for real devices",
+    :required => false,
+    :default => 'off'
+
+  option :megaraid_adapters,
+    :long => "--megaraidadapter 0",
+    :description => "Match these MegaRAID Adapters to the order of Devices provided",
+    :required => false,
+    :default => '0'
+
+  option :megaraid_binary,
+    :long => "--megaraidbinary /usr/sbin/megacli",
+    :description => "megacli binary to use, in case you hide yours",
+    :required => false,
+    :default => 'megacli'
+
+  option :ccissraid,
+    :long => "--ccissraid on",
+    :description => "Use cciss HP Smart Array passthru",
+    :required => false,
+    :default => 'off'
+
+  option :ccissraid_adapters,
+    :long => "--ccissraidadapter 0",
+    :description => "Match these cciss Adapters to the order of Devices provided, HP ",
+    :required => false,
+    :default => '0'
+
+  option :ccissraid_binary,
+    :long => "--ccissraidbinary /usr/sbin/hpacucli",
+    :description => "hpacucli binary to use, in case you hide yours",
+    :required => false,
+    :default => 'hpacucli'
+
   option :debug,
     :long => "--debug on",
     :description => "Turn debug output on",
@@ -110,84 +160,110 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     :required => false
 
   def run
-    @smartAttributes = JSON.parse(IO.read(File.dirname(__FILE__) + '/smart.json'), symbolize_names: true)[:smart][:attributes]
-    @smartDebug = config[:debug] == 'on'
+    @smart_attributes = JSON.parse(IO.read(File.dirname(__FILE__) + '/smart.json'), symbolize_names: true)[:smart][:attributes]
+    @smart_debug = config[:debug] == 'on'
+    @mega_raid = config[:megaraid] == 'on'
+    @cciss_raid = config[:ccissraid] == 'on'
 
     # Set default threshold
-    defaultThreshold = config[:defaults].split(',')
-    raise 'Invalid default threshold parameter count' unless defaultThreshold.size == 4
-    @smartAttributes.each do |att|
-      att[:crit_min] = defaultThreshold[0].to_i if att[:crit_min].nil?
-      att[:warn_min] = defaultThreshold[1].to_i if att[:warn_min].nil?
-      att[:warn_max] = defaultThreshold[2].to_i if att[:warn_max].nil?
-      att[:crit_max] = defaultThreshold[3].to_i if att[:crit_max].nil?
+    default_threshold = config[:defaults].split(',')
+    fail 'Invalid default threshold parameter count' unless default_threshold.size == 4
+    @smart_attributes.each do |att|
+      att[:crit_min] = default_threshold[0].to_i if att[:crit_min].nil?
+      att[:warn_min] = default_threshold[1].to_i if att[:warn_min].nil?
+      att[:warn_max] = default_threshold[2].to_i if att[:warn_max].nil?
+      att[:crit_max] = default_threshold[3].to_i if att[:crit_max].nil?
     end
 
     # Check threshold parameter if present
     unless config[:threshold].nil?
       thresholds = config[:threshold].split(',')
       # Check threshold parameter length
-      raise 'Invalid threshold parameter count' unless thresholds.size % 5 == 0
+      fail 'Invalid threshold parameter count' unless thresholds.size % 5 == 0
 
       (0..(thresholds.size/5-1)).each do |i|
-        att_id = @smartAttributes.index{|att| att[:id] == thresholds[i+0].to_i}
-        thash = {crit_min: thresholds[i+1].to_i, warn_min: thresholds[i+2].to_i,
-          warn_max: thresholds[i+3].to_i, crit_max: thresholds[i+4].to_i }
-        @smartAttributes[att_id].merge! thash
+        i = i * 5
+        att_id = @smart_attributes.index { |att| att[:id] == thresholds[i+0].to_i }
+        thash = { crit_min: thresholds[i+1].to_i, warn_min: thresholds[i+2].to_i, warn_max: thresholds[i+3].to_i, crit_max: thresholds[i+4].to_i }
+        @smart_attributes[att_id].merge! thash
       end
     end
 
     # Attributes to check
-    attCheckList = findAttributes
+    att_check_list = find_attributes
 
     # Devices to check
-    devices = config[:debug_file].nil? ? findDevices : ['sda']
+    devices = config[:debug_file].nil? ? find_devices : ['sda']
 
     # Overall health and attributes parameter
     parameters = "-H -A"
 
     # Get attributes in raw48 format
-    attCheckList.each do |att|
+    att_check_list.each do |att|
       parameters += " -v #{att},raw48"
     end
 
     output = {}
     warnings = []
     criticals = []
+
+    i = 0
     devices.each do |dev|
-      puts "#{config[:binary]} #{parameters} /dev/#{dev}" if @smartDebug
-      # check if debug file specified
-      if config[:debug_file].nil?
-        output[dev] = `sudo #{config[:binary]} #{parameters} /dev/#{dev}`
-      else
-        test_file = File.open(config[:debug_file], "rb")
-        output[dev] = test_file.read
-        test_file.close
-      end
 
-      # check overall helath status
-      if config[:overall] == 'on' && !output[dev].include?('SMART overall-health self-assessment test result: PASSED')
-        criticals << "Overall health check failed on #{dev}"
-      end
+      if @mega_raid
+        # check if there is an adapter for this device
+        adapters = config[:megaraid_adapters].split(',')
+        adapter = adapters[i]
 
-      output[dev].split("\n").each do |line|
-        fields = line.split
-        if fields.size == 10 && fields[0].to_i != 0 && attCheckList.include?(fields[0].to_i)
-          smartAtt = @smartAttributes.find{|att| att[:id] == fields[0].to_i}
-          attValue = fields[9].to_i
-          attValue = self.send(smartAtt[:read], attValue) unless smartAtt[:read].nil?
-          if attValue < smartAtt[:crit_min] || attValue > smartAtt[:crit_max]
-            criticals << "#{dev} critical #{fields[0]} #{smartAtt[:name]}: #{attValue}"
-            puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (critical)" if @smartDebug
-          elsif attValue < smartAtt[:warn_min] || attValue > smartAtt[:warn_max]
-            warnings << "#{dev} warning #{fields[0]} #{smartAtt[:name]}: #{attValue}"
-            puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (warning)" if @smartDebug
-          else
-            puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (ok)" if @smartDebug
+        unless adapter.nil?
+          adapter.to_i
+          adapter_device_ids = find_megaraid_device_ids_for_adapter(adapter)
+          if adapter_device_ids.kind_of?(Array)
+            adapter_device_ids.each do |device_id|
+              device_id = device_id[0]
+              command = "#{config[:binary]} #{parameters} -a -d megaraid,#{device_id} /dev/#{dev}"
+              megadev = dev + " megaraid,#{device_id}"
+              output[megadev] = `sudo #{command}`
+              check_device_smart_log(output[megadev], megadev, criticals, warnings, att_check_list)
+            end
           end
         end
+
+      elsif @cciss_raid
+        # check if there is an adapter for this device
+        adapters = config[:ccissraid_adapters].split(',')
+        adapter = adapters[i]
+
+        unless adapter.nil?
+          adapter.to_i
+          adapter_device_ids = find_cciss_device_ids_for_adapter(adapter)
+          if adapter_device_ids.kind_of?(Array)
+            adapter_device_ids.each do |device_id|
+              device_id = device_id[0].to_i - 1
+              command = "#{config[:binary]} #{parameters} -a -d cciss,#{device_id} /dev/#{dev}"
+              ccissdev = dev + " cciss,#{device_id}"
+              output[ccissdev] = `sudo #{command}`
+              check_device_smart_log(output[ccissdev], ccissdev, criticals, warnings, att_check_list)
+            end
+          end
+        end
+
+      else
+        command = "#{config[:binary]} #{parameters} /dev/#{dev}"
+        puts command if @smart_debug
+        # check if debug file specified
+        if config[:debug_file].nil?
+          output[dev] = `sudo #{command}`
+        else
+          test_file = File.open(config[:debug_file], "rb")
+          output[dev] = test_file.read
+          test_file.close
+        end
+
+        check_device_smart_log(output[dev], dev, criticals, warnings, att_check_list)
       end
-      puts "\n\n" if @smartDebug
+
+      i = i + 1
     end
 
     # check the result
@@ -198,6 +274,33 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     else
       ok "All device operating properly"
     end
+  end
+
+  def check_device_smart_log(smart_log, device, criticals, warnings, att_check_list)
+      # check overall helath status
+    if config[:overall] == 'on' &&
+       (!smart_log.include?('SMART overall-health self-assessment test result: PASSED') && !smart_log.include?('SMART Health Status: OK'))
+      criticals << "Overall health check failed on #{device}"
+    end
+
+    smart_log.split("\n").each do |line|
+      fields = line.split
+      if fields.size == 10 && fields[0].to_i != 0 && att_check_list.include?(fields[0].to_i)
+        smart_att = @smart_attributes.find { |att| att[:id] == fields[0].to_i }
+        att_value = fields[9].to_i
+        att_value = send(smart_att[:read], att_value) unless smart_att[:read].nil?
+        if att_value < smart_att[:crit_min] || att_value > smart_att[:crit_max]
+          criticals << "#{device} critical #{fields[0]} #{smart_att[:name]}: #{att_value}"
+          puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (critical)" if @smart_debug
+        elsif att_value < smart_att[:warn_min] || att_value > smart_att[:warn_max]
+          warnings << "#{device} warning #{fields[0]} #{smart_att[:name]}: #{att_value}"
+          puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (warning)" if @smart_debug
+        else
+          puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (ok)" if @smart_debug
+        end
+      end
+    end
+    puts "\n\n" if @smart_debug
   end
 
   # Get right 16 bit from raw48
@@ -211,7 +314,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
   end
 
   # find all devices from /proc/partitions or from parameter
-  def findDevices
+  def find_devices
     # Return parameter value if it's defined
     return config[:devices].split(',') unless config[:devices] == 'all'
 
@@ -219,7 +322,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     all = `cat /proc/partitions`.split("\n")
 
     # Delete first two row (header and empty line)
-    (1..2).each {all.delete_at(0)}
+    (1..2).each { all.delete_at(0) }
 
     # Search for devices without number
     devices = []
@@ -228,18 +331,44 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       devices << partition unless partition.nil?
     end
 
-    return devices
+    devices
+  end
+
+  def find_megaraid_device_ids_for_adapter(megaraid_adapters)
+    command = "sudo #{config[:megaraid_binary]} -PDlist -a#{megaraid_adapters} -NoLog | grep '^Device Id:'"
+    megaclioutput = `#{command}`
+
+    if command.include?('command not found')
+      fail 'MegaCli not found'
+    end
+    matches = megaclioutput.scan(/.*:\s(\d+)/)
+    matches
+  end
+
+  def find_cciss_device_ids_for_adapter(ccissraid_adapters)
+    command = "sudo #{config[:ccissraid_binary]} ctrl all show config | grep 'physicaldrive\s1'"
+    clioutput = `#{command}`
+
+    if command.include?('command not found')
+      fail 'hpacucli not found'
+    end
+    matches = clioutput.scan(/physicaldrive[\s]+\dI:\d:(\d)/)
+    matches
   end
 
   # find all attribute id from parameter or json file
-  def findAttributes
+  def find_attributes
     return config[:attributes].split(',') unless config[:attributes] == 'all'
 
+    ignore_attributes = config[:ignore_attributes].split(',')
+
     attributes = []
-    @smartAttributes.each do |att|
-      attributes << att[:id]
+    @smart_attributes.each do |att|
+      unless ignore_attributes.include?(att[:id].to_s)
+        attributes << att[:id]
+      end
     end
 
-    return attributes
+    attributes
   end
 end
