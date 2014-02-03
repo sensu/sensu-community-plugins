@@ -58,15 +58,15 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
       response = manager.get(["#{config[:objectid]}"])
-      response.each_varbind do |vb|
-        output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f
-      end
-      manager.close
-      ok
     rescue SNMP::RequestTimeout
       unknown "#{config[:host]} not responding"
     rescue Exception => e
       unknown "An unknown error occured: #{e.inspect}"
     end
+    response.each_varbind do |vb|
+      output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f
+    end
+    manager.close
+    ok
   end
 end

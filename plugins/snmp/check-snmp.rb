@@ -53,6 +53,11 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
       response = manager.get(["#{config[:objectid]}"])
+    rescue SNMP::RequestTimeout
+      unknown "#{config[:host]} not responding"
+    rescue Exception => e
+      unknown "An unknown error occured: #{e.inspect}"
+    end
       response.each_varbind do |vb|
         if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
           critical "Critical state detected"
@@ -67,10 +72,5 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
         end
       end
       manager.close
-    rescue SNMP::RequestTimeout
-      unknown "#{config[:host]} not responding"
-    rescue Exception => e
-      unknown "An unknown error occured: #{e.inspect}"
-    end
   end
 end
