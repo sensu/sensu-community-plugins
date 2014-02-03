@@ -115,6 +115,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :description => 'Check for a specific amount of response bytes',
     :proc => proc { |a| a.to_i }
 
+  option :response_code,
+    :long => '--response-code CODE',
+    :description => 'Check for a specific response code'
+
   def run
     if config[:url]
       uri = URI.parse(config[:url])
@@ -178,36 +182,45 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
 
     case res.code
-    when /^2/
-      if config[:redirectto]
-        critical "expected redirect to #{config[:redirectto]} but got #{res.code}" + body
-      elsif config[:pattern]
-        if res.body =~ /#{config[:pattern]}/
-          ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes" + body
-        else
-          critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
-        end
-      else
-        ok "#{res.code}, #{res.body.size} bytes" + body
-      end
-    when /^3/
-      if config[:redirectok] || config[:redirectto]
-        if config[:redirectok]
-          ok "#{res.code}, #{res.body.size} bytes" + body
-        elsif config[:redirectto]
-          if config[:redirectto] == res['Location']
-            ok "#{res.code} found redirect to #{res['Location']}" + body
+      when /^2/
+        if config[:redirectto]
+          critical "expected redirect to #{config[:redirectto]} but got #{res.code}" + body
+        elsif config[:pattern]
+          if res.body =~ /#{config[:pattern]}/
+            ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes" + body
           else
-            critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body
+            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
           end
+        else
+          ok("#{res.code}, #{res.body.size} bytes" + body) unless config[:response_code]
         end
+      when /^3/
+        if config[:redirectok] || config[:redirectto]
+          if config[:redirectok]
+            ok("#{res.code}, #{res.body.size} bytes" + body) unless config[:response_code]
+          elsif config[:redirectto]
+            if config[:redirectto] == res['Location']
+              ok "#{res.code} found redirect to #{res['Location']}" + body
+            else
+              critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body
+            end
+          end
+        else
+          warning res.code + body
+        end
+      when /^4/, /^5/
+        critical(res.code + body) unless config[:response_code]
       else
-        warning res.code + body
-      end
-    when /^4/, /^5/
-      critical res.code + body
-    else
-      warning res.code + body
+        warning(res.code + body) unless config[:response_code]
     end
+
+    if config[:response_code]
+      if config[:response_code] == res.code
+        ok "#{res.code}, #{res.body.size} bytes" + body
+      else
+        critical res.code + body
+      end
+    end
+
   end
 end

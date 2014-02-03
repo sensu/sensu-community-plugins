@@ -26,12 +26,10 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
 
   option :host,
     :short => '-h host',
-    :boolean => true,
     :default => "127.0.0.1"
 
   option :community,
     :short => '-C snmp community',
-    :boolean =>true,
     :default => "public"
 
   option :objectid,
@@ -52,21 +50,27 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :default => 'SNMPv2c'
 
   def run
-    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
-    response = manager.get(["#{config[:objectid]}"])
-    response.each_varbind do |vb|
-      if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
-        critical "Critical state detected"
-      end
+    begin
+      manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
+      response = manager.get(["#{config[:objectid]}"])
+      response.each_varbind do |vb|
+        if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
+          critical "Critical state detected"
+        end
 
-      if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i))
-        warning "Warning state detected"
-      end
+        if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i))
+          warning "Warning state detected"
+        end
 
-      if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
-        ok "All is well!"
+        if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
+          ok "All is well!"
+        end
       end
+      manager.close
+    rescue SNMP::RequestTimeout
+      unknown "#{config[:host]} not responding"
+    rescue Exception => e
+      unknown "An unknown error occured: #{e.inspect}"
     end
-    manager.close
   end
 end

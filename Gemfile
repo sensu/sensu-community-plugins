@@ -1,11 +1,12 @@
-# A sample Gemfile
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-group :development do
-  gem "sensu-plugin"
-end
+ruby '2.0.0'
 
+gem 'sensu-plugin'
+#TODO: drop rainbow after updating rubocop to 1.18 ish
+gem 'rainbow', '~> 1.99.2'
 group :test do
-  gem "sensu-plugin"
-  gem "rubocop"
+  gem 'rubocop', '~> 0.8.2'
+  gem 'rspec'
+  gem 'rake'
 end
