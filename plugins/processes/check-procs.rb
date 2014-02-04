@@ -42,29 +42,27 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     :short => '-w N',
     :long => '--warn-over N',
     :description => 'Trigger a warning if over a number',
-    :proc => proc {|a| a.to_i },
-    :default => 1
+    :proc => proc {|a| a.to_i }
 
   option :crit_over,
     :short => '-c N',
     :long => '--critical-over N',
     :description => 'Trigger a critical if over a number',
-    :proc => proc {|a| a.to_i },
-    :default => 1
+    :proc => proc {|a| a.to_i }
 
   option :warn_under,
     :short => '-W N',
     :long => '--warn-under N',
     :description => 'Trigger a warning if under a number',
     :proc => proc {|a| a.to_i },
-    :default => 0
+    :default => 1
 
   option :crit_under,
     :short => '-C N',
     :long => '--critical-under N',
     :description => 'Trigger a critial if under a number',
     :proc => proc {|a| a.to_i },
-    :default => 0
+    :default => 1
 
   option :metric,
     :short => '-t METRIC',
@@ -210,17 +208,19 @@ class CheckProcs < Sensu::Plugin::Check::CLI
       count = procs.size
     end
 
-    if config[:crit_under] != -1 && count < config[:crit_under]
+    if !!config[:crit_under] && count < config[:crit_under]
       critical msg
-    elsif config[:crit_over] != -1 && count > config[:crit_over]
-      critical msg
-    elsif config[:warn_under] != -1 && count < config[:warn_under]
-      warning msg
-    elsif config[:warn_over] != -1 && count > config[:warn_over]
-      warning msg
-    else
-      ok msg
     end
+    if !!config[:crit_over] && count > config[:crit_over]
+      critical msg
+    end
+    if !!config[:warn_under] && count < config[:warn_under]
+      warning msg
+    end
+    if !!config[:warn_over] && count > config[:warn_over]
+      warning msg
+    end
+    ok msg
   end
 
 end
