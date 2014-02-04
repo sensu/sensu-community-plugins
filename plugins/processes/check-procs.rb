@@ -210,17 +210,15 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
     if !!config[:crit_under] && count < config[:crit_under]
       critical msg
-    end
-    if !!config[:crit_over] && count > config[:crit_over]
+    elsif !!config[:crit_over] && count > config[:crit_over]
       critical msg
-    end
-    if !!config[:warn_under] && count < config[:warn_under]
+    elsif !!config[:warn_under] && count < config[:warn_under]
       warning msg
-    end
-    if !!config[:warn_over] && count > config[:warn_over]
+    elsif !!config[:warn_over] && count > config[:warn_over]
       warning msg
+    else
+      ok msg
     end
-    ok msg
   end
 
 end
