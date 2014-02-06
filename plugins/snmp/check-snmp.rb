@@ -56,7 +56,7 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
 
   option :comparison,
     :short => '-o comparison operator',
-    :description => 'Operator used to compare data with warning/critial values. Can be set to "le" (<=), "ge" (>=). if data <comparision> critical/warning, raise alert.',
+    :description => 'Operator used to compare data with warning/critial values. Can be set to "le" (<=), "ge" (>=).',
     :default => 'ge'
 
   def run
