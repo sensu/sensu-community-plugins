@@ -81,7 +81,7 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
           warning "Warning state detected"
         end
 
-        if !("#{vb.value.to_s}".to_i.send(symbol, "#{config[:warning]}".to_i))
+        unless ("#{vb.value.to_s}".to_i.send(symbol, "#{config[:warning]}".to_i))
           ok "All is well!"
         end
       end
