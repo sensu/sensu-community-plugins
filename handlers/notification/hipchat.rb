@@ -12,7 +12,8 @@ class HipChatNotif < Sensu::Handler
   end
 
   def handle
-    hipchatmsg = HipChat::Client.new(settings["hipchat"]["apikey"])
+    apiversion = settings["hipchat"]["apiversion"] || 'v1'
+    hipchatmsg = HipChat::Client.new(settings["hipchat"]["apikey"], :api_version => apiversion)
     room = settings["hipchat"]["room"]
     from = settings["hipchat"]["from"] || 'Sensu'
 
