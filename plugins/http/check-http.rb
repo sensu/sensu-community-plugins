@@ -86,6 +86,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :long => '--cacert FILE',
     :description => 'A CA Cert to use'
 
+  option :expiry,
+    :short => '-e EXPIRY',
+    :long => '--expiry EXPIRY',
+    :proc => proc { |a| a.to_i },
+    :description => 'Warn EXPIRE days before cert expires'
+
   option :pattern,
     :short => '-q PAT',
     :long => '--query PAT',
@@ -147,6 +153,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   def get_resource
     http = Net::HTTP.new(config[:host], config[:port])
 
+    warn_cert_expire = nil
     if config[:ssl]
       http.use_ssl = true
       if config[:cert]
@@ -159,6 +166,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       end
       if config[:insecure]
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+
+      if config[:expiry] != nil
+        expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
+        # We can't raise inside the callback, have to check when we finish.
+        http.verify_callback = proc do |preverify_ok, ssl_context|
+          if ssl_context.current_cert.not_after <= expire_warn_date
+            warn_cert_expire = ssl_context.current_cert.not_after
+          end
+        end
       end
     end
 
@@ -179,6 +196,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       body = "\n" + res.body[1..config[:response_bytes].to_i]
     else
       body = ''
+    end
+
+    if warn_cert_expire != nil
+      warning "Certificate will expire #{warn_cert_expire}"
     end
 
     case res.code
