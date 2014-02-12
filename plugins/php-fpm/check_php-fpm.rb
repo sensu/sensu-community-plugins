@@ -1,4 +1,20 @@
 #!/usr/bin/env ruby
+#
+# Check PHP-FPM
+# ===
+#
+# DESCRIPTION:
+# This plugin retrives php-fpm status, parse the default "pong response"
+#
+# PLATFORMS:
+# all
+#
+# DEPENDENCIES:
+# sensu-plugin Ruby gem
+# php-fpm ping configuration
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
