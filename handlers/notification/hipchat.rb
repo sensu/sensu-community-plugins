@@ -12,10 +12,11 @@ class HipChatNotif < Sensu::Handler
   end
 
   def handle
-    apiversion = settings["hipchat"]["apiversion"] || 'v1'
-    hipchatmsg = HipChat::Client.new(settings["hipchat"]["apikey"], :api_version => apiversion)
-    room = settings["hipchat"]["room"]
-    from = settings["hipchat"]["from"] || 'Sensu'
+    settings_hipchat = settings["handlers"]
+    apiversion = settings_hipchat["hipchat"]["apiversion"] || 'v1'
+    hipchatmsg = HipChat::Client.new(settings_hipchat["hipchat"]["apikey"], :api_version => apiversion))
+    room = settings_hipchat["hipchat"]["room"]
+    from = settings_hipchat["hipchat"]["from"] || 'Sensu'
 
     message = @event['check']['notification'] || @event['check']['output']
 
