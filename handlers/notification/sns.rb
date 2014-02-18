@@ -30,12 +30,32 @@ class SnsNotifier < Sensu::Handler
     "#{@event['client']['name']}/#{@event['check']['name']}"
   end
 
+  def useAmiRole
+    settings['sns']['use_ami_role'] || true
+  end
+
+  def awsAccessKey
+    settings['sns']['access_key'] || ''
+  end
+
+  def awsAccessSecret
+    settings['sns']['secret_key'] || ''
+  end
+
   def message
     @event['check']['notification'] || @event['check']['output']
   end
 
   def handle
-    AWS.config(:region => region)
+    if (useAmiRole)
+      AWS.config(:region => region)
+    else
+      AWS.config({
+        :access_key_id => awsAccessKey,
+        :secret_access_key => awsAccessSecret,
+        :region => region
+      })
+    end
 
     sns = AWS::SNS.new
 

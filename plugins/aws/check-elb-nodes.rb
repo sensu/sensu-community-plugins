@@ -93,8 +93,11 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     num_instances = instances.count.to_f
     state = { 'OutOfService' => [], 'InService' => [], 'Unknown' => []}
     instances.each do |instance|
+      # Force a requery of state
+      AWS.stop_memoizing if instance[:state] == 'Unknown'
       state[instance[:state]] << instance[:instance].id
     end
+    AWS.stop_memoizing
 
     message = "InService: #{state['InService'].count}"
     if state['InService'].count > 0
@@ -107,7 +110,6 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     if state['Unknown'].count > 0
       message << " (#{state['Unknown'].join(', ')})"
     end
-    AWS.stop_memoizing
 
     if state['Unknown'].count == num_instances
       unknown "All nodes in unknown state"

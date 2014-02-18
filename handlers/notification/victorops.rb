@@ -52,9 +52,10 @@ class VictorOps < Sensu::Handler
         response     = https.request(request)
 
         if response.code == '200'
-          puts 'victorops -- ' + @event['action'].capitalize + 'd incident -- ' + incident_key
+          puts "victorops -- #{@event['action'].capitalize}'d incident -- #{incident_key}"
         else
-          puts 'victorops -- failed to ' + @event['action'] + ' incident -- ' + incident_key
+          puts "victorops -- failed to #{@event['action']} incident -- #{incident_key}"
+          puts "victorops -- response: #{response.inspect}"
         end
       end
     rescue Timeout::Error

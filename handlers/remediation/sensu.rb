@@ -131,7 +131,7 @@ class Remediator < Sensu::Handler
 
   # Issue a check via the API
   def trigger_remediation(check, subscribers)
-    api_request(:POST, '/checks/request') do |req|
+    api_request(:POST, '/request') do |req|
       req.body = JSON.dump({"check" => check, "subscribers" => subscribers})
     end
   end
