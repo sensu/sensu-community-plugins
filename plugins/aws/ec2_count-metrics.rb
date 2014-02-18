@@ -45,12 +45,6 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
 
-  option :status,
-    :short => '-s STATUS',
-    :long => '--status STATUS',
-    :description => "EC2 Status",
-    :default => 'running'
-
   def run
     if config[:scheme] == ""
       graphitepath = "sensu.aws.ec2.count"
