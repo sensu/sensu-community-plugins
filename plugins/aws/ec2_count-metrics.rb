@@ -51,7 +51,6 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "EC2 Status",
     :default => 'running'
 
-
   def run
     if config[:scheme] == ""
       graphitepath = "sensu.aws.ec2.count"
@@ -68,7 +67,6 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         :secret_access_key  => config[:aws_secret_access_key],
         http_wire_trace: aws_debug
       )
-
 
       client = AWS::EC2::Client.new()
       options = {:include_all_instances => true}
@@ -91,8 +89,8 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
       unless data.nil?
         # We only return data when we have some to return
         output graphitepath + ".total", total
-        status.each do |name,count|
-          output graphitepath + ".#{name}", count 
+        status.each do |name, count|
+          output graphitepath + ".#{name}", count
         end
       end
 
