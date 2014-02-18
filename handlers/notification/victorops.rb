@@ -38,7 +38,7 @@ class VictorOps < Sensu::Handler
         payload[:host_name] = host
         payload[:monitoring_tool] = "sensu"
 
-        uri   = URI("#{config['api_url']}/#{config['routing_key']}")
+        uri   = URI("#{config['api_url'].chomp('/')}/#{config['routing_key']}")
         https = Net::HTTP.new(uri.host, uri.port)
 
         https.use_ssl = true
@@ -48,9 +48,10 @@ class VictorOps < Sensu::Handler
         response     = https.request(request)
 
         if response.code == '200'
-          puts 'victorops -- ' + @event['action'].capitalize + 'd incident -- ' + incident_key
+          puts "victorops -- #{@event['action'].capitalize}'d incident -- #{incident_key}"
         else
-          puts 'victorops -- failed to ' + @event['action'] + ' incident -- ' + incident_key
+          puts "victorops -- failed to #{@event['action']} incident -- #{incident_key}"
+          puts "victorops -- response: #{response.inspect}"
         end
       end
     rescue Timeout::Error
