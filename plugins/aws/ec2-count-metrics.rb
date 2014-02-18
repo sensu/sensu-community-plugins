@@ -42,7 +42,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
   option :aws_region,
     :short => '-r AWS_REGION',
     :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1).",
+    :description => "AWS Region (such as us-east-1).",
     :default => 'us-east-1'
 
   def run
