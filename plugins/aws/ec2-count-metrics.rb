@@ -45,6 +45,12 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "AWS Region (such as us-east-1).",
     :default => 'us-east-1'
 
+  option :type,
+    :short => '-t METRIC type',
+    :long => '--type METRIC type',
+    :description => 'Count by type: status, instance',
+    :default => 'instance'
+
   def run
     if config[:scheme] == ""
       graphitepath = "sensu.aws.ec2.count"
@@ -63,29 +69,62 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
       )
 
       client = AWS::EC2::Client.new()
-      options = {:include_all_instances => true}
-      data = client.describe_instance_status(options)
 
-      total = data[:instance_status_set].count
-      status = {}
+      def by_instances_status(client)
+        options = {:include_all_instances => true}
+        data = client.describe_instance_status(options)
 
-      unless total.nil?
-        data[:instance_status_set].each do |value|
-          stat = value[:instance_state][:name]
-          if status[stat] == nil
-            status[stat] = 1
-          else
-            status[stat] = status[stat] + 1
+        total = data[:instance_status_set].count
+        status = {}
+
+        unless total.nil?
+          data[:instance_status_set].each do |value|
+            stat = value[:instance_state][:name]
+            if status[stat] == nil
+              status[stat] = 1
+            else
+              status[stat] = status[stat] + 1
+            end
+          end
+        end
+
+        unless data.nil?
+          # We only return data when we have some to return
+          output graphitepath + ".total", total
+          status.each do |name, count|
+            output graphitepath + ".#{name}", count
           end
         end
       end
 
-      unless data.nil?
-        # We only return data when we have some to return
-        output graphitepath + ".total", total
-        status.each do |name, count|
-          output graphitepath + ".#{name}", count
+      def by_instances_type(client)
+
+        data = {}
+
+        instances = client.describe_instances()
+        instances[:reservation_set].each do |i|
+          i[:instances_set].each do |instance|
+            type = instance[:instance_type]
+            if data[type] == nil
+              data[type] = 1
+            else
+              data[type] = data[type] + 1
+            end
+          end
         end
+
+        unless data.nil?
+          # We only return data when we have some to return
+          data.each do |name, count|
+            output graphitepath + ".#{name}", count
+          end
+        end
+      end
+
+      if config[:type] == 'instance'
+        by_instances_type(client)
+      elsif config[:type] == 'status'
+        by_instances_status(client)
       end
 
     rescue Exception => e
