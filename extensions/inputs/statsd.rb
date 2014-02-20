@@ -148,7 +148,7 @@ module Sensu
               :name => 'statsd',
               :type => 'metric',
               :status => 0,
-              :output => @metrics.join("\n"),
+              :output => @metrics.join("\n") + "\n",
               :handler => 'graphite'
             }
           }
