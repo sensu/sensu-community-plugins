@@ -25,7 +25,9 @@ module Sensu
 
       def run
         proc_stat_metrics do
-          yield flush_metrics, 0
+          proc_loadavg_metrics do
+            yield flush_metrics, 0
+          end
         end
       end
 
@@ -118,6 +120,16 @@ module Sensu
               yield
             end
           end
+        end
+      end
+
+      def proc_loadavg_metrics
+        read_file('/proc/loadavg') do |proc_loadavg|
+          values = proc_loadavg.split(/\s+/).take(3).map(&:to_f)
+          add_metric('load_avg', '1_min', values[0])
+          add_metric('load_avg', '5_min', values[1])
+          add_metric('load_avg', '15_min', values[2])
+          yield
         end
       end
     end
