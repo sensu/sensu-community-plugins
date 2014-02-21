@@ -42,7 +42,7 @@ module Sensu
         @options = {
           :interval => 10,
           :handler => 'graphite',
-          :file_chunk_size => 1024,
+          :file_chunk_size => 4096,
           :add_client_prefix => true,
           :path_prefix => 'system'
         }
