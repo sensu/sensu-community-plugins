@@ -15,7 +15,7 @@ module Sensu
           :name => name,
           :interval => options[:interval],
           :standalone => true,
-          :handler => 'graphite'
+          :handler => options[:handler]
         }
       end
 
@@ -26,7 +26,9 @@ module Sensu
       def run
         proc_stat_metrics do
           proc_loadavg_metrics do
-            yield flush_metrics, 0
+            proc_net_dev_metrics do
+              yield flush_metrics, 0
+            end
           end
         end
       end
@@ -37,6 +39,7 @@ module Sensu
         return @options if @options
         @options = {
           :interval => 10,
+          :handler => 'graphite',
           :file_chunk_size => 1024,
           :add_client_prefix => true,
           :path_prefix => 'system'
@@ -129,6 +132,26 @@ module Sensu
           add_metric('load_avg', '1_min', values[0])
           add_metric('load_avg', '5_min', values[1])
           add_metric('load_avg', '15_min', values[2])
+          yield
+        end
+      end
+
+      def proc_net_dev_metrics
+        dev_metrics = [
+                       'rxBytes', 'rxPackets', 'rxErrors', 'rxDrops',
+                       'rxFifo', 'rxFrame', 'rxCompressed', 'rxMulticast',
+                       'txBytes', 'txPackets', 'txErrors', 'txDrops',
+                       'txFifo', 'txColls', 'txCarrier', 'txCompressed'
+                      ]
+        read_file('/proc/net/dev') do |proc_net_dev|
+          proc_net_dev.each_line do |line|
+            interface, data = line.scan(/^\s*([^:]+):\s*(.*)$/).first
+            next unless interface
+            values = data.split(/\s+/).map(&:to_i)
+            Hash[dev_metrics.zip(values)].each do |key, value|
+              add_metric('net', interface, key, value)
+            end
+          end
           yield
         end
       end
