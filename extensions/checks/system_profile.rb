@@ -27,7 +27,9 @@ module Sensu
         proc_stat_metrics do
           proc_loadavg_metrics do
             proc_net_dev_metrics do
-              yield flush_metrics, 0
+              proc_meminfo_metrics do
+                yield flush_metrics, 0
+              end
             end
           end
         end
@@ -149,7 +151,26 @@ module Sensu
             next unless interface
             values = data.split(/\s+/).map(&:to_i)
             Hash[dev_metrics.zip(values)].each do |key, value|
-              add_metric('net', interface, key, value)
+              add_metric('net', interface, key.downcase, value)
+            end
+          end
+          yield
+        end
+      end
+
+      def proc_meminfo_metrics
+        read_file('/proc/meminfo') do |proc_meminfo|
+          proc_meminfo.each_line do |line|
+            next if line.strip.empty?
+            root, data = line.split(':')
+            values = data.strip.split(/\s+/).map(&:to_i)
+            case root
+            when /Mem\w+/, 'Buffers', 'Cached', 'Active', 'Committed_AS'
+              key = root.gsub(/^Mem/, '').downcase
+              add_metric('memory', key, values.first)
+            when /Swap\w+/
+              key = root.gsub(/^Swap/, '').downcase
+              add_metric('swap', key, values.first)
             end
           end
           yield
