@@ -1,3 +1,23 @@
+# System Profile (metrics)
+# ===
+#
+# Collects a variety of system metrics every 10 seconds (by default).
+# Expects a "graphite" handler on the Sensu server, eg:
+#
+# "graphite": {
+#   "type": "tcp",
+#   "socket": {
+#     "host": "graphite.hw-ops.com",
+#     "port": 2003
+#   },
+#   "mutator": "only_check_output"
+# }
+#
+# Copyright 2014 Heavy Water Operations, LLC.
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
+
 module Sensu
   module Extension
     class SystemProfile < Check
