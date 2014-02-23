@@ -40,12 +40,16 @@ class CheckMulticastGroups < Sensu::Plugin::Check::CLI
 
   option :config,
     :short => '-c PATH',
-    :description => "Path to an additional config file"
+    :long => '--config PATH',
+    :required => true,
+    :description => "Path to a config file"
 
   def run
     targets = settings['check-multicast-groups'] ||= []
     extras = load_config(config[:config])['check-multicast-groups'] || []
     targets.deep_merge(extras)
+
+    critical "No target muticast groups are specified." if targets.empty?
 
     iface_pat = /[a-zA-Z0-9\.]+/
     refcount_pat = /\d+/
