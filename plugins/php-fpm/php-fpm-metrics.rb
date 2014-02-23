@@ -5,7 +5,7 @@
 #
 # Requires `crack` gem to parse xml.
 #
-# Copyright 2014 Ilari Mäkelä <ilari@i28.fi>
+# Copyright 2014 Ilari Mäkelä <ilari at i28.fi>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -52,7 +52,6 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end # until
 
     stats = Crack::XML.parse(response.body)
-    path = "#{config[:scheme]}"
     stat = [
       'start_since',
       'accepted_conn',
@@ -70,5 +69,5 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
     ok
   end
-  
+
 end
