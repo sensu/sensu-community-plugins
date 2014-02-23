@@ -57,7 +57,7 @@ class NtpStatsMetrics < Sensu::Plugin::Metric::CLI::Graphite
     num_val_pattern = /-?[\d]+(\.[\d]+)?/
     pattern = /(#{key_pattern})=(#{num_val_pattern}),?\s?/
 
-    return `ntpq -c rv #{host}`.scan(pattern).inject({}) do |hash, parsed|
+    `ntpq -c rv #{host}`.scan(pattern).inject({}) do |hash, parsed|
       key, val, fraction = parsed
       hash[key] = fraction ? val.to_f : val.to_i
       hash

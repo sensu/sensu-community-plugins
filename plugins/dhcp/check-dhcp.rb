@@ -100,7 +100,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       puts request
     end
 
-   sendsock.send(request.pack, 0)
+    sendsock.send(request.pack, 0)
 
     begin
       # try to read from the socket
@@ -115,6 +115,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
         data = listensock.recvfrom_nonblock(1500)
       end
     end
+
     listensock.close
 
     # Returns a DHCP::Message object, or nil if not parseable
