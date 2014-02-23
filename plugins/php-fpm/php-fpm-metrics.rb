@@ -5,7 +5,7 @@
 #
 # Requires `crack` gem to parse xml.
 #
-# Copyright 2014 Ilari Mäkelä ilari at i28.fi
+# Copyright 2014 Ilari Makela ilari at i28.fi
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
