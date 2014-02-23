@@ -189,7 +189,7 @@ module Sensu
               :error => error.to_s
             })
           end
-          EM::next_tick do
+          EM.next_tick do
             @data.pop(&parser)
           end
         end
@@ -202,10 +202,10 @@ module Sensu
         })
         bind = options[:bind]
         port = options[:port]
-        EM::start_server(bind, port, SimpleSocket) do |socket|
+        EM.start_server(bind, port, SimpleSocket) do |socket|
           socket.data = @data
         end
-        EM::open_datagram_socket(bind, port, SimpleSocket) do |socket|
+        EM.open_datagram_socket(bind, port, SimpleSocket) do |socket|
           socket.data = @data
         end
       end

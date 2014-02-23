@@ -167,7 +167,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         max_values[val[:target]] = max
       end
     end
-    return max_values
+    max_values
   end
 
   def get_max_value(values)
@@ -187,7 +187,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         last_values[val[:target]] = last
       end
     end
-    return last_values
+    last_values
   end
 
   def get_last_metric(values, count = 1)
@@ -215,7 +215,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         last_values[target_name] = metrics.map { | metric |  metric[0] }.mean
       end
     end
-    return last_values
+    last_values
   end
 
   def has_been_updated_since(target, time, updated_since)
@@ -227,7 +227,7 @@ class Graphite < Sensu::Plugin::Check::CLI
         warnings << "The metric #{target_name} has not been updated in #{updated_since.to_s} seconds" unless last_time_stamp_bool
       end
     end
-    return warnings
+    warnings
   end
 
   def greater_less
@@ -242,9 +242,9 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     max_gv = max_graphite_value target
     last_gv = last_graphite_value target
-    if last_gv.kind_of?(Hash) and max_gv.kind_of?(Hash)
+    if last_gv.kind_of?(Hash) && max_gv.kind_of?(Hash)
       last_gv.each do | target_name, value |
-        if value and max_gv[target_name]
+        if value && max_gv[target_name]
           last = value
           max = max_gv[target_name]
           if max > last * (1 + config[:acceptable_diff_percentage].to_f / 100)
@@ -275,11 +275,11 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values_array.size
       last_value = last_values[target]
-      percent = last_value / avg_value unless last_value.nil? or avg_value.nil?
+      percent = last_value / avg_value unless last_value.nil? || avg_value.nil?
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
-        if !percent.nil? and var1 > var2 and (values_array.size > 0 or !config[:ignore_nulls])
+        if !percent.nil? && var1 > var2 && (values_array.size > 0 || !config[:ignore_nulls])
           text = "The last value of metric #{target} is #{percent}% #{greater_less} than allowed #{max_value}% of the average value #{avg_value}"
           case type
           when "warning"
@@ -311,7 +311,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? avg_value : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : avg_value
-        if var1 > var2 and (values_array.size > 0 or !config[:ignore_nulls])
+        if var1 > var2 && (values_array.size > 0 || !config[:ignore_nulls])
           text = "The average value of metric #{target} is #{avg_value} that is #{greater_less} than allowed average of #{max_value}"
           case type
           when "warning"
@@ -342,11 +342,11 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       percentile_value = values_array.percentile(percentile)
       last_value = last_values[target]
-      percent = last_value / percentile_value unless last_value.nil? or percentile_value.nil?
+      percent = last_value / percentile_value unless last_value.nil? || percentile_value.nil?
       max_values.each_pair do |type, max_value|
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
-        if !percentile_value.nil? and var1 > var2
+        if !percentile_value.nil? && var1 > var2
           text = "The percentile value of metric #{target} (#{last_value}) is #{greater_less} than the
             #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
           case type

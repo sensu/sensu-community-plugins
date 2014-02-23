@@ -121,4 +121,3 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
     critical message
   end
 end
-

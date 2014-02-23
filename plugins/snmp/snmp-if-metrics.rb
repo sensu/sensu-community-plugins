@@ -110,7 +110,7 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
         puts row.inspect if config[:verbose]
         if_name = config[:include_name] ? "#{row['ifIndex'].value.to_s}__#{graphite_safe_name(row['ifName'].value.to_s)}" : row['ifIndex'].value.to_s
 
-        next if row['ifOperStatus'].value != 1 and !config[:include_down_interfaces]
+        next if row['ifOperStatus'].value != 1 && !config[:include_down_interfaces]
 
         output "#{config[:scheme]}.#{if_name}.ifHCInOctets", row['ifHCInOctets'].value
         output "#{config[:scheme]}.#{if_name}.ifHCOutOctets", row['ifHCOutOctets'].value

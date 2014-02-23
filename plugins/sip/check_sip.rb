@@ -9,6 +9,7 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -55,7 +56,7 @@ class SIP < Sensu::Plugin::Check::CLI
     req += "CSeq: 1 OPTIONS\r\n"
     req += "Contact: <sip:sensu@#{ourhost}:#{ourport}>\r\n"
     req += "Accept: application/sdp\r\n"
-    req += "Content-Length: 0\r\n\r\n"
+    req += "Content-Length: 0\r\n\r\n" # rubocop:disable UselessAssignment
   end
 
   def check_response(response)

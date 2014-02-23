@@ -95,7 +95,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     uri = "/aggregates"
     checks = api_request(uri)
     puts "Checks: #{checks.inspect}" if config[:debug]
-    return checks
+    checks
   end
 
   def get_aggregate(check)

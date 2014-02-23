@@ -25,7 +25,7 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
     critical_apps = []
 
     # Check if Bluepill is installed
-   `which bluepill`
+    `which bluepill`
     unless $?.success?
       ok "bluepill not installed"
     end

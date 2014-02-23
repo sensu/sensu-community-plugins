@@ -95,7 +95,7 @@ module Sensu
           read_chunk = Proc.new do
             content << file.read(options[:file_chunk_size])
             unless file.eof?
-              EM::next_tick(read_chunk)
+              EM.next_tick(read_chunk)
             else
               yield content
             end

@@ -24,7 +24,8 @@ class VictorOps < Sensu::Handler
     state_message = description
     begin
       timeout(10) do
-        response = case @event['action']
+
+        case @event['action']
         when 'create'
           message_type = 'CRITICAL'
         when 'resolve'

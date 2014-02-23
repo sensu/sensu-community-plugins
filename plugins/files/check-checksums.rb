@@ -49,7 +49,7 @@ class Checksum < Sensu::Plugin::Check::CLI
       end
     end
 
-    if errors.length > 0 and config[:warn_only]
+    if errors.length > 0 && config[:warn_only]
       warning errors.join("\n")
     elsif errors.length > 0
       critical errors.join("\n")
