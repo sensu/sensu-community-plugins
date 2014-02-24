@@ -60,7 +60,6 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :default => 'ge'
 
   def run
-<<<<<<< HEAD
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
       response = manager.get(["#{config[:objectid]}"])
