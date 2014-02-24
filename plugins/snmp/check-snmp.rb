@@ -60,8 +60,14 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :default => 'ge'
 
   def run
-    manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
-    response = manager.get(["#{config[:objectid]}"])
+    begin
+      manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
+      response = manager.get(["#{config[:objectid]}"])
+    rescue SNMP::RequestTimeout
+      unknown "#{config[:host]} not responding"
+    rescue Exception => e
+      unknown "An unknown error occured: #{e.inspect}"
+    end
     operators = {'le' => :<=, 'ge' => :>=}
     symbol = operators[config[:comparison]]
 
