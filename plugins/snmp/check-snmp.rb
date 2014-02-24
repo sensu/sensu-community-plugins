@@ -90,6 +90,7 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
           ok "All is well!"
         end
       end
-      manager.close
+    end
+    manager.close
   end
 end

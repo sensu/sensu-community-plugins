@@ -59,6 +59,9 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :boolean => true
 
   def run
+    if config[:graphite]
+      config[:host] = config[:host].gsub('.', '_')
+    end
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
       response = manager.get(["#{config[:objectid]}"])
