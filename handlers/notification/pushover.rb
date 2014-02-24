@@ -24,10 +24,10 @@ class Pushover < Sensu::Handler
     apiurl = settings['pushover']['apiurl'] || 'https://api.pushover.net/1/messages'
 
     params = {
-      :title => "Sensu Alert",
+      :title => event_name,
       :user => settings['pushover']['userkey'],
       :token => settings['pushover']['token'],
-      :message => "#{event_name}: #{@event['check']['output']}",
+      :message => @event['check']['output']
     }
 
     begin

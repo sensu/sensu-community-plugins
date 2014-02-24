@@ -60,10 +60,10 @@ def regionserver_info
   conf  = HBaseConfiguration.new
   admin = HBaseAdmin.new(conf)
 
-  status = admin.getClusterStatus()
-  status.getServerInfo().map do |server|
-    { :hostname => server.getServerAddress().getHostname(),
-      :regions => server.getLoad().getNumberOfRegions()
+  status = admin.getClusterStatus
+  status.getServerInfo.map do |server|
+    { :hostname => server.getServerAddress.getHostname,
+      :regions => server.getLoad.getNumberOfRegions
     }
   end
 end
@@ -79,7 +79,7 @@ def check_threshold(info)
   end
 end
 
-$config = { :ok => 0, :warning => 900, :critical => 1000 }
+@config = { :ok => 0, :warning => 900, :critical => 1000 }
 
 class Array
   def second
@@ -88,7 +88,7 @@ class Array
 end
 
 def config
-  $config
+  @config
 end
 
 def run
@@ -106,7 +106,7 @@ def run
 
 end
 
-$config[:warning]  = ARGV.first.to_i if ARGV.first
-$config[:critical] = ARGV.second.to_i if ARGV.second
+@config[:warning]  = ARGV.first.to_i if ARGV.first
+@config[:critical] = ARGV.second.to_i if ARGV.second
 
 run

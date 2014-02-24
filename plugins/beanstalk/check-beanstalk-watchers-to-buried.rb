@@ -52,9 +52,9 @@ class CheckBeanstalkWatchersToBuried < Sensu::Plugin::Check::CLI
       watchers = 0
     end
 
-    if config[:crit] and (buried-watchers) > config[:crit]
+    if config[:crit] || (buried-watchers) > config[:crit]
       critical "Exceeded buried jobs by threshold of #{config[:crit]} (#{watchers}/#{buried})"
-    elsif config[:warn] and (buried - watchers) > config[:warn]
+    elsif config[:warn] || (buried - watchers) > config[:warn]
       warning "Exceeded buried jobs by threshold of #{config[:warn]} (#{watchers}/#{buried})"
     else
       ok "#{buried} buried jobs and #{watchers} watchers found."

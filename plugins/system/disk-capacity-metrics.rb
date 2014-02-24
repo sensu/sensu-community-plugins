@@ -39,10 +39,8 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
     # Get capacity metrics from DF as they don't appear in /proc
     `df -PT`.split("\n").drop(1).each do |line|
       begin
-        fs, _type, _blocks, used, avail, capacity, mnt = line.split
-        if mnt == "/"
-          mnt = "root"
-        end
+        fs, _type, _blocks, used, avail, capacity, _mnt = line.split
+
         timestamp = Time.now.to_i
         if fs.match('/dev')
           fs = fs.gsub('/dev/', '')
@@ -67,10 +65,8 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
     # Get inode capacity metrics
     `df -Pi`.split("\n").drop(1).each do |line|
       begin
-        fs, _inodes, used, avail, capacity, mnt = line.split
-        if mnt == "/"
-          mnt = "root"
-        end
+        fs, _inodes, used, avail, capacity, _mnt = line.split
+
         timestamp = Time.now.to_i
         if fs.match('/dev')
           fs = fs.gsub('/dev/', '')

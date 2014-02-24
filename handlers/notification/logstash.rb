@@ -58,4 +58,3 @@ class LogstashHandler < Sensu::Handler
     redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
   end
 end
-

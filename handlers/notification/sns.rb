@@ -31,7 +31,8 @@ class SnsNotifier < Sensu::Handler
   end
 
   def useAmiRole
-    settings['sns']['use_ami_role'] || true
+    use_ami_role = settings['sns']['use_ami_role']
+    use_ami_role.nil? ? true : use_ami_role
   end
 
   def awsAccessKey

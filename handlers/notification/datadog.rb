@@ -44,7 +44,7 @@ class DatadogNotif < Sensu::Handler
     tags = []
     tags.push('sensu')
     # allow for tags to be set in the configuration, this could be used to indicate environment
-    tags.concat(settings['datadog']['tags']) unless settings['datadog']['tags'].nil? and !settings['datadog']['tags'].kind_of(Array)
+    tags.concat(settings['datadog']['tags']) unless settings['datadog']['tags'].nil? && !settings['datadog']['tags'].kind_of(Array)
     # add the subscibers for the event to the tags
     tags.concat(@event['check']['subscribers']) unless @event['check']['subscribers'].nil?
     begin

@@ -60,20 +60,20 @@ class ChefNodesStatusChecker < Sensu::Plugin::Check::CLI
 
   private
 
-    def chef_api_connection
-      chef_server_url      = config[:chef_server_url]
-      client_name          = config[:client_name]
-      signing_key_filename = config[:key]
-      Chef::REST.new(chef_server_url, client_name, signing_key_filename)
-    end
+  def chef_api_connection
+    chef_server_url      = config[:chef_server_url]
+    client_name          = config[:client_name]
+    signing_key_filename = config[:key]
+    Chef::REST.new(chef_server_url, client_name, signing_key_filename)
+  end
 
-    def any_node_stuck?
-      nodes_last_seen.map(&:values).flatten.all?{|x| x == false}
-    end
+  def any_node_stuck?
+    nodes_last_seen.map(&:values).flatten.all?{|x| x == false}
+  end
 
-    def failed_nodes_names
-      all_failed_tuples = nodes_last_seen.select{|node_set| node_set.values.first == true}
-      all_failed_tuples.map(&:keys).flatten.join(', ')
-    end
+  def failed_nodes_names
+    all_failed_tuples = nodes_last_seen.select{|node_set| node_set.values.first == true}
+    all_failed_tuples.map(&:keys).flatten.join(', ')
+  end
 
 end

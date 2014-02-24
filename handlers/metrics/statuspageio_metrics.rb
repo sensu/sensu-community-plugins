@@ -56,7 +56,7 @@ class StatusPageIOMetrics < Sensu::Handler
 
     # Split graphite-style metrics
     @event['check']['output'].split(/\n/).each do |m|
-      metric, value, timestamp = m.split()
+      metric, value, timestamp = m.split
       # Get the metric ID from the check, or from the global mapping
       metric_id = @event['check']['statuspageio_metric_id'] || @metrics[metric]
       send_metric(value, timestamp, metric_id) if metric_id
