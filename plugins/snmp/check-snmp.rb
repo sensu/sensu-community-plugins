@@ -11,6 +11,7 @@
 # Examples:
 #
 #   check-snmp -h host -C community -O oid -w warning -c critical
+#   check-snmp -h host -C community -O oid -m "(P|p)attern to match\.?"
 #
 #
 #  Author Deepak Mohan Das   <deepakmdass88@gmail.com>
@@ -44,12 +45,22 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :short => '-c critical',
     :default => "20"
 
+  option :match,
+    :short => '-m match',
+    :description => 'Regex pattern to match against returned value'
+
   option :snmp_version,
     :short => '-v version',
     :description => 'SNMP version to use (SNMPv1, SNMPv2c (default))',
     :default => 'SNMPv2c'
 
+  option :comparison,
+    :short => '-o comparison operator',
+    :description => 'Operator used to compare data with warning/critial values. Can be set to "le" (<=), "ge" (>=).',
+    :default => 'ge'
+
   def run
+<<<<<<< HEAD
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
       response = manager.get(["#{config[:objectid]}"])
@@ -58,16 +69,25 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     rescue Exception => e
       unknown "An unknown error occured: #{e.inspect}"
     end
-      response.each_varbind do |vb|
-        if "#{vb.value.to_s}".to_i >= "#{config[:critical]}".to_i
+    operators = {'le' => :<=, 'ge' => :>=}
+    symbol = operators[config[:comparison]]
+    response.each_varbind do |vb|
+      if config[:match]
+        if vb.value.to_s =~ /#{config[:match]}/
+          ok
+        else
+          critical "Value: #{vb.value.to_s} failed to match Pattern: #{config[:match]}"
+        end
+      else
+        if "#{vb.value.to_s}".to_i.send(symbol, "#{config[:critical]}".to_i)
           critical "Critical state detected"
         end
 
-        if (("#{vb.value.to_s}".to_i >= "#{config[:warning]}".to_i) && ("#{vb.value.to_s}".to_i < "#{config[:critical]}".to_i))
+        if (("#{vb.value.to_s}".to_i.send(symbol, "#{config[:warning]}".to_i)) && !("#{vb.value.to_s}".to_i.send(symbol, "#{config[:critical]}".to_i)))
           warning "Warning state detected"
         end
 
-        if ("#{vb.value.to_s}".to_i < "#{config[:warning]}".to_i)
+        unless ("#{vb.value.to_s}".to_i.send(symbol, "#{config[:warning]}".to_i))
           ok "All is well!"
         end
       end

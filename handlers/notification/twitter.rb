@@ -35,9 +35,9 @@ class TwitterHandler < Sensu::Handler
           t.oauth_token_secret = account[1]["oauth_token_secret"]
         end
         if @event['action'].eql?("resolve")
-          Twitter.update("RESOLVED - #{event_name}: #{@event['check']['notification']} Time: #{Time.now()} ")
+          Twitter.update("RESOLVED - #{event_name}: #{@event['check']['notification']} Time: #{Time.now} ")
         else
-          Twitter.update("ALERT - #{event_name}: #{@event['check']['notification']} Time: #{Time.now()} ")
+          Twitter.update("ALERT - #{event_name}: #{@event['check']['notification']} Time: #{Time.now} ")
         end
       end
     end

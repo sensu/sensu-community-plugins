@@ -41,7 +41,6 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   option :prefix,
     :short => '-p prefix',
-    :default => "com.dneg",
     :description => 'prefix to attach to graphite path'
 
   option :suffix,
@@ -54,6 +53,11 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :description => 'SNMP version to use (SNMPv1, SNMPv2c (default))',
     :default => 'SNMPv2c'
 
+  option :graphite,
+    :short => '-g',
+    :description => 'Replace dots with underscores in hostname',
+    :boolean => true
+
   def run
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
@@ -64,7 +68,11 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
       unknown "An unknown error occured: #{e.inspect}"
     end
     response.each_varbind do |vb|
-      output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f
+      if config[:prefix]
+        output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f
+      else
+        output "#{config[:host]}.#{config[:suffix]}", vb.value.to_f
+      end
     end
     manager.close
     ok

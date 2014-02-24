@@ -105,6 +105,6 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
     memcachedMetrics['total_items'] = stats['total_items'].to_i
     memcachedMetrics['evictions'] = stats['evictions'].to_i
     memcachedMetrics['reclaimed'] = stats['reclaimed'].to_i
-    return memcachedMetrics
+    memcachedMetrics
   end
 end

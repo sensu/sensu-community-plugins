@@ -44,7 +44,11 @@ class VarnishMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     begin
-      varnishstat = `varnishstat -x`
+      if config[:varnish_name]
+        varnishstat = `varnishstat -x -n #{config[:varnish_name]}`
+      else
+        varnishstat = `varnishstat -x`
+      end
       stats = Crack::XML.parse(varnishstat)
       stats['varnishstat']['stat'].each do |stat|
         path = "#{config[:scheme]}"
