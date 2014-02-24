@@ -60,8 +60,8 @@ def check_hbase_status
   conf  = HBaseConfiguration.new
   admin = HBaseAdmin.new(conf)
 
-  status = admin.getClusterStatus()
-  dead_servers = status.getDeadServerNames()
+  status = admin.getClusterStatus
+  dead_servers = status.getDeadServerNames
 
   count = dead_servers.length
 

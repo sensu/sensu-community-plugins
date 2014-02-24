@@ -22,7 +22,8 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
       # we are matching TOTAL stats and returning a hash of values
       if name.match(/^cpu$/)
         # return the CPU metrics sample as a hash
-        return Hash[cpu_metrics.zip(info.map(&:to_i))]
+        # filter out nil values, as some kernels don't have a 'guest' value
+        return Hash[cpu_metrics.zip(info.map(&:to_i))].reject {|key, value| value == nil }
       end
     end
   end
@@ -32,10 +33,10 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    cpu_metrics = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq', 'steal', 'guest']
     cpu_sample1 = get_proc_stats
     sleep(1)
     cpu_sample2 = get_proc_stats
+    cpu_metrics = cpu_sample2.keys
 
     # we will sum all jiffy counts read in get_proc_stats
     cpu_total1 = sum_cpu_metrics(cpu_sample1)

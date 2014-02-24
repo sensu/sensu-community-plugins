@@ -63,7 +63,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
- option :secure,
+  option :secure,
     :short => "-s",
     :long => "--secure",
     :description => "Use SSL"
@@ -75,7 +75,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       http.use_ssl = true
     end
     req = Net::HTTP::Get.new(config[:path])
-    if (config[:user] != nil and config[:password] != nil)
+    if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
     res = http.request(req)

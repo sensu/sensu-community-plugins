@@ -8,6 +8,7 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+# rubocop:disable VariableName, MethodName
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -24,16 +25,14 @@ class CpuMetric < Sensu::Plugin::Metric::CLI::Graphite
     tempArr=[]
     timestamp = Time.now.utc.to_i
     io= IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\" ") # { |io|
-    while (line = io.gets) do
-        tempArr.push(line)
-    end
+    tempArr.push(line) while (line = io.gets) # rubocop:disable UselessAssignment
     temp = tempArr[2].split(",")[1]
     cpuMetric = temp[1, temp.length - 3].to_f
-    return [cpuMetric, timestamp]
+    [cpuMetric, timestamp]
   end
 
   def run
-    values = getcpuLoad()
+    values = getcpuLoad
     metrics = {
         :cpu => {
             :loadavgsec => values[0]
@@ -47,6 +46,3 @@ class CpuMetric < Sensu::Plugin::Metric::CLI::Graphite
     ok
   end
 end
-
-
-

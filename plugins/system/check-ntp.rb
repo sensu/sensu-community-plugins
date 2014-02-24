@@ -20,13 +20,13 @@ class CheckNTP < Sensu::Plugin::Check::CLI
 
   def run
     begin
-      offset = `ntpq -c "rv 0 offset"`.split('=')[1].strip().to_i()
+      offset = `ntpq -c "rv 0 offset"`.split('=')[1].strip.to_i
     rescue
       unknown "NTP command Failed"
     end
 
-    critical if offset >= config[:crit] or offset <= -config[:crit]
-    warning if offset >= config[:warn] or offset <= -config[:warn]
+    critical if offset >= config[:crit] || offset <= -config[:crit]
+    warning if offset >= config[:warn] || offset <= -config[:warn]
     ok
 
   end

@@ -86,6 +86,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :long => '--cacert FILE',
     :description => 'A CA Cert to use'
 
+  option :expiry,
+    :short => '-e EXPIRY',
+    :long => '--expiry EXPIRY',
+    :proc => proc { |a| a.to_i },
+    :description => 'Warn EXPIRE days before cert expires'
+
   option :pattern,
     :short => '-q PAT',
     :long => '--query PAT',
@@ -115,6 +121,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :description => 'Check for a specific amount of response bytes',
     :proc => proc { |a| a.to_i }
 
+  option :response_code,
+    :long => '--response-code CODE',
+    :description => 'Check for a specific response code'
+
   def run
     if config[:url]
       uri = URI.parse(config[:url])
@@ -123,7 +133,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       config[:request_uri] = uri.request_uri
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] and config[:request_uri]
+      unless config[:host] && config[:request_uri]
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -143,6 +153,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   def get_resource
     http = Net::HTTP.new(config[:host], config[:port])
 
+    warn_cert_expire = nil
     if config[:ssl]
       http.use_ssl = true
       if config[:cert]
@@ -156,11 +167,21 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       if config[:insecure]
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
+
+      if config[:expiry] != nil
+        expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
+        # We can't raise inside the callback, have to check when we finish.
+        http.verify_callback = proc do |preverify_ok, ssl_context|
+          if ssl_context.current_cert.not_after <= expire_warn_date
+            warn_cert_expire = ssl_context.current_cert.not_after
+          end
+        end
+      end
     end
 
     req = Net::HTTP::Get.new(config[:request_uri], {'User-Agent' => config[:ua]})
 
-    if (config[:user] != nil and config[:password] != nil)
+    if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
@@ -177,37 +198,50 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       body = ''
     end
 
-    case res.code
-    when /^2/
-      if config[:redirectto]
-        critical "expected redirect to #{config[:redirectto]} but got #{res.code}" + body
-      elsif config[:pattern]
-        if res.body =~ /#{config[:pattern]}/
-          ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes" + body
-        else
-          critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
-        end
-      else
-        ok "#{res.code}, #{res.body.size} bytes" + body
-      end
-    when /^3/
-      if config[:redirectok] || config[:redirectto]
-        if config[:redirectok]
-          ok "#{res.code}, #{res.body.size} bytes" + body
-        elsif config[:redirectto]
-          if config[:redirectto] == res['Location']
-            ok "#{res.code} found redirect to #{res['Location']}" + body
-          else
-            critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body
-          end
-        end
-      else
-        warning res.code + body
-      end
-    when /^4/, /^5/
-      critical res.code + body
-    else
-      warning res.code + body
+    if warn_cert_expire != nil
+      warning "Certificate will expire #{warn_cert_expire}"
     end
+
+    case res.code
+      when /^2/
+        if config[:redirectto]
+          critical "expected redirect to #{config[:redirectto]} but got #{res.code}" + body
+        elsif config[:pattern]
+          if res.body =~ /#{config[:pattern]}/
+            ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes" + body
+          else
+            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
+          end
+        else
+          ok("#{res.code}, #{res.body.size} bytes" + body) unless config[:response_code]
+        end
+      when /^3/
+        if config[:redirectok] || config[:redirectto]
+          if config[:redirectok]
+            ok("#{res.code}, #{res.body.size} bytes" + body) unless config[:response_code]
+          elsif config[:redirectto]
+            if config[:redirectto] == res['Location']
+              ok "#{res.code} found redirect to #{res['Location']}" + body
+            else
+              critical "expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body
+            end
+          end
+        else
+          warning res.code + body
+        end
+      when /^4/, /^5/
+        critical(res.code + body) unless config[:response_code]
+      else
+        warning(res.code + body) unless config[:response_code]
+    end
+
+    if config[:response_code]
+      if config[:response_code] == res.code
+        ok "#{res.code}, #{res.body.size} bytes" + body
+      else
+        critical res.code + body
+      end
+    end
+
   end
 end

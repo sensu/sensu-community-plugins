@@ -23,7 +23,7 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
     def lag_compute(res1, res, m_segbytes)
       m_segment, m_offset = res1.split(/\//)
       s_segment, s_offset = res.split(/\//)
-      return ((m_segment.hex - s_segment.hex) * m_segbytes) + (m_offset.hex - s_offset.hex)
+      ((m_segment.hex - s_segment.hex) * m_segbytes) + (m_offset.hex - s_offset.hex)
     end
 
     # Establishing connections to the slave

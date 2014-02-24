@@ -60,9 +60,9 @@ class CheckBeanstalkStatistic < Sensu::Plugin::Check::CLI
     unknown "#{config[:stat]} doesn't exist" unless stats.has_key?(config[:stat])
     s = stats[config[:stat]].to_i
 
-    if config[:crit_high] and s > config[:crit_high]
+    if config[:crit_high] && s > config[:crit_high]
       critical "Too many #{config[:stat]} #{config[:crit_high]} (#{s} found)"
-    elsif config[:warn_high] and s > config[:warn_high]
+    elsif config[:warn_high] && s > config[:warn_high]
       warning "Too many #{config[:stat]} #{config[:warn_high]} jobs (#{s} found)"
     elsif s < config[:crit_low]
       warning "Not enough #{config[:stat]} #{config[:crit_low]} jobs (#{s} found)"

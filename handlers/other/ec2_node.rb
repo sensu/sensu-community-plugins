@@ -119,7 +119,7 @@ class Ec2Node < Sensu::Handler
     instance_ids.each do |id|
       return true if id == @event['client']['name']
     end
-    return false # no match found, node doesn't exist
+    false # no match found, node doesn't exist
   end
 
   def ec2
