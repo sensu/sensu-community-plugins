@@ -22,7 +22,6 @@ require 'sensu-handler'
 require 'net/http'
 require 'timeout'
 
-# Sensu handler for Fluentd
 class Fluentd < Sensu::Handler
   def host
     settings['fluentd']['host'] || 'localhost'
