@@ -109,18 +109,20 @@ class Graphite < Sensu::Plugin::Check::CLI
 
   def initialize
     super
-    @graphite_cache = []
+    @graphite_cache = {}
   end
 
-  def graphite_cache
-    graphite_value = @graphite_cache.find_all {|value| value[:period] == @period}
-    graphite_value if graphite_value.size > 0
+  def graphite_cache(target = nil)
+    if @graphite_cache.has_key?(target)
+      graphite_value = @graphite_cache[target].find_all {|value| value[:period] == @period}
+      graphite_value if graphite_value.size > 0
+    end
   end
 
   # Create a graphite url from params
   #
   #
-  def graphite_url (target = nil)
+  def graphite_url(target = nil)
     url = "#{config[:host]}/render/"
     url = "http://" + url unless url[0..3] == "http"
     url = url + "?target=#{target}" if target
@@ -139,7 +141,7 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def get_graphite_values(target)
-    cache_value = graphite_cache
+    cache_value = graphite_cache target
     return cache_value if cache_value
     params = {
         :target => target,
@@ -148,9 +150,10 @@ class Graphite < Sensu::Plugin::Check::CLI
     }
     resp = Net::HTTP.post_form(graphite_url, params)
     data = JSON.parse(resp.body)
+    @graphite_cache[target] = []
     if data.size > 0
-      data.each { |d| @graphite_cache << {:target => d['target'], :period => @period, :datapoints => d['datapoints'] }}
-      graphite_cache
+      data.each { |d| @graphite_cache[target] << {:target => d['target'], :period => @period, :datapoints => d['datapoints'] }}
+      graphite_cache target
     else
       nil
     end
@@ -455,7 +458,6 @@ class Graphite < Sensu::Plugin::Check::CLI
       warning warnings_string if warnings.size > 0
     end
     ok
-
   end
 
 end
