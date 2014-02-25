@@ -26,7 +26,6 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'sensu/io'
 require 'json'
-require 'English'
 
 class CephOsdMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
