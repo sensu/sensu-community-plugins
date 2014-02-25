@@ -24,8 +24,8 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
+require 'sensu/io'
 require 'json'
-require 'English'
 
 class CephOsdMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
@@ -39,6 +39,13 @@ class CephOsdMetrics < Sensu::Plugin::Metric::CLI::Graphite
          :short => '-p',
          :long => '--pattern',
          :default => '/var/run/ceph/ceph-osd.*.asok'
+
+  option :timeout,
+         :description => 'Timeout (default 10)',
+         :short => '-t SEC',
+         :long => '--timeout',
+         :proc => proc { |t| t.to_i },
+         :default => 10
 
   def output_data(h, leader)
     h.each_pair do |key, val|
@@ -54,17 +61,17 @@ class CephOsdMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     Dir.glob(config[:pattern]).each do |socket|
-      data = `ceph --admin-daemon #{socket} perf dump`
-      if $CHILD_STATUS.exitstatus == 0
-        # Left side of wildcard
-        strip1 = config[:pattern].match(/^.*\*/).to_s.gsub(/\*/, '')
-        # Right side of wildcard
-        strip2 = config[:pattern].match(/\*.*$/).to_s.gsub(/\*/, '')
-        osd_num = socket.gsub(strip1, '').gsub(strip2, '')
+      output, error = Sensu::IO.popen("ceph --admin-daemon #{socket} perf dump", 'r', config[:timeout])
+      unless error
+        regex = Regexp.new("^"+config[:pattern].gsub('.','\.').gsub(/\*/,'(.*)')+"$")
+        osd_num = regex.match(socket)[1]
+
         JSON.parse(data).each do |k, v|
           k = k.gsub(/\/$/, '').gsub(/\//, '_')
           output_data(v, "#{osd_num}.#{k}")
         end
+      else
+        warning 'no OSD socket found'
       end
     end
     ok
