@@ -53,7 +53,7 @@ class RedisSlaveCheck < Sensu::Plugin::Check::CLI
     :long => "--redis-info-key-value VALUE",
     :description => "Redis info key value to trigger alarm",
     :required => false,
-    :default => 'slave'
+    :default => 'master'
 
   def run
     begin
