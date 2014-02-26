@@ -30,14 +30,6 @@ require 'sensu-plugin/check/cli'
 
 class CheckProcs < Sensu::Plugin::Check::CLI
 
-  def self.read_pid(path)
-    begin
-      File.read(path).chomp.to_i
-    rescue
-      self.new.unknown "Could not read pid file #{path}"
-    end
-  end
-
   option :warn_over,
     :short => '-w N',
     :long => '--warn-over N',
@@ -92,8 +84,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :file_pid,
     :short => '-f PID',
     :long => '--file-pid PID',
-    :description => 'Check against a specific PID',
-    :proc => proc {|a| read_pid(a) }
+    :description => 'Check against a specific PID'
 
   option :vsz,
     :short => '-z VSZ',
@@ -137,6 +128,14 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :description => 'Match process that are younger than this, in SECONDS'
 
+  def read_pid(path)
+    if File.exists?(path)
+      File.read(path).chomp.to_i
+    else
+      unknown "Could not read pid file #{path}"
+    end
+  end
+
   def read_lines(cmd)
     IO.popen(cmd + ' 2>&1') do |child|
       child.read.split("\n")
@@ -178,7 +177,9 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   def run
     procs = get_procs
 
-    procs.reject! {|p| p[:pid].to_i != config[:file_pid] } if config[:file_pid]
+    if (config[:file_pid] && file_pid = read_pid(config[:file_pid]))
+      procs.reject! { |p| p[:pid].to_i != file_pid }
+    end
     procs.reject! {|p| p[:pid].to_i == $$ } unless config[:match_self]
     procs.reject! {|p| p[:pid].to_i == Process.ppid } unless config[:match_parent]
     procs.reject! {|p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
