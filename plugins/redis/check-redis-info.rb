@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Checks checks variables from redis INFO http://redis.io/commands/INFO
-# 
+#
 # ===
 #
 # Depends on redis gem
