@@ -62,7 +62,8 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
       'active_processes',
       'total_processes',
       'max_active_processes',
-      'max_children_reached'
+      'max_children_reached',
+      'slow_requests'
     ]
     stat.each do |name|
       output "#{config[:scheme]}.#{name}", stats['status'][name]
