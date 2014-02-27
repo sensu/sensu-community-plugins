@@ -85,7 +85,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
         :aws_secret_access_key  => config[:aws_secret_access_key],
         :region             => config[:aws_region])
 
-        et = Time.now() - config[:fetch_age]
+        et = Time.now - config[:fetch_age]
         st = et - 60
 
         data = {}
