@@ -177,7 +177,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   def run
     procs = get_procs
 
-    if (config[:file_pid] && file_pid = read_pid(config[:file_pid]))
+    if (config[:file_pid] && (file_pid = read_pid(config[:file_pid])))
       procs.reject! { |p| p[:pid].to_i != file_pid }
     end
     procs.reject! {|p| p[:pid].to_i == $$ } unless config[:match_self]
