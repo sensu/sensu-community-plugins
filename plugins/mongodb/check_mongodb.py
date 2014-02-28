@@ -188,9 +188,9 @@ def main(argv):
     if action == "connections":
         return check_connections(con, warning, critical, perf_data)
     elif action == "replication_lag":
-        return check_rep_lag(con, host, warning, critical, False, perf_data,max_lag,user,passwd)
+        return check_rep_lag(con, host, warning, critical, False, perf_data,max_lag,user,passwd,ssl)
     elif action == "replication_lag_percent":
-        return check_rep_lag(con, host, warning, critical, True, perf_data,max_lag,user,passwd)
+        return check_rep_lag(con, host, warning, critical, True, perf_data,max_lag,user,passwd,ssl)
     elif action == "replset_state":
         return check_replset_state(con,perf_data, warning , critical )
     elif action == "memory":
@@ -320,7 +320,7 @@ def check_connections(con, warning, critical, perf_data):
         return exit_with_general_critical(e)
 
 
-def check_rep_lag(con, host, warning, critical, percent, perf_data,max_lag, user, passwd):
+def check_rep_lag(con, host, warning, critical, percent, perf_data,max_lag, user, passwd, ssl=False):
     if percent:
         warning = warning or 50
         critical = critical or 75
@@ -390,7 +390,7 @@ def check_rep_lag(con, host, warning, critical, percent, perf_data,max_lag, user
                           data = data + member['name'] + " lag=%d;" % replicationLag
                           maximal_lag = max(maximal_lag, replicationLag)
                     if percent:
-                        err, con=mongo_connect(primary_node['name'].split(':')[0], int(primary_node['name'].split(':')[1]), False, user, passwd)
+                        err, con=mongo_connect(primary_node['name'].split(':')[0], int(primary_node['name'].split(':')[1]), ssl, user, passwd)
                         if err!=0:
                             return err 
                         primary_timediff=replication_get_time_diff(con)
@@ -422,7 +422,7 @@ def check_rep_lag(con, host, warning, critical, percent, perf_data,max_lag, user
                 lag = float(optime_lag.seconds + optime_lag.days * 24 * 3600)
 
             if percent:
-                err, con=mongo_connect(primary_node['name'].split(':')[0], int(primary_node['name'].split(':')[1]), False, user,passwd)
+                err, con=mongo_connect(primary_node['name'].split(':')[0], int(primary_node['name'].split(':')[1]), ssl, user,passwd)
                 if err!=0:
                     return err 
                 primary_timediff=replication_get_time_diff(con)
