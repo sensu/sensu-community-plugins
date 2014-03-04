@@ -4,8 +4,8 @@
 # ===
 #
 # DESCRIPTION:
-#   This plugin retrives machine-readable output of mod_status, parse
-#   it, and generates apache process metrics formated for Graphite.
+#   This plugin retrieves machine-readable output of mod_status, parses
+#   it, and generates Apache process metrics formatted for Graphite.
 #
 # OUTPUT:
 #   Graphite plain-text format (name value timestamp\n)
