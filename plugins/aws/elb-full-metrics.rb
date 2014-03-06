@@ -22,7 +22,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
-require 'fog'
+require 'fog/aws'
 
 class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
@@ -85,37 +85,37 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
         :aws_secret_access_key  => config[:aws_secret_access_key],
         :region             => config[:aws_region])
 
-        et = Time.now - config[:fetch_age]
-        st = et - 60
+      et = Time.now - config[:fetch_age]
+      st = et - 60
 
-        data = {}
+      data = {}
 
-        statistic_type.each do |key, value|
+      statistic_type.each do |key, value|
 
-          result = cw.get_metric_statistics({
-            'Namespace' => 'AWS/ELB',
-            'MetricName' => key,
-            'Dimensions' => [{
-            'Name' => 'LoadBalancerName',
-            'Value' => config[:elbname],
-          }],
-          'Statistics' => [value],
-          'StartTime' => st.iso8601,
-          'EndTime' => et.iso8601,
-          'Period' => '60'
-          })
-          r =  result.body['GetMetricStatisticsResult']['Datapoints']
-          if r.count > 0
-            data[key] = result.body['GetMetricStatisticsResult']['Datapoints'][0]
-          end
+        result = cw.get_metric_statistics({
+          'Namespace' => 'AWS/ELB',
+          'MetricName' => key,
+          'Dimensions' => [{
+          'Name' => 'LoadBalancerName',
+          'Value' => config[:elbname],
+        }],
+        'Statistics' => [value],
+        'StartTime' => st.iso8601,
+        'EndTime' => et.iso8601,
+        'Period' => '60'
+        })
+        r =  result.body['GetMetricStatisticsResult']['Datapoints']
+        if r.count > 0
+          data[key] = result.body['GetMetricStatisticsResult']['Datapoints'][0]
         end
+      end
 
-        unless data.nil?
-          # We only return data when we have some to return
-          data.each do |key, value|
-            output graphitepath + ".#{key}", value.to_a.last[1], value['Timestamp'].to_i
-          end
+      unless data.nil?
+        # We only return data when we have some to return
+        data.each do |key, value|
+          output graphitepath + ".#{key}", value.to_a.last[1], value['Timestamp'].to_i
         end
+      end
     rescue Exception => e
       puts "Error: exception: #{e}"
       critical

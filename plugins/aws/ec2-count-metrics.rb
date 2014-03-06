@@ -52,13 +52,8 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => 'instance'
 
   def run
-    if config[:scheme] == ""
-      graphitepath = "sensu.aws.ec2.count"
-    else
-      graphitepath = config[:scheme]
-    end
-
     begin
+
       aws_debug = false
 
       AWS.config(
@@ -68,9 +63,17 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         http_wire_trace: aws_debug
       )
 
-      client = AWS::EC2::Client.new()
+      client = AWS::EC2::Client.new
 
       def by_instances_status(client)
+
+        graphitepath = ""
+        if config[:scheme] == ""
+          graphitepath = "sensu.aws.ec2.count"
+        else
+          graphitepath = config[:scheme]
+        end
+
         options = {:include_all_instances => true}
         data = client.describe_instance_status(options)
 
@@ -101,7 +104,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
         data = {}
 
-        instances = client.describe_instances()
+        instances = client.describe_instances
         instances[:reservation_set].each do |i|
           i[:instances_set].each do |instance|
             type = instance[:instance_type]
