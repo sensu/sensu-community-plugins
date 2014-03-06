@@ -68,12 +68,12 @@ class CheckMySQLHealth < Sensu::Plugin::Check::CLI
         db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database], config[:port].to_i, config[:socket])
         max_con = db.
             query("SHOW VARIABLES LIKE 'max_connections'").
-            fetch_hash().
+            fetch_hash.
             fetch('Value').
             to_i
         used_con = db.
             query("SHOW GLOBAL STATUS LIKE 'Max_used_connections'").
-            fetch_hash().
+            fetch_hash.
             fetch('Value').
             to_i
         if config[:usepc]

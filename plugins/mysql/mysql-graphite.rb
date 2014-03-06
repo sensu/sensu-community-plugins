@@ -202,7 +202,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       slave_results.first.each do |key, value|
         if metrics['general'].include?(key)
           # Replication lag being null is bad, very bad, so negativate it here
-          if key == 'Seconds_Behind_Master' and value.nil?
+          if key == 'Seconds_Behind_Master' && value.nil?
             value = -1
           end
           output "#{config[:scheme]}.general.#{metrics['general'][key]}", value

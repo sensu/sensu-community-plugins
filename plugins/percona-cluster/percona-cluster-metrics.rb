@@ -115,4 +115,3 @@ class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
   end
 
 end
-

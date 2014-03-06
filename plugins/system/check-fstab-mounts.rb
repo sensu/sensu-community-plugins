@@ -36,7 +36,7 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
       next if line =~ /^\s*#/
       fields = line.split(/\s+/)
       next if fields[1] == 'none'
-      next if config[:fstypes] and !config[:fstypes].include? fields[2]
+      next if config[:fstypes] && !config[:fstypes].include?(fields[2])
       if @proc_mounts.select {|m| m.split(/\s+/)[1] == fields[1]}.empty?
         @missing_mounts << fields[1]
       end

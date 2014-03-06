@@ -90,7 +90,3 @@ class JenkinsJobChecker < Sensu::Plugin::Check::CLI
   end
 
 end
-
-
-
-
