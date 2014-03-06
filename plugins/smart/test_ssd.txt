@@ -1,0 +1,23 @@
+ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+  1 Raw_Read_Error_Rate     0x000f   105   105   050    Pre-fail  Always       -       0/10359163
+  5 Retired_Block_Count     0x0033   100   100   003    Pre-fail  Always       -       0
+  9 Power_On_Hours_and_Msec 0x0032   000   000   000    Old_age   Always       -       6475h+56m+19.040s
+ 12 Power_Cycle_Count       0x0032   100   100   000    Old_age   Always       -       108
+171 Program_Fail_Count      0x0032   000   000   000    Old_age   Always       -       0
+172 Erase_Fail_Count        0x0032   000   000   000    Old_age   Always       -       0
+174 Unexpect_Power_Loss_Ct  0x0030   000   000   000    Old_age   Offline      -       91
+177 Wear_Range_Delta        0x0000   000   000   000    Old_age   Offline      -       2
+181 Program_Fail_Count      0x0032   000   000   000    Old_age   Always       -       0
+182 Erase_Fail_Count        0x0032   000   000   000    Old_age   Always       -       0
+187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       0
+194 Temperature_Celsius     0x0022   032   037   000    Old_age   Always       -       32 (Min/Max 15/37)
+195 ECC_Uncorr_Error_Count  0x001c   120   120   000    Old_age   Offline      -       0/10359163
+196 Reallocated_Event_Count 0x0033   100   100   003    Pre-fail  Always       -       0
+201 Unc_Soft_Read_Err_Rate  0x001c   120   120   000    Old_age   Offline      -       0/10359163
+204 Soft_ECC_Correct_Rate   0x001c   120   120   000    Old_age   Offline      -       0/10359163
+230 Life_Curve_Status       0x0013   100   100   000    Pre-fail  Always       -       100
+231 SSD_Life_Left           0x0013   100   100   010    Pre-fail  Always       -       0
+233 SandForce_Internal      0x0000   000   000   000    Old_age   Offline      -       9601
+234 SandForce_Internal      0x0032   000   000   000    Old_age   Always       -       25986
+241 Lifetime_Writes_GiB     0x0032   000   000   000    Old_age   Always       -       25986
+242 Lifetime_Reads_GiB      0x0032   000   000   000    Old_age   Always       -       28655

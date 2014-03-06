@@ -28,6 +28,7 @@ class Mailer < Sensu::Handler
     mail_to = settings['mailer']['mail_to']
     mail_from =  settings['mailer']['mail_from']
 
+    delivery_method = settings['mailer']['delivery_method'] || 'smtp'
     smtp_address = settings['mailer']['smtp_address'] || 'localhost'
     smtp_port = settings['mailer']['smtp_port'] || '25'
     smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
@@ -35,6 +36,7 @@ class Mailer < Sensu::Handler
     smtp_username = settings['mailer']['smtp_username'] || nil
     smtp_password = settings['mailer']['smtp_password'] || nil
     smtp_authentication = settings['mailer']['smtp_authentication'] || :plain
+    smtp_enable_starttls_auto = settings['mailer']['smtp_enable_starttls_auto'] == "false" ? false : true
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
@@ -56,7 +58,7 @@ class Mailer < Sensu::Handler
         :port       => smtp_port,
         :domain     => smtp_domain,
         :openssl_verify_mode => 'none',
-        :enable_starttls_auto => true
+        :enable_starttls_auto => smtp_enable_starttls_auto
       }
 
       unless smtp_username.nil?
@@ -68,7 +70,7 @@ class Mailer < Sensu::Handler
         delivery_options.merge! auth_options
       end
 
-      delivery_method :smtp, delivery_options
+      delivery_method delivery_method.intern, delivery_options
     end
 
     begin

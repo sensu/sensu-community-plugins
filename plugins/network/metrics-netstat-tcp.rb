@@ -76,7 +76,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     File.open('/proc/net/' + protocol).each do |line|
       line.strip!
-      if m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/)
+      if m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
         connection_state = m[5]
         connection_port = m[2].to_i(16)
         connection_state = TCP_STATES[connection_state]
@@ -87,7 +87,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
       end
     end
-    return state_counts
+    state_counts
   end
 
   def run

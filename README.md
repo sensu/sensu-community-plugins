@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)
 
-## Community plugins, extenions, and handlers
+## Community plugins, extensions, and handlers
 
 This gem contains some example plugins and handlers for Sensu. Most of
 them are implemented in Ruby and use the `sensu-plugin` framework (a
@@ -26,6 +26,10 @@ be declared in the header of the plugin/handler file.
 
 Only pull requests passing lint/tests will be merged.
 
+Please do not not abandon your PR. Because only you can help us merge
+it - if there some issues withing it. If your PR has no feedback in month - we 
+close it. Anyway - you can always open a new one.
+
 ## Rubocop linting
 
 Rubocop is used to lint the style of the ruby plugins. This is done
@@ -38,6 +42,12 @@ pull requests.
 bundle install
 bundle exec rubocop
 ```
+
+## RSpec Testing
+
+Currently we have RSpec as a test framework. Please add coverage for your check.
+This is ~~little bit hard~~ almost impossible for non-ruby checks. But don't be afraid on pushing your PR with non-ruby code. Just let someone from [team](https://github.com/sensu?tab=members) know. Maybe we can help you to rewrite your check to Ruby or even we can invent something completely new to test your work. Just don't hesitate to contact us.
+
 
 ## License
 

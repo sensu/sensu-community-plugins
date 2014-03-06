@@ -10,13 +10,29 @@
 
 # rubocop:disable HandleExceptions
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
+if RUBY_VERSION < '1.9.0'
+  require 'rubygems'
+
+  # round(n) doesn't exist in ruby < 1.9
+  class Float
+    alias_method :oldround, :round
+
+    def round(precision = nil)
+      if precision.nil?
+        return self
+      else
+        return ((self * 10**precision).oldround.to_f) / (10**precision)
+      end
+    end
+  end
+end
+
 require 'sensu-plugin/check/cli'
 
 class LoadAverage
   def initialize(per_core = false)
     @cores = per_core ? cpu_count : 1
-    @avg = File.read('/proc/loadavg').split.take(3).map {|a| (a.to_f / @cores).round(2) } rescue nil
+    @avg = File.read('/proc/loadavg').split.take(3).map {|a| (a.to_f / @cores).round(2) } rescue nil # rubocop:disable RescueModifier
   end
   def cpu_count
     `grep -sc ^processor /proc/cpuinfo`.to_i rescue 0

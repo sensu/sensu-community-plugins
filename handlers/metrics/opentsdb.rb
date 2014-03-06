@@ -41,27 +41,29 @@ class OpenTSDB < Sensu::Handler
     check_name = @event['check']['name']
     host_name = @event['client']['name']
     sock = TCPSocket.new(tsd_server, tsd_port)
-  begin
-    metrics.split("\n").each do |output_line|
-      mutated_output = ""
-      (metric_name, metric_value, epoch_time) = output_line.split("\t")
-      tokens = metric_name.split('.')
-      host_name = tokens[0..host_name_len].join('.')
-      short_metric = tokens[(host_name_len + 1)]
-      long_metric = fqdn.length
-      mutated_output = "put #{short_metric} #{epoch_time} #{metric_value} check=#{check_name} host=#{host_name} metric=#{long_metric}"
-      timeout(3) do
-        sock.puts mutated_output
+
+    begin
+      metrics.split("\n").each do |output_line|
+        mutated_output = ""
+        (metric_name, metric_value, epoch_time) = output_line.split("\t")
+        tokens = metric_name.split('.')
+        host_name = tokens[0..host_name_len].join('.')
+        short_metric = tokens[(host_name_len + 1)]
+      long_metric = tokens[(host_name_len + 2)..-1].join('.')
+        mutated_output = "put #{short_metric} #{epoch_time} #{metric_value} check=#{check_name} host=#{host_name} metric=#{long_metric}"
+        timeout(3) do
+          sock.puts mutated_output
         puts mutated_output
+        end
       end
-    end
     ensure
       sock.flush
       sock.close
-  end
-  rescue Timeout::Error
-    puts "opentsdb -- timed out while sending metrics"
-  rescue => error
-    puts "opentsdb -- failed to send metrics : #{error}"
+    end
+
+    rescue Timeout::Error
+      puts "opentsdb -- timed out while sending metrics"
+    rescue => error
+      puts "opentsdb -- failed to send metrics : #{error}"
   end
 end

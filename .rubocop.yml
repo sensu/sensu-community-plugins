@@ -13,13 +13,6 @@ MethodLength:
 LineLength:
   Max: 160
 
-HashSyntax:
-  Enabled: false
-
-# Prefer single-quotes
-StringLiterals:
-  Enabled: false
-
 AlignParameters:
   Enabled: false
 
@@ -29,34 +22,96 @@ SpaceAroundOperators:
 Encoding:
   Enabled: false
 
-PercentR:
-  Enabled: false
-
-SpaceAroundBraces:
-  Enabled: false
-
-FavorPercentR:
-  Enabled: false
-
 AndOr:
+  Enabled: true
+
+FinalNewline:
+  Enabled: true
+
+AssignmentInCondition:
+  Enabled: true
+
+AllCops:
+  Excludes:
+    - vendor/**
+
+ClassLength:
   Enabled: false
 
-EmptyLineBetweenDefs:
+##
+# TODO: enable and check everything below
+
+RegexpLiteral:
   Enabled: false
 
-SpaceInsideHashLiteralBraces:
+AccessorMethodName:
   Enabled: false
 
-SymbolName:
+NilComparison:
   Enabled: false
 
-ReduceArguments:
+WhileUntilDo:
   Enabled: false
 
-RescueException:
+TrailingComma:
   Enabled: false
 
-Syntax:
+SpecialGlobalVars:
+  Enabled: false
+
+RedundantBegin:
+  Enabled: false
+
+VariableName:
+  Enabled: false
+
+MethodName:
+  Enabled: false
+
+SignalException:
+  Enabled: false
+
+HashMethods:
+  Enabled: false
+
+NumericLiterals:
+  Enabled: false
+
+SpaceAfterMethodName:
+  Enabled: false
+
+DotPosition:
+  Enabled: false
+
+AlignArray:
+  Enabled: false
+
+ConditionPosition:
+  Enabled: false
+
+EmptyLiteral:
+  Enabled: false
+
+TrivialAccessors:
+  Enabled: false
+
+MultilineBlockChain:
+  Enabled: false
+
+PredicateName:
+  Enabled: false
+
+HashSyntax:
+  Enabled: false
+
+# Single Quotes
+StringLiterals:
+  Enabled: false
+
+UnlessElse:
+  Enabled: false
+
+RedundantSelf:
   Enabled: false
 
 WordArray:
@@ -68,19 +123,10 @@ IfUnlessModifier:
 ParenthesesAroundCondition:
   Enabled: false
 
-MethodAndVariableSnakeCase:
-  Enabled: false
-
-AvoidClassVars:
-  Enabled: false
-
 WhileUntilModifier:
   Enabled: false
 
 Semicolon:
-  Enabled: false
-
-UnlessElse:
   Enabled: false
 
 BlockNesting:
@@ -89,24 +135,45 @@ BlockNesting:
 Proc:
   Enabled: false
 
-# Global vars should be removed
-AvoidGlobalVars:
-  Enabled: false
-
-# Probably some good ones in here.
-# Disabled for $? => $CHILD_STATUS
-AvoidPerlisms:
-  Enabled: false
-
 Lambda:
   Enabled: false
 
 CollectionMethods:
   Enabled: false
 
+EmptyLineBetweenDefs:
+  Enabled: false
+
+SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+RescueException:
+  Enabled: false
+
 CaseIndentation:
   Enabled: false
 
-AllCops:
-  Excludes:
-    - vendor/**
+EmptyLinesAroundBody:
+  Enabled: false
+
+IndentationWidth:
+  Enabled: false
+
+# That would be nice to have - check for long methods
+CyclomaticComplexity:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+AlignHash:
+  Enabled: false
+
+SpaceAroundBlockBraces:
+  Enabled: false
+
+SingleLineBlockParams:
+  Enabled: false
+
+BracesAroundHashParameters:
+  Enabled: false
