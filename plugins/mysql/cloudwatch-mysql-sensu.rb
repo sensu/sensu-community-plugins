@@ -14,7 +14,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'aws-sdk'
+require 'aws/cloud_watch'
 require 'optparse'
 require 'pp'
 
