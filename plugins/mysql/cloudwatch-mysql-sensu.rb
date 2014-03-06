@@ -31,7 +31,7 @@ optparse = OptionParser.new do|opts|
     exit
   end
 
-  opts.on('-H', '--host HOST', 'Warning threshold') do |host|
+  opts.on('-H', '--host HOST', 'Hostname') do |host|
     options[:host] = host
   end
 
