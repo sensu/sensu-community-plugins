@@ -17,6 +17,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'socket'
 require 'csv'
+require 'fastercsv'
 
 class CheckHAProxy < Sensu::Plugin::Check::CLI
 
@@ -79,12 +80,13 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
         warning
       end
     else
-      percent_up = 100 * services.select {|svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' }.size / services.size
-      failed_names = services.reject {|svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' }.map {|svc| svc[:svname] }
-      critical_sessions = services.select{ |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > config[:session_crit_percent] }
-      warning_sessions = services.select{ |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > config[:session_warn_percent] }
+      percent_up = 100 * services.select {|svc| svc['status'] == 'UP' || svc['status'] == 'OPEN' }.size / services.size
+      failed_names = services.reject {|svc| svc['status'] == 'UP' || svc['status'] == 'OPEN' }.map {|svc| svc['svname'] }
+      failed_services = services.reject {|svc| svc['status'] == 'UP' || svc['status'] == 'OPEN' }.map {|svc| svc['pxname'] }
+      critical_sessions = services.select{ |svc| svc['slim'].to_i > 0 && (100 * svc['scur'].to_f / svc['slim'].to_f) > config[:session_crit_percent] }
+      warning_sessions = services.select{ |svc| svc['slim'].to_i > 0 && (100 * svc['scur'].to_f / svc['slim'].to_f) > config[:session_warn_percent] }
 
-      status = "UP: #{percent_up}% of #{services.size} /#{config[:service]}/ services" + (failed_names.empty? ? "" : ", DOWN: #{failed_names.join(', ')}")
+      status = "UP: #{percent_up}% of #{services.size} /#{config[:service]}/ services" + (failed_names.empty? ? "" : ", DOWN: #{failed_names.join(', ')} -- #{failed_services.join(', ')}")
       if percent_up < config[:crit_percent]
         critical status
       elsif !critical_sessions.empty?
@@ -106,9 +108,16 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
       out = srv.read
       srv.close
 
-      parsed = CSV.parse(out, {:skip_blanks => true})
-      keys = parsed.shift.reject{|k| k.nil?}.map{|k| k.match(/(\w+)/)[0].to_sym}
-      haproxy_stats = parsed.map{|line| Hash[keys.zip(line)]}
+      l = out.split("\n")
+      l.each do |line|
+          if line.start_with?("# ")
+              line.slice!("# ")
+          end
+          line.slice!(-1..-1)
+          line
+      end
+      data = l.join("\n")
+      haproxy_stats = CSV.parse(data, { :headers => true, :converters => :all })
     else
       critical "Not a valid HAProxy socket: #{config[:socket]}"
     end

@@ -1,0 +1,126 @@
+#!/usr/bin/env python
+#
+#  Copyright (c) 2013 SWITCH http://www.switch.ch
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+import argparse
+import os
+import subprocess
+import sys
+
+__version__ = '1.0.1'
+
+# default ceph values
+CEPH_COMMAND = '/usr/bin/ceph'
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+STATUS_UNKNOWN = 3
+
+def main():
+
+    # parse args
+    parser = argparse.ArgumentParser(description="'ceph health' nagios plugin.")
+    parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
+    parser.add_argument('-c','--conf', help='alternative ceph conf file')
+    parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')    
+    parser.add_argument('-i','--id', help='ceph client id')
+    parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
+    parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+    args = parser.parse_args()
+   
+    # validate args
+    ceph_exec = args.exe if args.exe else CEPH_COMMAND
+    if not os.path.exists(ceph_exec):
+        print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+        return STATUS_UNKNOWN
+    
+    if args.version:
+        print 'version %s' % __version__
+        return STATUS_OK
+
+    if args.conf and not os.path.exists(args.conf):
+        print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
+        return STATUS_UNKNOWN
+    
+    if args.keyring and not os.path.exists(args.keyring):
+        print "ERROR: keyring file '%s' doesn't exist" % args.keyring
+        return STATUS_UNKNOWN
+    
+    # build command
+    ceph_health = [ceph_exec]
+    if args.monaddress:
+        ceph_health.append('-m')
+        ceph_health.append(args.monaddress)
+    if args.conf:
+        ceph_health.append('-c')
+        ceph_health.append(args.conf)
+    if args.id:
+        ceph_health.append('--id')
+        ceph_health.append(args.id)
+    if args.keyring:
+        ceph_health.append('--keyring')
+        ceph_health.append(args.keyring)
+    ceph_health.append('health')
+    if args.detail:
+        ceph_health.append('detail')
+
+    #print ceph_health
+    
+    # exec command
+    p = subprocess.Popen(ceph_health,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    
+    # parse output
+    #print "output:", output
+    #print "err:", err
+    if output:
+        # merge multi-lines of output in one line
+        one_line = output.replace('\n','; ')
+        if one_line.startswith('HEALTH_OK'):
+            #print 'HEALTH OK:', one_line[len('HEALTH_OK')+1:]
+            one_line= one_line[len('HEALTH_OK')+1:].strip()
+            if one_line:
+                print 'HEALTH OK:', one_line
+            else:
+                print 'HEALTH OK'
+            return STATUS_OK
+        elif one_line.startswith('HEALTH_WARN'):
+            print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
+            return STATUS_WARNING
+        elif one_line.startswith('HEALTH_ERR'):
+            print 'HEALTH ERROR:', one_line[len('HEALTH_ERR')+1:]
+            return STATUS_ERROR
+        else:
+            print one_line
+        
+    elif err:
+        # read only first line of error
+        one_line = err.split('\n')[0]
+        if '-1 ' in one_line:
+            idx = one_line.rfind('-1 ')
+            print 'ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):])
+        else:
+            print one_line
+    
+    return STATUS_UNKNOWN
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+
