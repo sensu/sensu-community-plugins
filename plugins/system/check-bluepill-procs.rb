@@ -35,6 +35,8 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
     bluepill_status.each_line do |line|
       if line =~ /^\s \d\.\s/
         bluepill_groups.push(line.split(/^\s \d\.\s/)[1])
+      elsif line =~ /^\w+\(pid:/
+        bluepill_groups.push(line.split(/\(/)[0])
       end
     end
     # What apps is each bluepill group running
