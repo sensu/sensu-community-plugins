@@ -58,13 +58,11 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
     :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :required => true
 
   option :aws_secret_access_key,
     :short => '-k AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
     :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true
 
   option :aws_region,
     :short => '-r AWS_REGION',
