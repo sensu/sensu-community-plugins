@@ -28,4 +28,3 @@ class CheckDatabase < Sensu::Plugin::Check::CLI
     end
   end
 end
-

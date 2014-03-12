@@ -4,8 +4,8 @@
 # ===
 #
 # DESCRIPTION:
-#   This plugin retrives machine-readable output of mod_status, parse
-#   it, and generates apache process metrics formated for Graphite.
+#   This plugin retrieves machine-readable output of mod_status, parses
+#   it, and generates Apache process metrics formatted for Graphite.
 #
 # OUTPUT:
 #   Graphite plain-text format (name value timestamp\n)
@@ -63,7 +63,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}"
 
- option :secure,
+  option :secure,
     :short => "-s",
     :long => "--secure",
     :description => "Use SSL"
@@ -75,7 +75,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       http.use_ssl = true
     end
     req = Net::HTTP::Get.new(config[:path])
-    if (config[:user] != nil and config[:password] != nil)
+    if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
     res = http.request(req)

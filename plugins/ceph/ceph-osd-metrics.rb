@@ -70,4 +70,3 @@ class CephOsdMetrics < Sensu::Plugin::Metric::CLI::Graphite
     ok
   end
 end
-

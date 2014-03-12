@@ -19,7 +19,7 @@ include Sensu::Plugin::Utils
 
 class CheckSilenced < Sensu::Plugin::Metric::CLI::Graphite
 
-  default_host = settings['api']['host'] rescue 'localhost'
+  default_host = settings['api']['host'] rescue 'localhost' # rubocop:disable RescueModifier
 
   option :host,
     :short => '-h HOST',

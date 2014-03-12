@@ -32,7 +32,7 @@ class TempoDBSensu < Sensu::Handler
 
     # loop through metrics, separated by \n, pull out each metric and add to data array
     metrics.split("\n").each do |metric|
-      m = metric.split()
+      m = metric.split
 
       # Should match format metric.path.two value timestamp
       next unless m.count == 3

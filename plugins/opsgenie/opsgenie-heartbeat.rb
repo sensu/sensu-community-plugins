@@ -36,7 +36,7 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
   def run
     begin
       timeout(config[:timeout]) do
-        response = opsgenie_heartbeat()
+        response = opsgenie_heartbeat
         case response['code']
         when 200
           ok 'heartbeat sent'

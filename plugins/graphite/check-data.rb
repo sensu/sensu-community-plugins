@@ -143,7 +143,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         @raw_data = JSON.parse(handle.gets)
         output = {}
         @raw_data.each do |raw|
-          raw['datapoints'].delete_if{|v| v.first == nil}
+          raw['datapoints'].delete_if{|v| v.first.nil? }
           next if raw['datapoints'].empty?
           target = raw['target']
           data = raw['datapoints'].map(&:first)
@@ -184,7 +184,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check is value is above defined threshold
   def above?(type)
-    (!config[:below]) and (@data.last > config[type]) and (!decreased?)
+    (!config[:below]) && (@data.last > config[type]) && (!decreased?)
   end
 
   # Check if values have decreased within interval if given

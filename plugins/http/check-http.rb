@@ -86,6 +86,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :long => '--cacert FILE',
     :description => 'A CA Cert to use'
 
+  option :expiry,
+    :short => '-e EXPIRY',
+    :long => '--expiry EXPIRY',
+    :proc => proc { |a| a.to_i },
+    :description => 'Warn EXPIRE days before cert expires'
+
   option :pattern,
     :short => '-q PAT',
     :long => '--query PAT',
@@ -127,7 +133,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       config[:request_uri] = uri.request_uri
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] and config[:request_uri]
+      unless config[:host] && config[:request_uri]
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -147,6 +153,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   def get_resource
     http = Net::HTTP.new(config[:host], config[:port])
 
+    warn_cert_expire = nil
     if config[:ssl]
       http.use_ssl = true
       if config[:cert]
@@ -160,11 +167,21 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       if config[:insecure]
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
+
+      if config[:expiry] != nil
+        expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
+        # We can't raise inside the callback, have to check when we finish.
+        http.verify_callback = proc do |preverify_ok, ssl_context|
+          if ssl_context.current_cert.not_after <= expire_warn_date
+            warn_cert_expire = ssl_context.current_cert.not_after
+          end
+        end
+      end
     end
 
     req = Net::HTTP::Get.new(config[:request_uri], {'User-Agent' => config[:ua]})
 
-    if (config[:user] != nil and config[:password] != nil)
+    if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
@@ -179,6 +196,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       body = "\n" + res.body[1..config[:response_bytes].to_i]
     else
       body = ''
+    end
+
+    if warn_cert_expire != nil
+      warning "Certificate will expire #{warn_cert_expire}"
     end
 
     case res.code

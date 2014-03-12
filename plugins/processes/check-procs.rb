@@ -30,41 +30,31 @@ require 'sensu-plugin/check/cli'
 
 class CheckProcs < Sensu::Plugin::Check::CLI
 
-  def self.read_pid(path)
-    begin
-      File.read(path).chomp.to_i
-    rescue
-      self.new.unknown "Could not read pid file #{path}"
-    end
-  end
-
   option :warn_over,
     :short => '-w N',
     :long => '--warn-over N',
     :description => 'Trigger a warning if over a number',
-    :proc => proc {|a| a.to_i },
-    :default => 1
+    :proc => proc {|a| a.to_i }
 
   option :crit_over,
     :short => '-c N',
     :long => '--critical-over N',
     :description => 'Trigger a critical if over a number',
-    :proc => proc {|a| a.to_i },
-    :default => 1
+    :proc => proc {|a| a.to_i }
 
   option :warn_under,
     :short => '-W N',
     :long => '--warn-under N',
     :description => 'Trigger a warning if under a number',
     :proc => proc {|a| a.to_i },
-    :default => 0
+    :default => 1
 
   option :crit_under,
     :short => '-C N',
     :long => '--critical-under N',
     :description => 'Trigger a critial if under a number',
     :proc => proc {|a| a.to_i },
-    :default => 0
+    :default => 1
 
   option :metric,
     :short => '-t METRIC',
@@ -94,8 +84,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :file_pid,
     :short => '-f PID',
     :long => '--file-pid PID',
-    :description => 'Check against a specific PID',
-    :proc => proc {|a| read_pid(a) }
+    :description => 'Check against a specific PID'
 
   option :vsz,
     :short => '-z VSZ',
@@ -139,6 +128,14 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :description => 'Match process that are younger than this, in SECONDS'
 
+  def read_pid(path)
+    if File.exists?(path)
+      File.read(path).strip.to_i
+    else
+      unknown "Could not read pid file #{path}"
+    end
+  end
+
   def read_lines(cmd)
     IO.popen(cmd + ' 2>&1') do |child|
       child.read.split("\n")
@@ -180,7 +177,9 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   def run
     procs = get_procs
 
-    procs.reject! {|p| p[:pid].to_i != config[:file_pid] } if config[:file_pid]
+    if config[:file_pid] && (file_pid = read_pid(config[:file_pid]))
+      procs.reject! { |p| p[:pid].to_i != file_pid }
+    end
     procs.reject! {|p| p[:pid].to_i == $$ } unless config[:match_self]
     procs.reject! {|p| p[:pid].to_i == Process.ppid } unless config[:match_parent]
     procs.reject! {|p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
@@ -210,13 +209,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
       count = procs.size
     end
 
-    if config[:crit_under] != -1 && count < config[:crit_under]
+    if !!config[:crit_under] && count < config[:crit_under]
       critical msg
-    elsif config[:crit_over] != -1 && count > config[:crit_over]
+    elsif !!config[:crit_over] && count > config[:crit_over]
       critical msg
-    elsif config[:warn_under] != -1 && count < config[:warn_under]
+    elsif !!config[:warn_under] && count < config[:warn_under]
       warning msg
-    elsif config[:warn_over] != -1 && count > config[:warn_over]
+    elsif !!config[:warn_over] && count > config[:warn_over]
       warning msg
     else
       ok msg

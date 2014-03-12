@@ -50,9 +50,9 @@ class CheckBeanstalkWatchers < Sensu::Plugin::Check::CLI
     else
       watchers = 0
     end
-    if config[:crit] and watchers < config[:crit]
+    if config[:crit] && watchers < config[:crit]
       critical "Required at least #{config[:crit]} watchers but have #{watchers}"
-    elsif config[:warn] and watchers < config[:warn]
+    elsif config[:warn] && watchers < config[:warn]
       warning "Required at least #{config[:warn]} watchers but have #{watchers}"
     else
       ok "#{watchers} watchers found."

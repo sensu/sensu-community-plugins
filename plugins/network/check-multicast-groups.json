@@ -1,0 +1,5 @@
+{
+  "check-multicast-groups": [
+    ["eth0", "224.2.2.4"]
+  ]
+}
