@@ -20,11 +20,18 @@ require "json"
 
 class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
 
-  option :customer_key,
-    :short => "-k customerKey",
-    :long => "--key customerKey",
+  option :api_key,
+    :short => "-k apiKey",
+    :long => "--key apiKey",
     :description => "Opsgenie Customer API key",
     :required => true
+
+  option :source,
+    :short => "-s SOURCE",
+    :long => "--source SOURCE",
+    :description => "heartbeat source",
+    :required => false,
+    :default => Socket.gethostbyname(Socket.gethostname).first # this should be fqdn
 
   option :timeout,
     :short => '-t Secs',
@@ -53,7 +60,8 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
 
   def opsgenie_heartbeat
     params = {}
-    params["customerKey"] = config[:customer_key]
+    params["apiKey"] = config[:api_key]
+    params["source"] = config[:source]
 
     uri = URI.parse("https://api.opsgenie.com/v1/json/customer/heartbeat")
     http = Net::HTTP.new(uri.host, uri.port)
