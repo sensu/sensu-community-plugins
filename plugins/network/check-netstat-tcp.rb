@@ -27,7 +27,7 @@
 # rubocop:disable FavorUnlessOverNegatedIf
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
-require 'sensu-plugin/metric/cli'
+require 'sensu-plugin/check/cli'
 require 'socket'
 
 TCP_STATES = {
@@ -46,7 +46,7 @@ TCP_STATES = {
   '0B' => 'CLOSING'
 }
 
-class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
+class CheckNetstatTCP < Sensu::Plugin::Check::CLI
 
   option :states,
     :description => "Comma delimited list of states to check",
@@ -100,27 +100,23 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
     state_counts = netstat('tcp')
     is_critical = false
     is_warning = false
-    message = "CheckNetstatTCP:"
+    message = ""
 
     config[:states].each_index do |i|
       if state_counts[config[:states][i]] >= config[:critical][i]
         is_critical = true
-        message += " Crit:#{config[:states][i]}=#{state_counts[config[:states][i]]}"
+        message += " CRITICAL:#{config[:states][i]}=#{state_counts[config[:states][i]]}"
       elsif state_counts[config[:states][i]] >= config[:warning][i]
         is_warning = true
-        message += " Warn:#{config[:states][i]}=#{state_counts[config[:states][i]]}"
+        message += " WARNING:#{config[:states][i]}=#{state_counts[config[:states][i]]}"
       else
         message += " OK:#{config[:states][i]}=#{state_counts[config[:states][i]]}"
       end
     end
 
-    if is_critical
-      critical message
-    elsif is_warning
-      warning message
-    else
-      ok message
-    end
+    critical message if is_critical
+    warning message if is_warning
+    ok message
 
   end
 
