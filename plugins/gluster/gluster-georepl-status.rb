@@ -11,13 +11,21 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
-class GlusterGeoreplStatus < Sensu::Plugin::Check::CLI
+class GlusterGeoReplStatus < Sensu::Plugin::Check::CLI
+
+  option :states,
+    :description => 'Comma delimited states (case sensitive)',
+    :short => '-s STATE',
+    :long => '--state STATE',
+    :proc => lambda { |o| o.split(/[\s,]+/) },
+    :required => true
+
   def run
     errors = Array.new
     `gluster volume geo-replication status`.each_line do |l|
       # Need to remove the first 3 lines of the command's output
       unless l =~ /(^MASTER|^\s*$|^-)/
-        unless l.split[4] =~ /(Active|Passive)/
+        unless config[:states].include?(l.split[4])
           errors << "#{l.split[1]} on #{l.split[0]} is in #{l.split[4]} state"
         end
       end
