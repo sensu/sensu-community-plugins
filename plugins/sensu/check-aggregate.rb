@@ -30,7 +30,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     :description => "Sensu API USER"
 
   option :password,
-    :short => "-p PASSOWRD",
+    :short => "-p PASSWORD",
     :long => "--password PASSWORD",
     :description => "Sensu API PASSWORD"
 
