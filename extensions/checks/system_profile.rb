@@ -62,7 +62,6 @@ module Sensu
         @options = {
           :interval => 10,
           :handler => 'graphite',
-          :file_chunk_size => 4096,
           :add_client_prefix => true,
           :path_prefix => 'system'
         }
@@ -89,11 +88,11 @@ module Sensu
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
 
-      def read_file(file_path)
+      def read_file(file_path, chunk_size=nil)
         content = ''
         File.open(file_path, 'r') do |file|
           read_chunk = Proc.new do
-            content << file.read(options[:file_chunk_size])
+            content << file.read(chunk_size)
             unless file.eof?
               EM.next_tick(read_chunk)
             else
