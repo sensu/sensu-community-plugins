@@ -26,9 +26,11 @@ be declared in the header of the plugin/handler file.
 
 Only pull requests passing lint/tests will be merged.
 
-Please do not abandon your PR. Because only you can help us merge
-it - if there some issues withing it. If your PR has no feedback in month - we 
-close it. Anyway - you can always open a new one.
+Please do not not abandon your pull request, only you can help us merge 
+it. We will wait for feedback from you on your pull request for up to 
+one month. A lack of feedback in one month may require you to re-open 
+your pull request.
+
 
 ## Rubocop linting
 
