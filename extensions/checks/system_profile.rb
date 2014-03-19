@@ -88,7 +88,7 @@ module Sensu
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
 
-      def read_file(file_path, chunk_size=nil)
+      def read_file(file_path, chunk_size = nil)
         content = ''
         File.open(file_path, 'r') do |file|
           read_chunk = Proc.new do
