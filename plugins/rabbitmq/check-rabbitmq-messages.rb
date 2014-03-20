@@ -81,7 +81,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
 
     crit = false
     warn = false
-    queues.each do |name,count|
+    queues.each do |name, count|
       if count > config[:critical].to_i
         output "[CRITICAL] #{name}: #{count}"
         crit = true
