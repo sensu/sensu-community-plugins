@@ -22,7 +22,7 @@ class GlusterGeoReplStatus < Sensu::Plugin::Check::CLI
 
   def run
     errors = Array.new
-    `gluster volume geo-replication status`.each_line do |l|
+    `sudo gluster volume geo-replication status`.each_line do |l|
       # Need to remove the first 3 lines of the command's output
       unless l =~ /(^MASTER|^\s*$|^-)/
         unless config[:states].include?(l.split[4])
