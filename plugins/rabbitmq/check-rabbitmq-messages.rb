@@ -42,6 +42,11 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     :boolean => true,
     :default => false
 
+  option :ignore,
+    :description => 'A comma-separated list of Queues to ignore',
+    :short => '-i QUEUE_NAME[,QUEUE_NAME]',
+    :long => '--ignore QUEUE_NAME[,QUEUE_NAME]'
+
   option :warn,
     :short => '-w NUM_MESSAGES',
     :long => '--warn NUM_MESSAGES',
@@ -54,9 +59,9 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     :description => 'CRITICAL message count threshold',
     :default => 500
 
-  def get_rabbitmq_info
-    begin
-      rabbitmq_info = CarrotTop.new(
+  def rabbitmq
+    @rabbitmq ||= begin
+      CarrotTop.new(
         :host => config[:host],
         :port => config[:port],
         :user => config[:user],
@@ -64,18 +69,37 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
         :ssl => config[:ssl]
       )
     rescue
-      warning "could not get rabbitmq info"
+      message "Could not connect to RabbitMQ"
+      exit 1
     end
-    rabbitmq_info
   end
 
   def run
-    rabbitmq = get_rabbitmq_info
-    overview = rabbitmq.overview
-    total = overview['queue_totals']['messages']
-    message "#{total}"
-    critical if total > config[:critical].to_i
-    warning if total > config[:warn].to_i
+    queues = {}
+    if config[:ignore]
+      items = config[:ignore].split(',')
+      rabbitmq.queues.each do |q|
+        next if items.include?(q['name'])
+        queues[q['name']] = q['messages'] || 0
+      end
+    else
+      rabbitmq.queues.each { |q| queues[q['name']] = q['messages'] || 0 }
+    end
+
+    crit = false
+    warn = false
+    queues.each do |name,count|
+      if count > config[:critical].to_i
+        output "[CRITICAL] #{name}: #{count}"
+        crit = true
+      elsif count > config[:warn].to_i
+        output "[WARNING] #{name}: #{count}"
+        warn = true
+      end
+    end
+
+    critical if crit
+    warning if warn
     ok
   end
 
