@@ -45,10 +45,7 @@ class CheckBeanstalkWatchersToBuried < Sensu::Plugin::Check::CLI
     rescue Beanstalk::NotFoundError
       warning "Tube #{config[:tube]} not found"
     end
-    if watchers
-      # subtract ourselves
-      watchers = watchers - 1
-    else
+    if not watchers
       watchers = 0
     end
 
