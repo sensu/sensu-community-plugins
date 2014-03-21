@@ -103,7 +103,15 @@ class CheckJson < Sensu::Plugin::Check::CLI
       if json_valid?(res.body)
         if (config[:key] != nil && config[:value] != nil)
           json = JSON.parse(res.body)
-          if json[config[:key]] == config[:value]
+          case json[config[:key]]
+            when TrueClass 
+              config_value = config[:value] == "true"
+            when FalseClass
+              config_value = config[:value] == "false" ? false : true
+            else
+              config_value = config[:value]
+          end
+          if json[config[:key]] == config_value
             ok "Valid JSON and key present and correct"
           else
             critical "JSON key check failed"
