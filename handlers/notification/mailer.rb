@@ -15,6 +15,18 @@ gem 'mail', '~> 2.5.4'
 require 'mail'
 require 'timeout'
 
+# patch to fix Exim delivery_method: https://github.com/mikel/mail/pull/546
+module ::Mail
+  class Exim < Sendmail
+    def self.call(path, arguments, destinations, encoded_message)
+      popen "#{path} #{arguments}" do |io|
+        io.puts encoded_message.to_lf
+        io.flush
+      end
+    end
+  end
+end
+
 class Mailer < Sensu::Handler
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
