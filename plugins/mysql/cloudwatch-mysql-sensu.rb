@@ -14,12 +14,14 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'aws-sdk'
+require 'aws/cloud_watch'
 require 'optparse'
 require 'pp'
 
-access_key_id=""
-secret_key=""
+aws_access_key_id=""
+aws_secret_key=""
+aws_region=""
+aws_debug=false
 
 options = {}
 optparse = OptionParser.new do|opts|
@@ -29,7 +31,7 @@ optparse = OptionParser.new do|opts|
     exit
   end
 
-  opts.on('-H', '--host HOST', 'Warning threshold') do |host|
+  opts.on('-H', '--host HOST', 'Hostname') do |host|
     options[:host] = host
   end
 
@@ -54,7 +56,7 @@ begin
   optparse.parse!
   mandatory = [:warn, :crit, :stat, :host]                         # Enforce the presence of
   missing = mandatory.select{ |param| options[param].nil? }        # the -t and -f switches
-  unless missing.empty?                                               #
+  unless missing.empty?                                            #
     puts "Missing options: #{missing.join(', ')}"                  #
     puts optparse                                                  #
     exit                                                           #
@@ -66,8 +68,10 @@ rescue OptionParser::InvalidOption, OptionParser::MissingArgument  #
 end
 
 AWS.config({
-  :access_key_id => access_key_id,
-  :secret_access_key => secret_key
+  :access_key_id => aws_access_key_id,
+  :secret_access_key => aws_secret_key,
+  :region => aws_region,
+  http_wire_trace: aws_debug
 })
 
 metric = AWS::CloudWatch::Metric.new('AWS/RDS', "#{options[:stat]}",

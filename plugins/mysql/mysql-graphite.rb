@@ -133,7 +133,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Com_unlock_tables' =>  'unlock_tables',
         'Com_alter_table' =>    'alter_table'
       },
-      'counters' => {
+        'counters' => {
         'Handler_write' =>              'handlerWrite',
         'Handler_update' =>             'handlerUpdate',
         'Handler_delete' =>             'handlerDelete',
@@ -174,57 +174,61 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       }
     }
 
-    begin
-      mysql = Mysql2::Client.new(
-        :host => config[:host],
-        :port =>config[:port],
-        :username => config[:username],
-        :password => config[:password],
-        :socket => config[:socket]
+    config[:host].split(' ').each do |mysql_host|
+      mysql_shorthostname = mysql_host.split('.')[0]
+      begin
+        mysql = Mysql2::Client.new(
+          :host => mysql_host,
+          :port =>config[:port],
+          :username => config[:username],
+          :password => config[:password],
+          :socket => config[:socket]
         )
 
-      results = mysql.query("SHOW GLOBAL STATUS")
-    rescue => e
-      puts e.message
-    end
-
-    results.each do |row|
-      metrics.each do |category, var_mapping|
-        if var_mapping.has_key?(row["Variable_name"])
-          output "#{config[:scheme]}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
-        end
+        results = mysql.query("SHOW GLOBAL STATUS")
+      rescue => e
+        puts e.message
       end
-    end
 
-    begin
-      slave_results = mysql.query("SHOW SLAVE STATUS")
-      # should return a single element array containing one hash
-      slave_results.first.each do |key, value|
-        if metrics['general'].include?(key)
-          # Replication lag being null is bad, very bad, so negativate it here
-          if key == 'Seconds_Behind_Master' && value.nil?
-            value = -1
-          end
-          output "#{config[:scheme]}.general.#{metrics['general'][key]}", value
-        end
-      end
-    rescue Exception => e
-      puts "Error querying slave status: #{e}" if config[:verbose]
-    end
-
-    begin
-      variables_results = mysql.query("SHOW GLOBAL VARIABLES")
-
-      category = 'configuration'
-      variables_results.each do |row|
-        metrics[category].each do |metric, desc|
-          if metric.casecmp(row["Variable_name"]) == 0
-            output "#{config[:scheme]}.#{category}.#{desc}", row["Value"]
+      results.each do |row|
+        metrics.each do |category, var_mapping|
+          if var_mapping.has_key?(row["Variable_name"])
+            output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
           end
         end
       end
-    rescue => e
-      puts e.message
+
+      begin
+        slave_results = mysql.query("SHOW SLAVE STATUS")
+        # should return a single element array containing one hash
+        slave_results.first.each do |key, value|
+          if metrics['general'].include?(key)
+            # Replication lag being null is bad, very bad, so negativate it here
+            if key == 'Seconds_Behind_Master' && value.nil?
+              value = -1
+            end
+            output "#{config[:scheme]}.#{mysql_shorthostname}.general.#{metrics['general'][key]}", value
+          end
+        end
+      rescue Exception => e
+        puts "Error querying slave status: #{e}" if config[:verbose]
+      end
+
+      begin
+        variables_results = mysql.query("SHOW GLOBAL VARIABLES")
+
+        category = 'configuration'
+        variables_results.each do |row|
+          metrics[category].each do |metric, desc|
+            if metric.casecmp(row["Variable_name"]) == 0
+              output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{desc}", row["Value"]
+            end
+          end
+        end
+      rescue => e
+        puts e.message
+      end
+
     end
 
     ok
