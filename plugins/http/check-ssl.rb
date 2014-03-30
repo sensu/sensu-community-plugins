@@ -44,13 +44,13 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
 
       if @cert.not_after > expire_warn_date
-        ok "SSL is no expiring yet."
+        ok "SSL expires on #{@cert.not_after}."
       else
-        warning "SSL expiring on #{@cert.not_after}."
+        warning "SSL expires on #{@cert.not_after}."
       end
 
     rescue
-      message "Could not connect to #{config[:host]}"
+      message "Could not connect to #{config[:url]}"
       exit 1
     end
   end
