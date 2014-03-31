@@ -34,7 +34,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   def run
     begin
       uri = URI.parse(config[:url])
-      http = Net::HTTP.new(uri.host,uri.port)
+      http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
