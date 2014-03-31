@@ -75,21 +75,23 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
     :long => "--port PORT",
     :proc => proc {|a| a.to_i }
 
-  def netstat(protocol = 'tcp')
+  def netstat(protocols = ['tcp'])
     state_counts = Hash.new(0)
     TCP_STATES.each_pair { |hex, name| state_counts[name] = 0 }
 
-    File.open('/proc/net/' + protocol).each do |line|
-      line.strip!
-      if m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
-        connection_state = m[5]
-        connection_port = m[2].to_i(16)
-        connection_state = TCP_STATES[connection_state]
-        next unless config[:states].include?(connection_state)
-        if config[:port] && config[:port] == connection_port
-          state_counts[connection_state] += 1
-        elsif !config[:port]
-          state_counts[connection_state] += 1
+    protocols.each do |protocol|
+      File.open('/proc/net/' + protocol).each do |line|
+        line.strip!
+        if m = line.match(/^\s*\d+:\s+(.{8}|.{32}):(.{4})\s+(.{8}|.{32}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
+          connection_state = m[5]
+          connection_port = m[2].to_i(16)
+          connection_state = TCP_STATES[connection_state]
+          next unless config[:states].include?(connection_state)
+          if config[:port] && config[:port] == connection_port
+            state_counts[connection_state] += 1
+          elsif !config[:port]
+            state_counts[connection_state] += 1
+          end
         end
       end
     end
@@ -97,7 +99,7 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
   end
 
   def run
-    state_counts = netstat('tcp')
+    state_counts = netstat(['tcp', 'tcp6'])
     is_critical = false
     is_warning = false
     message = ""
