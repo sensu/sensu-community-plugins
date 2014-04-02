@@ -54,6 +54,7 @@ class LogstashHandler < Sensu::Handler
       :occurrences   => @event['occurrences'],
       :action        => @event['action']
     }
+    logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
     redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
   end
 end
