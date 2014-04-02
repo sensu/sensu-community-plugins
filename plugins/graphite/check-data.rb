@@ -9,6 +9,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
 require 'open-uri'
+require 'uri'
 
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
@@ -205,7 +206,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       @formatted = Socket.gethostbyname(Socket.gethostname).first.gsub('.', config[:hostname_sub] || '_')
       config[:target].gsub('$', @formatted)
     else
-      config[:target]
+      URI.escape config[:target]
     end
   end
 
