@@ -148,11 +148,13 @@ module Sensu
       end
 
       def proc_loadavg_metrics
+        @cores ||= File.readlines('/proc/cpuinfo').select { |l| l =~ /^processor\s+:/ }.count
+        
         read_file('/proc/loadavg') do |proc_loadavg|
           values = proc_loadavg.split(/\s+/).take(3).map(&:to_f)
-          add_metric('load_avg', '1_min', values[0])
-          add_metric('load_avg', '5_min', values[1])
-          add_metric('load_avg', '15_min', values[2])
+          add_metric('load_avg', '1_min', (values[0] / @cores))
+          add_metric('load_avg', '5_min', (values[1] / @cores))
+          add_metric('load_avg', '15_min', (values[2] / @cores))
           yield
         end
       end
