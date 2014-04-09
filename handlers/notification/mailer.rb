@@ -45,7 +45,7 @@ class Mailer < Sensu::Handler
         end
       end
     end
-    return mail_to
+    mail_to
   end
 
   def handle
