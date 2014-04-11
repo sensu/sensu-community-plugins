@@ -132,7 +132,7 @@ def main(argv):
     p.add_option('-W', '--warning', action='store', dest='warning', default=None, help='The warning threshold we want to set')
     p.add_option('-C', '--critical', action='store', dest='critical', default=None, help='The critical threshold we want to set')
     p.add_option('-A', '--action', action='store', type='choice', dest='action', default='connect', help='The action you want to take',
-                 choices=['connect', 'connections', 'replication_lag', 'replication_lag_percent', 'replset_state', 'memory', 'memory_mapped', 'lock', 
+                 choices=['arbiter', 'connect', 'connections', 'replication_lag', 'replication_lag_percent', 'replset_state', 'memory', 'memory_mapped', 'lock', 
                           'flushing', 'last_flush_time', 'index_miss_ratio', 'databases', 'collections', 'database_size','queues','oplog','journal_commits_in_wl',
                           'write_data_files','journaled','opcounters','current_lock','replica_primary','page_faults','asserts', 'queries_per_second',
                           'page_faults', 'chunks_balance', 'connect_primary', 'collection_state', 'row_count'])
@@ -187,6 +187,8 @@ def main(argv):
 
     if action == "connections":
         return check_connections(con, warning, critical, perf_data)
+    elif action == "arbiter":
+        return check_arbiter(con)
     elif action == "replication_lag":
         return check_rep_lag(con, host, warning, critical, False, perf_data,max_lag,user,passwd,ssl)
     elif action == "replication_lag_percent":
@@ -319,6 +321,26 @@ def check_connections(con, warning, critical, perf_data):
     except Exception, e:
         return exit_with_general_critical(e)
 
+def check_arbiter(con):
+    try:
+        # Get replica set status
+        try:
+            rs_status = con.admin.command("replSetGetStatus")
+        except pymongo.errors.OperationFailure, e:
+            if e.code == None and str(e).find('failed: not running with --replSet"'):
+                print "OK - Not running with replSet"
+                return 0
+
+        # Get arbiter
+        for member in rs_status["members"]:
+            if member["stateStr"] == "ARBITER":
+                return 0
+
+        print "CRITICAL - Unable to find arbiter in replSet"
+        return 2
+
+    except Exception, e:
+        return exit_with_general_critical(e)
 
 def check_rep_lag(con, host, warning, critical, percent, perf_data,max_lag, user, passwd, ssl=False):
     if percent:
@@ -1283,4 +1305,3 @@ def replication_get_time_diff(con):
 #
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
-
