@@ -2,13 +2,13 @@
 # check-docker-containers
 # ===
 #
-# This is a simple check script for Sensu to check the count of a Docker Container
+# This is a simple check script for Sensu to check the number of a Docker Container
 #
 # Requires "docker-api" gem
 #
 # Examples:
 #
-#   check-docker-containers.rb -w 3 -c 3
+#   check-docker-container.rb -w 3 -c 3
 #     => 1 container running = OK.
 #     => 4 container running = CRITICAL
 #
