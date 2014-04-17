@@ -25,6 +25,12 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.elasticsearch.cluster"
 
+  option :es_version,
+    :description => 'Version of elasticsearch API',
+    :short => '-v VERSION',
+    :long => '--version VERSION',
+    :default => '0.90.999'
+
   def get_es_resource(resource)
     begin
       r = RestClient::Resource.new("http://localhost:9200/#{resource}", :timeout => 45)
@@ -38,7 +44,12 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def is_master
     state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
-    local = get_es_resource('/_cluster/nodes/_local')
+    if Gem::Version.new(config[:es_version]) < Gem::Version.new('1.0.0')
+      node_path = '/_cluster/nodes/_local'
+    else
+      node_path = '/_nodes/_local'
+    end
+    local = get_es_resource(node_path)
     local['nodes'].keys.first == state['master_node']
   end
 

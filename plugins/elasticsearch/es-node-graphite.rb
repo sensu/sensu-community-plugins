@@ -45,7 +45,20 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--host HOST",
     :default => "localhost"
 
+  option :es_version,
+    :description => 'Version of elasticsearch API',
+    :short => '-v VERSION',
+    :long => '--version VERSION',
+    :default => '0.90.999'
+
   def run
+    if Gem::Version.new(config[:es_version]) < Gem::Version.new('1.0.0')
+      separator = '&'
+      node_path = '/_cluster/nodes/_local/stats?'
+    else
+      separator = ','
+      node_path = '/_nodes/_local/stats/'
+    end
     stats_query_string = [
         'clear=true',
         'indices=true',
@@ -57,8 +70,8 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
         'http=true',
         'fs=true',
         'thread_pool=true'
-    ].join('&')
-    stats = RestClient::Resource.new "http://#{config[:server]}:9200/_cluster/nodes/_local/stats?#{stats_query_string}", :timeout => 30
+    ].join(separator)
+    stats = RestClient::Resource.new "http://#{config[:server]}:9200#{node_path}#{stats_query_string}", :timeout => 30
     stats = JSON.parse(stats.get)
     timestamp = Time.now.to_i
     node = stats['nodes'].values.first
