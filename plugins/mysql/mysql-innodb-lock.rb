@@ -59,7 +59,7 @@ class CheckMySQLInnoDBLock < Sensu::Plugin::Check::CLI
 
   def run
     begin
-      db = Mysql::new(config[:hostname], config[:user], config[:password], config[:database], config[:port].to_i, config[:socket])
+      db = Mysql.new(config[:hostname], config[:user], config[:password], config[:database], config[:port].to_i, config[:socket])
 
       warn = config[:warn].to_i
       crit = config[:crit].to_i
@@ -94,7 +94,7 @@ class CheckMySQLInnoDBLock < Sensu::Plugin::Check::CLI
           and
             t_w.trx_mysql_thread_id = p_w.ID
           and
-            p_w.TIME > #{warn} 
+            p_w.TIME > #{warn}
         order by
           requesting_id,blocking_id
       EQSQL
@@ -116,12 +116,12 @@ class CheckMySQLInnoDBLock < Sensu::Plugin::Check::CLI
         h['seconds'] = row['seconds']
         h['blocking_info'] = row['blocking_info']
         h['requesting_info'] = row['requesting_info']
-        lock_info.push(h) 
+        lock_info.push(h)
       end
-  
+
       if lock_info.length == 0
         ok
-      elsif is_crit == false 
+      elsif is_crit == false
         warning "Detected Locks #{lock_info}"
       else
         critical "Detected Locks #{lock_info}"
