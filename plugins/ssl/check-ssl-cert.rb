@@ -46,7 +46,9 @@ class CheckSSLCert < Sensu::Plugin::Check::CLI
   def check_ssl_cert_expiration
     expire = `openssl s_client -connect #{config[:host]}:#{config[:port]} < /dev/null 2>&1 | openssl x509 -enddate -noout`.split('=').last
     days_until = (Date.parse(expire) - Date.today).to_i
-    if days_until < config[:critical].to_i
+    if days_until < 0
+      critical "Expired #{days_until.abs} days ago - #{config[:host]}:#{config[:port]}"
+    elsif days_until < config[:critical].to_i
       critical "#{days_until} days left - #{config[:host]}:#{config[:port]}"
     elsif days_until < config[:warning].to_i
       warning "#{days_until} days left - #{config[:host]}:#{config[:port]}"
