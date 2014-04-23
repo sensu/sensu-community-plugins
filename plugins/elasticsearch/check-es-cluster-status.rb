@@ -45,9 +45,37 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     end
   end
 
+  def get_version
+    system = get_es_resource('/')
+    system['version']['number']
+  end
+
+  def pre_one_point_oh?
+    version = get_version
+    cur_version = version.split('.')
+    min_version = ["1","0","0"]
+
+    length = [cur_version.length, min_version.length].max - 1
+    cur_version.fill(0, cur_version.length..length)
+    min_version.fill(0, min_version.length..length)
+
+    (0..length).each { |i|
+       val = cur_version[i].to_i - min_version[i].to_i
+       return val < 0 if val != 0
+    }
+
+    false
+  end
+
+  # API endpoint changed in 1.0.
+  def local_uri
+    return "/_cluster/nodes/_local" if pre_one_point_oh?
+    return "/_nodes/_local"
+  end
+
   def is_master
     state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
-    local = get_es_resource('/_cluster/nodes/_local')
+    local = get_es_resource(local_uri)
     local['nodes'].keys.first == state['master_node']
   end
 
