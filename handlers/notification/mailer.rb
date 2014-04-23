@@ -37,6 +37,7 @@ class Mailer < Sensu::Handler
   end
 
   def handle
+    admin_gui = settings['mailer']['admin_gui'] || 'http://localhost:8080/'
     mail_to = settings['mailer']['mail_to']
     mail_from =  settings['mailer']['mail_from']
 
@@ -53,6 +54,7 @@ class Mailer < Sensu::Handler
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
             #{@event['check']['output']}
+            Admin GUI: #{admin_gui}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
             Address:  #{@event['client']['address']}
