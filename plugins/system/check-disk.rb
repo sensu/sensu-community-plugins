@@ -17,15 +17,18 @@ require 'sensu-plugin/check/cli'
 class CheckDisk < Sensu::Plugin::Check::CLI
 
   option :fstype,
-    :short => '-t TYPE',
+    :short => '-t TYPE[,TYPE]',
+    :description => 'Only check fs type(s)',
     :proc => proc {|a| a.split(',') }
 
   option :ignoretype,
-    :short => '-x TYPE',
+    :short => '-x TYPE[,TYPE]',
+    :description => 'Ignore fs type(s)',
     :proc => proc {|a| a.split(',') }
 
   option :ignoremnt,
-    :short => '-i MNT',
+    :short => '-i MNT[,MNT]',
+    :description => 'Ignore mount point(s)',
     :proc => proc {|a| a.split(',') }
 
   option :ignoreline,
@@ -40,11 +43,13 @@ class CheckDisk < Sensu::Plugin::Check::CLI
 
   option :warn,
     :short => '-w PERCENT',
+    :description => 'Warn if PERCENT or more of disk full',
     :proc => proc {|a| a.to_i },
     :default => 85
 
   option :crit,
     :short => '-c PERCENT',
+    :description => 'Critical if PERCENT or more of disk full',
     :proc => proc {|a| a.to_i },
     :default => 95
 
