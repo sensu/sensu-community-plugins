@@ -86,6 +86,11 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :long => '--cacert FILE',
     :description => 'A CA Cert to use'
 
+  option :ssl_version,
+    :short => '-v VERSION',
+    :long => '--ssl-version VERSION',
+    :description => 'The SSL Version to use'
+
   option :expiry,
     :short => '-e EXPIRY',
     :long => '--expiry EXPIRY',
@@ -156,6 +161,9 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     warn_cert_expire = nil
     if config[:ssl]
       http.use_ssl = true
+      if config[:ssl_version]
+        http.ssl_version = config[:ssl_version]
+      end
       if config[:cert]
         cert_data = File.read(config[:cert])
         http.cert = OpenSSL::X509::Certificate.new(cert_data)
