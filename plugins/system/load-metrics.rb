@@ -48,6 +48,13 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
     :boolean => true,
     :default => false
 
+  option :core_count,
+    :description => 'Include count of cpu/cores',
+    :short => '-c',
+    :long => '--core-count',
+    :boolean => true,
+    :default => false
+
   def number_of_cores
     @cores ||= File.readlines('/proc/cpuinfo').select { |l| l =~ /^processor\s+:/ }.count
   end
@@ -73,6 +80,10 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
            :fifteen => result[2]
          }
       }
+    end
+
+    if config[:core_count]
+      metrics[:load_avg][:total] = number_of_cores
     end
 
     metrics.each do |parent, children|
