@@ -45,20 +45,25 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--host HOST",
     :default => "localhost"
 
+  option :es_version,
+    :description => 'Version of elasticsearch API',
+    :short => '-v VERSION',
+    :long => '--version VERSION',
+    :default => '0.90.999'
+
   def run
+    if Gem::Version.new(config[:es_version]) < Gem::Version.new('1.0.0')
+      separator = '&'
+      node_path = '/_cluster/nodes/_local/stats?'
+    else
+      separator = ','
+      node_path = '/_nodes/_local/stats/'
+    end
     stats_query_string = [
-        'clear=true',
-        'indices=true',
-        'os=true',
-        'process=true',
-        'jvm=true',
-        'network=true',
-        'transport=true',
-        'http=true',
-        'fs=true',
-        'thread_pool=true'
-    ].join('&')
-    stats = RestClient::Resource.new "http://#{config[:server]}:9200/_cluster/nodes/_local/stats?#{stats_query_string}", :timeout => 30
+        'clear', 'indices', 'os', 'process', 'jvm', 'network', 'transport', 'http',
+        'fs', 'thread_pool'
+    ].join(separator)
+    stats = RestClient::Resource.new "http://#{config[:server]}:9200#{node_path}#{stats_query_string}", :timeout => 30
     stats = JSON.parse(stats.get)
     timestamp = Time.now.to_i
     node = stats['nodes'].values.first
@@ -72,7 +77,9 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     node['jvm']['mem']['pools'].keys do |k|
       metrics['jvm.mem.max_heap_size_in_bytes'] += node['jvm']['mem']['pools'][k]['max_in_bytes']
     end
-    metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] +  node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
+    if Gem::Version.new(config[:es_version]) < Gem::Version.new('1.0.0')
+      metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] +  node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
+    end
     metrics['jvm.threads.count']                = node['jvm']['threads']['count']
     metrics['jvm.threads.peak_count']           = node['jvm']['threads']['peak_count']
     metrics['indices.store.size_in_bytes']      = node['indices']['store']['size_in_bytes']
