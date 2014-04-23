@@ -46,13 +46,13 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     end
   end
 
-  def version
+  def get_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
 
   def is_master
-    if Gem::Version.new(version) >= Gem::Version.new('1.0.0')
+    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
       master = get_es_resource('_cluster/state/master_node')['master_node']
       local = get_es_resource('/_nodes/_local')
     else
