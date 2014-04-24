@@ -35,6 +35,12 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :long => '--server SERVER',
     :default => 'localhost'
 
+  option :master_only,
+    :description => 'Use master Elasticsearch server only',
+    :short => '-m',
+    :long => '--master-only',
+    :default => false
+
   def get_es_resource(resource)
     begin
       r = RestClient::Resource.new("http://#{config[:server]}:9200/#{resource}", :timeout => 45)
@@ -68,7 +74,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    if is_master
+    if !config[:master_only] || is_master
       case get_status
       when 'green'
         ok "Cluster is green"
