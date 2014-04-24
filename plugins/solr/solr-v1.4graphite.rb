@@ -51,7 +51,8 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
     # Go through each core and get the appropriate data
     doc.css('CORE entry').each do |coreinfo|
-      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'numDocs'].join("."), coreinfo.css("stats stat[name='numDocs']").text.strip, Time.now.to_i
+      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'numDocs'].join("."), coreinfo.css("stats stat[name='numDocs']").text.strip, \
+             Time.now.to_i
       output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'maxDoc'].join("."), coreinfo.css("stats stat[name='maxDoc']").text.strip, Time.now.to_i
       output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'warmupTime'].join("."), coreinfo.css("stats stat[name='warmupTime']").text.strip, \
              Time.now.to_i
@@ -90,6 +91,6 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     name = doc.css('CACHE entry')[indFilCache].css('name').text.strip
     outputstats('CACHE', indFilCache, doc, statcache, name)
 
-  ok
+    ok
   end
 end
