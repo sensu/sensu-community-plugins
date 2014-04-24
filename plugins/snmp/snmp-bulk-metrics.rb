@@ -36,7 +36,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   option :objectid,
     :short => '-O OID[,OID,OID...]',
-    :description => 'comma separated list of OIDs to bulkwalk', 
+    :description => 'comma separated list of OIDs to bulkwalk',
     :required => true
 
   option :prefix,
@@ -61,7 +61,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
   option :maxrepeat,
     :short => '-m maxrepeat',
     :description => 'Number of iterations to perform on repeating variables (defaults to 10)',
-    :default => 10 
+    :default => 10
 
   option :nonrepeat,
     :short => '-n non-repeaters',
@@ -70,13 +70,18 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   option :timeout,
     :short => '-t timeout (seconds) (defaults to 5)',
-    :default => 5 
+    :default => 5
 
   def run
     oids = config[:objectid].split(',')
     begin
-      manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym, :timeout => config[:timeout].to_i)
-      response = manager.get_bulk(config[:nonrepeat].to_i,config[:maxrepeat].to_i,oids)
+      manager = SNMP::Manager.new(:host => "#{config[:host]}",
+                                  :community => "#{config[:community]}",
+                                  :version => config[:snmp_version].to_sym,
+                                  :timeout => config[:timeout].to_i)
+      response = manager.get_bulk(config[:nonrepeat].to_i,
+                                  config[:maxrepeat].to_i,
+                                  oids)
     rescue SNMP::RequestTimeout
       unknown "#{config[:host]} not responding"
     rescue Exception => e
