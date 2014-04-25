@@ -44,7 +44,7 @@ class CheckBeanstalkWatchers < Sensu::Plugin::Check::CLI
     rescue Beanstalk::NotFoundError
       warning "Tube #{config[:tube]} not found"
     end
-    if not watchers
+    unless watchers
       watchers = 0
     end
     if config[:crit] && watchers < config[:crit]
