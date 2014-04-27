@@ -205,7 +205,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       @formatted = Socket.gethostbyname(Socket.gethostname).first.gsub('.', config[:hostname_sub] || '_')
       config[:target].gsub('$', @formatted)
     else
-      config[:target]
+      URI.escape config[:target]
     end
   end
 
