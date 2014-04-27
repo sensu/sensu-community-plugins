@@ -24,7 +24,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     :description => "RabbitMQ management API port",
     :long => "--port PORT",
     :proc => proc { |p| p.to_i },
-    :default => 55672
+    :default => 15672
 
   option :user,
     :description => "RabbitMQ management API user",

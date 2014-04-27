@@ -45,7 +45,7 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
     :description => "RabbitMQ API port",
     :short => '-P',
     :long => '--port PORT',
-    :default => '55672'
+    :default => '15672'
 
   def run
     res = vhost_alive?
