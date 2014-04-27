@@ -52,25 +52,17 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
 
   def pre_one_point_oh?
     version = get_version
-    cur_version = version.split('.')
-    min_version = ["1","0","0"]
-
-    length = [cur_version.length, min_version.length].max - 1
-    cur_version.fill(0, cur_version.length..length)
-    min_version.fill(0, min_version.length..length)
-
-    (0..length).each { |i|
-       val = cur_version[i].to_i - min_version[i].to_i
-       return val < 0 if val != 0
-    }
-
-    false
+    version.start_with('0')
   end
 
   # API endpoint changed in 1.0.
   def local_uri
-    return "/_cluster/nodes/_local" if pre_one_point_oh?
-    return "/_nodes/_local"
+      uri = "/_nodes/_local"
+      if pre_one_point_oh? then
+          uri = "/_cluster/nodes/_local"
+      end
+
+      uri
   end
 
   def is_master
