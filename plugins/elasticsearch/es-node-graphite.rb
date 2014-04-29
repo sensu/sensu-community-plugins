@@ -122,8 +122,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
         "process=#{process_stats}",
         "thread_pool=#{tp_stats}",
         "transport=true",
-        "thread_pool=true",
-        "breaker=true"
+        "thread_pool=true"
     ].join('&')
 
     if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
