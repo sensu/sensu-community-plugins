@@ -106,10 +106,10 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
 
     # invert various stats depending on if some flags are set
-    os_stat = ( true ^ config[:disable_os_stats] )
-    process_stats = ( true ^ config[:disable_process_stats] )
-    jvm_stats = ( true ^ config[:disable_jvm_stats] )
-    tp_stats = ( true ^ config[:disable_thread_pool] )
+    os_stat = (true ^ config[:disable_os_stats])
+    process_stats = (true ^ config[:disable_process_stats])
+    jvm_stats = (true ^ config[:disable_jvm_stats])
+    tp_stats = (true ^ config[:disable_thread_pool])
 
     stats_query_string = [
         "clear=true",
@@ -155,19 +155,20 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['jvm.mem.non_heap_used_in_bytes']   = node['jvm']['mem']['non_heap_used_in_bytes']
       metrics['jvm.mem.max_heap_size_in_bytes']   = 0
 
-      node['jvm']['mem']['pools'].each do |k,v|
-        metrics["jvm.mem.#{k.gsub(' ','_')}.max_in_bytes"] = v['max_in_bytes']
+      node['jvm']['mem']['pools'].each do |k, v|
+        metrics["jvm.mem.#{k.gsub(' ', '_')}.max_in_bytes"] = v['max_in_bytes']
         metrics['jvm.mem.max_heap_size_in_bytes'] += v['max_in_bytes']
       end
 
       # This makes absolutely no sense - not sure what it's trying to measure - @vjanelle
-      # metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] +  node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
+      # metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] + \
+      # node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
 
-      node['jvm']['gc']['collectors'].each do |gc,gc_value|
-        gc_value.each do |k,v|
+      node['jvm']['gc']['collectors'].each do |gc, gc_value|
+        gc_value.each do |k, v|
           # this contains stupid things like '28ms' and '2s', and there's already
           # something that counts in millis, which makes more sense
-          if !k.end_with? "collection_time"
+          unless k.end_with? "collection_time"
             metrics["jvm.gc.collectors.#{gc}.#{k}"] = v
           end
         end
@@ -177,16 +178,16 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['jvm.threads.peak_count']           = node['jvm']['threads']['peak_count']
     end
 
-    node['indices'].each do |type, index|
-      index.each do |k,v|
-        if !( k =~ /(_time|memory|size$)/ )
+    node['indices'].each do |type,  index|
+      index.each do |k, v|
+        unless (k =~ /(_time|memory|size$)/)
           metrics["indicies.#{type}.#{k}"] = v
         end
       end
     end
 
-    node['transport'].each do |k,v|
-      if !(k =~ /(_size$)/)
+    node['transport'].each do |k, v|
+      unless (k =~ /(_size$)/)
         metrics["transport.#{k}"] = v
       end
     end
@@ -207,8 +208,8 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['network.tcp.curr_estab']           = node['network']['tcp']['curr_estab']
     metrics['network.tcp.estab_resets']         = node['network']['tcp']['estab_resets']
 
-    node['thread_pool'].each do |pool,stat|
-      stat.each do |k,v|
+    node['thread_pool'].each do |pool, stat|
+      stat.each do |k, v|
         metrics["tread_pool.#{pool}.#{k}"] = v
       end
     end
