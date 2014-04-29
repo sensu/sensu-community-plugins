@@ -36,7 +36,6 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'rest-client'
 require 'json'
-require 'pp'
 
 class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
