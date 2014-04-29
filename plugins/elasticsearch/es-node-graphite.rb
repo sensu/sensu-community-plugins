@@ -82,6 +82,12 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :boolean => true,
     :default => false
 
+  option :disable_thread_pool,
+    :description => "Disable thread-pool statistics",
+    :long => "--disable-thread-pool-stats",
+    :boolean => true,
+    :default => false
+
   def get_es_resource(resource)
     begin
       r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", :timeout => config[:request_timeout])
@@ -104,6 +110,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     os_stat = ( true ^ config[:disable_os_stats] )
     process_stats = ( true ^ config[:disable_process_stats] )
     jvm_stats = ( true ^ config[:disable_jvm_stats] )
+    tp_stats = ( true ^ config[:disable_thread_pool] )
 
     stats_query_string = [
         "clear=true",
@@ -113,7 +120,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
         "network=true",
         "os=#{os_stat}",
         "process=#{process_stats}",
-        "thread_pool=true",
+        "thread_pool=#{tp_stats}",
         "transport=true",
         "thread_pool=true",
         "breaker=true"
@@ -150,8 +157,9 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['jvm.mem.non_heap_used_in_bytes']   = node['jvm']['mem']['non_heap_used_in_bytes']
       metrics['jvm.mem.max_heap_size_in_bytes']   = 0
 
-      node['jvm']['mem']['pools'].keys do |k|
-        metrics['jvm.mem.max_heap_size_in_bytes'] += node['jvm']['mem']['pools'][k]['max_in_bytes']
+      node['jvm']['mem']['pools'].each do |k,v|
+        metrics["jvm.mem.#{k.gsub(' ','_')}.max_in_bytes"] = v['max_in_bytes']
+        metrics['jvm.mem.max_heap_size_in_bytes'] += v['max_in_bytes']
       end
 
       # This makes absolutely no sense - not sure what it's trying to measure - @vjanelle
@@ -200,6 +208,12 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     metrics['network.tcp.curr_estab']           = node['network']['tcp']['curr_estab']
     metrics['network.tcp.estab_resets']         = node['network']['tcp']['estab_resets']
+
+    node['thread_pool'].each do |pool,stat|
+      stat.each do |k,v|
+        metrics["tread_pool.#{pool}.#{k}"] = v
+      end
+    end
 
     metrics.each do |k, v|
       output([config[:scheme], k].join("."), v, timestamp)
