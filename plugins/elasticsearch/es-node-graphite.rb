@@ -17,10 +17,16 @@
 #   rest-client Ruby gem
 #   json Ruby gem
 #
+# 2014/04
+# Modifid by Vincent Janelle @randomfrequency http://github.com/vjanelle
+# Add more metrics, fix es 1.x URLs, translate graphite stats from
+# names directly
+#
 # 2012/12 - Modified by Zach Dunn @SillySophist http://github.com/zadunn
 # To add more metrics, and correct for new versins of ES. Tested on
 # ES Version 0.19.8
 #
+# Copyright 2013 Vincent Janelle <randomfrequency@gmail.com>
 # Copyright 2012 Sonian, Inc <chefs@sonian.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -30,6 +36,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'rest-client'
 require 'json'
+require 'pp'
 
 class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
@@ -58,19 +65,19 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => 30
 
   option :disable_jvm_stats,
-    :description => "Return JVM statistics",
+    :description => "Disable JVM statistics",
     :long => "--disable-jvm-stats",
     :boolean => true,
     :default => false
 
   option :disable_os_stats,
-    :description => "Return OS Stats",
+    :description => "Disable OS Stats",
     :long => "--disable-os-stat",
     :boolean => true,
     :default => false
 
   option :disable_process_stats,
-    :description => "Return process statistics",
+    :description => "Disable process statistics",
     :long => "--disable-process-stats",
     :boolean => true,
     :default => false
@@ -99,18 +106,17 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     jvm_stats = ( true ^ config[:disable_jvm_stats] )
 
     stats_query_string = [
-        'clear=true',
-        'indices=true',
-        'fs=true',
-        'http=true',
+        "clear=true",
+        "indices=true",
+        "http=true",
         "jvm=#{jvm_stats}",
-        'network=true',
+        "network=true",
         "os=#{os_stat}",
         "process=#{process_stats}",
-        'thread_pool=true',
-        'transport=true',
-        'thread_pool=true',
-        'breaker=true'
+        "thread_pool=true",
+        "transport=true",
+        "thread_pool=true",
+        "breaker=true"
     ].join('&')
 
     if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
@@ -137,11 +143,14 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['jvm.mem.heap_used_in_bytes']       = node['jvm']['mem']['heap_used_in_bytes']
       metrics['jvm.mem.non_heap_used_in_bytes']   = node['jvm']['mem']['non_heap_used_in_bytes']
       metrics['jvm.mem.max_heap_size_in_bytes']   = 0
+
       node['jvm']['mem']['pools'].keys do |k|
         metrics['jvm.mem.max_heap_size_in_bytes'] += node['jvm']['mem']['pools'][k]['max_in_bytes']
       end
+
       # This makes absolutely no sense - not sure what it's trying to measure - @vjanelle
       # metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis'] +  node['jvm']['mem']['pools']['CMS Old Gen']['max_in_bytes']
+
       node['jvm']['gc']['collectors'].each do |gc,gc_value|
         gc_value.each do |k,v|
           # this contains stupid things like '28ms' and '2s', and there's already
@@ -151,35 +160,41 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
       end
+
       metrics['jvm.threads.count']                = node['jvm']['threads']['count']
       metrics['jvm.threads.peak_count']           = node['jvm']['threads']['peak_count']
     end
 
     node['indices'].each do |type, index|
       index.each do |k,v|
-        if !k.end_with? "_time"
+        if !( k =~ /(_time|memory|size$)/ )
           metrics["indicies.#{type}.#{k}"] = v
         end
       end
     end
 
-    metrics['transport.server_open']            = node['transport']['server_open']
-    metrics['transport.rx_count']               = node['transport']['rx_count']
-    metrics['transport.rx_size_in_bytes']       = node['transport']['rx_size_in_bytes']
-    metrics['transport.tx_count']               = node['transport']['tx_count']
-    metrics['transport.tx_size_in_bytes']       = node['transport']['tx_size_in_bytes']
+    node['transport'].each do |k,v|
+      if !(k =~ /(_size$)/)
+        metrics["transport.#{k}"] = v
+      end
+    end
+
     metrics['http.current_open']                = node['http']['current_open']
     metrics['http.total_opened']                = node['http']['total_opened']
+
     metrics['network.tcp.active_opens']         = node['network']['tcp']['active_opens']
     metrics['network.tcp.passive_opens']        = node['network']['tcp']['passive_opens']
-    metrics['network.tcp.current_estab']        = node['network']['tcp']['current_estab']
+
     metrics['network.tcp.in_segs']              = node['network']['tcp']['in_segs']
     metrics['network.tcp.out_segs']             = node['network']['tcp']['out_segs']
     metrics['network.tcp.retrans_segs']         = node['network']['tcp']['retrans_segs']
-    metrics['network.tcp.estab_resets']         = node['network']['tcp']['estab_resets']
     metrics['network.tcp.attempt_fails']        = node['network']['tcp']['attempt_fails']
     metrics['network.tcp.in_errs']              = node['network']['tcp']['in_errs']
     metrics['network.tcp.out_rsts']             = node['network']['tcp']['out_rsts']
+
+    metrics['network.tcp.curr_estab']           = node['network']['tcp']['curr_estab']
+    metrics['network.tcp.estab_resets']         = node['network']['tcp']['estab_resets']
+
     metrics.each do |k, v|
       output([config[:scheme], k].join("."), v, timestamp)
     end
