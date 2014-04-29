@@ -181,7 +181,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['network.tcp.in_errs']              = node['network']['tcp']['in_errs']
     metrics['network.tcp.out_rsts']             = node['network']['tcp']['out_rsts']
     metrics.each do |k, v|
-      output([config[:scheme], k].join("."), v.to_s, timestamp)
+      output([config[:scheme], k].join("."), v, timestamp)
     end
     ok
   end
