@@ -28,7 +28,7 @@ module Sensu
       end
 
       def description
-        'collects system metrics, using WMI and the graphite plain-text format'
+        'collects system metrics, using wmi and the graphite plain-text format'
       end
 
       def definition
@@ -96,7 +96,7 @@ module Sensu
           begin
             ::WMI.const_get(full_provider).find(filter)
           rescue => error
-            @logger.error('WMI query error', {
+            @logger.error('wmi query error', {
               :error => error.to_s
             })
             nil
