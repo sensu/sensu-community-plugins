@@ -107,10 +107,10 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
 
     # invert various stats depending on if some flags are set
-    os_stat = (true ^ config[:disable_os_stats])
-    process_stats = (true ^ config[:disable_process_stats])
-    jvm_stats = (true ^ config[:disable_jvm_stats])
-    tp_stats = (true ^ config[:disable_thread_pool_stats])
+    os_stat = !config[:disable_os_stats]
+    process_stats = !config[:disable_process_stats]
+    jvm_stats = !config[:disable_jvm_stats]
+    tp_stats = !config[:disable_thread_pool_stats]
 
     stats_query_string = [
         "clear=true",
