@@ -82,7 +82,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :boolean => true,
     :default => false
 
-  option :disable_thread_pool,
+  option :disable_thread_pool_stats,
     :description => "Disable thread-pool statistics",
     :long => "--disable-thread-pool-stats",
     :boolean => true,
@@ -110,7 +110,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     os_stat = (true ^ config[:disable_os_stats])
     process_stats = (true ^ config[:disable_process_stats])
     jvm_stats = (true ^ config[:disable_jvm_stats])
-    tp_stats = (true ^ config[:disable_thread_pool])
+    tp_stats = (true ^ config[:disable_thread_pool_stats])
 
     stats_query_string = [
         "clear=true",
