@@ -90,7 +90,7 @@ module Sensu
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
 
-      def formatted_perf_data(provider, filter=:first)
+      def formatted_perf_data(provider, filter = :first)
         full_provider = 'Win32_PerfFormattedData_' + provider
         query = Proc.new do
           begin
@@ -102,7 +102,7 @@ module Sensu
             nil
           end
         end
-        EM::defer(query, Proc.new { |data| yield data })
+        EM.defer(query, Proc.new { |data| yield data })
       end
 
       def memory_metrics
