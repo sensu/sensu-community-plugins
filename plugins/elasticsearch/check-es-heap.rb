@@ -52,6 +52,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
     :short => '-p N',
     :long => '--port N',
     :description => "Specify port used",
+    :proc => proc {|a| a.to_i },
     :default => 9200
 
   def get_es_version
