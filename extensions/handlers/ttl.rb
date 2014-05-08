@@ -62,13 +62,13 @@ module Sensu
         unless new_expiry.nil?
           client_name = event[:client][:name] unless event[:client].nil?
           check_name = check[:name] unless check.nil?
-          @logger.info('Received event with TTL: #{client_name}_#{check_name} expires in #{new_expiry.to_s} seconds')
+          @logger.info("Received event with TTL: #{client_name}_#{check_name} expires in #{new_expiry.to_s} seconds")
           now = Time.now.to_i
           expires_at = now + new_expiry
-          result = api_post('/stashes/ttl/#{client_name}_#{check_name}', {:ttl => expires_at}.to_json)
+          api_post('/stashes/ttl/#{client_name}_#{check_name}', {:ttl => expires_at}.to_json)
           retval = "stashed TTL for event"
         end
-        return retval
+        retval
       end
 
       def periodic_ttl_expiration
@@ -78,20 +78,20 @@ module Sensu
         ttl_stashes = all_stashes.select {|x| x['path'] =~ /\Attl\// }
         now = Time.now.to_i
         ttl_stashes.each do |stash|
-          check_and_expire_ttl_stash(stash)
+          check_and_expire_ttl_stash(stash, now)
         end
         @logger.info('Done execution of periodic TTL expirey')
       end
 
-      def check_and_expire_ttl_stash(stash)
+      def check_and_expire_ttl_stash(stash, now)
         expiry = stash[:content][:ttl].to_i unless stash[:content].nil?
-        if not expiry.nil? and expiry <= now
+        if !expiry.nil? && expiry <= now
           client_name, check_name = names_from_path(stash[:path])
           age = (now - expiry).to_s
-          @logger.info('TTL - entry for #{client_name}_#{check_name} expired #{age} seconds ago')
+          @logger.info("TTL - entry for #{client_name}_#{check_name} expired #{age} seconds ago")
           payload = { :client => client_name, :check => check_name }
-          res = api_post('/resolve', payload.to_json)
-          res = api_delete('/stashes/' + stash[:path])
+          api_post('/resolve', payload.to_json)
+          api_delete('/stashes/' + stash[:path])
         end
       end
 
@@ -117,7 +117,7 @@ module Sensu
         unless payload.nil?
           req.body = payload
         end
-        res = http.request(req)
+        http.request(req)
       end
 
       def logger
@@ -130,12 +130,12 @@ module Sensu
         new_expiry = check[:ttl] unless check.nil?
         client_name = event[:client][:name] unless event[:client].nil?
         check_name = check[:name] unless check.nil?
-        return new_expiry, client_name, check_name
+        [new_expiry, client_name, check_name]
       end
 
       def names_from_path(path)
         subpath = stash[:path].split('/', 2)[1]
-        return subpath.split('_', 2)
+        subpath.split('_', 2)
       end
 
     end # class TimeToLive
