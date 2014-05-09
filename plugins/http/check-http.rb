@@ -116,9 +116,15 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :description => 'Redirect to another page'
 
   option :response_bytes,
-    :short => '-bytes BYTES',
+    :short => '-b BYTES',
     :long => '--response-bytes BYTES',
-    :description => 'Check for a specific amount of response bytes',
+    :description => 'Print BYTES of the output',
+    :proc => proc { |a| a.to_i }
+
+  option :require_bytes,
+    :short => '-B BYTES',
+    :long => '--require-bytes BYTES',
+    :description => 'Check the response contains exactly BYTES bytes',
     :proc => proc { |a| a.to_i }
 
   option :response_code,
@@ -193,9 +199,13 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     res = http.request(req)
 
     if config[:response_bytes]
-      body = "\n" + res.body[1..config[:response_bytes].to_i]
+      body = "\n" + res.body[0..config[:response_bytes]]
     else
       body = ''
+    end
+
+    if config[:require_bytes] and res.body.length != config[:require_bytes]
+      critical "Response was #{res.body.length} bytes instead of #{config[:require_bytes]}" + body
     end
 
     if warn_cert_expire != nil
