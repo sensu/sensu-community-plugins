@@ -204,7 +204,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       body = ''
     end
 
-    if config[:require_bytes] and res.body.length != config[:require_bytes]
+    if config[:require_bytes] && res.body.length != config[:require_bytes]
       critical "Response was #{res.body.length} bytes instead of #{config[:require_bytes]}" + body
     end
 
