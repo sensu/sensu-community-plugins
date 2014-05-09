@@ -5,7 +5,8 @@
 # Collect device network interface metrics using the IF-MIB (RFC 2863) interface.
 #
 # This script uses the 64-bit "HC" (high capacity) metrics which I am assuming most
-# modern devices probably support.
+# modern devices probably support. If there is no HC support, use --low-capacity
+# flag.
 #
 # Example
 # -------
@@ -23,6 +24,7 @@
 # - `--include-packet-counts`: Output packet metrics.
 # - `--include-speed`: Output a metric for the interface's speed. Useful when constructing
 #   a view of an interfaces capacity in graphite.
+# - `--low-capacity`: Use low capacity counters
 #
 # Copyright (c) 2013 Joe Miller
 #
@@ -98,10 +100,31 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => false,
     :description => 'verbose output for debugging'
 
+  option :low_capacity,
+    :long => '--low-capacity',
+    :boolean => true,
+    :default => false,
+    :description => 'Use low capacity counters'
+
   def run
-    ifTable_columns = %w[ifIndex ifOperStatus ifName ifDescr ifHCInOctets ifHCOutOctets ifHCInUcastPkts
-                         ifHCOutUcastPkts ifHCInMulticastPkts ifHCOutMulticastPkts ifHCInBroadcastPkts
-                         ifHCOutBroadcastPkts ifInErrors ifOutErrors ifInDiscards ifOutDiscards ifSpeed]
+    ifTable_HC_columns = %w[
+      ifHCInOctets ifHCOutOctets
+      ifHCInUcastPkts ifHCOutUcastPkts
+      ifHCInMulticastPkts ifHCOutMulticastPkts
+      ifHCInBroadcastPkts ifHCOutBroadcastPkts
+    ]
+    ifTable_LC_columns = %w[
+      ifInOctets ifOutOctets
+      ifInUcastPkts ifOutUcastPkts
+      ifInMulticastPkts ifOutMulticastPkts
+      ifInBroadcastPkts ifOutBroadcastPkts
+    ]
+    ifTable_common_columns = %w[
+      ifIndex ifOperStatus ifName ifDescr
+      ifInErrors ifOutErrors ifInDiscards ifOutDiscards ifSpeed
+    ]
+    ifTable_columns = ifTable_common_columns +
+      (config[:low_capacity] ? ifTable_LC_columns : ifTable_HC_columns)
 
     SNMP::Manager.open(:host => "#{config[:host]}", :community => "#{config[:community]}") do |manager|
       manager.walk(ifTable_columns) do |row_array|
@@ -112,8 +135,10 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
         next if row['ifOperStatus'].value != 1 && !config[:include_down_interfaces]
 
-        output "#{config[:scheme]}.#{if_name}.ifHCInOctets", row['ifHCInOctets'].value
-        output "#{config[:scheme]}.#{if_name}.ifHCOutOctets", row['ifHCOutOctets'].value
+        in_octets = config[:low_capacity] ? "ifInOctets" : "ifHCInOctets"
+        out_octets = config[:low_capacity] ? "ifOutOctets" : "ifHCOutOctets"
+        output "#{config[:scheme]}.#{if_name}.#{in_octets}", row[in_octets].value
+        output "#{config[:scheme]}.#{if_name}.#{out_octets}", row[out_octets].value
 
         if config[:include_speed]
           output "#{config[:scheme]}.#{if_name}.ifSpeed", row['ifSpeed'].value
@@ -127,12 +152,18 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
         end
 
         if config[:include_pkt_metrics]
-          output "#{config[:scheme]}.#{if_name}.ifHCInUcastPkts", row['ifHCInUcastPkts'].value
-          output "#{config[:scheme]}.#{if_name}.ifHCOutUcastPkts", row['ifHCOutUcastPkts'].value
-          output "#{config[:scheme]}.#{if_name}.ifHCInMulticastPkts", row['ifHCInMulticastPkts'].value
-          output "#{config[:scheme]}.#{if_name}.ifHCOutMulticastPkts", row['ifHCOutMulticastPkts'].value
-          output "#{config[:scheme]}.#{if_name}.ifHCInBroadcastPkts", row['ifHCInBroadcastPkts'].value
-          output "#{config[:scheme]}.#{if_name}.ifHCOutBroadcastPkts", row['ifHCOutBroadcastPkts'].value
+          in_ucast_pkts = config[:low_capacity] ? "ifInUcastPkts" : "ifHCInUcastPkts"
+          out_ucast_pkts = config[:low_capacity] ? "ifOutUcastPkts" : "ifHCOutUcastPkts"
+          in_mcast_pkts = config[:low_capacity] ? "ifInMulticastPkts" : "ifHCInMulticastPkts"
+          out_mcast_pkts = config[:low_capacity] ? "ifOutMulticastPkts" : "ifHCOutMulticastPkts"
+          in_bcast_pkts = config[:low_capacity] ? "ifInBroadcastPkts" : "ifHCInBroadcastPkts"
+          out_bcast_pkts = config[:low_capacity] ? "ifOutBroadcastPkts" : "ifHCOutBroadcastPkts"
+          output "#{config[:scheme]}.#{if_name}.#{in_ucast_pkts}", row[in_ucast_pkts].value
+          output "#{config[:scheme]}.#{if_name}.#{out_ucast_pkts}", row[out_ucast_pkts].value
+          output "#{config[:scheme]}.#{if_name}.#{in_mcast_pkts}", row[in_mcast_pkts].value
+          output "#{config[:scheme]}.#{if_name}.#{out_mcast_pkts}", row[out_mcast_pkts].value
+          output "#{config[:scheme]}.#{if_name}.#{in_bcast_pkts}", row[in_bcast_pkts].value
+          output "#{config[:scheme]}.#{if_name}.#{out_bcast_pkts}", row[out_bcast_pkts].value
         end
       end
     end
