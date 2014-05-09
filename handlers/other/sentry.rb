@@ -8,7 +8,7 @@
 #    "handlers": {
 #      "sentry": {
 #        "type": "pipe",
-#        "command": "/opt/sensu/embedded/bin/ruby /etc/sensu/handlers/sentry.rb",
+#        "command": "/opt/sensu/embedded/bin/ruby /etc/sensu/handlers/sentry.rb <https://DSN_INFO>",
 #        "severities": [
 #          "ok",
 #          "warning",
@@ -33,7 +33,7 @@ event = JSON.parse(STDIN.read, :symbolize_names => true)
 
 
 # set up the URL and URI
-dsn = /(.+\/\/)(.+):(.+)@(.+)\/(\d+)/.match('http://key:secret@domain.com/project_id') #paste your full dsn 
+dsn = /(.+\/\/)(.+):(.+)@(.+)\/(\d+)/.match("#{ARGV[0]")
 @proto = dsn[1]
 @key = dsn[2]
 @secret = dsn[3]
@@ -42,7 +42,7 @@ dsn = /(.+\/\/)(.+):(.+)@(.+)\/(\d+)/.match('http://key:secret@domain.com/projec
 @url = "#{@proto}#{@address}/api/#{@project_id}/store/"
 @uri = URI.parse(@url)
 @client = Net::HTTP.new(@uri.host, @uri.port)
-@client.use_ssl = false
+@client.use_ssl = @proto[0,5] == 'https' ? true : false
 @client.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
 # set the sentry level based off of sensus status
