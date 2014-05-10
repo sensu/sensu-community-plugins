@@ -55,7 +55,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Elasticsearch port.",
     :short => "-p PORT",
     :long => "--port PORT",
-    :proc => proc {|a| a.to_i }
+    :proc => proc {|a| a.to_i },
     :default => 9200
 
   option :request_timeout,
