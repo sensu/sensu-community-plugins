@@ -33,6 +33,13 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :long => '--server SERVER',
     :default => 'localhost'
 
+  option :port,
+    :description => 'Port ElasticSearch is listening on',
+    :short => '-p PORT',
+    :long => '--port PORT',
+    :proc => proc {|a| a.to_i },
+    :default => 9200
+
   option :critical,
     :description => 'Critical percentage of FD usage',
     :short       => '-c PERCENTAGE',
@@ -47,7 +54,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:server]}:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}", :timeout => 45)
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
