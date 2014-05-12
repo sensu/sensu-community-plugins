@@ -67,7 +67,7 @@ class Tail < Sensu::Plugin::Check::CLI
     unknown "No log file specified" unless config[:file]
     unknown "No pattern specified" unless config[:pattern]
     if File.exists?(config[:file])
-      if not config[:absent]
+      if !config[:absent]
         if pattern_match?
           send(
             config[:warn_only] ? :warning : :critical,
