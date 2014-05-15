@@ -100,7 +100,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
 
     `df -Pi`.split("\n").drop(1).each do |line|
       begin
-        _fs, _inodes, used, _avail, capacity, mnt = line.split
+        _fs, _inodes, _used, _avail, capacity, mnt = line.split
         next if config[:includeline] && !config[:includeline].find { |x| line.match(x) }
         next if config[:fstype] && !config[:fstype].include?(type)
         next if config[:ignoretype] && config[:ignoretype].include?(type)
