@@ -17,16 +17,16 @@ class CheckPassengerQueue < Sensu::Plugin::Check::CLI
     :short => '-w N',
     :long => '--warn-over N',
     :description => 'Trigger a warning if over a number',
-    :proc => proc {|a| a.to_i }
+    :proc => proc {|a| a.to_i },
     :default => 0
 
   option :crit_over,
     :short => '-c N',
     :long => '--critical-over N',
     :description => 'Trigger a critical if over a number',
-    :proc => proc {|a| a.to_i }
+    :proc => proc {|a| a.to_i },
     :default => 1
-    
+
   def run
     passenger_queue = %x[sudo passenger-status|grep 'Requests in queue'| awk '{print $4}']
 
