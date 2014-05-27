@@ -64,6 +64,9 @@ module Sensu
         else
           tags.concat(client[:subscriptions])
         end
+        unless check[:flapjack_tags].nil? || check[:flapjack_tags].empty?
+          tags.concat(check[:flapjack_tags])
+        end
         details = ['Address:' + client[:address]]
         details << 'Tags:' + tags.join(',')
         flapjack_event = {
