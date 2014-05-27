@@ -28,11 +28,11 @@ module Sensu
           :interval => 60,
         }
         if @settings
-          if @settings[:ttl] && @settings[:ttl].is_a?(Hash)
+          if @settings['ttl'] && @settings['ttl'].is_a?(Hash)
             @options.merge!(@settings[:ttl])
           end
-          if @settings[:api] && @settings[:api].is_a?(Hash)
-            @options.merge!(@settings[:api])
+          if @settings['api'] && @settings['api'].is_a?(Hash)
+            @options['api'] = @settings['api']
           end
         end
         @options
@@ -45,7 +45,7 @@ module Sensu
 
       def post_init
         @logger.info('Setting up TTL expiration loop')
-        if @settings && @settings[:api]
+        if options['api']
           EM::PeriodicTimer.new(options[:interval]) do
             periodic_ttl_expiration
           end
@@ -55,6 +55,7 @@ module Sensu
       end
 
       def process_event_for_ttl(event_data)
+        @logger.info("TTL process event")
         retval = "event has no TTL expiration"
         event = Oj.load(event_data)
         check = event[:check]
@@ -65,8 +66,8 @@ module Sensu
           @logger.info("Received event with TTL: #{client_name}_#{check_name} expires in #{new_expiry.to_s} seconds")
           now = Time.now.to_i
           expires_at = now + new_expiry
-          api_post('/stashes/ttl/#{client_name}_#{check_name}', {:ttl => expires_at}.to_json)
-          retval = "stashed TTL for event"
+          res = api_post("/stashes/ttl/#{client_name}_#{check_name}", {:ttl => expires_at}.to_json)
+          retval = "stashed TTL for event - code " + res.code.to_s
         end
         retval
       end
@@ -84,14 +85,14 @@ module Sensu
       end
 
       def check_and_expire_ttl_stash(stash, now)
-        expiry = stash[:content][:ttl].to_i unless stash[:content].nil?
+        expiry = stash['content']['ttl'].to_i unless stash['content'].nil?
         if !expiry.nil? && expiry <= now
-          client_name, check_name = names_from_path(stash[:path])
+          client_name, check_name = names_from_path(stash['path'])
           age = (now - expiry).to_s
           @logger.info("TTL - entry for #{client_name}_#{check_name} expired #{age} seconds ago")
           payload = { :client => client_name, :check => check_name }
           api_post('/resolve', payload.to_json)
-          api_delete('/stashes/' + stash[:path])
+          api_delete("/stashes/#{stash['path']}")
         end
       end
 
@@ -108,11 +109,10 @@ module Sensu
       end
 
       def api_request(method, path, payload)
-        @logger.info('method api_request #{method.to_s}')
-        http = Net::HTTP.new(@options[:api][:host], @options[:api][:port])
+        http = Net::HTTP.new(options['api']['host'], options['api']['port'])
         req = method.new(path)
-        if @options[:api][:user] && @options[:api][:password]
-          req.basic_auth(@options[:api][:user], @options[:api][:password])
+        if options['api']['user'] && options['api']['password']
+          req.basic_auth(options['api']['user'], options['api']['password'])
         end
         unless payload.nil?
           req.body = payload
@@ -126,15 +126,15 @@ module Sensu
 
       def get_check_data(event_data)
         event = Oj.load(event_data)
-        check = event[:check]
-        new_expiry = check[:ttl] unless check.nil?
-        client_name = event[:client][:name] unless event[:client].nil?
-        check_name = check[:name] unless check.nil?
+        check = event['check']
+        new_expiry = check['ttl'] unless check.nil?
+        client_name = event['client']['name'] unless event['client'].nil?
+        check_name = check['name'] unless check.nil?
         [new_expiry, client_name, check_name]
       end
 
       def names_from_path(path)
-        subpath = stash[:path].split('/', 2)[1]
+        subpath = path.split('/', 2)[1]
         subpath.split('_', 2)
       end
 
