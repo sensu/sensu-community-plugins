@@ -1,19 +1,17 @@
 #!/usr/bin/env ruby
-# Check-ping
-# ===
 #
-# This is a simple Ping check script for Sensu, Currently works with
-#  ICMP, HTTP and TCP.
+# This is a simple Ping check script for Sensu.
 #
 # Requires "net-ping" gem
 #
 # Examples:
 #
-#   check-ping -h host -t type -p port    => port option is for HTTP ping
+#   check-ping -h host -T timeout
 #
-#  Default host is "google.com", change to if you dont want to pass host
-# option
+#  Default host is "localhost"
+#
 #  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -24,37 +22,20 @@ require 'net/ping'
 
 class CheckPING < Sensu::Plugin::Check::CLI
 
-  option :port,
-    :short => '-p port',
-    :default => "80"
-
   option :host,
     :short => '-h host',
-    :default => 'google.com'
+    :default => 'localhost'
 
-  option :type,
-    :short => '-t type',
-    :default => 'HTTP'
+  option :timeout,
+    :short => '-T timeout',
+    :default => '5'
 
   def run
-    pt = nil
-    ping_type = config[:type].upcase
-    case ping_type
-    when 'HTTP'
-      pt = Net::Ping::HTTP.new(config[:host], config[:port], 10)
-    when 'ICMP'
-      pt = Net::Ping::ICMP.new(config[:host], config[:port], 10)
-    when 'TCP'
-      pt = Net::Ping::TCP.new(config[:host], config[:port], 10)
+    pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
+    if pt.ping?
+      ok "ICMP ping successful for host: #{config[:host]}"
     else
-      unknown "Unknown type specified: #{config[:type]}"
-    end
-    if pt != nil
-      if pt.ping?
-        ok "#{ping_type} ping successful for host: #{config[:host]}"
-      else
-        critical "#{ping_type} ping unsuccessful for host: #{config[:host]}"
-      end
+      critical "ICMP ping unsuccessful for host: #{config[:host]}"
     end
   end
 end
