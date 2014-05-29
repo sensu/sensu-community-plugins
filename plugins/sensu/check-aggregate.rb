@@ -54,6 +54,12 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     :default => 30,
     :proc => proc {|a| a.to_i }
 
+  option :limit,
+    :short => "-l LIMIT",
+    :long => "--limit LIMIT",
+    :description => "Limit of aggregates you want the API to return",
+    :proc => proc {|a| a.to_i }
+
   option :summarize,
     :short => "-s",
     :long => "--summarize",
@@ -108,7 +114,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
 
   def get_aggregate
     uri = "/aggregates/#{config[:check]}"
-    issued = api_request(uri + "?age=#{config[:age]}")
+    issued = api_request(uri + "?age=#{config[:age]}" + (config[:limit] ? "&limit=#{config[:limit]}" : ""))
     unless issued.empty?
       issued_sorted = issued.sort
       time = issued_sorted.pop
