@@ -58,6 +58,7 @@ module Sensu
         client = event[:client]
         check = event[:check]
         tags = []
+        tags.concat(check[:tags]) unless check[:tags].nil?
         tags << client[:environment] unless client[:environment].nil?
         unless check[:subscribers].nil? || check[:subscribers].empty?
           tags.concat(client[:subscriptions] - (client[:subscriptions] - check[:subscribers]))
