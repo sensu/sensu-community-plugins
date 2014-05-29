@@ -25,7 +25,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
-    :default => ""
+    :default => "sensu.aws.ec2"
 
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',
@@ -60,18 +60,15 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         :region => config[:aws_region],
         :access_key_id      => config[:aws_access_key],
         :secret_access_key  => config[:aws_secret_access_key],
-        http_wire_trace: aws_debug
+        :http_wire_trace    => aws_debug
       )
 
       client = AWS::EC2::Client.new
 
       def by_instances_status(client)
 
-        graphitepath = ""
-        if config[:scheme] == ""
-          graphitepath = "sensu.aws.ec2.count"
-        else
-          graphitepath = config[:scheme]
+        if config[:scheme] == "sensu.aws.ec2"
+          config[:scheme] += ".count"
         end
 
         options = {:include_all_instances => true}
@@ -93,14 +90,18 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
         unless data.nil?
           # We only return data when we have some to return
-          output graphitepath + ".total", total
+          output config[:scheme] + ".total", total
           status.each do |name, count|
-            output graphitepath + ".#{name}", count
+            output config[:scheme] + ".#{name}", count
           end
         end
       end
 
       def by_instances_type(client)
+
+        if config[:scheme] == "sensu.aws.ec2"
+          config[:scheme] += ".types"
+        end
 
         data = {}
 
@@ -119,7 +120,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         unless data.nil?
           # We only return data when we have some to return
           data.each do |name, count|
-            output graphitepath + ".#{name}", count
+            output config[:scheme] + ".#{name}", count
           end
         end
       end
