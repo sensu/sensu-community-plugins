@@ -33,8 +33,14 @@ class CheckJson < Sensu::Plugin::Check::CLI
   option :cert, :short => '-c FILE'
   option :cacert, :short => '-C FILE'
   option :timeout, :short => '-t SECS', :proc => proc { |a| a.to_i }, :default => 15
+  # Has support for finding nested keys in json by key/subkey1/subkey2
   option :key, :short => '-K KEY', :long => '--key KEY'
   option :value, :short => '-v VALUE', :long => '--value VALUE'
+  # Comparison operator to use when comparing key to value
+  option :comparison_operator, :short => '-c OPERATOR', :long => '--comparison-operator OPERATOR', :default => '=='
+  # Only valid if METHOD = POST
+  option :post_data, :short => '-d DATA', :long => '--post-data DATA'
+  option :method, :short => '-m METHOD', :long => '--http-method METHOD', :default => "GET"
 
   def run
     if config[:url]
@@ -86,7 +92,17 @@ class CheckJson < Sensu::Plugin::Check::CLI
       end
     end
 
-    req = Net::HTTP::Get.new(config[:path])
+
+    req = case config[:method]
+          when "GET"
+            Net::HTTP::Get.new(config[:path])
+          when "POST"
+            r = Net::HTTP::Post.new(config[:path])
+            r.body = config[:post_data]
+            r
+          else
+            unknown "Invalid HTTP method: #{config[:method]} (only GET and POST are supported)"
+          end
     if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
@@ -103,7 +119,14 @@ class CheckJson < Sensu::Plugin::Check::CLI
       if json_valid?(res.body)
         if (config[:key] != nil && config[:value] != nil)
           json = JSON.parse(res.body)
-          if json[config[:key]].to_s == config[:value].to_s
+          value = json
+          # Find nested keys
+          config[:key].split('/').each do |key|
+            value = value[key]
+          end
+          # Dynamicly use the operator (passed in by the config param :comparison_operator) to do the comparison
+          # Also, try converting to an integer first before comparing... if that fails use string comparison
+          if (value.to_i.send(config[:comparison_operator], config[:value].to_i) rescue false) || value.to_s.send(config[:comparison_operator], config[:value].to_s)
             ok "Valid JSON and key present and correct"
           else
             critical "JSON key check failed"
