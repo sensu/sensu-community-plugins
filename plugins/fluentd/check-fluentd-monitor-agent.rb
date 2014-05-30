@@ -10,7 +10,7 @@ class CheckFluentdMonitorAgent < Sensu::Plugin::Check::CLI
     short: '-u URL',
     long: '--url URL',
     description: 'A URL to connect to',
-    default: 'http://localhost:24220'
+    default: 'http://localhost:24220/api/plugins.json'
 
   option :warn,
     short: '-w WARN',
