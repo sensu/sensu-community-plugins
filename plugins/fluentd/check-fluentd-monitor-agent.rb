@@ -78,7 +78,7 @@ class CheckFluentdMonitorAgent < Sensu::Plugin::Check::CLI
     result = JSON.parse(response.body)
 
     result['plugins'].each do |r|
-      next if r['buffer_queue_length'].nil?
+      next if r[config[:metric]].nil?
       critical "plugin_id #{r['plugin_id']} #{config[:metric]} #{r[config[:metric]]}" if r[config[:metric]] > config[:crit]
       warning "plugin_id #{r['plugin_id']} #{config[:metric]} #{r[config[:metric]]}" if r[config[:metric]] > config[:warn]
     end
