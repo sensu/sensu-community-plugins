@@ -48,10 +48,10 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
     :default => '15672'
 
   option :ssl,
-    :description => "Use SSL",
-    :short => '-s',
+    :description => "Enable SSL for connection to RabbitMQ",
     :long => '--ssl',
-    :boolean => true
+    :boolean => true,
+    :default => false
 
   def run
     res = vhost_alive?
