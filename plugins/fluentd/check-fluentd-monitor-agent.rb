@@ -1,4 +1,22 @@
 #!/usr/bin/env ruby
+#
+# Checks fluentd monitor_agent
+# ===
+#
+# DESCRIPTION:
+#   This plugin checks fluentd monitor_agent.
+#
+# OUTPUT:
+#   plain-text
+#
+# PLATFORMS:
+#   linux
+#
+# DEPENDENCIES:
+#   sensu-plugin Ruby gem
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
