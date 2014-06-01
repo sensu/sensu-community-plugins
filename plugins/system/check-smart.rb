@@ -5,6 +5,17 @@
 #
 # This is a drop-in replacement for check-disk-health.sh.
 #
+# smartctl requires root permissions.  When running this script as a non-root
+# user such as nagios, ensure it is run with sudo.
+#
+# Create a file named /etc/sudoers.d/smartctl with this line inside :
+# sensu ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+#
+# Fedora has some additional restrictions : if requiretty is set, sudo will only
+# run when the user is logged in to a real tty.
+# Then add this in the sudoers file (/etc/sudoers), below the line Defaults requiretty :
+# Defaults sensu !requiretty
+#
 # Copyright 2013 Mitsutoshi Aoe <maoe@foldr.in>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -30,14 +41,14 @@ class Disk
   end
 
   def check_smart_capability!
-    output = `smartctl -i #{@device_path}`
+    output = `sudo smartctl -i #{@device_path}`
     @smart_available = !output.scan(/SMART support is: Available/).empty?
     @smart_enabled = !output.scan(/SMART support is: Enabled/).empty?
     @capability_output = output
   end
 
   def check_health!
-    output = `smartctl -H #{@device_path}`
+    output = `sudo smartctl -H #{@device_path}`
     @smart_healthy = !output.scan(/PASSED/).empty?
     @health_output = output
   end
