@@ -46,6 +46,10 @@ parser.add_argument('--tenant', metavar='tenant', type=str,
                     help='tenant name for authentication')
 parser.add_argument('--region_name', metavar='region', type=str,
                     help='Region to select for authentication')
+parser.add_argument('--bypass', metavar='bybass', type=str,
+                    required=False,
+                    help='bypass the service catalog and use this URL for Nova API')
+
 args = parser.parse_args()
 
 try:
@@ -54,7 +58,9 @@ try:
                       tenant_name=args.tenant,
                       password=args.password,
                       auth_url=args.auth_url,
-                      region_name=args.region_name)
+                      region_name=args.region_name,
+                      insecure=True,
+                      endpoint_url=args.bypass)
     networks = c.list_networks()
 except Exception as e:
     print str(e)
