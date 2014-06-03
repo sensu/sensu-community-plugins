@@ -27,7 +27,7 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
   def initialize
     super
     @fstab = IO.readlines '/etc/fstab'
-    @proc_mounts = IO.readlines '/proc/mounts'
+    @mtab = IO.readlines '/etc/mtab'
     @swap_mounts = IO.readlines '/proc/swaps'
     @missing_mounts = []
   end
@@ -36,11 +36,12 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
     # check by mount destination, which is col 2 in fstab and proc/mounts
     @fstab.each do |line|
       next if line =~ /^\s*#/
+      next if line =~ /^\s*$/
       fields = line.split(/\s+/)
       next if fields[1] == 'none' || (fields[3].include? 'noauto')
       next if config[:fstypes] && !config[:fstypes].include?(fields[2])
       if fields[2] != 'swap'
-        if @proc_mounts.select {|m| m.split(/\s+/)[1] == fields[1]}.empty?
+        if @mtab.select {|m| m.split(/\s+/)[1] == fields[1]}.empty?
           @missing_mounts << fields[1]
         end
       else
