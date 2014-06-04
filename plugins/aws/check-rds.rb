@@ -8,8 +8,24 @@
 # Examples
 # -----------
 #
-#     # critical if DB instance "sensu-admin-db" is not on ap-northeast-1a
+#     # Critical if DB instance "sensu-admin-db" is not on ap-northeast-1a
 #     check-procs -i sensu-admin-db --availability-zone-critical ap-northeast-1a
+#
+#     # Warning if CPUUtilization is over 80%, critical if over 90%
+#     check-procs -i sensu-admin-db --cpu-warning-over 80 --cpu-critical-over 90
+#
+#     # Critical if CPUUtilization is over 90%, maximum of last one hour
+#     check-procs -i sensu-admin-db --cpu-critical-over 90 --statistics maximum --period 3600
+#
+#     # Warning if memory usage is over 80%, maximum of last 2 hour
+#     # specifying "minimum" is intended actually since memory usage is calculated from CloudWatch "FreeableMemory" metric.
+#     check-procs -i sensu-admin-db --memory-warning-over 80 --statistics minimum --period 7200
+#
+#     # Disk usage, same as memory
+#     check-procs -i sensu-admin-db --disk-warning-over 80 --period 7200
+#
+#     # You can check multiple metrics simultaneously. Highest severity will be reported
+#     check-procs -i sensu-admin-db --cpu-warning-over 80 --cpu-critical-over 90 --memory-warning-over 60 --memory-critical-over 80
 #
 # Copyright 2014 github.com/y13i
 #
