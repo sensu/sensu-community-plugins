@@ -206,8 +206,8 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     end
 
     if %w(cpu memory disk).any? {|item| %W(warning critical).any? {|severity| config[:"#{item}_#{severity}_over"]}}
-      @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds \
-        between #{config[:end_time] - config[:period]} to #{config[:end_time]})"
+      @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds "
+      @message += "between #{config[:end_time] - config[:period]} to #{config[:end_time]})"
     end
 
     if @severities[:critical]
