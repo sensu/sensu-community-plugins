@@ -91,7 +91,7 @@ class CheckRDS < Sensu::Plugin::Check::CLI
 
   def aws_config
     hash = {}
-    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] and config[:secret_access_key]
+    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
     hash.update region: config[:region] if config[:region]
     hash
   end
@@ -104,8 +104,8 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     @cloud_watch ||= AWS::CloudWatch.new aws_config
   end
 
-  def find_db_instance id
-    fail if !id or id.empty?
+  def find_db_instance(id)
+    fail if !id || id.empty?
     db = rds.instances[id]
     fail unless db.exists?
     db
@@ -113,7 +113,7 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     unknown "DB instance not found."
   end
 
-  def cloud_watch_metric metric_name
+  def cloud_watch_metric(metric_name)
     cloud_watch.metrics.with_namespace("AWS/RDS").with_metric_name(metric_name).with_dimensions(name: "DBInstanceIdentifier", value: @db_instance.id).first
   end
 
@@ -126,16 +126,16 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     }
   end
 
-  def latest_value metric, unit
+  def latest_value(metric, unit)
     metric.statistics(statistics_options.merge unit: unit).datapoints.sort_by {|datapoint| datapoint[:timestamp]}.last[config[:statistics]]
   end
 
-  def flag_alert severity, message
+  def flag_alert(severity, message)
     @severities[severity] = true
     @message += message
   end
 
-  def memory_total_bytes instance_class
+  def memory_total_bytes(instance_class)
     memory_total_gigabytes = {
       "db.t1.micro"    => 0.615,
       "db.m1.small"    => 1.7,
@@ -160,36 +160,36 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     memory_total_gigabytes.fetch(instance_class) * 1024 ** 3
   end
 
-  def check_az severity, expected_az
+  def check_az(severity, expected_az)
     return if @db_instance.availability_zone_name == expected_az
     flag_alert severity, "; AZ is #{@db_instance.availability_zone_name} (expected #{expected_az})"
   end
 
-  def check_cpu severity, expected_lower_than
+  def check_cpu(severity, expected_lower_than)
     @cpu_metric       ||= cloud_watch_metric "CPUUtilization"
     @cpu_metric_value ||= latest_value @cpu_metric, "Percent"
     return if @cpu_metric_value < expected_lower_than
-    flag_alert severity, "; CPUUtilization is #{"%.2f" % @cpu_metric_value}% (expected lower than #{expected_lower_than}%)"
+    flag_alert severity, "; CPUUtilization is #{sprintf "%.2f", @cpu_metric_value}% (expected lower than #{expected_lower_than}%)"
   end
 
-  def check_memory severity, expected_lower_than
+  def check_memory(severity, expected_lower_than)
     @memory_metric           ||= cloud_watch_metric "FreeableMemory"
     @memory_metric_value     ||= latest_value @memory_metric, "Bytes"
     @memory_total_bytes      ||= memory_total_bytes @db_instance.db_instance_class
     @memory_usage_bytes      ||= @memory_total_bytes - @memory_metric_value
     @memory_usage_percentage ||= @memory_usage_bytes / @memory_total_bytes * 100
     return if @memory_usage_percentage < expected_lower_than
-    flag_alert severity, "; Memory usage is #{"%.2f" % @memory_usage_percentage}% (expected lower than #{expected_lower_than}%)"
+    flag_alert severity, "; Memory usage is #{sprintf "%.2f", @memory_usage_percentage}% (expected lower than #{expected_lower_than}%)"
   end
 
-  def check_disk severity, expected_lower_than
+  def check_disk(severity, expected_lower_than)
     @disk_metric           ||= cloud_watch_metric "FreeStorageSpace"
     @disk_metric_value     ||= latest_value @disk_metric, "Bytes"
     @disk_total_bytes      ||= @db_instance.allocated_storage * 1024 ** 3
     @disk_usage_bytes      ||= @disk_total_bytes - @disk_metric_value
     @disk_usage_percentage ||= @disk_usage_bytes / @disk_total_bytes * 100
     return if @disk_usage_percentage < expected_lower_than
-    flag_alert severity, "; Disk usage is #{"%.2f" % @disk_usage_percentage}% (expected lower than #{expected_lower_than}%)"
+    flag_alert severity, "; Disk usage is #{sprintf "%.2f", @disk_usage_percentage}% (expected lower than #{expected_lower_than}%)"
   end
 
   def run
@@ -205,7 +205,10 @@ class CheckRDS < Sensu::Plugin::Check::CLI
       end
     end
 
-    @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds between #{config[:end_time] - config[:period]} to #{config[:end_time]})" if %w(cpu memory disk).any? {|item| %W(warning critical).any? {|severity| config[:"#{item}_#{severity}_over"]}}
+    if %w(cpu memory disk).any? {|item| %W(warning critical).any? {|severity| config[:"#{item}_#{severity}_over"]}}
+      @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds \
+        between #{config[:end_time] - config[:period]} to #{config[:end_time]})"
+    end
 
     if @severities[:critical]
       critical @message
