@@ -16,6 +16,7 @@
 
 require "sensu-plugin/check/cli"
 require "aws-sdk"
+require "time"
 
 class CheckRDS < Sensu::Plugin::Check::CLI
   option :access_key_id,
@@ -38,43 +39,39 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     long:        "--db-instance-id NAME",
     description: "DB instance identifier"
 
-  option :availability_zone_warning,
-    long:        "--availability-zone-warning AZ",
-    description: "Trigger a warning if availability zone is different than given argument"
+  option :end_time,
+    short:       "-t T",
+    long:        "--end-time TIME",
+    default:     Time.now,
+    proc:        proc {|a| Time.parse a},
+    description: "CloudWatch metric statistics end time"
 
-  option :availability_zone_critical,
-    long:        "--availability-zone-critical AZ",
-    description: "Trigger a critical if availability zone is different than given argument"
+  option :period,
+    short:       "-p N",
+    long:        "--period SECONDS",
+    default:     60,
+    proc:        proc {|a| a.to_i},
+    description: "CloudWatch metric statistics period"
 
-  option :cpu_warning_over,
-    long:        "--cpu-warning-over N",
-    description: "Trigger a warning if CPUUtilization is over a percentage",
-    proc:        proc {|a| a.to_i}
+  option :statistics,
+    short:       "-S N",
+    long:        "--statistics NAME",
+    default:     :average,
+    proc:        proc {|a| a.downcase.intern},
+    description: "CloudWatch statistics method"
 
-  option :cpu_critical_over,
-    long:        "--cpu-critical-over N",
-    description: "Trigger a critical if CPUUtilization is over a percentage",
-    proc:        proc {|a| a.to_i}
+  %w(warning critical).each do |severity|
+    option :"availability_zone_#{severity}",
+      long:        "--availability-zone-#{severity} AZ",
+      description: "Trigger a #{severity} if availability zone is different than given argument"
 
-  option :memory_warning_over,
-    long:        "--memory-warning-over N",
-    description: "Trigger a warning if memory usage is over a percentage",
-    proc:        proc {|a| a.to_i}
-
-  option :memory_critical_over,
-    long:        "--memory-critical-over N",
-    description: "Trigger a critical if memory usage is over a percentage",
-    proc:        proc {|a| a.to_i}
-
-  option :disk_warning_over,
-    long:        "--disk-warning-over N",
-    description: "Trigger a warning if disk usage is over a percentage",
-    proc:        proc {|a| a.to_i}
-
-  option :disk_critical_over,
-    long:        "--disk-critical-over N",
-    description: "Trigger a critical if disk usage is over a percentage",
-    proc:        proc {|a| a.to_i}
+    %w(cpu memory disk).each do |item|
+      option :"#{item}_#{severity}_over",
+        long:        "--#{item}-#{severity}-over N",
+        proc:        proc {|a| a.to_f},
+        description: "Trigger a #{severity} if #{item} usage is over a percentage"
+    end
+  end
 
   def aws_config
     hash = {}
@@ -88,38 +85,118 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def cloud_watch
-    @cloud_watch ||= AWS::ClouWatch.new aws_config
+    @cloud_watch ||= AWS::CloudWatch.new aws_config
+  end
+
+  def find_db_instance id
+    fail if !id or id.empty?
+    db = rds.instances[id]
+    fail unless db.exists?
+    db
+  rescue
+    unknown "DB instance not found."
+  end
+
+  def cloud_watch_metric metric_name
+    cloud_watch.metrics.with_namespace("AWS/RDS").with_metric_name(metric_name).with_dimensions(name: "DBInstanceIdentifier", value: @db_instance.id).first
+  end
+
+  def statistics_options
+    {
+      start_time: config[:end_time] - config[:period],
+      end_time:   config[:end_time],
+      statistics: [config[:statistics].to_s.capitalize],
+      period:     config[:period],
+    }
+  end
+
+  def latest_value metric, unit
+    metric.statistics(statistics_options.merge unit: unit).datapoints.sort_by {|datapoint| datapoint[:timestamp]}.last[config[:statistics]]
+  end
+
+  def flag_alert severity, message
+    @severities[severity] = true
+    @message += message
+  end
+
+  def memory_total_bytes instance_class
+    memory_total_gigabytes = {
+      "db.t1.micro"    => 0.615,
+      "db.m1.small"    => 1.7,
+      "db.m3.medium"   => 3.75,
+      "db.m3.large"    => 7.5,
+      "db.m3.xlarge"   => 15.0,
+      "db.m3.2xlarge"  => 30.0,
+      "db.r3.large"    => 15.0,
+      "db.r3.xlarge"   => 30.5,
+      "db.r3.2xlarge"  => 61.0,
+      "db.r3.4xlarge"  => 122.0,
+      "db.r3.8xlarge"  => 244.0,
+      "db.m2.xlarge"   => 17.1,
+      "db.m2.2xlarge"  => 34.2,
+      "db.m2.4xlarge"  => 68.4,
+      "db.cr1.8xlarge" => 244.0,
+      "db.m1.medium"   => 3.75,
+      "db.m1.large"    => 7.5,
+      "db.m1.xlarge"   => 15.0,
+    }
+
+    memory_total_gigabytes.fetch(instance_class) * 1024 ** 3
+  end
+
+  def check_az severity, expected_az
+    return if @db_instance.availability_zone_name == expected_az
+    flag_alert severity, "; AZ is #{@db_instance.availability_zone_name} (expected #{expected_az})"
+  end
+
+  def check_cpu severity, expected_lower_than
+    @cpu_metric       ||= cloud_watch_metric "CPUUtilization"
+    @cpu_metric_value ||= latest_value @cpu_metric, "Percent"
+    return if @cpu_metric_value < expected_lower_than
+    flag_alert severity, "; CPUUtilization is #{"%.2f" % @cpu_metric_value}% (expected lower than #{expected_lower_than}%)"
+  end
+
+  def check_memory severity, expected_lower_than
+    @memory_metric           ||= cloud_watch_metric "FreeableMemory"
+    @memory_metric_value     ||= latest_value @memory_metric, "Bytes"
+    @memory_total_bytes      ||= memory_total_bytes @db_instance.db_instance_class
+    @memory_usage_bytes      ||= @memory_total_bytes - @memory_metric_value
+    @memory_usage_percentage ||= @memory_usage_bytes / @memory_total_bytes * 100
+    return if @memory_usage_percentage < expected_lower_than
+    flag_alert severity, "; Memory usage is #{"%.2f" % @memory_usage_percentage}% (expected lower than #{expected_lower_than}%)"
+  end
+
+  def check_disk severity, expected_lower_than
+    @disk_metric           ||= cloud_watch_metric "FreeStorageSpace"
+    @disk_metric_value     ||= latest_value @disk_metric, "Bytes"
+    @disk_total_bytes      ||= @db_instance.allocated_storage * 1024 ** 3
+    @disk_usage_bytes      ||= @disk_total_bytes - @disk_metric_value
+    @disk_usage_percentage ||= @disk_usage_bytes / @disk_total_bytes * 100
+    return if @disk_usage_percentage < expected_lower_than
+    flag_alert severity, "; Disk usage is #{"%.2f" % @disk_usage_percentage}% (expected lower than #{expected_lower_than}%)"
   end
 
   def run
-    begin
-      fail if !config[:db_instance_id] or config[:db_instance_id].empty?
-      db = rds.instances[config[:db_instance_id]]
-      fail unless db.exists?
-    rescue
-      unknown "DB instance not found."
-    end
+    @db_instance = find_db_instance config[:db_instance_id]
+    @message     = @db_instance.inspect
+    @severities  = {warning: false, critical: false}
 
-    message  = "DB instance #{db.inspect}"
-    az       = db.availability_zone_name
-    statuses = {warning: false, critical: false}
+    @severities.keys.each do |severity|
+      check_az severity, config[:"availability_zone_#{severity}"] if config[:"availability_zone_#{severity}"]
 
-    statuses.keys.each do |status|
-      if config[:"availability_zone_#{status}"] and az != config[:"availability_zone_#{status}"]
-        statuses[status] = true
-        message += "; AZ is now #{az} (expected #{config[:"availability_zone_#{status}"]})"
+      %w(cpu memory disk).each do |item|
+        send "check_#{item}", severity, config[:"#{item}_#{severity}_over"] if config[:"#{item}_#{severity}_over"]
       end
-
-      # TODO
-      # CPU, memory, disk checks!
     end
 
-    if statuses[:critical]
-      critical message
-    elsif statuses[:warning]
-      warning message
+    @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds between #{config[:end_time] - config[:period]} to #{config[:end_time]})" if %w(cpu memory disk).any? {|item| %W(warning critical).any? {|severity| config[:"#{item}_#{severity}_over"]}}
+
+    if @severities[:critical]
+      critical @message
+    elsif @severities[:warning]
+      warning @message
     else
-      ok message
+      ok @message
     end
   end
 end
