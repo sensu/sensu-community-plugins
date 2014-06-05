@@ -24,6 +24,7 @@
 # Clark Dave
 # (http://clarkdave.net/2014/01/tracking-errors-with-logstash-and-sentry/)
 # and of course the sensu documentation....
+# Pieced together by: Josh Zitting (jzjoshzitting@gmail.com)
 
 require 'rubygems'
 require 'json'
@@ -89,5 +90,8 @@ begin
   request.body = packet.to_json
   request.add_field('X-Sentry-Auth', auth_header)
 
-  @client.request(request)
+  response = @client.request(request)
+  puts response
+  puts auth_header
+  puts packet
 end
