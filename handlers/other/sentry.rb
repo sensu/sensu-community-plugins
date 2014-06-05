@@ -89,9 +89,5 @@ request = Net::HTTP::Post.new(@uri.path)
 begin
   request.body = packet.to_json
   request.add_field('X-Sentry-Auth', auth_header)
-
-  response = @client.request(request)
-  puts response
-  puts auth_header
-  puts packet
+  @client.request(request)
 end
