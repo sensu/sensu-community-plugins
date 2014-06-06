@@ -61,10 +61,17 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
          :boolean => true,
          :default => false
 
+  option :local,
+         :description => 'Only check local filesystems (df -l option)',
+         :short => '-l',
+         :long => '--local',
+         :boolean => true,
+         :default => false
+
   def run
     delim = config[:flatten] == true ? '_' : '.'
     # Get disk usage from df with used and avail in megabytes
-    `df -PBM`.split("\n").drop(1).each do |line|
+    `df -PBM #{config[:local] ? '-l' : ''}`.split("\n").drop(1).each do |line|
       _, _, used, avail, used_p, mnt = line.split
 
       unless %r{/sys|/dev|/run}.match(mnt)
