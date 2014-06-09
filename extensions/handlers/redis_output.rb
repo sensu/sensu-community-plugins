@@ -1,3 +1,5 @@
+require 'sensu/redis'
+
 module Sensu::Extension
   class RedisOutput < Handler
     def name
