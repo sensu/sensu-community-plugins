@@ -18,7 +18,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'ruby-wmi'
+require 'win32ole'
 
 module Sensu
   module Extension
@@ -43,6 +43,7 @@ module Sensu
 
       def post_init
         @metrics = []
+        @wmi = WIN32OLE.connect("winmgmts://")
       end
 
       def run
@@ -67,8 +68,8 @@ module Sensu
           :add_client_prefix => true,
           :path_prefix => 'WMI'
         }
-        if settings[:system_profile].is_a?(Hash)
-          @options.merge!(settings[:system_profile])
+        if settings[:wmi_metrics].is_a?(Hash)
+          @options.merge!(settings[:wmi_metrics])
         end
         @options
       end
@@ -90,24 +91,24 @@ module Sensu
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
 
-      def formatted_perf_data(provider, filter = :first)
+      def formatted_perf_data(provider, &callback)
         full_provider = 'Win32_PerfFormattedData_' + provider
-        query = Proc.new do
+        EM.next_tick do
+          result = []
           begin
-            ::WMI.const_get(full_provider).find(filter)
+            result = @wmi.ExecQuery('select * from ' + full_provider)
           rescue => error
-            @logger.error('wmi query error', {
+            @logger.debug('wmi query error', {
               :error => error.to_s
             })
-            nil
           end
+          yield result
         end
-        EM.defer(query, Proc.new { |data| yield data })
       end
 
       def memory_metrics
-        formatted_perf_data('PerfOS_Memory') do |data|
-          unless data.nil?
+        formatted_perf_data('PerfOS_Memory') do |result|
+          result.each do |data|
             %w[
               AvailableBytes
               CacheBytes
@@ -121,18 +122,16 @@ module Sensu
       end
 
       def disk_metrics
-        formatted_perf_data('PerfDisk_LogicalDisk', :all) do |disks|
-          unless disks.nil?
-            disks.each do |data|
-              %w[
-                AvgDiskQueueLength
-                FreeMegabytes
-                PercentDiskTime
-                PercentFreeSpace
-              ].each do |point|
-                disk_name = data.Name.gsub(/[^0-9a-z]/i, '')
-                add_metric('Disk', disk_name, point, data.send(point.to_sym))
-              end
+        formatted_perf_data('PerfDisk_LogicalDisk') do |disks|
+          disks.each do |data|
+            %w[
+              AvgDiskQueueLength
+              FreeMegabytes
+              PercentDiskTime
+              PercentFreeSpace
+            ].each do |point|
+              disk_name = data.Name.gsub(/[^0-9a-z]/i, '')
+              add_metric('Disk', disk_name, point, data.send(point.to_sym))
             end
           end
           yield
@@ -140,20 +139,18 @@ module Sensu
       end
 
       def cpu_metrics
-        formatted_perf_data('PerfOS_Processor', :all) do |processors|
-          unless processors.nil?
-            processors.each do |data|
-              %w[
-                InterruptsPerSec
-                PercentIdleTime
-                PercentInterruptTime
-                PercentPrivilegedTime
-                PercentProcessorTime
-                PercentUserTime
-              ].each do |point|
-                cpu_name = data.Name.gsub(/[^0-9a-z]/i, '')
-                add_metric('CPU', cpu_name, point, data.send(point.to_sym))
-              end
+        formatted_perf_data('PerfOS_Processor') do |processors|
+          processors.each do |data|
+            %w[
+              InterruptsPerSec
+              PercentIdleTime
+              PercentInterruptTime
+              PercentPrivilegedTime
+              PercentProcessorTime
+              PercentUserTime
+            ].each do |point|
+              cpu_name = data.Name.gsub(/[^0-9a-z]/i, '')
+              add_metric('CPU', cpu_name, point, data.send(point.to_sym))
             end
           end
           yield
@@ -161,25 +158,23 @@ module Sensu
       end
 
       def network_interface_metrics
-        formatted_perf_data('Tcpip_NetworkInterface', :all) do |interfaces|
-          unless interfaces.nil?
-            interfaces.each do |data|
-              %w[
-                BytesReceivedPerSec
-                BytesSentPerSec
-                BytesTotalPerSec
-                OutputQueueLength
-                PacketsOutboundDiscarded
-                PacketsOutboundErrors
-                PacketsPerSec
-                PacketsReceivedDiscarded
-                PacketsReceivedErrors
-                PacketsReceivedPerSec
-                PacketsSentPerSec
-              ].each do |point|
-                interface_name = data.Name.gsub(/[^0-9a-z]/i, '')
-                add_metric('Interface', interface_name, point, data.send(point.to_sym))
-              end
+        formatted_perf_data('Tcpip_NetworkInterface') do |interfaces|
+          interfaces.each do |data|
+            %w[
+              BytesReceivedPerSec
+              BytesSentPerSec
+              BytesTotalPerSec
+              OutputQueueLength
+              PacketsOutboundDiscarded
+              PacketsOutboundErrors
+              PacketsPerSec
+              PacketsReceivedDiscarded
+              PacketsReceivedErrors
+              PacketsReceivedPerSec
+              PacketsSentPerSec
+            ].each do |point|
+              interface_name = data.Name.gsub(/[^0-9a-z]/i, '')
+              add_metric('Interface', interface_name, point, data.send(point.to_sym))
             end
           end
           yield
