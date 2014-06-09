@@ -25,11 +25,17 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     :proc => proc { |i| i.to_s },
     :description => 'A URL to connect to'
 
-  option :expiry,
-    :short => '-e EXPIRY',
-    :long => '--e EXPIRY',
+  option :warning,
+    :short => '-w',
+    :long => '--warning DAYS',
     :proc => proc { |a| a.to_i },
     :description => 'Warn EXPIRE days before cert expires'
+
+  option :critical,
+    :short => '-c',
+    :long => '--critical DAYS',
+    :proc => proc { |a| a.to_i },
+    :description => 'Critical EXPIRE days before cert expires'
 
   def run
     begin
@@ -41,12 +47,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       http.start do |h|
         @cert = h.peer_cert
       end
-      expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
+      days_until = ((@cert.not_after - Time.now)/ (60 * 60 * 24)).to_i
 
-      if @cert.not_after > expire_warn_date
-        ok "SSL expires on #{@cert.not_after}."
+      if days_until <= 0
+        critical "Expired #{days_until.abs} days ago."
+      elsif days_until < config[:critical].to_i
+        critical "SSL expires on #{@cert.not_after} - #{days_until} days left."
+      elsif days_until < config[:warning].to_i
+        warning "SSL expires on #{@cert.not_after} - #{days_until} days left."
       else
-        warning "SSL expires on #{@cert.not_after}."
+        ok "SSL expires on #{@cert.not_after} - #{days_until} days left."
       end
 
     rescue
