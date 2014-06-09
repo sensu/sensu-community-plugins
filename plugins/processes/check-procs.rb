@@ -128,6 +128,18 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :description => 'Match process that are younger than this, in SECONDS'
 
+  option :cpu_over,
+    :short => '-i SECONDS',
+    :long => '--cpu-over SECONDS',
+    :proc => proc {|a| a.to_i },
+    :description => 'Match processes cpu time that is older than this, in SECONDS'
+
+  option :cpu_under,
+    :short => '-I SECONDS',
+    :long => '--cpu-under SECONDS',
+    :proc => proc {|a| a.to_i },
+    :description => 'Match processes cpu time that is younger than this, in SECONDS'
+
   def read_pid(path)
     if File.exists?(path)
       File.read(path).strip.to_i
@@ -160,17 +172,22 @@ class CheckProcs < Sensu::Plugin::Check::CLI
         # const char *lfmt = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
         state = line.slice!(0..0)
         _stime = line.slice!(45..53)
-        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :etime, :command).merge(:state => state)
+        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :etime, :command, :time).merge(:state => state)
       end
     else
-      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,etime,command').drop(1).map do |line|
-        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :etime, :command)
+      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,etime,command,time').drop(1).map do |line|
+        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :etime, :command, :time)
       end
     end
   end
 
   def etime_to_esec(etime)
     m = /(\d+-)?(\d\d:)?(\d\d):(\d\d)/.match(etime)
+    (m[1]||0).to_i*86400 + (m[2]||0).to_i*3600 + (m[3]||0).to_i*60 + (m[4]||0).to_i
+  end
+
+  def cputime_to_csec(time)
+    m = /(\d+-)?(\d\d:)?(\d\d):(\d\d)/.match(time)
     (m[1]||0).to_i*86400 + (m[2]||0).to_i*3600 + (m[3]||0).to_i*60 + (m[4]||0).to_i
   end
 
@@ -188,6 +205,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! {|p| p[:pcpu].to_f < config[:pcpu] } if config[:pcpu]
     procs.reject! {|p| etime_to_esec(p[:etime]) >= config[:esec_under] } if config[:esec_under]
     procs.reject! {|p| etime_to_esec(p[:etime]) <= config[:esec_over] } if config[:esec_over]
+    procs.reject! {|p| cputime_to_csec(p[:time]) >= config[:cpu_under] } if config[:cpu_under]
+    procs.reject! {|p| cputime_to_csec(p[:time]) <= config[:cpu_over] } if config[:cpu_over]
     procs.reject! {|p| !config[:state].include?(p[:state]) } if config[:state]
     procs.reject! {|p| !config[:user].include?(p[:user]) } if config[:user]
 
@@ -200,6 +219,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     msg += "; pcpu > #{config[:pcpu]}" if config[:pcpu]
     msg += "; esec < #{config[:esec_under]}" if config[:esec_under]
     msg += "; esec > #{config[:esec_over]}" if config[:esec_over]
+    msg += "; csec < #{config[:cpu_under]}" if config[:cpu_under]
+    msg += "; csec > #{config[:cpu_over]}" if config[:cpu_over]
     msg += "; pid #{config[:file_pid]}" if config[:file_pid]
 
     if config[:metric]
