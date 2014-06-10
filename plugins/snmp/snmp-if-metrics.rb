@@ -79,7 +79,7 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => false,
     :description => 'append ifName to ifIndex when generating metric name, eg: "1__OUTSIDE"'
 
-  option :include_errors,
+  option :include_error_metrics,
     :short => '-e',
     :long => '--include-errors',
     :boolean => true,
