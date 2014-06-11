@@ -14,9 +14,9 @@
 #
 # DEPENDENCIES:
 #   sensu-plugin Ruby gem
-#   right_aws Ruby gem
+#   fog Ruby gem
 #
-# Copyright (c) 2012, Panagiotis Papadomitsos <pj@ezgr.net>
+# Copyright (c) 2014, Panagiotis Papadomitsos <pj@ezgr.net>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -25,7 +25,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'net/http'
 require 'uri'
-require 'right_aws'
+require 'fog'
 
 class ELBHealth < Sensu::Plugin::Check::CLI
 
@@ -81,11 +81,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   def run
     begin
       aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
-      elb = RightAws::ElbInterface.new(config[:aws_access_key], config[:aws_secret_access_key], {
-        :logger => Logger.new('/dev/null'),
-        :cache => false,
-        :server => "elasticloadbalancing.#{aws_region}.amazonaws.com"
-      })
+      elb = Fog::AWS::ELB.new(:aws_access_key_id => config[:aws_access_key], :aws_secret_access_key => config[:aws_secret_access_key], :region => aws_region)
       if config[:instances]
         instances = config[:instances].split(',')
         health = elb.describe_instance_health(config[:elb_name], instances)
@@ -95,10 +91,10 @@ class ELBHealth < Sensu::Plugin::Check::CLI
     rescue Exception => e
       critical "An issue occured while communicating with the AWS EC2 API: #{e.message}"
     end
-    unless health.empty?
+    if (health.body['DescribeInstanceHealthResult']['InstanceStates'] rescue nil)
       unhealthy_instances = {}
-      health.each do |instance|
-        unhealthy_instances[instance[:instance_id]] = instance[:state] unless instance[:state].eql?('InService')
+      health.body['DescribeInstanceHealthResult']['InstanceStates'].each do |instance|
+        unhealthy_instances[instance['InstanceId']] = instance['State'] unless instance['State'].eql?('InService')
       end
       unless unhealthy_instances.empty?
         if config[:verbose]
