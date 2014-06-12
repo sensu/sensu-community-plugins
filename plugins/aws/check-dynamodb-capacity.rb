@@ -144,7 +144,10 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
 
   def run
     @message    = "#{tables.size} tables total"
-    @severities = {warning: false, critical: false}
+    @severities = {
+                    critical: false,
+                    warning: false,
+                  }
 
     tables.each {|table| check_capacity table}
 
