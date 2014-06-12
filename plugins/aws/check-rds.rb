@@ -193,9 +193,12 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def run
-    @db_instance = find_db_instance config[:db_instance_id]
-    @message     = @db_instance.inspect
-    @severities  = {warning: false, critical: false}
+    @db_instance  = find_db_instance config[:db_instance_id]
+    @message      = @db_instance.inspect
+    @severities   = {
+                      critical: false,
+                      warning:  false,
+                    }
 
     @severities.keys.each do |severity|
       check_az severity, config[:"availability_zone_#{severity}"] if config[:"availability_zone_#{severity}"]
