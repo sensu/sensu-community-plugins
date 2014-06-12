@@ -8,11 +8,11 @@
 # Examples
 # -----------------
 #
-#     # Warning if any table's consumed read/write capacity is over 80%, critical if over 90%
-#     check-dynamodb-capacity --warning-over 80 --critical-over 90
+#     # Warning if any load balancer's latency is over 1 second, critical if over 3 seconds.
+#     check-elb-latency --warning-over 80 --critical-over 90
 #
-#     # Critical if session table's consumed read capacity is over 90%, maximum of last one hour
-#     check-dynamodb-capacity --table_names session --capacity-for read --critical-over 90 --statistics maximum --period 3600
+#     # Critical if "app" load balancer's latency is over 5 seconds, maximum of last one hour
+#     check-elb-latency --table_names app --critical-over 5 --statistics maximum --period 3600
 #
 # Copyright 2014 github.com/y13i
 #
@@ -140,7 +140,7 @@ class CheckELBLatency < Sensu::Plugin::Check::CLI
 
     @severities = {
                     critical: false,
-                    warning: false,
+                    warning:  false,
                   }
 
     elbs.each {|elb| check_latency elb}
