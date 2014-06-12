@@ -126,7 +126,7 @@ class CheckELBLatency < Sensu::Plugin::Check::CLI
       threshold = config[:"#{severity}_over"]
       next unless threshold
       next if metric_value < threshold
-      flag_alert severity, "; #{elbs.size == 1 ? nil : "#{elb.inspect}'s"} Latency is #{metric_value} seconds. (expected lower than #{threshold})"
+      flag_alert severity, "; #{elbs.size == 1 ? nil : "#{elb.inspect}'s"} Latency is #{sprintf "%.3f", metric_value} seconds. (expected lower than #{sprintf "%.3f", threshold})"
       break
     end
   end
