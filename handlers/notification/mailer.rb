@@ -39,7 +39,7 @@ class Mailer < Sensu::Handler
   def build_mail_to_list
     mail_to = settings['mailer']['mail_to']
     if settings['mailer'].has_key?('subscriptions')
-      @event['client']['subscriptions'].each do |sub|
+      @event['check']['subscribers'].each do |sub|
         if settings['mailer']['subscriptions'].has_key?(sub)
           mail_to << ", #{settings['mailer']['subscriptions'][sub]['mail_to']}"
         end
