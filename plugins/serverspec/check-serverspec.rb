@@ -67,12 +67,12 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
 
       if serverspec_test["status"] == "passed"
         send_ok(
-          test_name
+          test_name,
           output
         )
       else
         send_warning(
-          test_name
+          test_name,
           output
         )
       end
