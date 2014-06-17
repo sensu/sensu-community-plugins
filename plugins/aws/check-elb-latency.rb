@@ -12,7 +12,7 @@
 #     check-elb-latency --warning-over 1 --critical-over 3
 #
 #     # Critical if "app" load balancer's latency is over 5 seconds, maximum of last one hour
-#     check-elb-latency --table_names app --critical-over 5 --statistics maximum --period 3600
+#     check-elb-latency --elb-names app --critical-over 5 --statistics maximum --period 3600
 #
 # Copyright 2014 github.com/y13i
 #
