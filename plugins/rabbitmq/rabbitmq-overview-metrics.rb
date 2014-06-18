@@ -94,7 +94,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     overview = rabbitmq.overview
 
     # overview['queue_totals']['messages']
-    if overview.has_key?('queue_totals')
+    if overview.has_key?('queue_totals') and !overview['queue_totals'].empty?
       output "#{config[:scheme]}.queue_totals.messages.count", overview['queue_totals']['messages'], timestamp
       output "#{config[:scheme]}.queue_totals.messages.rate", overview['queue_totals']['messages_details']['rate'], timestamp
 
@@ -107,7 +107,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
       output "#{config[:scheme]}.queue_totals.messages_ready.rate", overview['queue_totals']['messages_ready_details']['rate'], timestamp
     end
 
-    if overview.has_key?('message_stats')
+    if overview.has_key?('message_stats') and !overview['message_stats'].empty?
       # overview['message_stats']['publish']
       if overview['message_stats'].include?('publish')
         output "#{config[:scheme]}.message_stats.publish.count", overview['message_stats']['publish'], timestamp
