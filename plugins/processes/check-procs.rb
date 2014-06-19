@@ -175,8 +175,8 @@ class CheckProcs < Sensu::Plugin::Check::CLI
         line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :etime, :command, :time).merge(:state => state)
       end
     else
-      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,etime,command,time').drop(1).map do |line|
-        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :etime, :command, :time)
+      read_lines('ps axwwo user,pid,vsz,rss,pcpu,state,etime,time,command').drop(1).map do |line|
+        line_to_hash(line, :user, :pid, :vsz, :rss, :pcpu, :state, :etime, :time, :command)
       end
     end
   end
