@@ -6,7 +6,7 @@
 # This is a drop-in replacement for check-disk-health.sh.
 #
 # smartctl requires root permissions.  When running this script as a non-root
-# user such as nagios, ensure it is run with sudo.
+# user such as sensu, ensure it is run with sudo.
 #
 # Create a file named /etc/sudoers.d/smartctl with this line inside :
 # sensu ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
