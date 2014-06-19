@@ -27,7 +27,12 @@ class VictorOps < Sensu::Handler
 
         case @event['action']
         when 'create'
-          message_type = 'CRITICAL'
+          case @event['check']['status']
+          when 1
+            message_type = 'WARNING'
+          else
+            message_type = 'CRITICAL'
+          end
         when 'resolve'
           message_type = 'RECOVERY'
         end
