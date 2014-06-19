@@ -9,6 +9,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
 require 'open-uri'
+require 'openssl'
 
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
@@ -89,6 +90,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :short => '-b',
     :long => '--below'
 
+  option :no_ssl_verify,
+   :description => 'Do not verify SSL certs',
+   :short => '-v',
+   :long => '--nosslverify'
+
   option :help,
     :description => 'Show this message',
     :short => '-h',
@@ -127,18 +133,29 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def retrieve_data
     unless @raw_data
       begin
+        unless config[:server].start_with?('https://', 'http://')
+          config[:server].prepend('http://')
+        end
 
-        url = "http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
+        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
+
+        url_opts = {}
+
+        if config[:no_ssl_verify]
+          url_opts[:ssl_verify_mode] = OpenSSL::SSL::VERIFY_NONE
+        end
+
         if (config[:username] && (config[:password] || config[:passfile]))
           if config[:passfile]
             pass = File.open(config[:passfile]).readline
           elsif config[:password]
             pass = config[:password]
           end
-          handle = open(url, :http_basic_authentication =>["#{config[:username]}", pass.chomp])
-        else # we don't have both username and password trying without
-          handle = open(url)
-        end
+
+          url_opts[:http_basic_authentication] = [config[:username], pass.chomp]
+        end # we don't have both username and password trying without
+
+        handle = open(url, url_opts)
 
         @raw_data = JSON.parse(handle.gets)
         output = {}

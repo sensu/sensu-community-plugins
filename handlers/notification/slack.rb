@@ -41,6 +41,10 @@ class Slack < Sensu::Handler
     get_setting('bot_name')
   end
 
+  def slack_surround
+    get_setting('surround')
+  end
+
   def incident_key
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -70,7 +74,8 @@ class Slack < Sensu::Handler
     http.use_ssl = true
 
     req = Net::HTTP::Post.new("#{uri.path}?#{uri.query}")
-    req.body = "payload=#{payload(notice).to_json}"
+    text = slack_surround ? slack_surround + notice + slack_surround : notice
+    req.body = "payload=#{payload(text).to_json}"
 
     response = http.request(req)
     verify_response(response)
