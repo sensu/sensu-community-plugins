@@ -30,41 +30,41 @@ class YoutubeMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.youtube"
 
   def run
-      unless config[:videoid].nil?
-        res = Net::HTTP.start("gdata.youtube.com", "80") do |http|
-          req = Net::HTTP::Get.new("/feeds/api/videos/#{config[:videoid]}")
-          http.request(req)
-        end
-
-        stats  = Crack::XML.parse(res.body)
-
-        author =  stats["entry"]["author"]["name"]
-        comments = stats["entry"]["gd:comments"]["gd:feedLink"]["countHint"]
-        likes = stats["entry"]["gd:rating"]["numRaters"]
-        favorites = stats["entry"]["yt:statistics"]["favoriteCount"]
-        views = stats["entry"]["yt:statistics"]["viewCount"]
-
-        channelres = Net::HTTP.start("gdata.youtube.com", "80") do |http|
-          req = Net::HTTP::Get.new("/feeds/api/users/#{author}")
-          http.request(req)
-        end
-
-        channel  = Crack::XML.parse(channelres.body)
-
-        chansubs = channel["entry"]["yt:statistics"]["subscriberCount"]
-        chanviews = channel["entry"]["yt:statistics"]["viewCount"]
-        chanuploadviews = channel["entry"]["yt:statistics"]["totalUploadViews"]
-
-        name = author.gsub(/(\W)/, '_').downcase
-
-        output "#{config[:scheme]}.video.#{config[:videoid]}.comments", comments
-        output "#{config[:scheme]}.video.#{config[:videoid]}.likes", likes
-        output "#{config[:scheme]}.video.#{config[:videoid]}.favorites", favorites
-        output "#{config[:scheme]}.video.#{config[:videoid]}.views", views
-        output "#{config[:scheme]}.channel.#{name}.subs", chansubs
-        output "#{config[:scheme]}.channel.#{name}.views", chanviews
-        output "#{config[:scheme]}.channel.#{name}.videoviews", chanuploadviews
+    unless config[:videoid].nil?
+      res = Net::HTTP.start("gdata.youtube.com", "80") do |http|
+        req = Net::HTTP::Get.new("/feeds/api/videos/#{config[:videoid]}")
+        http.request(req)
       end
+
+      stats  = Crack::XML.parse(res.body)
+
+      author =  stats["entry"]["author"]["name"]
+      comments = stats["entry"]["gd:comments"]["gd:feedLink"]["countHint"]
+      likes = stats["entry"]["gd:rating"]["numRaters"]
+      favorites = stats["entry"]["yt:statistics"]["favoriteCount"]
+      views = stats["entry"]["yt:statistics"]["viewCount"]
+
+      channelres = Net::HTTP.start("gdata.youtube.com", "80") do |http|
+        req = Net::HTTP::Get.new("/feeds/api/users/#{author}")
+        http.request(req)
+      end
+
+      channel  = Crack::XML.parse(channelres.body)
+
+      chansubs = channel["entry"]["yt:statistics"]["subscriberCount"]
+      chanviews = channel["entry"]["yt:statistics"]["viewCount"]
+      chanuploadviews = channel["entry"]["yt:statistics"]["totalUploadViews"]
+
+      name = author.gsub(/(\W)/, '_').downcase
+
+      output "#{config[:scheme]}.video.#{config[:videoid]}.comments", comments
+      output "#{config[:scheme]}.video.#{config[:videoid]}.likes", likes
+      output "#{config[:scheme]}.video.#{config[:videoid]}.favorites", favorites
+      output "#{config[:scheme]}.video.#{config[:videoid]}.views", views
+      output "#{config[:scheme]}.channel.#{name}.subs", chansubs
+      output "#{config[:scheme]}.channel.#{name}.views", chanviews
+      output "#{config[:scheme]}.channel.#{name}.videoviews", chanuploadviews
+    end
 
     ok
 

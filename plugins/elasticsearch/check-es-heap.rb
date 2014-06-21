@@ -28,6 +28,12 @@ require 'json'
 
 class ESHeap < Sensu::Plugin::Check::CLI
 
+  option :server,
+    :description => 'Elasticsearch server',
+    :short => '-s SERVER',
+    :long => '--server SERVER',
+    :default => 'localhost'
+
   option :warn,
     :short => '-w N',
     :long => '--warn N',
@@ -42,9 +48,21 @@ class ESHeap < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :default => 0
 
+  option :port,
+    :short => '-p N',
+    :long => '--port N',
+    :description => "Specify port used",
+    :proc => proc {|a| a.to_i },
+    :default => 9200
+
+  def get_es_version
+    info = get_es_resource('/')
+    info['version']['number']
+  end
+
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://localhost:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}", :timeout => 45)
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
@@ -56,8 +74,13 @@ class ESHeap < Sensu::Plugin::Check::CLI
   end
 
   def get_heap_used
-    stats = get_es_resource('/_cluster/nodes/_local/stats?jvm=true')
-    node = stats['nodes'].keys.first
+    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+      stats = get_es_resource('_nodes/_local/stats?jvm=true')
+      node = stats['nodes'].keys.first
+    else
+      stats = get_es_resource('_cluster/nodes/_local/stats?jvm=true')
+      node = stats['nodes'].keys.first
+    end
     begin
       stats['nodes'][node]['jvm']['mem']['heap_used_in_bytes']
     rescue

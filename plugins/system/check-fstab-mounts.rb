@@ -14,6 +14,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
+require 'pathname'
 
 class CheckFstabMounts < Sensu::Plugin::Check::CLI
   option :fstypes,
@@ -27,6 +28,7 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
     super
     @fstab = IO.readlines '/etc/fstab'
     @proc_mounts = IO.readlines '/proc/mounts'
+    @swap_mounts = IO.readlines '/proc/swaps'
     @missing_mounts = []
   end
 
@@ -35,10 +37,16 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
     @fstab.each do |line|
       next if line =~ /^\s*#/
       fields = line.split(/\s+/)
-      next if fields[1] == 'none'
-      next if config[:fstypes] and !config[:fstypes].include? fields[2]
-      if @proc_mounts.select {|m| m.split(/\s+/)[1] == fields[1]}.empty?
-        @missing_mounts << fields[1]
+      next if fields[1] == 'none' || (fields[3].include? 'noauto')
+      next if config[:fstypes] && !config[:fstypes].include?(fields[2])
+      if fields[2] != 'swap'
+        if @proc_mounts.select {|m| m.split(/\s+/)[1] == fields[1]}.empty?
+          @missing_mounts << fields[1]
+        end
+      else
+        if @swap_mounts.select {|m| m.split(/\s+/)[0] == Pathname.new(fields[0]).realpath.to_s}.empty?
+          @missing_mounts << fields[1]
+        end
       end
     end
   end

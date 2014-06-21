@@ -1,43 +1,39 @@
-# Send event output to Redis
-# ===
-#
-# Copyright 2013 kcrayon <crayon@crayon.at>
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+require 'sensu/redis'
 
-module Sensu
-  module Extension
-    class RedisOutput < Handler
-      def name
-        'redis_output'
-      end
+module Sensu::Extension
+  class RedisOutput < Handler
+    def name
+      'redis_output'
+    end
 
-      def description
-        'sends event output to a redis list or channel'
-      end
+    def description
+      'outputs events output to a redis list or channel'
+    end
 
-      def run(event, settings, &block)
-        opts = settings["redis_output"]
+    def post_init
+      @redis = Sensu::Redis.connect({
+        :host => @settings["redis_output"]["host"],
+        :port => @settings["redis_output"]["port"] || 6379,
+        :database => @settings["redis_output"]["db"] || 0,
+      })
+    end
 
-        opts["db"]   ||= 0
-        opts["port"] ||= 6379
-        @@redis ||= Redis.connect(:host => opts["host"], :port => opts["port"], :db => opts["db"])
+    def run(event)
+      opts = @settings["redis_output"]
 
-        output = JSON.parse(event)["check"]["output"]
-        output = opts["split"] ? output.split("\n") : Array(output)
+      output = Oj.load(event)[:check][:output]
+      output = output.split("\n") if opts["split"]
 
-        output.each do |e|
-          case opts["data_type"]
-          when "list"
-            @@redis.lpush(opts["key"], e)
-          when "channel"
-            @@redis.publish(opts["key"], e)
-          end
+      Array(output).each do |e|
+        case opts["data_type"]
+        when "list"
+          @redis.lpush(opts["key"], e)
+        when "channel"
+          @redis.publish(opts["key"], e)
         end
-
-        block.call("sent #{output.count} events", 0)
       end
+
+      yield("sent #{output.count} events", 0)
     end
   end
 end

@@ -30,7 +30,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     :description => "Sensu API USER"
 
   option :password,
-    :short => "-p PASSOWRD",
+    :short => "-p PASSWORD",
     :long => "--password PASSWORD",
     :description => "Sensu API PASSWORD"
 
@@ -52,6 +52,12 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     :long => "--age SECONDS",
     :description => "Minimum aggregate age in SECONDS, time since check request issued",
     :default => 30,
+    :proc => proc {|a| a.to_i }
+
+  option :limit,
+    :short => "-l LIMIT",
+    :long => "--limit LIMIT",
+    :description => "Limit of aggregates you want the API to return",
     :proc => proc {|a| a.to_i }
 
   option :summarize,
@@ -108,7 +114,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
 
   def get_aggregate
     uri = "/aggregates/#{config[:check]}"
-    issued = api_request(uri + "?age=#{config[:age]}")
+    issued = api_request(uri + "?age=#{config[:age]}" + (config[:limit] ? "&limit=#{config[:limit]}" : ""))
     unless issued.empty?
       issued_sorted = issued.sort
       time = issued_sorted.pop

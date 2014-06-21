@@ -36,7 +36,7 @@ class ParseEmail
       "UID failed",
       "Uptime failed"
     ]
-   array_failure.include?(@alert)
+    array_failure.include?(@alert)
   end
 
   def recover?
@@ -49,7 +49,7 @@ class ParseEmail
       "Filesystem flags succeeded",
       "GID succeeded",
       "ICMP succeeded",
-     "Monit instance changed not",
+      "Monit instance changed not",
       "Type succeeded",
       "Exists",
       "Permission succeeded",
@@ -67,7 +67,7 @@ class ParseEmail
   end
 
   def body
-    return "#{@token.subject}  ERROR BODY:#{@token.body} ALERT:#{@alert}"
+    "#{@token.subject}  ERROR BODY:#{@token.body} ALERT:#{@alert}"
   end
   def service
     service_string = @token.body.match(/Service: .*/).to_s

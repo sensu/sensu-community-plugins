@@ -74,20 +74,26 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
               'Last_IO_Error',
               'Last_SQL_Error',
               'Seconds_Behind_Master'].all? do |key|
-            row.has_key? key
-          end
+                row.has_key? key
+              end
 
           slave_running = %w[Slave_IO_Running Slave_SQL_Running].all? do |key|
             row[key] =~ /Yes/
           end
 
-          critical "slave not running" unless slave_running
+          output = "Slave not running!"
+          output += " STATES:"
+          output += " Slave_IO_Running=#{row['Slave_IO_Running']}"
+          output += ", Slave_SQL_Running=#{row['Slave_SQL_Running']}"
+          output += ", LAST ERROR: #{row['Last_SQL_Error']}"
+
+          critical output unless slave_running
 
           replication_delay = row['Seconds_Behind_Master'].to_i
 
           message = "replication delayed by #{replication_delay}"
 
-          if replication_delay > config[:warn] and
+          if replication_delay > config[:warn] &&
               replication_delay <= config[:crit]
             warning message
           elsif replication_delay >= config[:crit]

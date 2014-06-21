@@ -17,15 +17,18 @@ require 'sensu-plugin/check/cli'
 class CheckDisk < Sensu::Plugin::Check::CLI
 
   option :fstype,
-    :short => '-t TYPE',
+    :short => '-t TYPE[,TYPE]',
+    :description => 'Only check fs type(s)',
     :proc => proc {|a| a.split(',') }
 
   option :ignoretype,
-    :short => '-x TYPE',
+    :short => '-x TYPE[,TYPE]',
+    :description => 'Ignore fs type(s)',
     :proc => proc {|a| a.split(',') }
 
   option :ignoremnt,
-    :short => '-i MNT',
+    :short => '-i MNT[,MNT]',
+    :description => 'Ignore mount point(s)',
     :proc => proc {|a| a.split(',') }
 
   option :ignoreline,
@@ -40,11 +43,25 @@ class CheckDisk < Sensu::Plugin::Check::CLI
 
   option :warn,
     :short => '-w PERCENT',
+    :description => 'Warn if PERCENT or more of disk full',
     :proc => proc {|a| a.to_i },
     :default => 85
 
   option :crit,
     :short => '-c PERCENT',
+    :description => 'Critical if PERCENT or more of disk full',
+    :proc => proc {|a| a.to_i },
+    :default => 95
+
+  option :iwarn,
+    :short => '-W PERCENT',
+    :description => 'Warn if PERCENT or more of inodes used',
+    :proc => proc {|a| a.to_i },
+    :default => 85
+
+  option :icrit,
+    :short => '-K PERCENT',
+    :description => 'Critical if PERCENT or more of inodes used',
     :proc => proc {|a| a.to_i },
     :default => 95
 
@@ -80,6 +97,26 @@ class CheckDisk < Sensu::Plugin::Check::CLI
         @warn_fs <<  "#{mnt} #{capacity}"
       end
     end
+
+    `df -PTi`.split("\n").drop(1).each do |line|
+      begin
+        _fs, type, _inodes, _used, _avail, capacity, mnt = line.split
+        next if config[:includeline] && !config[:includeline].find { |x| line.match(x) }
+        next if config[:fstype] && !config[:fstype].include?(type)
+        next if config[:ignoretype] && config[:ignoretype].include?(type)
+        next if config[:ignoremnt] && config[:ignoremnt].include?(mnt)
+        next if config[:ignoreline] && config[:ignoreline].find { |x| line.match(x) }
+        puts line if config[:debug]
+      rescue
+        unknown "malformed line from df: #{line}"
+      end
+      @line_count += 1
+      if capacity.to_i > config[:icrit]
+        @crit_fs << "#{mnt} inodes #{capacity}"
+      elsif capacity.to_i >= config[:iwarn]
+        @warn_fs << "#{mnt} inodes #{capacity}"
+      end
+    end
   end
 
   def usage_summary
@@ -94,7 +131,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
     unknown 'No filesystems found' unless @line_count > 0
     critical usage_summary unless @crit_fs.empty?
     warning usage_summary unless @warn_fs.empty?
-    ok "All disk usage under #{config[:warn]}%"
+    ok "All disk usage under #{config[:warn]}% and inode usage under #{config[:iwarn]}%"
   end
 
 end

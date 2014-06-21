@@ -25,12 +25,25 @@ class CheckCMDStatus < Sensu::Plugin::Check::CLI
     :long => '--status STATUS',
     :default => '0'
 
+  option :check_output,
+    :description => 'Optionally check the process stdout against a regex',
+    :short => '-o',
+    :long => '--check_output REGEX'
+
   def get_cmd_status
-    `#{config[:command]}`
+    stdout = `#{config[:command]}`
     unless $?.exitstatus.to_s == config[:status]
       critical "#{config[:command]} exited with #{$?.exitstatus}"
     else
-      ok "#{config[:command]} exited with #{$?.exitstatus}"
+      if config[:check_output]
+        if Regexp.new(config[:check_output]).match(stdout)
+          ok "#{config[:command]} matched #{config[:check_output]} and exited with #{$?.exitstatus}"
+        else
+          critical "#{config[:command]} output didn't match #{config[:check_output]} (exit #{$?.exitstatus})"
+        end
+      else
+        ok "#{config[:command]} exited with #{$?.exitstatus}"
+      end
     end
   end
 

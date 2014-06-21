@@ -50,8 +50,8 @@ class CheckBanner < Sensu::Plugin::Check::CLI
 
   def get_banner
     begin
-      sock = TCPSocket.new(config[:host], config[:port])
       timeout(config[:timeout]) do
+        sock = TCPSocket.new(config[:host], config[:port])
         sock.puts config[:write] if config[:write]
         sock.readline
       end
@@ -59,6 +59,10 @@ class CheckBanner < Sensu::Plugin::Check::CLI
       critical "Connection refused by #{config[:host]}:#{config[:port]}"
     rescue Timeout::Error
       critical "Connection or read timed out"
+    rescue Errno::EHOSTUNREACH
+      critical "Check failed to run: No route to host"
+    rescue EOFError
+      critical "Connection closed unexpectedly"
     end
   end
 

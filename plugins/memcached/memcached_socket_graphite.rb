@@ -62,6 +62,7 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def sortMetrics(stats)
     memcachedMetrics = {}
+    memcachedMetrics['uptime'] = stats['uptime'].to_i
     memcachedMetrics['pointer_size'] = stats['pointer_size'].to_i
     memcachedMetrics['rusage_user'] = stats['rusage_user'].to_i
     memcachedMetrics['rusage_system'] = stats['rusage_system'].to_i
@@ -105,6 +106,6 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
     memcachedMetrics['total_items'] = stats['total_items'].to_i
     memcachedMetrics['evictions'] = stats['evictions'].to_i
     memcachedMetrics['reclaimed'] = stats['reclaimed'].to_i
-    return memcachedMetrics
+    memcachedMetrics
   end
 end
