@@ -39,7 +39,7 @@ class CheckQMAILQ < Sensu::Plugin::Check::CLI
 
   def checkq (qtype)
     queue= `/var/qmail/bin/qmail-qread | grep #{qtype} | grep -v done | wc -l`
-    return queue.to_i
+    queue.to_i
   end
 
   def run

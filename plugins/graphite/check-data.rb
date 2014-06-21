@@ -8,8 +8,8 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
-require 'openssl'
 require 'open-uri'
+require 'openssl'
 
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
@@ -24,6 +24,24 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     :short => '-s SERVER:PORT',
     :long => '--server SERVER:PORT',
     :required => true
+
+  option :username,
+    :description => 'username for basic http authentication',
+    :short => '-u USERNAME',
+    :long => '--user USERNAME',
+    :required => false
+
+  option :password,
+    :description => 'user password for basic http authentication',
+    :short => '-p PASSWORD',
+    :long => '--pass PASSWORD',
+    :required => false
+
+  option :passfile,
+    :description => 'password file path for basic http authentication',
+    :short => '-P PASSWORDFILE',
+    :long => '--passfile PASSWORDFILE',
+    :required => false
 
   option :warning,
     :description => 'Generate warning if given value is above received value',
@@ -114,7 +132,14 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       puts opt_parser if config[:help]
       exit
     end
-    retreive_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
+
+    data = retrieve_data
+    data.each_pair do |key, value|
+      @value = value
+      @data = value['data']
+      check_age || check(:critical) || check(:warning)
+    end
+    ok("#{name} value okay")
   end
 
   # name used in responses
@@ -125,13 +150,13 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check the age of the data being processed
   def check_age
-    if (Time.now.to_i - @end) > config[:allowed_graphite_age]
+    if (Time.now.to_i - @value['end']) > config[:allowed_graphite_age]
       critical "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
     end
   end
 
   # grab data from graphite
-  def retreive_data
+  def retrieve_data
     unless @raw_data
       begin
         protocol = config[:ssl] ? 'https' : 'http'
@@ -163,8 +188,16 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         if config[:ignore_no_data]
           ok "No data, but we don't mind"
         else
-          critical "No data for time period and/or target"
+          unknown "No data for time period and/or target"
         end
+      rescue Errno::ECONNREFUSED
+        unknown "Connection refused when connecting to graphite server"
+      rescue Errno::ECONNRESET
+        unknown "Connection reset by peer when connecting to graphite server"
+      rescue EOFError
+        unknown "End of file error when reading from graphite server"
+      rescue Exception => e
+        unknown "An unknown error occured: #{e.inspect}"
       end
     end
   end
@@ -177,6 +210,16 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
         send(type, "#{name} has passed #{type} threshold (#{@data.last})")
       end
     end
+  end
+
+  # Check if value is below defined threshold
+  def below?(type)
+    config[:below] && @data.last < config[type]
+  end
+
+  # Check is value is above defined threshold
+  def above?(type)
+    (!config[:below]) && (@data.last > config[type]) && (!decreased?)
   end
 
   # Check if values have decreased within interval if given

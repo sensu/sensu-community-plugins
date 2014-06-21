@@ -1,5 +1,5 @@
 {
   "flowdock": {
-    "auth_token": "FLOWDOCK_API_TOKEN",
+    "auth_token": "FLOWDOCK_API_TOKEN"
   }
 }

@@ -1,5 +1,6 @@
 {
   "mailer": {
+    "admin_gui": "http://admin.example.com:8080/",
     "mail_from": "sensu@example.com",
     "mail_to": "monitor@example.com",
     "smtp_address": "smtp.example.org",

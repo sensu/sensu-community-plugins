@@ -21,7 +21,7 @@ class LibratoMetrics < Sensu::Handler
     queue = Librato::Metrics::Queue.new
     @event['check']['output'].split("\n").each do |line|
       name, value, timestamp = line.split(/\s+/)
-      queue.add name => {:measure_time => timestamp.to_i, :value => value.to_i}
+      queue.add name => {:measure_time => timestamp.to_i, :value => value.to_f}
     end
 
     Librato::Metrics.authenticate settings['librato']['email'], settings['librato']['api_key']

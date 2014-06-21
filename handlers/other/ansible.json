@@ -1,0 +1,6 @@
+{
+  "ansible: {
+    "command": "/usr/bin/ansible-playbook",
+    "playbook": "playbook.yml"
+  }
+}

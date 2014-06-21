@@ -65,6 +65,8 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# rubocop:disable AssignmentInCondition
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -320,8 +322,8 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     def get_metric(string)
       string.strip!
-      (metric, value) = string.split(':')
-      if metric.nil? or value.nil?
+      (metric, value) = string.split(': ')
+      if metric.nil? || value.nil?
         return [nil, nil]
       else
         # sanitize metric names for graphite
@@ -349,7 +351,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       elsif num_indents == 0
         # keyspace = nil
         cf = nil
-      elsif num_indents == 2 and !cf.nil?
+      elsif num_indents == 2 && !cf.nil?
         # a column family metric
         if config[:filter_regex]
           unless cf.match(config[:filter_regex])
@@ -357,8 +359,8 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
         (metric, value) = get_metric(line)
-        output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp
-      elsif num_indents == 1 and !keyspace.nil?
+        output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp unless value == "disabled"
+      elsif num_indents == 1 && !keyspace.nil?
         # a keyspace metric
         (metric, value) = get_metric(line)
         output "#{config[:scheme]}.#{keyspace}.#{metric}", value, @timestamp

@@ -20,7 +20,7 @@ class GeckoboardPush < Sensu::Handler
   def filter; end
 
   def handle
-  Geckoboard::Push.api_key = settings["geckoboard"]["api_key"]
+    Geckoboard::Push.api_key = settings["geckoboard"]["api_key"]
 
     checks = settings["geckoboard"]["checks"]
 

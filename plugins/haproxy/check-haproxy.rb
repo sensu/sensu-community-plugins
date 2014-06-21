@@ -55,13 +55,17 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
   option :service,
     :short => '-s SVC',
     :description => "Service Name to Check"
+  option :exact_match,
+    :short => '-e',
+    :boolean => false,
+    :description => "Whether service name specified with -s should be exact match or not"
   option :socket,
     :short => '-S SOCKET',
     :default => "/var/run/haproxy.sock",
     :description => "Path to HAProxy Socket, default: /var/run/haproxy.sock"
 
   def run
-    if config[:service] or config[:all_services]
+    if config[:service] || config[:all_services]
       services = get_services
     else
       unknown 'No service specified'
@@ -112,8 +116,9 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
     if config[:all_services]
       haproxy_stats
     else
+      regexp = config[:exact_match] ? Regexp.new("^#{config[:service]}$") : Regexp.new("#{config[:service]}")
       haproxy_stats.select do |svc|
-        svc[:pxname] =~ /#{config[:service]}/
+        svc[:pxname] =~ regexp
       end.reject do |svc|
         ["FRONTEND", "BACKEND"].include?(svc[:svname])
       end

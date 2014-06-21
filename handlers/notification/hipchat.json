@@ -1,6 +1,8 @@
 {
   "hipchat": {
     "apikey": "1234abcdefg1234abcdefg",
-    "room": "Ops"
+    "apiversion": "v1",
+    "room": "Ops",
+    "from": "Sensu"
   }
 }
