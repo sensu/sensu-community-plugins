@@ -19,6 +19,13 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
     :long => '--host=VALUE',
     :description => 'Database host'
 
+  option :port,
+    :short => '-P',
+    :long => '--port=VALUE',
+    :description => 'Database port',
+    :default => 3306,
+    :proc => lambda { |s| s.to_i }
+
   option :user,
     :short => '-u',
     :long => '--username=VALUE',
@@ -54,6 +61,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
 
   def run
     db_host = config[:host]
+    db_port = config[:port]
     db_user = config[:user]
     db_pass = config[:pass]
 
@@ -62,7 +70,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
     end
 
     begin
-      db = Mysql.new(db_host, db_user, db_pass)
+      db = Mysql.new(db_host, db_user, db_pass, nil, db_port)
       results = db.query 'show slave status'
 
       unless results.nil?
