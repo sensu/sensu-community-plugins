@@ -3,7 +3,7 @@
 # Sensu Twitter Handler
 # =====================
 #
-# The functionality of this handler is the same as twitter.rb however supports the latest Twitter gem. 
+# The functionality of this handler is the same as twitter.rb however supports the latest Twitter gem.
 # 99% based on the original work by Joe Crim.
 #
 # This handler reports alerts to a configured twitter handler.
