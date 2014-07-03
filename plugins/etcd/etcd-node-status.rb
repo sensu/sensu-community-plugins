@@ -18,7 +18,9 @@
 #
 # this is a first pass need to figure out all bad responses
 # 
-
+# AUTHOR:
+#   Will Salt - williamejsalt@gmail.com
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
