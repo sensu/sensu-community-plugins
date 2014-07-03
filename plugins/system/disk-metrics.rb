@@ -11,7 +11,7 @@ class DiskGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.disk"
- 
+
   # this option uses lsblk to convert the dm-<whatever> name to the LVM name.
   # sample metric scheme without this:
   # <hostname>.disk.dm-0
