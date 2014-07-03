@@ -11,8 +11,13 @@ class DiskGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :short => "-s SCHEME",
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.disk"
-
-  option :convert,
+ 
+  # this option uses lsblk to convert the dm-<whatever> name to the LVM name.
+  # sample metric scheme without this:
+  # <hostname>.disk.dm-0
+  # sample metric scheme with this:
+  # <hostname>.disk.vg-root
+  option :convert,  
     :description => "Convert devicemapper to logical volume name",
     :short => "-c",
     :long => "--convert",
