@@ -68,6 +68,12 @@ class KeystoneTokenCounts < Sensu::Plugin::Metric::CLI::Graphite
          :description => 'Delimited list of users to include',
          :long => '--ks-users USER[,USER]'
 
+  option :database,
+         :short => '-d DATABASE',
+         :long => '--database DATABASE',
+         :description => 'Database name',
+         :default => 'keystone'
+
   def run
     if config[:ks_users]
       config[:by_user] = true
@@ -88,7 +94,7 @@ GROUP BY user.name
       mysql = Mysql2::Client.new(
         :host => config[:host], :port => config[:port],
         :username => config[:username], :password => config[:password],
-        :socket => config[:socket], :database => 'keystone'
+        :socket => config[:socket], :database => config[:database]
       )
       mysql.query(sql).each do |row|
         metrics.size.times do |i|

@@ -21,6 +21,8 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE for details.
 
+require 'sensu/redis'
+
 module Sensu
   module Extension
     class Flapjack < Handler

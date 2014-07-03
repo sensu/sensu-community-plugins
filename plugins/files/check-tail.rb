@@ -5,7 +5,9 @@
 #
 # DESCRIPTION:
 #   This plugin checks the tail of a file for a given patten and sends
-#   critical (or optionally warning) message if found
+#   critical (or optionally warning) message if found. Alternatively,
+#   failure can be triggered when the pattern is not found by passing
+#   the 'absent' flag.
 #
 # OUTPUT:
 #   plain-text
@@ -36,6 +38,12 @@ class Tail < Sensu::Plugin::Check::CLI
     :short => '-P PAT',
     :long => '--pattern PAT'
 
+  option :absent,
+    :description => "Fail if pattern is absent",
+    :short => '-a',
+    :long => '--absent',
+    :boolean => true
+
   option :lines,
     :description => "Number of lines to tail",
     :short => '-l LINES',
@@ -59,13 +67,24 @@ class Tail < Sensu::Plugin::Check::CLI
     unknown "No log file specified" unless config[:file]
     unknown "No pattern specified" unless config[:pattern]
     if File.exists?(config[:file])
-      if pattern_match?
-        send(
-          config[:warn_only] ? :warning : :critical,
-          "Pattern matched: #{config[:pattern]}"
-        )
+      if !config[:absent]
+        if pattern_match?
+          send(
+            config[:warn_only] ? :warning : :critical,
+            "Pattern matched: #{config[:pattern]}"
+          )
+        else
+          ok "No matches found"
+        end
       else
-        ok "No matches found"
+        if pattern_match?
+          ok "Match found"
+        else
+          send(
+            config[:warn_only] ? :warning : :critical,
+            "Pattern not found: #{config[:pattern]}"
+          )
+        end
       end
     else
       critical 'File not found'

@@ -46,6 +46,12 @@ class CheckRabbitAMQP < Sensu::Plugin::Check::CLI
     :long => '--port PORT',
     :default => '5672'
 
+  option :ssl,
+    :description => "Enable SSL for connection to RabbitMQ",
+    :long => '--ssl',
+    :boolean => true,
+    :default => false
+
   def run
     res = vhost_alive?
 
@@ -64,9 +70,10 @@ class CheckRabbitAMQP < Sensu::Plugin::Check::CLI
     username = config[:username]
     password = config[:password]
     vhost    = config[:vhost]
+    ssl      = config[:ssl]
 
     begin
-      conn = Bunny.new("amqp://#{username}:#{password}@#{host}:#{port}/#{vhost}")
+      conn = Bunny.new("amqp#{ssl ? 's' : ''}://#{username}:#{password}@#{host}:#{port}/#{vhost}")
       conn.start
       { "status" => "ok", "message" => "RabbitMQ server is alive" }
     rescue Bunny::PossibleAuthenticationFailureError
