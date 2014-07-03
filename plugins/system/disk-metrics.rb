@@ -17,7 +17,7 @@ class DiskGraphite < Sensu::Plugin::Metric::CLI::Graphite
   # <hostname>.disk.dm-0
   # sample metric scheme with this:
   # <hostname>.disk.vg-root
-  option :convert,  
+  option :convert,
     :description => "Convert devicemapper to logical volume name",
     :short => "-c",
     :long => "--convert",
