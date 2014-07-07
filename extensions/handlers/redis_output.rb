@@ -11,11 +11,13 @@ module Sensu::Extension
     end
 
     def post_init
-      @redis = Sensu::Redis.connect({
-        :host => @settings["redis_output"]["host"],
-        :port => @settings["redis_output"]["port"] || 6379,
-        :database => @settings["redis_output"]["db"] || 0,
-      })
+      if @settings["redis_output"].is_a?(Hash)
+        @redis = Sensu::Redis.connect({
+          :host => @settings["redis_output"]["host"] || 127.0.0.1,
+          :port => @settings["redis_output"]["port"] || 6379,
+          :database => @settings["redis_output"]["db"] || 0,
+        })
+      end
     end
 
     def run(event)
