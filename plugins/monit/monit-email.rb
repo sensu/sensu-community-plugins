@@ -14,11 +14,13 @@ class ParseEmail
   end
 
   def body
-    @body ||= "#{token.subject}  ERROR BODY:#{token.body} ALERT:#{alert}"
+    return @body if @body
+    @body = "#{token.subject}  ERROR BODY:#{token.body} ALERT:#{alert}"
   end
 
   def service
-    @service ||= if service_string = token.body.match(/Service: .*/)
+    return @service if @service
+    @service = if service_string = token.body.match(/Service: .*/)
                  service_string.split(': ')[1]
                else
                  token.subject.sub(/([^ ]+) *.*/, '\1')
@@ -26,7 +28,8 @@ class ParseEmail
   end
 
   def alert
-    @alert ||= if alert_string = token.body.match(/Event: .*/)
+    return @alert if @alert
+    @alert = if alert_string = token.body.match(/Event: .*/)
                alert_string.to_s.split(':')[1].strip
              else
                alert_string = token.body.to_s.split("\n")[0]
