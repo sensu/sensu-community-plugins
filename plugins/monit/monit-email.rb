@@ -20,7 +20,8 @@ class ParseEmail
 
   def service
     return @service if @service
-    if service_string = token.body.match(/Service: .*/)
+    service_string = token.body.match(/Service: .*/)
+    if service_string
       @service = service_string.split(': ')[1]
     else
       @service = token.subject.sub(/([^ ]+) *.*/, '\1')
@@ -29,7 +30,8 @@ class ParseEmail
 
   def alert
     return @alert if @alert
-    if alert_string = token.body.match(/Event: .*/)
+    alert_string = token.body.match(/Event: .*/)
+    if alert_string
       @alert = alert_string.to_s.split(':')[1].strip
     else
       alert_string = token.body.to_s.split("\n")[0]
