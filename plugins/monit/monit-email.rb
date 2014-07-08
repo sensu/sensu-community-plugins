@@ -20,21 +20,21 @@ class ParseEmail
 
   def service
     return @service if @service
-    @service = if service_string = token.body.match(/Service: .*/)
-                 service_string.split(': ')[1]
-               else
-                 token.subject.sub(/([^ ]+) *.*/, '\1')
-               end
+    if service_string = token.body.match(/Service: .*/)
+      @service = service_string.split(': ')[1]
+    else
+      @service = token.subject.sub(/([^ ]+) *.*/, '\1')
+    end
   end
 
   def alert
     return @alert if @alert
-    @alert = if alert_string = token.body.match(/Event: .*/)
-               alert_string.to_s.split(':')[1].strip
-             else
-               alert_string = token.body.to_s.split("\n")[0]
-               alert_string.split(':')[-1].strip
-             end
+    if alert_string = token.body.match(/Event: .*/)
+      @alert = alert_string.to_s.split(':')[1].strip
+    else
+      alert_string = token.body.to_s.split("\n")[0]
+      @alert = alert_string.split(':')[-1].strip
+    end
   end
 
   def failure?
