@@ -31,7 +31,6 @@ if [[ $TOTAL -eq 0 ]] ; then
   exit 0
 else
   PERCENT=`echo "scale=3;$USED/$TOTAL*100" | bc -l`
-  PERCENT=${PERCENT%.*}
 
   OUTPUT="Swap usage: $PERCENT%, $USED/$TOTAL"
 
