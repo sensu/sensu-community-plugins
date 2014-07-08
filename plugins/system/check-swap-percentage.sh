@@ -33,10 +33,10 @@ else
 
   OUTPUT="Swap usage: $PERCENT%, $USED/$TOTAL"
 
-  if [[ $PERCENT -ge $CRIT ]] ; then
+  if [ ! $(echo "$PERCENT >= $CRIT" | bc) ] ; then
     echo "SWAP CRITICAL - $OUTPUT"
     exit 2
-  elif [[ $PERCENT -ge $WARN ]] ; then
+  elif [ ! $(echo "$PERCENT >= $WARN" | bc) ] ; then
     echo "SWAP WARNING - $OUTPUT"
     exit 1
   else
