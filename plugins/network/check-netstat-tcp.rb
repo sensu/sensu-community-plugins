@@ -52,7 +52,7 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
     :description => "Comma delimited list of states to check",
     :short => "-s STATES",
     :long => "--states STATES",
-    :default => "ESTABLISHED",
+    :default => ["ESTABLISHED"],
     :proc => proc {|a| a.split(',') }
 
   option :critical,
