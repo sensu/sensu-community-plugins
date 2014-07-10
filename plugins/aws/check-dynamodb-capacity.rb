@@ -136,7 +136,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
         threshold = config[:"#{severity}_over"]
         next unless threshold
         next if percentage < threshold
-        flag_alert severity, "; Consumed #{r_or_w} capacity is #{sprintf "%.2f", percentage}% (expected_lower_than #{threshold})"
+        flag_alert severity, "; On table #{table.name} consumed #{r_or_w} capacity is #{sprintf "%.2f", percentage}% (expected_lower_than #{threshold})"
         break
       end
     end
