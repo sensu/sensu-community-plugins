@@ -3,18 +3,28 @@
 # Check application processes running under bluepill control
 # ===
 #
-# Specify applications to monitor with -a [APP1,APP2]
-# If this option is not provided, this check will monitor the processes
-# of all the applications that bluepill has loaded.
+# DESCRIPTION:
+#   This plugin monitors the status of applications and processes
+#   running under the bluepill process supervisor.
 #
-# Returns CRITICAL if any process is down or if a manually specified
-# application has no processes loaded
-# Returns WARNING if any process is starting or unmonitored
-# Returns OK if all processes for all specified applications are 'up'
-# or bluepill is not in $PATH
+#   Specify applications to monitor with -a [APP1,APP2]
+#   If this option is not provided, this check will monitor the processes
+#   of all the applications that bluepill has loaded.
 #
-# James Legg mail@jameslegg.co.uk
-# Matt Greensmith mgreensmith@cozy.co
+# OUTPUT:
+#   Plain-text.
+#   Returns CRITICAL if any process is down or if a manually specified
+#   application has no processes loaded
+#   Returns WARNING if any process is starting or unmonitored
+#   Returns OK if all processes for all specified applications are 'up'
+#   or bluepill is not in $PATH
+#
+# DEPENDENCIES:
+#   sensu-plugin Ruby gem
+#
+# AUTHORS:
+#   James Legg mail@jameslegg.co.uk
+#   Matt Greensmith mgreensmith@cozy.co
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
