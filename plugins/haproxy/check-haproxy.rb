@@ -15,11 +15,36 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
+require 'net/http'
 require 'socket'
 require 'csv'
+require 'uri'
 
 class CheckHAProxy < Sensu::Plugin::Check::CLI
 
+  option :stats_source,
+    :short => "-S HOSTNAME|SOCKETPATH",
+    :long => "--stats HOSTNAME|SOCKETPATH",
+    :description => "HAproxy web stats hostname or path to stats socket",
+    :required => true
+  option :port,
+    :short => "-P PORT",
+    :long => "--port PORT",
+    :description => "HAproxy web stats port",
+    :default => "80"
+  option :path,
+    :short => "-q STATUSPATH",
+    :long => "--statspath STATUSPATH",
+    :description => "HAproxy web stats path",
+    :default => "/"
+  option :username,
+    :short => "-u USERNAME",
+    :long => "--user USERNAME",
+    :description => "HAproxy web stats username"
+  option :password,
+    :short => "-p PASSWORD",
+    :long => "--pass PASSWORD",
+    :description => "HAproxy web stats password"
   option :warn_percent,
     :short => '-w PERCENT',
     :boolean => true,
@@ -59,10 +84,6 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
     :short => '-e',
     :boolean => false,
     :description => "Whether service name specified with -s should be exact match or not"
-  option :socket,
-    :short => '-S SOCKET',
-    :default => "/var/run/haproxy.sock",
-    :description => "Path to HAProxy Socket, default: /var/run/haproxy.sock"
 
   def run
     if config[:service] || config[:all_services]
@@ -100,18 +121,31 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
   end
 
   def get_services
-    if File.socket?(config[:socket])
-      srv = UNIXSocket.open(config[:socket])
+    uri = URI.parse(config[:stats_source])
+
+    if uri.is_a?(URI::Generic) && File.socket?(uri.path)
+      srv = UNIXSocket.open(config[:stats_source])
       srv.write("show stat\n")
       out = srv.read
       srv.close
-
-      parsed = CSV.parse(out, {:skip_blanks => true})
-      keys = parsed.shift.reject{|k| k.nil?}.map{|k| k.match(/(\w+)/)[0].to_sym}
-      haproxy_stats = parsed.map{|line| Hash[keys.zip(line)]}
     else
-      critical "Not a valid HAProxy socket: #{config[:socket]}"
+      res = Net::HTTP.start(config[:stats_source], config[:port]) do |http|
+        req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
+        unless config[:username].nil?
+          req.basic_auth config[:username], config[:password]
+        end
+        http.request(req)
+      end
+      unless res.code.to_i == 200
+        unknown "Failed to fetch from #{config[:stats_source]}:#{config[:port]}/#{config[:path]}: #{res.code}"
+      end
+
+      out = res.body
     end
+
+    parsed = CSV.parse(out, {:skip_blanks => true})
+    keys = parsed.shift.reject{|k| k.nil?}.map{|k| k.match(/(\w+)/)[0].to_sym}
+    haproxy_stats = parsed.map{|line| Hash[keys.zip(line)]}
 
     if config[:all_services]
       haproxy_stats
