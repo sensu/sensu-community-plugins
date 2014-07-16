@@ -100,7 +100,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       when "IdleWorkers"
         stats["idle_workers"] = value.to_i
       when "ReqPerSec"
-        stats["requests_per_sec"] = value.to_f 
+        stats["requests_per_sec"] = value.to_f
       when "BytesPerSec"
         stats["bytes_per_sec"] = value.to_f
       when "BytesPerReq"
