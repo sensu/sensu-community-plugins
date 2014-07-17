@@ -3,6 +3,8 @@
 # Check Windows's CPU usage
 # ===
 #
+# Tested on Windows 2008RC2.
+#
 # Jean-Francois Theroux <me@failshell.io>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
