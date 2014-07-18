@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 #
-# Checks ElasticSearch cluster status
+# Checks etcd node self stats
 # ===
 #
 # DESCRIPTION:
-#   This plugin checks the ElasticSearch cluster status, using its API.
+#   This plugin checks that the stats/self url returns 200OK
 #
 # OUTPUT:
 #   plain-text
@@ -16,27 +16,25 @@
 #   sensu-plugin Ruby gem
 #   rest-client Ruby gem
 #
-# Copyright 2012 Sonian, Inc <chefs@sonian.net>
+# this is a first pass need to figure out all bad responses
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'rest-client'
 require 'json'
 
-class ESClusterStatus < Sensu::Plugin::Check::CLI
+class EtcdNodeStatus < Sensu::Plugin::Check::CLI
 
   option :server,
-    :description => 'Elasticsearch server',
+    :description => 'etcd server',
     :short => '-s SERVER',
     :long => '--server SERVER',
     :default => 'localhost'
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:server]}:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:server]}:4001/#{resource}", :timeout => 5)
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
@@ -45,30 +43,15 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     end
   end
 
-  def is_master
-    state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
-    local = get_es_resource('/_cluster/nodes/_local')
-    local['nodes'].keys.first == state['master_node']
-  end
-
-  def get_status
-    health = get_es_resource('/_cluster/health')
-    health['status'].downcase
-  end
-
   def run
-    if is_master
-      case get_status
-      when 'green'
-        ok "Cluster is green"
-      when 'yellow'
-        warning "Cluster is yellow"
-      when 'red'
-        critical "Cluster is red"
-      end
-    else
-      ok 'Not the master'
+    begin
+      r = RestClient::Resource.new("http://#{config[:server]}:4001/v2/stats/self", :timeout => 5)
+      JSON.parse(r.get)
+      ok "etcd is up"
+    rescue Errno::ECONNREFUSED
+      critical "Etcd is not responding"
+    rescue RestClient::RequestTimeout
+      critical 'Etcd Connection timed out'
     end
   end
-
 end
