@@ -3,9 +3,6 @@
 # System Load Stats Plugin
 # ===
 #
-# This plugin uses uptime to collect load metrics
-# Basically copied from sensu-community-plugins/plugins/system/vmstat-metrics.rb
-#
 # Load per processor
 # ------------------
 #
@@ -34,6 +31,37 @@ if RUBY_VERSION < '1.9.0'
   end
 end
 
+class LoadAverage
+  
+  def initialize(per_core = false)
+    @cores = per_core ? cpu_count : 1
+    @avg = File.read('/proc/loadavg').split.take(3).map { |a|
+      (a.to_f / @cores).round(2)
+    } rescue nil # rubocop:disable RescueModifier
+  end
+  
+  def cpu_count
+    `grep -sc ^processor /proc/cpuinfo`.to_i rescue 0
+  end
+  
+  def failed?
+    @avg.nil? || @cores.zero?
+  end
+  
+  def exceed?(thresholds)
+    @avg.zip(thresholds).any? {|a, t| a > t }
+  end
+  
+  def to_s
+    @avg.join(', ')
+  end
+  
+  def [](y)
+    @avg[y]
+  end
+  
+end
+
 class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
 
   option :scheme,
@@ -48,32 +76,16 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
     :boolean => true,
     :default => false
 
-  def number_of_cores
-    @cores ||= File.readlines('/proc/cpuinfo').select { |l| l =~ /^processor\s+:/ }.count
-  end
-
   def run
-    result = `uptime`.gsub(',', '').split(' ')
-    result = result[-3..-1]
-
     timestamp = Time.now.to_i
-    if config[:per_core]
-      metrics = {
-        :load_avg => {
-          :one => (result[0].to_f / number_of_cores).round(2),
-          :five => (result[1].to_f / number_of_cores).round(2),
-          :fifteen => (result[2].to_f / number_of_cores).round(2)
-        }
+    avg = LoadAverage.new(config[:per_core])
+    metrics = {
+      :load_avg => {
+        :one => avg[0],
+        :five => avg[1],
+        :fifteen => avg[2]
       }
-    else
-      metrics = {
-        :load_avg => {
-           :one => result[0],
-           :five => result[1],
-           :fifteen => result[2]
-         }
-      }
-    end
+    }
 
     metrics.each do |parent, children|
       children.each do |child, value|
