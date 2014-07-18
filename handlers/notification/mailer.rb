@@ -36,6 +36,19 @@ class Mailer < Sensu::Handler
    @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
   end
 
+  def status_to_string
+    case @event['status']
+    when 0
+      'OK'
+    when 1
+      'WARNING'
+    when 2
+      'CRITICAL'
+    else
+      'UNKNOWN'
+    end
+  end
+
   def build_mail_to_list
     mail_to = settings['mailer']['mail_to']
     if settings['mailer'].has_key?('subscriptions')
@@ -72,11 +85,11 @@ class Mailer < Sensu::Handler
             Address:  #{@event['client']['address']}
             Check Name:  #{@event['check']['name']}
             Command:  #{@event['check']['command']}
-            Status:  #{@event['check']['status']}
+            Status:  #{status_to_string}
             Occurrences:  #{@event['occurrences']}
             #{playbook}
           BODY
-    subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
+    subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
 
     Mail.defaults do
       delivery_options = {
