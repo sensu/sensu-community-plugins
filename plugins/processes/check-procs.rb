@@ -86,6 +86,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     :long => '--file-pid PID',
     :description => 'Check against a specific PID'
 
+  option :require_pid,
+    :short => '-F',
+    :long => '--require-pid',
+    :description => 'Fail if PID file not found',
+    :boolean => true,
+    :default => false
+
   option :vsz,
     :short => '-z VSZ',
     :long => '--virtual-memory-size VSZ',
@@ -144,7 +151,10 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     if File.exists?(path)
       File.read(path).strip.to_i
     else
-      unknown "Could not read pid file #{path}"
+      send(
+        config[:require_pid] ? :warning : :unknown,
+        "Could not read pid file #{path}"
+      )
     end
   end
 
