@@ -17,8 +17,7 @@
 #   rest-client Ruby gem
 #
 # this is a first pass need to figure out all bad responses
-# 
-
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
