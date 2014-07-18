@@ -10,6 +10,7 @@ The following three configuration variables must be set if you want mailer to us
 
 There is an optional subscriptions hash which can be added to your mailer.json file.  This subscriptions hash allows you to define individual mail_to addresses for a given subscription.  When the mailer handler runs it will check the clients subscriptions and build a mail_to string with the default mailer.mail_to address as well as any subscriptions the client subscribes to where a mail_to address is found.  There can be N number of hashes inside of subscriptions but the key for a given hash inside of subscriptions must match a subscription name. 
 
+```json
 {
   "mailer": {
     "mail_from": "sensu@example.com",
@@ -23,5 +24,4 @@ There is an optional subscriptions hash which can be added to your mailer.json f
     }
   }
 }
-
-
+```
