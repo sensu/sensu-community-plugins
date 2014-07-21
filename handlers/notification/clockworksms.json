@@ -1,0 +1,17 @@
+{
+    "clockworksms": {
+        "key": "1234abc1esg1234abcdfdfg",
+        "to": {
+            "3864153012": [
+                "ok",
+                "warning"
+            ],
+            "61431324189": [
+                "ok",
+                "critical",
+                "warning"
+            ]
+        }
+    }
+}
+

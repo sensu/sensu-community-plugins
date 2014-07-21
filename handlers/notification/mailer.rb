@@ -15,6 +15,18 @@ gem 'mail', '~> 2.5.4'
 require 'mail'
 require 'timeout'
 
+# patch to fix Exim delivery_method: https://github.com/mikel/mail/pull/546
+module ::Mail
+  class Exim < Sendmail
+    def self.call(path, arguments, destinations, encoded_message)
+      popen "#{path} #{arguments}" do |io|
+        io.puts encoded_message.to_lf
+        io.flush
+      end
+    end
+  end
+end
+
 class Mailer < Sensu::Handler
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
@@ -24,10 +36,37 @@ class Mailer < Sensu::Handler
    @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
   end
 
-  def handle
+  def status_to_string
+    case @event['status']
+    when 0
+      'OK'
+    when 1
+      'WARNING'
+    when 2
+      'CRITICAL'
+    else
+      'UNKNOWN'
+    end
+  end
+
+  def build_mail_to_list
     mail_to = settings['mailer']['mail_to']
+    if settings['mailer'].has_key?('subscriptions')
+      @event['check']['subscribers'].each do |sub|
+        if settings['mailer']['subscriptions'].has_key?(sub)
+          mail_to << ", #{settings['mailer']['subscriptions'][sub]['mail_to']}"
+        end
+      end
+    end
+    mail_to
+  end
+
+  def handle
+    admin_gui = settings['mailer']['admin_gui'] || 'http://localhost:8080/'
+    mail_to = build_mail_to_list
     mail_from =  settings['mailer']['mail_from']
 
+    delivery_method = settings['mailer']['delivery_method'] || 'smtp'
     smtp_address = settings['mailer']['smtp_address'] || 'localhost'
     smtp_port = settings['mailer']['smtp_port'] || '25'
     smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
@@ -35,20 +74,22 @@ class Mailer < Sensu::Handler
     smtp_username = settings['mailer']['smtp_username'] || nil
     smtp_password = settings['mailer']['smtp_password'] || nil
     smtp_authentication = settings['mailer']['smtp_authentication'] || :plain
+    smtp_enable_starttls_auto = settings['mailer']['smtp_enable_starttls_auto'] == "false" ? false : true
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
             #{@event['check']['output']}
+            Admin GUI: #{admin_gui}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
             Address:  #{@event['client']['address']}
             Check Name:  #{@event['check']['name']}
             Command:  #{@event['check']['command']}
-            Status:  #{@event['check']['status']}
+            Status:  #{status_to_string}
             Occurrences:  #{@event['occurrences']}
             #{playbook}
           BODY
-    subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
+    subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
 
     Mail.defaults do
       delivery_options = {
@@ -56,7 +97,7 @@ class Mailer < Sensu::Handler
         :port       => smtp_port,
         :domain     => smtp_domain,
         :openssl_verify_mode => 'none',
-        :enable_starttls_auto => true
+        :enable_starttls_auto => smtp_enable_starttls_auto
       }
 
       unless smtp_username.nil?
@@ -68,7 +109,7 @@ class Mailer < Sensu::Handler
         delivery_options.merge! auth_options
       end
 
-      delivery_method :smtp, delivery_options
+      delivery_method delivery_method.intern, delivery_options
     end
 
     begin

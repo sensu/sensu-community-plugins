@@ -36,26 +36,24 @@ class LogstashHandler < Sensu::Handler
     redis = Redis.new(:host => settings['logstash']['server'], :port => settings['logstash']['port'])
     time = Time.now.utc.iso8601
     logstash_msg = {
-      :@source => ::Socket.gethostname,
-      :@type => settings['logstash']['type'],
-      :@tags => ["sensu-#{action_to_string}"],
-      :@message => @event['check']['output'],
-      :@fields => {
-        :host          => @event['client']['name'],
-        :timestamp     => @event['check']['issued'],
-        :address       => @event['client']['address'],
-        :check_name    => @event['check']['name'],
-        :command       => @event['check']['command'],
-        :status        => @event['check']['status'],
-        :flapping      => @event['check']['flapping'],
-        :occurrences   => @event['occurrences'],
-        :flapping      => @event['check']['flapping'],
-        :occurrences   => @event['occurrences'],
-        :action        => @event['action']
-      },
-      :@timestamp => time
+      :@timestamp => time,
+      :@version => 1,
+      :source => ::Socket.gethostname,
+      :tags => ["sensu-#{action_to_string}"],
+      :message => @event['check']['output'],
+      :host          => @event['client']['name'],
+      :timestamp     => @event['check']['issued'],
+      :address       => @event['client']['address'],
+      :check_name    => @event['check']['name'],
+      :command       => @event['check']['command'],
+      :status        => @event['check']['status'],
+      :flapping      => @event['check']['flapping'],
+      :occurrences   => @event['occurrences'],
+      :flapping      => @event['check']['flapping'],
+      :occurrences   => @event['occurrences'],
+      :action        => @event['action']
     }
+    logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
     redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
   end
 end
-

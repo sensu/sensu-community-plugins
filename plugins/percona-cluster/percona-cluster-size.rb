@@ -46,18 +46,18 @@ class CheckPerconaClusterSize < Sensu::Plugin::Check::CLI
 
   def run
     begin
-        db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database])
-        cluster_size = db.
-            query("SHOW GLOBAL STATUS LIKE 'wsrep_cluster_size'").
-            fetch_hash().
-            fetch('Value').
-            to_i
-    critical "Expected to find #{config[:expected]} nodes, found #{cluster_size}" if cluster_size != config[:expected].to_i
-    ok "Expected to find #{config[:expected]} nodes and found those #{cluster_size}" if cluster_size == config[:expected].to_i
+      db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database])
+      cluster_size = db.
+          query("SHOW GLOBAL STATUS LIKE 'wsrep_cluster_size'").
+          fetch_hash.
+          fetch('Value').
+          to_i
+      critical "Expected to find #{config[:expected]} nodes, found #{cluster_size}" if cluster_size != config[:expected].to_i
+      ok "Expected to find #{config[:expected]} nodes and found those #{cluster_size}" if cluster_size == config[:expected].to_i
     rescue Mysql::Error => e
-        critical "Percona MySQL check failed: #{e.error}"
+      critical "Percona MySQL check failed: #{e.error}"
     ensure
-        db.close if db
+      db.close if db
     end
   end
 

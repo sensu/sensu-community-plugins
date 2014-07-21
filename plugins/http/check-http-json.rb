@@ -44,7 +44,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
       config[:port] = uri.port
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] and config[:path]
+      unless config[:host] && config[:path]
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -87,7 +87,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
     end
 
     req = Net::HTTP::Get.new(config[:path])
-    if (config[:user] != nil and config[:password] != nil)
+    if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
@@ -101,9 +101,9 @@ class CheckJson < Sensu::Plugin::Check::CLI
     case res.code
     when /^2/
       if json_valid?(res.body)
-        if (config[:key] != nil and config[:value] != nil)
+        if (config[:key] != nil && config[:value] != nil)
           json = JSON.parse(res.body)
-          if json[config[:key]] == config[:value]
+          if json[config[:key]].to_s == config[:value].to_s
             ok "Valid JSON and key present and correct"
           else
             critical "JSON key check failed"

@@ -1,0 +1,29 @@
+smartctl 5.43 2012-06-30 r3573 [x86_64-linux-2.6.32-042stab083.2] (local build)
+Copyright (C) 2002-12 by Bruce Allen, http://smartmontools.sourceforge.net
+
+=== START OF READ SMART DATA SECTION ===
+SMART overall-health self-assessment test result: FAILED
+
+SMART Attributes Data Structure revision number: 10Vendor Specific SMART Attributes with Thresholds:
+ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+  1 Raw_Read_Error_Rate     0x000f   081   063   044    Pre-fail  Always       -       11157161131
+  3 Spin_Up_Time            0x0003   096   096   000    Pre-fail  Always       -       0
+  4 Start_Stop_Count        0x0032   100   100   020    Old_age   Always       -       85
+  5 Reallocated_Sector_Ct   0x0033   100   100   036    Pre-fail  Always       -       1
+  7 Seek_Error_Rate         0x000f   088   060   030    Pre-fail  Always       -       5062635275
+  9 Power_On_Hours          0x0032   093   093   000    Old_age   Always       -       11000
+ 10 Spin_Retry_Count        0x0013   100   100   097    Pre-fail  Always       -       1
+ 12 Power_Cycle_Count       0x0032   100   100   020    Old_age   Always       -       85
+184 End-to-End_Error        0x0032   100   100   099    Old_age   Always       -       1
+187 Reported_Uncorrect      0x0032   100   100   000    Old_age   Always       -       1
+188 Command_Timeout         0x0032   100   100   000    Old_age   Always       -       1
+189 High_Fly_Writes         0x003a   100   100   000    Old_age   Always       -       0
+190 Airflow_Temperature_Cel 0x0022   069   063   045    Old_age   Always       -       31 (Min/Max 30/32)
+191 G-Sense_Error_Rate      0x0032   100   100   000    Old_age   Always       -       0
+192 Power-Off_Retract_Count 0x0032   100   100   000    Old_age   Always       -       72
+193 Load_Cycle_Count        0x0032   100   100   000    Old_age   Always       -       400000
+194 Temperature_Celsius     0x0022   031   040   000    Old_age   Always       -       45
+195 Hardware_ECC_Recovered  0x001a   117   099   000    Old_age   Always       -       157161131
+197 Current_Pending_Sector  0x0012   100   100   000    Old_age   Always       -       1
+198 Offline_Uncorrectable   0x0010   100   100   000    Old_age   Offline      -       1
+199 UDMA_CRC_Error_Count    0x003e   200   200   000    Old_age   Always       -       1

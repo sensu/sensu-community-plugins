@@ -1,11 +1,9 @@
-# A sample Gemfile
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-group :development do
-  gem "sensu-plugin"
-end
+gem 'sensu-plugin'
 
 group :test do
-  gem "sensu-plugin"
-  gem "rubocop"
+  gem 'rubocop', '~> 0.17.0'
+  gem 'rspec'
+  gem 'rake'
 end

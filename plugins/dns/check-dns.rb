@@ -74,23 +74,26 @@ class DNS < Sensu::Plugin::Check::CLI
   end
 
   def run
-    unknown "No domain specified" unless config[:domain]
-    entries = resolve_domain
-    if entries.length.zero?
-      if config[:warn_only]
-        warning "Could not resolve #{config[:domain]}"
-      else
-        critical "Could not resolve #{config[:domain]}"
-      end
+    if config[:domain].nil?
+      unknown "No domain specified"
     else
-      if config[:result]
-        if entries.include?(config[:result])
-          ok "Resolved #{config[:domain]} including #{config[:result]}"
+      entries = resolve_domain
+      if entries.length.zero?
+        if config[:warn_only]
+          warning "Could not resolve #{config[:domain]}"
         else
-          critical "Resolved #{config[:domain]} did not include #{config[:result]}"
+          critical "Could not resolve #{config[:domain]}"
         end
       else
-        ok "Resolved #{config[:domain]} #{config[:type]} records"
+        if config[:result]
+          if entries.include?(config[:result])
+            ok "Resolved #{config[:domain]} including #{config[:result]}"
+          else
+            critical "Resolved #{config[:domain]} did not include #{config[:result]}"
+          end
+        else
+          ok "Resolved #{config[:domain]} #{config[:type]} records"
+        end
       end
     end
   end

@@ -14,10 +14,10 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+# rubocop:disable VariableName
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'active_support/core_ext/numeric'
 
 class CheckDisk < Sensu::Plugin::Check::CLI
 

@@ -49,4 +49,3 @@ class XmppHandler < Sensu::Handler
   end
 
 end
-

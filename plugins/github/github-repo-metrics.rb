@@ -29,7 +29,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :api,
     :short => "-a URL",
     :long => "--api URL",
-    :description => "Sensu API URL",
+    :description => "Github API URL",
     :default => "https://api.github.com"
 
   option :token,

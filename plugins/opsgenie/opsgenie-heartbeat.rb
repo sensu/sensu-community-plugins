@@ -14,29 +14,36 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require "net/https"
-require "uri"
-require "json"
+require 'net/https'
+require 'uri'
+require 'json'
 
 class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
 
-  option :customer_key,
-    :short => "-k customerKey",
-    :long => "--key customerKey",
-    :description => "Opsgenie Customer API key",
-    :required => true
+  option :api_key,
+    :short       => "-k apiKey",
+    :long        => "--key apiKey",
+    :description => "Opsgenie API key",
+    :required    => true
+
+  option :name,
+    :short       => '-n Name',
+    :long        => '--name Name',
+    :description => "Heartbeat Name",
+    :default     => "Default"
 
   option :timeout,
-    :short => '-t Secs',
-    :long => '--timeout Secs',
+    :short       => '-t Secs',
+    :long        => '--timeout Secs',
     :description => "Plugin timeout",
-    :proc => proc { |a| a.to_i },
-    :default => 10
+    :proc        => proc { |a| a.to_i },
+    :default     => 10
 
   def run
     begin
       timeout(config[:timeout]) do
-        response = opsgenie_heartbeat()
+        response = opsgenie_heartbeat
+        puts response
         case response['code']
         when 200
           ok 'heartbeat sent'
@@ -53,9 +60,10 @@ class OpsgenieHeartbeat < Sensu::Plugin::Check::CLI
 
   def opsgenie_heartbeat
     params = {}
-    params["customerKey"] = config[:customer_key]
+    params["apiKey"] = config[:api_key]
+    params["name"] = config[:name]
 
-    uri = URI.parse("https://api.opsgenie.com/v1/json/customer/heartbeat")
+    uri = URI.parse("https://api.opsgenie.com/v1/json/heartbeat/send")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
