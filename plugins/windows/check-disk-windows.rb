@@ -66,9 +66,9 @@ class CheckDisk < Sensu::Plugin::Check::CLI
             mnt = label if mnt.nil?
             prct_used = (100*(1-(_avail.to_f / capacity.to_f)))
             if prct_used >= config[:crit]
-                @crit_fs << "#{mnt} #{prct_used.to_s(:percentage, precision: 0)}"
+                @crit_fs << "#{mnt} #{prct_used.round(2)}"
             elsif prct_used >= config[:warn]
-                @warn_fs << "#{mnt} #{prct_used.to_s(:percentage, precision: 0)}"
+                @warn_fs << "#{mnt} #{prct_used.round(2)}"
             end
         end
     end
