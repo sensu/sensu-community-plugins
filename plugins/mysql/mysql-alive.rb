@@ -78,7 +78,7 @@ class CheckMySQL < Sensu::Plugin::Check::CLI
       db_pass = section['password']
     else
       db_user = config[:user]
-      db_pass = config[:pass]
+      db_pass = config[:password]
     end
 
     begin
