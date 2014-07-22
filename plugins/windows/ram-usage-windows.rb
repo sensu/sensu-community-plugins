@@ -24,15 +24,12 @@ class RamMetric < Sensu::Plugin::Metric::CLI::Graphite
 
   def getRamUsage
     tempArr1=Array.new
-    tempArr2=Array.new # rubocop:disable UselessAssignment
-    line=String.new
-    result1 = IO.popen("typeperf -sc 1 \"Memory\\Available bytes\" ")
-    tempArr1.push(line) while (line = result1.gets)
+    tempArr2=Array.new
+    timestamp = Time.now.utc.to_i
+    IO.popen("typeperf -sc 1 \"Memory\\Available bytes\" ") { |io| io.each { |line| tempArr1.push(line) } }
     temp = tempArr1[2].split(",")[1]
     ramAvailableInBytes = temp[1, temp.length - 3].to_f
-    timestamp = Time.now.utc.to_i
-    result2 = IO.popen("wmic OS get TotalVisibleMemorySize /Value")
-    tempArr2.push(line) while (line=result2.gets)
+    IO.popen("wmic OS get TotalVisibleMemorySize /Value") { |io| io.each { |line| tempArr2.push(line) } }
     totalRam = tempArr2[4].split('=')[1].to_f
     totalRamInBytes = totalRam*1000.0
     ramUsePercent=(totalRamInBytes - ramAvailableInBytes)*100.0/(totalRamInBytes)
