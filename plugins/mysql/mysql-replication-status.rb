@@ -42,6 +42,11 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
     :default => 3306,
     :proc => lambda { |s| s.to_i }
 
+  option :socket,
+    :short => '-s SOCKET',
+    :long => '--socket SOCKET',
+    :description => "Socket to use"
+
   option :user,
     :short => '-u',
     :long => '--username=VALUE',
@@ -91,14 +96,13 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
       db_pass = config[:pass]
     end
     db_host = config[:host]
-    db_port = config[:port]
 
     if [db_host, db_user, db_pass].any? {|v| v.nil? }
       unknown "Must specify host, user, password"
     end
 
     begin
-      db = Mysql.new(db_host, db_user, db_pass, nil, db_port)
+      db = Mysql.new(db_host, db_user, db_pass, nil, config[:port], config[:socket])
       results = db.query 'show slave status'
 
       unless results.nil?
