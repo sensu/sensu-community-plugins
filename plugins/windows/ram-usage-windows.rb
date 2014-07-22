@@ -11,7 +11,6 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 # rubocop:disable VariableName, MethodName
-
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
@@ -24,8 +23,9 @@ class RamMetric < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}"
 
   def getRamUsage
-    tempArr1=[]
-    tempArr2=[]
+    tempArr1=Array.new
+    tempArr2=Array.new
+    line=String.new
     result1 = IO.popen("typeperf -sc 1 \"Memory\\Available bytes\" ")
     tempArr1.push(line) while (line = result1.gets) # rubocop:disable UselessAssignment
     temp = tempArr1[2].split(",")[1]
