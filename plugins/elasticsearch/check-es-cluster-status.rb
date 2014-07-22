@@ -40,7 +40,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :short => '-p PORT',
     :long => '--host PORT',
     :proc => proc {|a| a.to_i },
-    :default => '9200'
+    :default => 9200
 
   option :master_only,
     :description => 'Use master Elasticsearch server only',

@@ -36,7 +36,7 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :short => '-p PORT',
     :long => '--host PORT',
     :proc => proc {|a| a.to_i },
-    :default => '9200'
+    :default => 9200
 
   def get_es_version
     info = get_es_resource('/')

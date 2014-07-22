@@ -39,7 +39,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
     :short => '-p PORT',
     :long => '--host PORT',
     :proc => proc {|a| a.to_i },
-    :default => '9200'
+    :default => 9200
 
   option :warn,
     :short => '-w N',
