@@ -21,11 +21,11 @@ class CpuMetric < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}"
 
   def getcpuLoad
-    tempArr=Array.new
+    tempArr=Array.new # rubocop:disable UselessAssignment
     line=String.new
     timestamp = Time.now.utc.to_i
     io= IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\" ") # { |io|
-    tempArr.push(line) while (line = io.gets) # rubocop:disable UselessAssignment
+    tempArr.push(line) while (line = io.gets)
     temp = tempArr[2].split(",")[1]
     cpuMetric = temp[1, temp.length - 3].to_f
     [cpuMetric, timestamp]
