@@ -26,6 +26,7 @@ class RamMetric < Sensu::Plugin::Metric::CLI::Graphite
   def getRamUsage
     tempArr1=[]
     tempArr2=[]
+    line=''
     result1 = IO.popen("typeperf -sc 1 \"Memory\\Available bytes\" ")
     tempArr1.push(line) while (line = result1.gets) # rubocop:disable UselessAssignment
     temp = tempArr1[2].split(",")[1]

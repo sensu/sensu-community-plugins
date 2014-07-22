@@ -23,6 +23,7 @@ class CpuMetric < Sensu::Plugin::Metric::CLI::Graphite
 
   def getcpuLoad
     tempArr=[]
+    line=''
     timestamp = Time.now.utc.to_i
     io= IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\" ") # { |io|
     tempArr.push(line) while (line = io.gets) # rubocop:disable UselessAssignment
