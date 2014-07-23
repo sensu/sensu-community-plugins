@@ -3,7 +3,7 @@
 # Check fstab Mounts Plugin
 # ===
 #
-# Check /proc/mounts to ensure all filesystems of the requested type(s) from
+# Check /etc/mtab to ensure all filesystems of the requested type(s) from
 # fstab are currently mounted.  If no fstypes are specified, will check all
 # entries in fstab.
 #
