@@ -6,7 +6,7 @@
 #
 # Examples:
 #
-#   check-ping -h host -T timeout
+#   check-ping -h host -T timeout [--report]
 #
 #  Default host is "localhost"
 #
@@ -30,12 +30,23 @@ class CheckPING < Sensu::Plugin::Check::CLI
     :short => '-T timeout',
     :default => '5'
 
+  option :report,
+    :short => '-r',
+    :long => '--report',
+    :description => "Attach MTR report if ping is failed",
+    :default => false
+
   def run
     pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
     if pt.ping?
       ok "ICMP ping successful for host: #{config[:host]}"
     else
-      critical "ICMP ping unsuccessful for host: #{config[:host]}"
+      message = "ICMP ping unsuccessful for host: #{config[:host]}"
+      if config[:report]
+        report = `mtr --curses --report-cycles=1 --report --no-dns #{config[:host]}`
+        message = message + "\n" + report
+      end
+      critical message
     end
   end
 end
