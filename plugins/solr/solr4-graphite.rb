@@ -95,6 +95,7 @@ class Solr4Graphite < Sensu::Plugin::Metric::CLI::Graphite
         '/select'       => 'selects',
         '/replication'  => 'replication',
       }.each do |hash_node, graphite_node|
+        next unless mbeans_json['solr-mbeans']['QUERYHANDLER'][hash_node]
         mbeans_json['solr-mbeans']['QUERYHANDLER'][hash_node]['stats'].each do |stat, value|
           output "#{graphite_path}.queryHandler.#{graphite_node}.#{stat}", value if value.kind_of?(Numeric)
           output "#{graphite_path}.queryHandler.replication.#{stat}", (value.to_f * 1_073_741_824).to_i if value =~ /\d+\.?\d* GB/
