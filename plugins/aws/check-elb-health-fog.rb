@@ -88,10 +88,6 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       else
         health = elb.describe_instance_health(config[:elb_name])
       end
-    rescue Exception => e
-      critical "An issue occured while communicating with the AWS EC2 API: #{e.message}"
-    end
-    if (health.body['DescribeInstanceHealthResult']['InstanceStates'] rescue nil)
       unhealthy_instances = {}
       health.body['DescribeInstanceHealthResult']['InstanceStates'].each do |instance|
         unhealthy_instances[instance['InstanceId']] = instance['State'] unless instance['State'].eql?('InService')
@@ -105,8 +101,8 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       else
         ok "All instances on ELB #{aws_region}::#{config[:elb_name]} healthy!"
       end
-    else
-      critical 'Failed to retrieve ELB instance health data'
+    rescue Exception => e
+      warning "An issue occured while communicating with the AWS EC2 API: #{e.message}"
     end
   end
 
