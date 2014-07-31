@@ -1,0 +1,7 @@
+{
+  "fluentd": {
+    "host": "localhost",
+    "port": 9880,
+    "tag_prefix": "sensu"
+  }
+}

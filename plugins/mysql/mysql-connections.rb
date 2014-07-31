@@ -34,6 +34,17 @@ class CheckMySQLHealth < Sensu::Plugin::Check::CLI
          :long => '--hostname HOST',
          :default => 'localhost'
 
+  option :port,
+         :description => "Port to connect to",
+         :short => '-P PORT',
+         :long => '--port PORT',
+         :default => "3306"
+
+  option :socket,
+         :description => "Socket to use",
+         :short => '-s SOCKET',
+         :long => '--socket SOCKET'
+
   option :maxwarn,
          :description => "Number of connections upon which we'll issue a warning",
          :short => '-w NUMBER',
@@ -54,15 +65,15 @@ class CheckMySQLHealth < Sensu::Plugin::Check::CLI
 
   def run
     begin
-        db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database])
+        db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database], config[:port].to_i, config[:socket])
         max_con = db.
             query("SHOW VARIABLES LIKE 'max_connections'").
-            fetch_hash().
+            fetch_hash.
             fetch('Value').
             to_i
         used_con = db.
-            query("SHOW GLOBAL STATUS LIKE 'Max_used_connections'").
-            fetch_hash().
+            query("SHOW GLOBAL STATUS LIKE 'Threads_connected'").
+            fetch_hash.
             fetch('Value').
             to_i
         if config[:usepc]

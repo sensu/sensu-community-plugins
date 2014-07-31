@@ -45,39 +45,50 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.nginx"
 
   def run
-    if config[:url]
-      uri = URI.parse(config[:url])
-    
-      http = Net::HTTP.new(uri.host, uri.port)
-      if uri.scheme == 'https' then 
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    found = false
+    attempts = 0
+    until (found || attempts >= 10)
+      attempts+=1
+      if config[:url]
+        uri = URI.parse(config[:url])
+        http = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+        request = Net::HTTP::Get.new(uri.request_uri)
+        response = http.request(request)
+        if response.code=="200"
+          found = true
+        elsif response.header['location']!=nil
+          config[:url] = response.header['location']
+        end
+      else
+        response= Net::HTTP.start(config[:hostname], config[:port]) do |connection|
+          request = Net::HTTP::Get.new("/#{config[:path]}")
+          connection.request(request)
+        end
       end
-      request = Net::HTTP::Get.new(uri.request_uri)
-      response = http.request(request)
-    else
-      response= Net::HTTP.start(config[:hostname], config[:port]) do |http|
-        request = Net::HTTP::Get.new("/#{config[:path]}")
-        http.request(request)
-      end
-    end
+    end # until
 
     response.body.split(/\r?\n/).each do |line|
-      if connections = line.match(/^Active connections:\s+(\d+)/).to_a
+      if line.match(/^Active connections:\s+(\d+)/)
+        connections = line.match(/^Active connections:\s+(\d+)/).to_a
         output "#{config[:scheme]}.active_connections", connections[1]
       end
-      if requests = line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/).to_a
+      if line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/)
+        requests = line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/).to_a
         output "#{config[:scheme]}.accepted", requests[1]
         output "#{config[:scheme]}.handled", requests[2]
         output "#{config[:scheme]}.handles", requests[3]
       end
-      if queue = line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/).to_a
+      if line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/)
+        queue = line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/).to_a
         output "#{config[:scheme]}.reading", queue[1]
         output "#{config[:scheme]}.writing", queue[2]
         output "#{config[:scheme]}.waiting", queue[3]
       end
     end
-
     ok
   end
 

@@ -1,0 +1,6 @@
+{
+    "tempodb": {
+        "api_key": "your-api-key",
+        "api_secret": "your-api-secret"
+    }
+}

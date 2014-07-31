@@ -19,20 +19,27 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
   SKIP_KEYS_REGEX = ['gcc_version', 'master_host', 'master_link_status',
                      'master_port', 'mem_allocator', 'multiplexing_api', 'process_id',
                      'redis_git_dirty', 'redis_git_sha1', 'redis_version', '^role',
-                     'run_id', '^slave', 'used_memory_human', 'used_memory_peak_human']
+                     'run_id', '^slave', 'used_memory_human', 'used_memory_peak_human',
+                     'redis_mode', 'os', 'arch_bits', 'tcp_port',
+                     'rdb_last_bgsave_status', 'aof_last_bgrewrite_status']
 
   option :host,
     :short => "-h HOST",
     :long => "--host HOST",
     :description => "Redis Host to connect to",
-    :required => true
+    :default  => '127.0.0.1'
 
   option :port,
     :short => "-p PORT",
     :long => "--port PORT",
     :description => "Redis Port to connect to",
     :proc => proc {|p| p.to_i },
-    :required => true
+    :default => 6379
+
+  option :password,
+    :short => "-P PASSWORD",
+    :long => "--password PASSWORD",
+    :description => "Redis Password to connect with"
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
@@ -41,7 +48,9 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.redis"
 
   def run
-    redis = Redis.new(:host => config[:host], :port => config[:port])
+    options = {:host => config[:host], :port => config[:port]}
+    options[:password] = config[:password] if config[:password]
+    redis = Redis.new(options)
 
     redis.info.each do |k, v|
       next unless SKIP_KEYS_REGEX.map { |re| k.match(/#{re}/)}.compact.empty?

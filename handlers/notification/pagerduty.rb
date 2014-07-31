@@ -19,23 +19,24 @@ class Pagerduty < Sensu::Handler
   end
 
   def handle
-    description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
+    description = @event['check']['notification']
+    description ||= [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     begin
-      timeout(3) do
+      timeout(10) do
         response = case @event['action']
-                   when 'create'
-                     Redphone::Pagerduty.trigger_incident(
-                                                          :service_key => settings['pagerduty']['api_key'],
-                                                          :incident_key => incident_key,
-                                                          :description => description,
-                                                          :details => @event
-                                                          )
-                   when 'resolve'
-                     Redphone::Pagerduty.resolve_incident(
-                                                          :service_key => settings['pagerduty']['api_key'],
-                                                          :incident_key => incident_key
-                                                          )
-                   end
+        when 'create'
+          Redphone::Pagerduty.trigger_incident(
+            :service_key => settings['pagerduty']['api_key'],
+            :incident_key => incident_key,
+            :description => description,
+            :details => @event
+          )
+        when 'resolve'
+          Redphone::Pagerduty.resolve_incident(
+            :service_key => settings['pagerduty']['api_key'],
+            :incident_key => incident_key
+          )
+        end
         if response['status'] == 'success'
           puts 'pagerduty -- ' + @event['action'].capitalize + 'd incident -- ' + incident_key
         else

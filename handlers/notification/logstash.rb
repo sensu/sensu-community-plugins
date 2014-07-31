@@ -1,17 +1,17 @@
 #!/usr/bin/env ruby
 #
-# Sensu Logstash Handler 
+# Sensu Logstash Handler
 #
 # Heavily inspried (er, copied from) the GELF Handler writeen by
 # Joe Miller.
-# 
+#
 # Designed to take sensu events, transform them into logstah JSON events
 # and ship them to a redis server for logstash to index.  This also
 # generates a tag with either 'sensu-ALERT' or 'sensu-RECOVERY' so that
 # searching inside of logstash can be a little easier.
 #
 # Written by Zach Dunn -- @SillySophist or http://github.com/zadunn
-# 
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
@@ -36,27 +36,24 @@ class LogstashHandler < Sensu::Handler
     redis = Redis.new(:host => settings['logstash']['server'], :port => settings['logstash']['port'])
     time = Time.now.utc.iso8601
     logstash_msg = {
-      :@source => ::Socket.gethostname,
-      :@type => settings['logstash']['type'],
-      :@tags => ["sensu-#{action_to_string}"],
-      :@fields => {
-        :short_message => "#{action_to_string} - #{event_name}: #{@event['check']['notification']}",
-        :full_message  => @event['check']['output'],
-        :host          => @event['client']['name'],
-        :timestamp     => @event['check']['issued'],
-        :address       => @event['client']['address'],
-        :check_name    => @event['check']['name'],
-        :command       => @event['check']['command'],
-        :status        => @event['check']['status'],
-        :flapping      => @event['check']['flapping'],
-        :occurrences   => @event['occurrences'],
-        :flapping      => @event['check']['flapping'],
-        :occurrences   => @event['occurrences'],
-        :action        => @event['action']
-      },
-      :@timestamp => time
+      :@timestamp => time,
+      :@version => 1,
+      :source => ::Socket.gethostname,
+      :tags => ["sensu-#{action_to_string}"],
+      :message => @event['check']['output'],
+      :host          => @event['client']['name'],
+      :timestamp     => @event['check']['issued'],
+      :address       => @event['client']['address'],
+      :check_name    => @event['check']['name'],
+      :command       => @event['check']['command'],
+      :status        => @event['check']['status'],
+      :flapping      => @event['check']['flapping'],
+      :occurrences   => @event['occurrences'],
+      :flapping      => @event['check']['flapping'],
+      :occurrences   => @event['occurrences'],
+      :action        => @event['action']
     }
-    redis.lpush(settings['logstash']['list'],logstash_msg.to_json)
+    logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
+    redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
   end
 end
-

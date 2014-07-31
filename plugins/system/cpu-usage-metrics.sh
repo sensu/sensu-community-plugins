@@ -12,7 +12,7 @@ This plugin produces CPU usage (%)
 OPTIONS:
    -h      Show this message
    -p      PID
-   -f      Path to PID file		
+   -f      Path to PID file
    -s      Metric naming scheme, text to prepend to cpu.usage (default: $SCHEME)
 EOF
 }
@@ -31,7 +31,7 @@ while getopts "hp:f:s:" OPTION
         SCHEME="$OPTARG"
         ;;
       f)
-        PIDFILE="$OPTARG" 
+        PIDFILE="$OPTARG"
         ;;
       ?)
         usage

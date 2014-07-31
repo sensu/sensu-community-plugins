@@ -29,6 +29,11 @@ class RedisChecks < Sensu::Plugin::Check::CLI
     :required => false,
     :default => 6379
 
+  option :password,
+    :short => "-P PASSWORD",
+    :long => "--password PASSWORD",
+    :description => "Redis Password to connect with"
+
   option :warn_mem,
     :short => "-w KB",
     :long => "--warnmem KB",
@@ -43,22 +48,35 @@ class RedisChecks < Sensu::Plugin::Check::CLI
     :proc => proc {|p| p.to_i },
     :required => true
 
+  option :crit_conn,
+    :long => "--crit-conn-failure",
+    :boolean => true,
+    :description => "Critical instead of warning on connection failure",
+    :default => false
+
   def run
     begin
-        redis = Redis.new(:host => config[:host], :port =>config[:port])
+      options = {:host => config[:host], :port => config[:port]}
+      options[:password] = config[:password] if config[:password]
+      redis = Redis.new(options)
 
-        used_memory = redis.info.fetch('used_memory').to_i.div(1024)
-        warn_memory = config[:warn_mem]
-        crit_memory = config[:crit_mem]
-        if (used_memory >= crit_memory)    
-            critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit: #{used_memory} KB used / #{crit_memory} KB limit"  
-        elsif (used_memory >= warn_memory)
-            warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit: #{used_memory} KB used / #{warn_memory} KB limit"
-        else
-            ok 'Redis memory usage is below defined limits'
-        end
+      used_memory = redis.info.fetch('used_memory').to_i.div(1024)
+      warn_memory = config[:warn_mem]
+      crit_memory = config[:crit_mem]
+      if (used_memory >= crit_memory)
+        critical "Redis running on #{config[:host]}:#{config[:port]} is above the CRITICAL limit: #{used_memory} KB used / #{crit_memory} KB limit"
+      elsif (used_memory >= warn_memory)
+        warning "Redis running on #{config[:host]}:#{config[:port]} is above the WARNING limit: #{used_memory} KB used / #{warn_memory} KB limit"
+      else
+        ok 'Redis memory usage is below defined limits'
+      end
     rescue
-        warning "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
+      message = "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
+      if config[:crit_conn]
+        critical message
+      else
+        warning message
+      end
     end
   end
 

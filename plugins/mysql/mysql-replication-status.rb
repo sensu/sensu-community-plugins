@@ -68,28 +68,34 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
       unless results.nil?
         results.each_hash do |row|
           warn "couldn't detect replication status" unless
-            [ 'Slave_IO_State',
+            ['Slave_IO_State',
               'Slave_IO_Running',
               'Slave_SQL_Running',
               'Last_IO_Error',
               'Last_SQL_Error',
-              'Seconds_Behind_Master' ].all? do |key|
-            row.has_key? key
-          end
+              'Seconds_Behind_Master'].all? do |key|
+                row.has_key? key
+              end
 
           slave_running = %w[Slave_IO_Running Slave_SQL_Running].all? do |key|
             row[key] =~ /Yes/
           end
 
-          critical "slave not running" unless slave_running
+          output = "Slave not running!"
+          output += " STATES:"
+          output += " Slave_IO_Running=#{row['Slave_IO_Running']}"
+          output += ", Slave_SQL_Running=#{row['Slave_SQL_Running']}"
+          output += ", LAST ERROR: #{row['Last_SQL_Error']}"
+
+          critical output unless slave_running
 
           replication_delay = row['Seconds_Behind_Master'].to_i
 
           message = "replication delayed by #{replication_delay}"
 
-          if replication_delay > config[:warn] and
+          if replication_delay > config[:warn] &&
               replication_delay <= config[:crit]
-            warn message
+            warning message
           elsif replication_delay >= config[:crit]
             critical message
           else
@@ -97,6 +103,7 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
           end
 
         end
+        ok "show slave status was nil. This server is not a slave."
       end
 
     rescue Mysql::Error => e

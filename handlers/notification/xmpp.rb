@@ -29,22 +29,23 @@ class XmppHandler < Sensu::Handler
 #      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['output']}"
     end
 
-    jid = JID::new(xmpp_jid)
-    cl = Client::new(jid)
+    jid = JID.new(xmpp_jid)
+    cl = Client.new(jid)
     cl.connect(xmpp_server)
     cl.auth(xmpp_password)
+    cl.send(Jabber::Presence.new.set_type(:available))
     if xmpp_target_type == 'conference'
-      m = Message::new(xmpp_target, body)
+      m = Message.new(xmpp_target, body)
       room = MUC::MUCClient.new(cl)
+      room.my_jid = jid
       room.join(Jabber::JID.new(xmpp_target+'/'+cl.jid.node))
       room.send m
       room.exit
     else
-      m = Message::new(xmpp_target, body).set_type(:normal).set_id('1').set_subject("SENSU ALERT!")
+      m = Message.new(xmpp_target, body).set_type(:normal).set_id('1').set_subject("SENSU ALERT!")
       cl.send m
     end
     cl.close
   end
 
 end
-

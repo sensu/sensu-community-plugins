@@ -1,0 +1,7 @@
+{ "gtalk":
+  {
+    "mail": "lery.page@gmail.com",
+    "password" : "iamtheboss",
+    "recipients": ["admin1@test.com", "admin2@test.com"]
+  }
+}
