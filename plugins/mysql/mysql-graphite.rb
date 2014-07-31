@@ -11,14 +11,30 @@
 #
 # Copyright 2012 Pete Shima <me@peteshima.com>
 # Additional hacks by Joe Miller - https://github.com/joemiller
+# Updated by Oluwaseun Obajobi 2014 to accept ini argument
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# USING INI ARGUMENT
+# This was implemented to load mysql credentials without parsing the username/password.
+# The ini file should be readable by the sensu user/group.
+# Ref: http://eric.lubow.org/2009/ruby/parsing-ini-files-with-ruby/
+#
+#   EXAMPLE
+#     mysql-alive.rb -h db01 --ini '/etc/sensu/my.cnf'
+#
+#   MY.CNF INI FORMAT
+#   [client]
+#   user=sensu
+#   password="abcd1234"
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'mysql2'
 require 'socket'
+require 'inifile'
 
 class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
 
@@ -38,14 +54,18 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
   option :username,
     :short => "-u USERNAME",
     :long => "--user USERNAME",
-    :description => "Mysql Username",
-    :required => true
+    :description => "Mysql Username"
 
   option :password,
     :short => "-p PASSWORD",
     :long => "--pass PASSWORD",
     :description => "Mysql password",
     :default => ""
+
+  option :ini,
+    :short => '-i',
+    :long => '--ini VALUE',
+    :description => "My.cnf ini file"
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
@@ -176,12 +196,21 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
 
     config[:host].split(' ').each do |mysql_host|
       mysql_shorthostname = mysql_host.split('.')[0]
+      if config[:ini]
+        ini = IniFile.load(config[:ini])
+        section = ini['client']
+        db_user = section['user']
+        db_pass = section['password']
+      else
+        db_user = config[:username]
+        db_pass = config[:password]
+      end
       begin
         mysql = Mysql2::Client.new(
           :host => mysql_host,
-          :port =>config[:port],
-          :username => config[:username],
-          :password => config[:password],
+          :port => config[:port],
+          :username => db_user,
+          :password => db_pass,
           :socket => config[:socket]
         )
 

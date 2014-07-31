@@ -25,9 +25,27 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.elasticsearch.cluster"
 
+  option :host,
+    :description => 'Elasticsearch host',
+    :short => '-h HOST',
+    :long => '--host HOST',
+    :default => 'localhost'
+
+  option :port,
+    :description => 'Elasticsearch port',
+    :short => '-p PORT',
+    :long => '--host PORT',
+    :proc => proc {|a| a.to_i },
+    :default => 9200
+
+  def get_es_version
+    info = get_es_resource('/')
+    info['version']['number']
+  end
+
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://localhost:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => 45)
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
@@ -38,7 +56,11 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def is_master
     state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
-    local = get_es_resource('/_cluster/nodes/_local')
+    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+      local = get_es_resource('/_nodes/_local')
+    else
+      local = get_es_resource('/_cluster/nodes/_local')
+    end
     local['nodes'].keys.first == state['master_node']
   end
 

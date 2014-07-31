@@ -25,15 +25,22 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.elasticsearch"
 
-  option :server,
+  option :host,
     :description => "Elasticsearch server host.",
     :short => "-h HOST",
     :long => "--host HOST",
     :default => "localhost"
 
+  option :port,
+    :description => 'Elasticsearch port',
+    :short => '-p PORT',
+    :long => '--port PORT',
+    :proc => proc {|a| a.to_i },
+    :default => 9200
+
   def run
-    ln = RestClient::Resource.new "http://config[:server]:9200/_cluster/nodes/_local", :timeout => 30
-    stats = RestClient::Resource.new "http://config[:server]:9200/_cluster/nodes/_local/stats", :timeout => 30
+    ln = RestClient::Resource.new "http://#{config[:host]}:#{config[:port]}/_cluster/nodes/_local", :timeout => 30
+    stats = RestClient::Resource.new "http://#{config[:host]}:#{config[:port]}/_cluster/nodes/_local/stats", :timeout => 30
     ln = JSON.parse(ln.get)
     stats = JSON.parse(stats.get)
     timestamp = Time.now.to_i

@@ -61,6 +61,8 @@ class CheckBanner < Sensu::Plugin::Check::CLI
       critical "Connection or read timed out"
     rescue Errno::EHOSTUNREACH
       critical "Check failed to run: No route to host"
+    rescue EOFError
+      critical "Connection closed unexpectedly"
     end
   end
 
