@@ -37,7 +37,7 @@ class Mailer < Sensu::Handler
   end
 
   def status_to_string
-    case @event['status']
+    case @event['check']['status']
     when 0
       'OK'
     when 1
