@@ -47,18 +47,34 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
+    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
+    :required => true,
+    :default => ENV['AWS_ACCESS_KEY']
 
   option :aws_secret_access_key,
-    :short => '-k AWS_SECRET_ACCESS_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
+    :short => '-k AWS_SECRET_KEY',
+    :long => '--aws-secret-access-key AWS_SECRET_KEY',
+    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
+    :required => true,
+    :default => ENV['AWS_SECRET_KEY']
 
   option :aws_region,
     :short => '-r AWS_REGION',
     :long => '--aws-region REGION',
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
+
+  def query_instance_region
+    begin
+      instance_az = nil
+      Timeout.timeout(3) do
+        instance_az = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/placement/availability-zone/'))
+      end
+      instance_az[0...-1]
+    rescue Exception
+      raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?"
+    end
+  end
 
   def run
     if config[:scheme] == ""
@@ -78,10 +94,12 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
       'HTTPCode_ELB_5XX' => 'Sum',
     }
     begin
+
+      aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
       cw = Fog::AWS::CloudWatch.new(
         :aws_access_key_id      => config[:aws_access_key],
         :aws_secret_access_key  => config[:aws_secret_access_key],
-        :region             => config[:aws_region]
+        :region                 => aws_region
       )
 
       et = Time.now - config[:fetch_age]
@@ -118,8 +136,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
       end
     rescue Exception => e
-      puts "Error: exception: #{e}"
-      critical
+      critical "Error: exception: #{e}"
     end
     ok
   end
