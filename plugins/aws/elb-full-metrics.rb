@@ -64,7 +64,6 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
 
-
   def query_instance_region
     begin
       instance_az = nil
