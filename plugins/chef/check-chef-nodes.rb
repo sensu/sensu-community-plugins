@@ -12,7 +12,6 @@
 #
 # It will report you nodes from you cluster last seen more then some amount of seconds
 # Set CRITICAL-TIMESPAN to something interval + splay + <average chef kitchen run time>
-# Copyright 2014 SUSE, GmbH <happy-customer@suse.de>
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
