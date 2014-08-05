@@ -50,16 +50,16 @@ class DockerContainerMetrics < Sensu::Plugin::Metric::CLI::Graphite
       processes = ps.values_at(*pids).flatten.compact.group_by(&:comm)
       processes2 = ps2.values_at(*pids).flatten.compact.group_by(&:comm)
 
-      processes.each do |comm, processes|
+      processes.each do |comm, process|
         prefix = "#{config[:scheme]}.#{container}.#{comm}"
         fields.each do |field|
-          output "#{prefix}.#{field}", processes.map(&field).reduce(:+), timestamp
+          output "#{prefix}.#{field}", process.map(&field).reduce(:+), timestamp
         end
         # this check requires a lot of permissions, even root maybe?
-        output "#{prefix}.fd", processes.map { |p| p.fd.keys.count }.reduce(:+), timestamp
+        output "#{prefix}.fd", process.map { |p| p.fd.keys.count }.reduce(:+), timestamp
 
         second = processes2[comm]
-        cpu = second.map { |p| p.utime + p.stime }.reduce(:+) - processes.map { |p| p.utime + p.stime }.reduce(:+)
+        cpu = second.map { |p| p.utime + p.stime }.reduce(:+) - process.map { |p| p.utime + p.stime }.reduce(:+)
         output "#{prefix}.cpu", cpu, timestamp
       end
     end
