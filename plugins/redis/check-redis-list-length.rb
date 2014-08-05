@@ -33,9 +33,9 @@ class RedisListLengthCheck < Sensu::Plugin::Check::CLI
     :default => 6379
 
   option :database,
-    :short => "-db DATABASE",
-    :long => "--database DATABASE",
-    :description => "Redis database to connect to",
+    :short => "-n DATABASE",
+    :long => "--dbnumber DATABASE",
+    :description => "Redis database number to connect to",
     :proc => proc {|p| p.to_i },
     :required => false,
     :default => 0
@@ -66,7 +66,7 @@ class RedisListLengthCheck < Sensu::Plugin::Check::CLI
     :required => true
 
   def run
-    begin 
+    begin
       options = {:host => config[:host], :port => config[:port], :db => config[:database]}
       options[:password] = config[:password] if config[:password]
       redis = Redis.new(options)
