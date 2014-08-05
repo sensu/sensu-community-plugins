@@ -13,7 +13,8 @@ class HipChatNotif < Sensu::Handler
 
   def handle
     apiversion = settings["hipchat"]["apiversion"] || 'v1'
-    hipchatmsg = HipChat::Client.new(settings["hipchat"]["apikey"], :api_version => apiversion)
+    proxy_url = settings["hipchat"]["proxy_url"]
+    hipchatmsg = HipChat::Client.new(settings["hipchat"]["apikey"], :api_version => apiversion, :http_proxy => proxy_url)
     room = settings["hipchat"]["room"]
     from = settings["hipchat"]["from"] || 'Sensu'
 
