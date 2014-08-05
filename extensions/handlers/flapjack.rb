@@ -56,7 +56,7 @@ module Sensu
       end
 
       def run(event_data)
-        event = Oj.load(event_data)
+        event = MultiJson.load(event_data)
         client = event[:client]
         check = event[:check]
         tags = []
@@ -79,7 +79,7 @@ module Sensu
           :time    => check[:executed],
           :tags    => tags
         }
-        @redis.lpush(options[:channel], Oj.dump(flapjack_event))
+        @redis.lpush(options[:channel], MultiJson.dump(flapjack_event))
         yield 'sent an event to the flapjack redis queue', 0
       end
     end
