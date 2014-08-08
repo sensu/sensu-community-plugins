@@ -1,4 +1,38 @@
 #!/usr/bin/env ruby
+#
+# Push docker stats into graphite
+# ===
+#
+# DESCRIPTION:
+#   This plugin gets the stats data provided by docker API
+#   and sends it to graphite.
+#
+#
+# DEPENDENCIES:
+#   sensu-plugin   Ruby gem
+#   socket         Ruby stdlib
+#   pathname       Ruby stdlib
+#   sys/proctable  Ruby stdlib
+#
+# EXAMPLE:
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.supervisord.rss	3485	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.supervisord.vsize	53399552	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.supervisord.nswap	0	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.supervisord.pctmem	0.05	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.supervisord.fd	20	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.supervisord.cpu	1	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.cron.rss	269	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.cron.vsize	24223744	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.cron.nswap	0	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.cron.pctmem	0.0	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.cron.fd	4	1407488861
+# docker.hostname.e3f35c891c409fb57d2bd09135ccdfc8ca560a845e9d42f8313c1619160f6a00.cron.cpu	0	1407488861
+#
+# LICENSE
+# Copyright 2014 Michal Cichra. Github @mikz
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
