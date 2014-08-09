@@ -164,7 +164,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     req = Net::HTTP::Post.new(graphite_url.path)
 
     # If the basic http authentication credentials have been provided, then use them
-    if !config[:http_user].nil? && !config[:http_password].nil? then
+    if !config[:http_user].nil? && !config[:http_password].nil?
       req.basic_auth(config[:http_user], config[:http_password])
     end
 
