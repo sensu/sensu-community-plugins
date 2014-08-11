@@ -52,7 +52,7 @@ class CheckCassandraSchema < Sensu::Plugin::Check::CLI
     end
 
     if bad_nodes.count > 0
-      critical ("nodes " + bad_nodes.join(", ") + " are in schema disagreement")
+      critical("nodes " + bad_nodes.join(", ") + " are in schema disagreement")
     else
       ok
     end
