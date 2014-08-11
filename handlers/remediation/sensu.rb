@@ -85,15 +85,18 @@ class Remediator < Sensu::Handler
     remediations = @event['check']['remediation']
     occurrences = @event['occurrences']
     severity = @event['check']['status'].to_i
-    puts "REMEDIATION: Evaluating remediation: #{client} #{remediations.inspect} #=#{occurrences} sev=#{severity}"
+    puts "REMEDIATION: Evaluating remediation: #{client} "\
+         "#{remediations.inspect} #=#{occurrences} sev=#{severity}"
 
     remediation_checks = parse_remediations(remediations, occurrences, severity)
 
-    subscribers = remediations['trigger_on'] ? [remediations['trigger_on']].flatten : [client]
+    subscribers = @event['check']['trigger_on'] ? @event['check']['trigger_on'] : [client]
     remediation_checks.each do |remediation_check|
-      puts "REMEDIATION: Triggering remediation check '#{remediation_check}' for #{[client].inspect}"
+      puts "REMEDIATION: Triggering remediation check '#{remediation_check}' "\
+           "for #{[client].inspect}"
       response = trigger_remediation(remediation_check, subscribers)
-      puts "REMEDIATION: Recieved API Response (#{response.code}): #{response.body}, exiting."
+      puts "REMEDIATION: Received API Response (#{response.code}): "\
+           "#{response.body}, exiting."
     end
   end
 
@@ -104,27 +107,41 @@ class Remediator < Sensu::Handler
     remediations_to_trigger = []
 
     remediations.each do |check, conditions|
-      # Check for remediations matching the current occurrence count
-      (conditions["occurrences"] || []).each do |value|
-        if value.is_a?(Integer)
-          next unless occurrences == value
-        elsif value.to_s.match(/^\d+$/)
-          parsed_value = $~.to_a.first.to_i
-          next unless occurrences == parsed_value
-        elsif value.to_s.match(/^(\d+)-(\d+)$/)
-          range = Range.new($~.to_a[1].to_i, $~.to_a[2].to_i).to_a
-          next unless range.include?(occurrences)
-        elsif value.to_s.match(/^(\d+)\+$/)
-          puts "REMEDIATION: Matchdata: #{$~.inspect}"
-          range = Range.new($~.to_a[1].to_i, 9999).to_a
-          next unless range.include?(occurrences)
-        end
-      end
-
       # Check remediations matching the current severity
       next unless (conditions["severities"] || []).include?(severity)
 
-      remediations_to_trigger << check
+      # Check for remediations matching the current occurrence count
+      trigger = false
+      (conditions["occurrences"] || []).each do |value|
+        if value.is_a?(Integer) then
+          if occurrences == value then
+            trigger = true
+            break
+          end
+        elsif value.to_s.match(/^\d+$/)
+          parsed_value = $~.to_a.first.to_i
+          if occurrences == parsed_value then
+            trigger = true
+            break
+          end
+        elsif value.to_s.match(/^(\d+)-(\d+)$/)
+          puts "REMEDIATION: Matchdata: #{$~.inspect}"
+          range = Range.new($~.to_a[1].to_i, $~.to_a[2].to_i).to_a
+          if range.include?(occurrences) then
+            trigger = true
+            break
+          end
+        elsif value.to_s.match(/^(\d+)\+$/)
+          puts "REMEDIATION: Matchdata: #{$~.inspect}"
+          range = Range.new($~.to_a[1].to_i, 9999).to_a
+          if range.include?(occurrences) then
+            trigger = true
+            break
+          end
+        end
+      end
+
+      remediations_to_trigger << check if trigger
     end
     remediations_to_trigger
   end
