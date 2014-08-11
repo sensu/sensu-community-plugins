@@ -18,7 +18,7 @@
 # By default, the remediation checks will be triggered on the
 # the client where the check is failing.  An array of
 # subscriptions may be specified via a 'trigger_on' property
-# of the 'remediation' dictionary.
+# outside of the 'remediation' dictionary (in the 'check' dictionary).
 #
 # Example:
 #
@@ -113,28 +113,28 @@ class Remediator < Sensu::Handler
       # Check for remediations matching the current occurrence count
       trigger = false
       (conditions["occurrences"] || []).each do |value|
-        if value.is_a?(Integer) then
-          if occurrences == value then
+        if value.is_a?(Integer)
+          if occurrences == value
             trigger = true
             break
           end
         elsif value.to_s.match(/^\d+$/)
           parsed_value = $~.to_a.first.to_i
-          if occurrences == parsed_value then
+          if occurrences == parsed_value
             trigger = true
             break
           end
         elsif value.to_s.match(/^(\d+)-(\d+)$/)
           puts "REMEDIATION: Matchdata: #{$~.inspect}"
           range = Range.new($~.to_a[1].to_i, $~.to_a[2].to_i).to_a
-          if range.include?(occurrences) then
+          if range.include?(occurrences)
             trigger = true
             break
           end
         elsif value.to_s.match(/^(\d+)\+$/)
           puts "REMEDIATION: Matchdata: #{$~.inspect}"
           range = Range.new($~.to_a[1].to_i, 9999).to_a
-          if range.include?(occurrences) then
+          if range.include?(occurrences)
             trigger = true
             break
           end
