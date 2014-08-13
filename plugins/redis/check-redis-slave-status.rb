@@ -32,7 +32,7 @@ class RedisSlaveCheck < Sensu::Plugin::Check::CLI
     :short => "-m",
     :long => "--master-ok",
     :description => "Do not report problem if connected instance is master",
-    :boolean => 'true',
+    :boolean => true,
     :default => false
 
   def run
