@@ -28,6 +28,13 @@ class RedisSlaveCheck < Sensu::Plugin::Check::CLI
     :long => "--password PASSWORD",
     :description => "Redis Password to connect with"
 
+  option :master_ok,
+    :short => "-m",
+    :long => "--master-ok",
+    :description => "Do not report problem if connected instance is master",
+    :boolean => 'true',
+    :default => false
+
   def run
     begin
 
@@ -41,13 +48,18 @@ class RedisSlaveCheck < Sensu::Plugin::Check::CLI
         msg = ''
         msg += "The redis master link status to: #{redis.info.fetch('master_host')} is down!"
         msg += " It has been down for #{redis.info.fetch('master_link_down_since_seconds')}."
-        critcal msg
+        critical msg
+      end
+
+    rescue KeyError
+      if config[:master_ok]
+        ok "Redis server on #{config[:host]}:#{config[:port]} is master"
+      else
+        critical "Redis server on #{config[:host]}:#{config[:port]} is master"
       end
 
     rescue
-      message "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
-      exit 1
+      critical "Could not connect to Redis server on #{config[:host]}:#{config[:port]}"
     end
   end
-
 end
