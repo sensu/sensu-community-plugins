@@ -50,10 +50,10 @@ class CheckEyeHttp < Sensu::Plugin::Check::CLI
     status_doc.each do |app|
       app['subtree'].each do |group|
         group['subtree'].each do |process|
-           proc_summary = string_formatter app['name'],
-                                           group['name'],
-                                           process['name'],
-                                           process['state']
+          proc_summary = string_formatter app['name'],
+                                          group['name'],
+                                          process['name'],
+                                          process['state']
 
           puts debug(proc_summary) if config[:debug]
 
@@ -73,7 +73,7 @@ class CheckEyeHttp < Sensu::Plugin::Check::CLI
     process_statuses out
   end
 
-private
+  private
 
   def debug(s)
     "DEBUG: #{s}"
