@@ -45,13 +45,20 @@ class CheckMonit < Sensu::Plugin::Check::CLI
     :short => '-u uri',
     :default => '/_status?format=xml'
 
+  option :ignore,
+    :short => '-i ignore',
+    :default => ''
+
   def run
     status_doc = REXML::Document.new(monit_status)
+    ignored = config[:ignore].split(',')
 
     status_doc.elements.each('monit/service') do |svc|
       name = svc.elements['name'].text
       monitored = svc.elements['monitor'].text
       status = svc.elements['status'].text
+
+      next if ignored.include? name
 
       unless monitored == '1'
         unknown "#{name} status unkown"
