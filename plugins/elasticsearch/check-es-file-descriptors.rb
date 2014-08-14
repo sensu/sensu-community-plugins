@@ -36,7 +36,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
   option :port,
     :description => 'Elasticsearch port',
     :short => '-p PORT',
-    :long => '--host PORT',
+    :long => '--port PORT',
     :proc => proc {|a| a.to_i },
     :default => 9200
 
