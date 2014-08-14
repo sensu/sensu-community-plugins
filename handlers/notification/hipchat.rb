@@ -6,7 +6,7 @@ require 'hipchat'
 require 'timeout'
 
 class HipChatNotif < Sensu::Handler
-  
+
   option :jsonConfig,
          :description => 'Config Name',
          :short => '-j JsonConfig',
