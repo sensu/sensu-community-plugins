@@ -142,10 +142,9 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['os.load_average.5']                = node['os']['load_average'][1]
       metrics['os.load_average.15']               = node['os']['load_average'][2]
       metrics['os.mem.free_in_bytes']             = node['os']['mem']['free_in_bytes']
+      # ... Process uptime in millis?
+      metrics['os.uptime']                        = node['os']['uptime_in_millis']
     end
-
-    # ... Process uptime in millis?
-    metrics['os.uptime'] = node['os']['uptime_in_millis']
 
     if process_stats
       metrics['process.mem.resident_in_bytes']    = node['process']['mem']['resident_in_bytes']
