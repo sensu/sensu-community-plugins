@@ -48,6 +48,13 @@ class ESHeap < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :default => 0
 
+  option :timeout,
+    :description => 'Sets the connection timeout for REST client',
+    :short => '-t SECS',
+    :long => '--timeout SECS',
+    :proc => proc {|a| a.to_i },
+    :default => 30
+
   option :crit,
     :short => '-c N',
     :long => '--crit N',
@@ -62,7 +69,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
