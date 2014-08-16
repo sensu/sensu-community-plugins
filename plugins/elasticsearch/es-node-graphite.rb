@@ -58,7 +58,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :proc => proc {|a| a.to_i },
     :default => 9200
 
-  option :request_timeout,
+  option :timeout,
     :description => "Request timeout to elasticsearch",
     :short => "-t TIMEOUT",
     :long => "--timeout TIMEOUT",
@@ -90,7 +90,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", :timeout => config[:request_timeout])
+      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'

@@ -40,6 +40,13 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :default => 9200
 
+  option :timeout,
+    :description => 'Sets the connection timeout for REST client',
+    :short => '-t SECS',
+    :long => '--timeout SECS',
+    :proc => proc {|a| a.to_i },
+    :default => 30
+
   option :critical,
     :description => 'Critical percentage of FD usage',
     :short       => '-c PERCENTAGE',
@@ -54,7 +61,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
