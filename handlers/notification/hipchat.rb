@@ -7,7 +7,7 @@ require 'timeout'
 
 class HipChatNotif < Sensu::Handler
 
-  option :jsonConfig,
+  option :json_config,
          :description => 'Config Name',
          :short => '-j JsonConfig',
          :long => '--jsonConfig JsonConfig',
@@ -18,12 +18,12 @@ class HipChatNotif < Sensu::Handler
   end
 
   def handle
-    jsonConfig = config[:jsonConfig] || 'hipchat'
-    apiversion = settings[jsonConfig]["apiversion"] || 'v1'
-    proxy_url = settings[jsonConfig]["proxy_url"]
-    hipchatmsg = HipChat::Client.new(settings[jsonConfig]["apikey"], :api_version => apiversion, :http_proxy => proxy_url)
-    room = settings[jsonConfig]["room"]
-    from = settings[jsonConfig]["from"] || 'Sensu'
+    json_config = config[:json_config] || 'hipchat'
+    apiversion = settings[json_config]["apiversion"] || 'v1'
+    proxy_url = settings[json_config]["proxy_url"]
+    hipchatmsg = HipChat::Client.new(settings[json_config]["apikey"], :api_version => apiversion, :http_proxy => proxy_url)
+    room = settings[json_config]["room"]
+    from = settings[json_config]["from"] || 'Sensu'
 
     message = @event['check']['notification'] || @event['check']['output']
 
