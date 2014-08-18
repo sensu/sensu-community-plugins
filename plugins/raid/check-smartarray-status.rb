@@ -30,7 +30,7 @@ class CheckSmartArrayStatus < Sensu::Plugin::Check::CLI
     @bad_disks = []
   end
 
-  def _run(cmd)
+  def execute(cmd)
     captured_stdout = ''
     # we use popen2e because hpacucli does not use stderr for errors
     exit_status = Open3.popen2e(ENV, cmd) do |stdin, stdout, wait_thr|
@@ -68,12 +68,12 @@ class CheckSmartArrayStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    exit_status, raw_data = _run "#{@binary} ctrl all show status"
+    exit_status, raw_data = execute "#{@binary} ctrl all show status"
     unknown "hpacucli command failed - #{raw_data}" unless exit_status.success?
     parse_controllers! raw_data
 
     @controllers.each do |controller|
-      exit_status, raw_data = _run "#{@binary} ctrl slot=#{controller} pd all show status"
+      exit_status, raw_data = execute "#{@binary} ctrl slot=#{controller} pd all show status"
       unknown "hpacucli command failed - #{raw_data}" unless exit_status.success?
       parse_disks! raw_data, controller
     end
