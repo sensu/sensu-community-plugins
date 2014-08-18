@@ -109,7 +109,8 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Select_full_range_join' => 'fullRangeJoins',
         'Select_range' =>           'selectRange',
         'Select_range_check' =>     'selectRange_check',
-        'Select_scan' =>            'selectScan'
+        'Select_scan' =>            'selectScan',
+        'Slow_queries' =>           'slowQueries'
       },
       'querycache' => {
         'Qcache_queries_in_cache' =>  'queriesInCache',
