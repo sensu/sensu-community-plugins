@@ -30,7 +30,7 @@ class Check3wareStatus < Sensu::Plugin::Check::CLI
     @bad_disks = []
   end
 
-  def _run(cmd)
+  def execute(cmd)
     captured_stdout = ''
     captured_stderr = ''
     exit_status = Open3.popen3(ENV, cmd) do |stdin, stdout, stderr, wait_thr|
@@ -74,12 +74,12 @@ class Check3wareStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    exit_status, raw_data, err = _run "#{@binary} info"
+    exit_status, raw_data, err = execute "#{@binary} info"
     unknown "tw-cli command failed - #{err}" unless exit_status.success?
     parse_controllers! raw_data
 
     @controllers.each do |controller|
-      exit_status, raw_data, err = _run "#{@binary} info #{controller}"
+      exit_status, raw_data, err = execute "#{@binary} info #{controller}"
       unknown "tw-cli command failed - #{err}" unless exit_status.success?
       parse_disks! raw_data, controller
     end
