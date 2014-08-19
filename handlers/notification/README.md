@@ -18,7 +18,7 @@ There is an optional subscriptions hash which can be added to your mailer.json f
     "smtp_address": "smtp.example.org",
     "smtp_port": "25",
     "smtp_domain": "example.org",
-    "subsciptions": {
+    "subscriptions": {
         "subscription_name": {
             "mail_to": "teamemail@example.com"
     }
