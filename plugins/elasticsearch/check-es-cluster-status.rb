@@ -60,9 +60,9 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
       r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
-      warning 'Connection refused'
+      critical 'Connection refused'
     rescue RestClient::RequestTimeout
-      warning 'Connection timed out'
+      critical 'Connection timed out'
     end
   end
 
