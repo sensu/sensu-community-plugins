@@ -28,11 +28,18 @@ require 'json'
 
 class ESHeap < Sensu::Plugin::Check::CLI
 
-  option :server,
-    :description => 'Elasticsearch server',
-    :short => '-s SERVER',
-    :long => '--server SERVER',
+  option :host,
+    :description => 'Elasticsearch host',
+    :short => '-h HOST',
+    :long => '--host HOST',
     :default => 'localhost'
+
+  option :port,
+    :description => 'Elasticsearch port',
+    :short => '-p PORT',
+    :long => '--port PORT',
+    :proc => proc {|a| a.to_i },
+    :default => 9200
 
   option :warn,
     :short => '-w N',
@@ -41,6 +48,13 @@ class ESHeap < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :default => 0
 
+  option :timeout,
+    :description => 'Sets the connection timeout for REST client',
+    :short => '-t SECS',
+    :long => '--timeout SECS',
+    :proc => proc {|a| a.to_i },
+    :default => 30
+
   option :crit,
     :short => '-c N',
     :long => '--crit N',
@@ -48,9 +62,14 @@ class ESHeap < Sensu::Plugin::Check::CLI
     :proc => proc {|a| a.to_i },
     :default => 0
 
+  def get_es_version
+    info = get_es_resource('/')
+    info['version']['number']
+  end
+
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:server]}:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
@@ -62,8 +81,13 @@ class ESHeap < Sensu::Plugin::Check::CLI
   end
 
   def get_heap_used
-    stats = get_es_resource('/_cluster/nodes/_local/stats?jvm=true')
-    node = stats['nodes'].keys.first
+    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+      stats = get_es_resource('_nodes/_local/stats?jvm=true')
+      node = stats['nodes'].keys.first
+    else
+      stats = get_es_resource('_cluster/nodes/_local/stats?jvm=true')
+      node = stats['nodes'].keys.first
+    end
     begin
       stats['nodes'][node]['jvm']['mem']['heap_used_in_bytes']
     rescue

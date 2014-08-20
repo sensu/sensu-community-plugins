@@ -4,7 +4,7 @@
         "page_id": "my_page_id",
         "metrics": {
             "some.metric.identifier": "my_metric_id",
-            "another.metric.identifier": "another_metric_id",
+            "another.metric.identifier": "another_metric_id"
         }
     }
 }

@@ -4,7 +4,12 @@
 # ===
 #
 # Description
-#   Connects to sFTP, optionally writes a small file with a random name, then disconnects.
+#   Provides checks against an sFTP site.
+#
+#   1)  SFTP Connection Testing
+#   2)  File Writes
+#   3)  File Count Exceeding
+#   4)  Files Older Than
 #
 # Dependencies
 # - net-sftp
@@ -18,7 +23,7 @@ require 'sensu-plugin/check/cli'
 gem 'net-sftp', '~> 2.1.0'
 require 'net/sftp'
 
-# Checks sFTP site for availability
+# Checks sFTP site
 class CheckSftp < Sensu::Plugin::Check::CLI
   option :host,
     :short => "-h HOST",
@@ -56,21 +61,35 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   option :directory,
     :short => "-d DIRECTORY",
     :long => "--directory DIRECTORY",
-    :description => "Directory to use for writing temporary file (eg. /My/Path) - blank for none"
+    :description => "Directory to use for file checks",
+    :default => "/"
 
-  option :prefix,
+  option :match,
+    :short => "-m MATCH",
+    :long => "--match MATCH",
+    :description => "Match files with this pattern for counting/file aging checks (**, **/*)."
+
+  option :check_prefix,
     :short => "-x PREFIX",
-    :description => "Prefix for temporary file",
-    :default => "sensu"
+    :description => "Prefix for temporary file write check. Blank for none."
+
+  option :check_count,
+    :short => "-n COUNT",
+    :long => "--number COUNT",
+    :proc => proc { |a| a.to_i },
+    :description => "Alert if files > COUNT in directory"
+
+  option :check_older,
+    :short => "-o OLDER_THAN",
+    :long => "--older_than OLDER_THAN",
+    :proc => proc { |a| a.to_i },
+    :description => "Alert if any file age > OLDER_THAN seconds"
 
   def run
-    Net::SFTP.start(config[:host], config[:username], :password => config[:password], :timeout => config[:timeout], :port => config[:port]) do |sftp|
-      if config[:directory] && !config[:directory].empty?
-        io = StringIO.new("Generated from Sensu at "+Time.now.to_s)
-        remote_path = File.join('', config[:directory], config[:prefix]+"_#{Time.now.to_i}.txt")
-        sftp.upload!(io, remote_path)
-        sftp.remove!(remote_path)
-      end
+    if sftp
+      check_file_write
+      check_file_count
+      check_file_age
     end
 
     ok
@@ -78,11 +97,48 @@ class CheckSftp < Sensu::Plugin::Check::CLI
     critical "Timed out after #{config[:timeout]}s"
   rescue SocketError => e
     critical "Could not connect: #{e.inspect}"
-  rescue Net::SSH::AuthenticationFailed => e
+  rescue Net::SSH::AuthenticationFailed
     critical "Failed authentication with #{config[:username]}"
   rescue Net::SFTP::StatusException => e
     critical "SFTP Error - #{e.message}"
-  rescue
+  rescue => e
     critical "Unexpected error; #{e.inspect}"
+  end
+
+  private
+
+  def check_file_write
+    if config[:check_prefix]
+      io = StringIO.new("Generated from Sensu at "+Time.now.to_s)
+      remote_path = File.join('', config[:directory], config[:check_prefix]+"_#{Time.now.to_i}.txt")
+      sftp.upload!(io, remote_path)
+      sftp.remove!(remote_path)
+    end
+  end
+
+  def check_file_count
+    if config[:check_count]
+      if matching_files.count > config[:check_count]
+        critical "Too many files - #{config[:directory]} has #{matching_files.count} matching files"
+      end
+    end
+  end
+
+  def check_file_age
+    if config[:check_older]
+      run_at    = Time.now
+      old_files = matching_files.find_all { |f| (run_at.to_i - f.attributes.mtime) > config[:check_older] }
+      unless old_files.empty?
+        critical "Files too old - #{config[:directory]} has #{old_files.count} matching files older than #{config[:check_older]}s"
+      end
+    end
+  end
+
+  def matching_files
+    @matching_files ||= sftp.dir.glob(config[:directory], config[:match]).find_all { |f| f.attributes.file? }
+  end
+
+  def sftp
+    @sftp ||= Net::SFTP.start(config[:host], config[:username], :password => config[:password], :timeout => config[:timeout], :port => config[:port])
   end
 end

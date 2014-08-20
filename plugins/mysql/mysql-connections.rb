@@ -72,7 +72,7 @@ class CheckMySQLHealth < Sensu::Plugin::Check::CLI
             fetch('Value').
             to_i
         used_con = db.
-            query("SHOW GLOBAL STATUS LIKE 'Max_used_connections'").
+            query("SHOW GLOBAL STATUS LIKE 'Threads_connected'").
             fetch_hash.
             fetch('Value').
             to_i

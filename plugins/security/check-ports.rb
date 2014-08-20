@@ -14,7 +14,7 @@
 # Examples
 # -------
 #
-#   $ ./check-ports.rb --host some_server --ports 5671,5672
+#   $ ./check-ports.rb --host some_server --ports 5671,5672 --level crit
 #
 # Pass condition
 #   CheckPorts OK: open:5671,5672
@@ -41,6 +41,12 @@ class CheckPorts < Sensu::Plugin::Check::CLI
     :description => 'TCP port(s) you wish to get status for',
     :short       => '-t PORT,PORT...',
     :long        => '--ports PORT,PORT...'
+
+  option :level,
+    :description => 'Alert level crit(critical) or warn(warning)',
+    :short       => '-l crit|warn',
+    :long        => '--level crit|warn',
+    :default     => 'WARN'
 
   def run
 
@@ -71,10 +77,12 @@ class CheckPorts < Sensu::Plugin::Check::CLI
 
     if check_pass
       ok result
-    else
+    elsif config[:level].upcase == 'WARN'
       warning result
+    elsif config[:level].upcase == 'CRIT'
+      critical result
+    else
+      unknown "Unknown alert level #{config[:level]}"
     end
-
   end
-
 end

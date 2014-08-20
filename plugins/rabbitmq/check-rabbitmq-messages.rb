@@ -23,8 +23,8 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   option :port,
     :description => "RabbitMQ management API port",
     :long => "--port PORT",
-    :proc => proc {|p| p.to_i},
-    :default => 55672
+    :proc => proc { |p| p.to_i },
+    :default => 15672
 
   option :user,
     :description => "RabbitMQ management API user",
@@ -35,6 +35,12 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     :description => "RabbitMQ management API password",
     :long => "--password PASSWORD",
     :default => "guest"
+
+  option :ssl,
+    :description => "Enable SSL for connection to the API",
+    :long => "--ssl",
+    :boolean => true,
+    :default => false
 
   option :warn,
     :short => '-w NUM_MESSAGES',
@@ -54,7 +60,8 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
         :host => config[:host],
         :port => config[:port],
         :user => config[:user],
-        :password => config[:password]
+        :password => config[:password],
+        :ssl => config[:ssl]
       )
     rescue
       warning "could not get rabbitmq info"

@@ -64,9 +64,6 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     :boolean => true
 
   def run
-    if config[:graphite]
-      config[:host] = config[:host].gsub('.', '_')
-    end
     begin
       manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
       response = manager.get(["#{config[:objectid]}"])
@@ -74,6 +71,9 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
       unknown "#{config[:host]} not responding"
     rescue Exception => e
       unknown "An unknown error occured: #{e.inspect}"
+    end
+    if config[:graphite]
+      config[:host] = config[:host].gsub('.', '_')
     end
     response.each_varbind do |vb|
       if config[:prefix]

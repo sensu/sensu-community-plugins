@@ -107,6 +107,18 @@ class Graphite < Sensu::Plugin::Check::CLI
          :description => "Values should not be greater than the VALUE of Graphite values from PERIOD",
          :long => "--percentile_value VALUE"
 
+  option :http_user,
+         :description => "Basic HTTP authentication user",
+         :short => "-U USER",
+         :long => "--http-user USER",
+         :default => nil
+
+  option :http_password,
+         :description => "Basic HTTP authentication password",
+         :short => "-P PASSWORD",
+         :long => "--http-password USER",
+         :default => nil
+
   def initialize
     super
     @graphite_cache = {}
@@ -148,7 +160,16 @@ class Graphite < Sensu::Plugin::Check::CLI
         :from   => "-#{@period.to_s}",
         :format => 'json'
     }
-    resp = Net::HTTP.post_form(graphite_url, params)
+
+    req = Net::HTTP::Post.new(graphite_url.path)
+
+    # If the basic http authentication credentials have been provided, then use them
+    if !config[:http_user].nil? && !config[:http_password].nil?
+      req.basic_auth(config[:http_user], config[:http_password])
+    end
+
+    req.set_form_data(params)
+    resp = Net::HTTP.new(graphite_url.host, graphite_url.port).start { |http| http.request(req) }
     data = JSON.parse(resp.body)
     @graphite_cache[target] = []
     if data.size > 0

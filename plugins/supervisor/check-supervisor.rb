@@ -13,7 +13,7 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION > "1.9"
+require 'rubygems' if RUBY_VERSION < "1.9"
 require 'sensu-plugin/check/cli'
 require 'ruby-supervisor'
 

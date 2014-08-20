@@ -5,6 +5,7 @@
 #
 # DESCRIPTION:
 #   This plugin checks the ElasticSearch cluster status, using its API.
+#   Works with ES 0.9x and ES 1.x
 #
 # OUTPUT:
 #   plain-text
@@ -28,27 +29,59 @@ require 'json'
 
 class ESClusterStatus < Sensu::Plugin::Check::CLI
 
-  option :server,
-    :description => 'Elasticsearch server',
-    :short => '-s SERVER',
-    :long => '--server SERVER',
+  option :host,
+    :description => 'Elasticsearch host',
+    :short => '-h HOST',
+    :long => '--host HOST',
     :default => 'localhost'
+
+  option :port,
+    :description => 'Elasticsearch port',
+    :short => '-p PORT',
+    :long => '--port PORT',
+    :proc => proc {|a| a.to_i },
+    :default => 9200
+
+  option :master_only,
+    :description => 'Use master Elasticsearch server only',
+    :short => '-m',
+    :long => '--master-only',
+    :default => false
+
+  option :timeout,
+    :description => 'Sets the connection timeout for REST client',
+    :short => '-t SECS',
+    :long => '--timeout SECS',
+    :proc => proc {|a| a.to_i },
+    :default => 30
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:server]}:9200/#{resource}", :timeout => 45)
+      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
-      warning 'Connection refused'
+      critical 'Connection refused'
     rescue RestClient::RequestTimeout
-      warning 'Connection timed out'
+      critical 'Connection timed out'
+    rescue Errno::ECONNRESET
+      critical 'Connection reset by peer'
     end
   end
 
+  def get_es_version
+    info = get_es_resource('/')
+    info['version']['number']
+  end
+
   def is_master
-    state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
-    local = get_es_resource('/_cluster/nodes/_local')
-    local['nodes'].keys.first == state['master_node']
+    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+      master = get_es_resource('_cluster/state/master_node')['master_node']
+      local = get_es_resource('/_nodes/_local')
+    else
+      master = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')['master_node']
+      local = get_es_resource('/_cluster/nodes/_local')
+    end
+    local['nodes'].keys.first == master
   end
 
   def get_status
@@ -57,7 +90,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    if is_master
+    if !config[:master_only] || is_master
       case get_status
       when 'green'
         ok "Cluster is green"

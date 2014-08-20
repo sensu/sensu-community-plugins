@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# System Load Stats Plugin
+# Disk Capacity Metrics Plugin
 # ===
 #
 # This plugin uses df to collect disk capacity metrics

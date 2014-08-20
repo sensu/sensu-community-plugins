@@ -17,6 +17,12 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
     :description => 'PostgreSQL slave HOST',
     :default => 'localhost'
 
+  option :database,
+     :short => '-d',
+     :long => '--database=NAME',
+     :description => 'Database NAME',
+     :default => 'postgres'
+
   option :user,
     :short => '-u',
     :long => '--username=VALUE',
@@ -37,11 +43,12 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
     @dbmaster = config[:master_host]
     @dbslave = config[:slave_host]
     @dbport = 5432
+    @dbname = config[:database]
     @dbusername = config[:user]
     @password = config[:pass]
 
     # Establishing connections to the master
-    conn_master = PGconn.connect(@dbmaster, @dbport, '', '', 'postgres', @dbusername, @password)
+    conn_master = PGconn.connect(@dbmaster, @dbport, '', '', @dbname, @dbusername, @password)
     res1 = conn_master.exec('SELECT pg_current_xlog_location()').getvalue(0, 0)
     m_segbytes = conn_master.exec('SHOW wal_segment_size').getvalue(0, 0).sub(/\D+/, '').to_i << 20
     conn_master.close
@@ -53,7 +60,7 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     # Establishing connections to the slave
-    conn_slave = PGconn.connect(@dbslave, @dbport, '', '' , 'postgres', @dbusername, @password)
+    conn_slave = PGconn.connect(@dbslave, @dbport, '', '' , @dbname, @dbusername, @password)
     res = conn_slave.exec('SELECT pg_last_xlog_receive_location()').getvalue(0, 0)
     conn_slave.close
 

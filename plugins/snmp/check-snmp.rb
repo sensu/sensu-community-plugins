@@ -59,9 +59,16 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     :description => 'Operator used to compare data with warning/critial values. Can be set to "le" (<=), "ge" (>=).',
     :default => 'ge'
 
+  option :timeout,
+    :short => '-t timeout (seconds)',
+    :default => '1'
+
   def run
     begin
-      manager = SNMP::Manager.new(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:snmp_version].to_sym)
+      manager = SNMP::Manager.new(:host => "#{config[:host]}",
+                                  :community => "#{config[:community]}",
+                                  :version => config[:snmp_version].to_sym,
+                                  :timeout => config[:timeout].to_i)
       response = manager.get(["#{config[:objectid]}"])
     rescue SNMP::RequestTimeout
       unknown "#{config[:host]} not responding"

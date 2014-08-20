@@ -93,10 +93,18 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     get_mod_status.split("\n").each do |line|
       name, value = line.split(": ")
       case name
+      when "CPULoad"
+        stats["cpuload"] = value.to_f * 100
+      when "BusyWorkers"
+        stats["busy_workers"] = value.to_i
+      when "IdleWorkers"
+        stats["idle_workers"] = value.to_i
       when "ReqPerSec"
-        stats["requests_per_sec"] = value.to_i
+        stats["requests_per_sec"] = value.to_f
       when "BytesPerSec"
-        stats["kbytes_per_sec"] = (value.to_i/1024).to_i
+        stats["bytes_per_sec"] = value.to_f
+      when "BytesPerReq"
+        stats["bytes_per_req"] = value.to_f
       when "Scoreboard"
         value = value.strip
         stats["open"] = value.count(".")
