@@ -30,10 +30,10 @@ end
 class Mailer < Sensu::Handler
 
   option :json_config,
-	 :description => 'Config Name',
-	 :short => '-j JsonConfig',
-	 :long => '--jsonConfig JsonConfig',
-	 :required => false
+   :description => 'Config Name',
+   :short => '-j JsonConfig',
+   :long => '--jsonConfig JsonConfig',
+   :required => false
 
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
