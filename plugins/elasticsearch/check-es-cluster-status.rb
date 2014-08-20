@@ -63,6 +63,8 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
       critical 'Connection refused'
     rescue RestClient::RequestTimeout
       critical 'Connection timed out'
+    rescue Errno::ECONNRESET
+      critical 'Connection reset by peer'
     end
   end
 
