@@ -13,6 +13,12 @@ require 'sensu-plugin/check/cli'
 
 class PostfixMailq < Sensu::Plugin::Check::CLI
 
+  option :path,
+    :short => '-p MAILQ_PATH',
+    :long => '--path MAILQ_PATH',
+    :description => 'Path to the postfix mailq binary.  Defaults to /usr/bin/mailq',
+    :default => '/usr/bin/mailq'
+
   option :warning,
     :short  => '-w WARN_NUM',
     :long  => '--warnnum WARN_NUM',
@@ -30,7 +36,7 @@ class PostfixMailq < Sensu::Plugin::Check::CLI
     # mailq will either end with a summary line (-- 11 Kbytes in 31 Requests.)
     # or 'Mail queue is empty'.  Using grep rather than returning the entire
     # list since that could consume a significant amount of memory.
-    queue = `/usr/bin/mailq | /bin/egrep '[0-9]+ Kbytes in [0-9]+ Request\|Mail queue is empty'`
+    queue = `#{config[:path]} | /bin/egrep '[0-9]+ Kbytes in [0-9]+ Request\|Mail queue is empty'`
 
     # Set the number of messages in the queue
     if queue == 'Mail queue is empty'
