@@ -37,7 +37,7 @@ class CheckPING < Sensu::Plugin::Check::CLI
     :default => false
 
   def run
-    pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
+    pt = Net::Ping::External.new(config[:host], nil, config[:timeout].to_i)
     if pt.ping?
       ok "ICMP ping successful for host: #{config[:host]}"
     else
