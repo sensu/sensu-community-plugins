@@ -30,6 +30,30 @@ class CheckPING < Sensu::Plugin::Check::CLI
     :short => '-T timeout',
     :default => '5'
 
+  option :count,
+    :short => '-c count',
+    :description => 'The number of ping requests',
+    :proc => Proc.new {|s| s.to_i },
+    :default => 1
+
+  option :interval,
+    :short => '-i interval',
+    :description => 'The number of seconds to wait between ping requests',
+    :proc => Proc.new {|s| s.to_f },
+    :default => 1
+
+  option :warn_ratio,
+    :short => '-W ratio',
+    :description => 'Warn if successful ratio is under this value',
+    :proc => Proc.new {|s| s.to_f },
+    :default => 0.5
+
+  option :critical_ratio,
+    :short => '-C ratio',
+    :description => 'Critical if successful ratio is under this value',
+    :proc => Proc.new {|s| s.to_f },
+    :default => 0.2
+
   option :report,
     :short => '-r',
     :long => '--report',
@@ -37,16 +61,33 @@ class CheckPING < Sensu::Plugin::Check::CLI
     :default => false
 
   def run
+    result = []
     pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
-    if pt.ping?
-      ok "ICMP ping successful for host: #{config[:host]}"
+    (0 .. config[:count] - 1).each do |i|
+      sleep(config[:interval]) unless i == 0
+      result[i] = pt.ping?
+    end
+
+    successful_count = result.count(true)
+    total_count = config[:count]
+    success_ratio = successful_count / total_count.to_f
+
+    if success_ratio > config[:warn_ratio]
+      success_message = "ICMP ping successful for host: #{config[:host]}"
+      ok success_message
     else
-      message = "ICMP ping unsuccessful for host: #{config[:host]}"
+      failure_message = "ICMP ping unsuccessful for host: #{config[:host]} (successful: #{successful_count}/#{total_count})"
+
       if config[:report]
         report = `mtr --curses --report-cycles=1 --report --no-dns #{config[:host]}`
-        message = message + "\n" + report
+        failure_message = failure_message + "\n" + report
       end
-      critical message
+
+      if success_ratio <= config[:critical_ratio]
+        critical failure_message
+      else
+        warning failure_message
+      end
     end
   end
 end
