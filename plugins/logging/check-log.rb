@@ -45,7 +45,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :long => '--pattern PAT'
 
   option :exclude,
-         :description => "Pattern to exclude for",
+         :description => "Pattern to exclude from matching",
          :short => '-E PAT',
          :long => '--exclude PAT',
          :proc => proc {|s| Regexp.compile s},
