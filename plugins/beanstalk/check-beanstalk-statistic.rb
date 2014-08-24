@@ -56,7 +56,7 @@ class CheckBeanstalkStatistic < Sensu::Plugin::Check::CLI
     else
       stats = beanstalk.stats
     end
-    puts config[:stat]
+
     unknown "#{config[:stat]} doesn't exist" unless stats.has_key?(config[:stat])
     s = stats[config[:stat]].to_i
 
