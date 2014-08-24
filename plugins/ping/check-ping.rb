@@ -63,7 +63,7 @@ class CheckPING < Sensu::Plugin::Check::CLI
   def run
     result = []
     pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
-    (0 .. config[:count] - 1).each do |i|
+    config[:count].times do |i|
       sleep(config[:interval]) unless i == 0
       result[i] = pt.ping?
     end
