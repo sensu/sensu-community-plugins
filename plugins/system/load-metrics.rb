@@ -9,7 +9,7 @@
 # Load per processor
 # ------------------
 #
-# Optionally, with `--load-per-proc`, this plugin will calculate load per
+# Optionally, with `--per-core`, this plugin will calculate load per
 # processor from the raw load average by dividing load average by the number
 # of processors.
 #
