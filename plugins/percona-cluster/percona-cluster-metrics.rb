@@ -53,6 +53,16 @@ class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.percona"
 
+  def fix_and_output_evs_repl_latency_data(row)
+    # see https://github.com/codership/galera/issues/67 for documentation on field mappings
+    data = row["Value"].split("/")
+    output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_min", data[0]
+    output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_avg", data[1]
+    output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_max", data[2]
+    output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_stddev", data[3]
+    output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_samplesize", data[4]
+  end
+
   def run
 
     metrics = {
@@ -104,19 +114,11 @@ class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     results.each do |row|
-      # forward slash delimited data; need to capture it all
-      if row["Variable_name"] == "wsrep_evs_repl_latency"
-        repl_latency_data = row["Value"].split("/")
-        output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_min", repl_latency_data[0]
-        output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_avg", repl_latency_data[1]
-        output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_max", repl_latency_data[2]
-        output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_stddev", repl_latency_data[3]
-        output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_samplesize", repl_latency_data[4]
-      else
-        metrics.each do |category, var_mapping|
-          if var_mapping.has_key?(row["Variable_name"])
-            output "#{config[:scheme]}.mysql.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
-          end
+      # special handling for wsrep_evs_repl_latency as this contains forward slash delimited data
+      fix_and_output_evs_repl_latency_data(row) if row["Variable_name"] == "wsrep_evs_repl_latency"
+      metrics.each do |category, var_mapping|
+        if var_mapping.has_key?(row["Variable_name"])
+          output "#{config[:scheme]}.mysql.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
         end
       end
     end
