@@ -114,11 +114,11 @@ class IOPingMetrics < Sensu::Plugin::Metric::CLI::Graphite
     str.scan(pattern).each do |scanned|
       values = []
       units = []
-      scanned.each_with_index do |value, idx|
-        if idx % 2 == 0
-          values[idx/2] = value.to_f
+      scanned.each_with_index do |val, idx|
+        if idx.even?
+          values[idx/2] = val.to_f
         else
-          units[idx/2] = TIME_UNITS[value]
+          units[idx/2] = TIME_UNITS[val]
         end
       end
 
