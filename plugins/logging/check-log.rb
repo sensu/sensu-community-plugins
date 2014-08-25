@@ -44,6 +44,13 @@ class CheckLog < Sensu::Plugin::Check::CLI
          :short => '-q PAT',
          :long => '--pattern PAT'
 
+  option :exclude,
+         :description => "Pattern to exclude from matching",
+         :short => '-E PAT',
+         :long => '--exclude PAT',
+         :proc => proc {|s| Regexp.compile s},
+         :default => /(?!)/
+
   option :encoding,
          :description => "Explicit encoding page to read log file with",
          :short => '-e ENCODING-PAGE',
@@ -151,9 +158,9 @@ class CheckLog < Sensu::Plugin::Check::CLI
     @log.each_line do |line|
       bytes_read += line.size
       if config[:case_insensitive]
-         m = line.downcase.match(config[:pattern].downcase)
+         m = line.downcase.match(config[:pattern].downcase) unless line.match(config[:exclude])
       else
-         m = line.match(config[:pattern])
+         m = line.match(config[:pattern]) unless line.match(config[:exclude])
       end
       if m
         if m[1]
