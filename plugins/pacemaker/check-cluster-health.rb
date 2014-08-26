@@ -53,22 +53,18 @@ class CheckClusterHealth < Sensu::Plugin::Check::CLI
   def run
     cluster_state = REXML::Document.new(cluster_xml)
 
-    nodes = 0
-    resources = 0
+    nodes = cluster_state.elements.to_a('crm_mon/nodes/node').length
+    resources = cluster_state.elements.to_a('crm_mon/nodes/node/resource').length
 
     offline_nodes = []
     failed_resources = []
 
     cluster_state.elements.each('crm_mon/nodes/node') do |node|
-      nodes += 1
-
       if node.attributes['expected_up'] == 'true' && node.attributes['online'] == 'false'
         offline_nodes << node.attributes['name']
       end
 
       node.elements.each('resource') do |resource|
-        resources += 1
-
         if resource.attributes['failed'] == 'true'
           failed_resources << resource.attributes['id']
         end
