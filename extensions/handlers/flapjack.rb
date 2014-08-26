@@ -69,12 +69,13 @@ module Sensu
         end
         details = ['Address:' + client[:address]]
         details << 'Tags:' + tags.join(',')
+        details << "Raw Output: #{check[:output]}" if check[:notification]
         flapjack_event = {
           :entity  => client[:name],
           :check   => check[:name],
           :type    => 'service',
           :state   => Sensu::SEVERITIES[check[:status]] || 'unknown',
-          :summary => check[:output],
+          :summary => check[:notification] || check[:output] ,
           :details => details.join(' '),
           :time    => check[:executed],
           :tags    => tags
