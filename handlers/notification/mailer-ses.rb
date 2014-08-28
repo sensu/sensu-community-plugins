@@ -30,7 +30,8 @@ class Mailer < Sensu::Handler
       :mail_to   => settings['mailer-ses']['mail_to'],
       :mail_from => settings['mailer-ses']['mail_from'],
       :aws_access_key => settings['mailer-ses']['aws_access_key'],
-      :aws_secret_key => settings['mailer-ses']['aws_secret_key']
+      :aws_secret_key => settings['mailer-ses']['aws_secret_key'],
+      :aws_ses_endpoint => settings['mailer-ses']['aws_ses_endpoint']
     }
 
     body = <<-BODY.gsub(/^ {14}/, '')
@@ -47,7 +48,8 @@ class Mailer < Sensu::Handler
 
     ses = AWS::SES::Base.new(
       :access_key_id     => params[:aws_access_key],
-      :secret_access_key => params[:aws_secret_key]
+      :secret_access_key => params[:aws_secret_key],
+      :server            => params[:aws_ses_endpoint]
     )
 
     begin
