@@ -45,6 +45,18 @@ class Slack < Sensu::Handler
     get_setting('surround')
   end
 
+  def get_emoji_0
+    get_setting('emoji_0')
+  end
+
+  def get_emoji_1
+    get_setting('emoji_1')
+  end
+
+  def get_emoji_2
+    get_setting('emoji_2')
+  end
+
   def incident_key
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -102,11 +114,11 @@ class Slack < Sensu::Handler
   end
 
   def icon_emoji
-    default = ":feelsgood:"
+    default = get_emoji_2 || ":feelsgood:"
     emoji = {
-      0 => ':godmode:',
-      1 => ':hurtrealbad:',
-      2 => ':feelsgood:'
+      0 => get_emoji_0 || ':godmode:',
+      1 => get_emoji_1 || ':hurtrealbad:',
+      2 => get_emoji_2 || ':feelsgood:'
     }
     emoji.fetch(check_status.to_i, default)
   end
