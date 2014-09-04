@@ -21,6 +21,7 @@ require 'redis'
 require 'json'
 require 'socket'
 require 'time'
+require 'json'
 
 class LogstashHandler < Sensu::Handler
 
@@ -33,14 +34,14 @@ class LogstashHandler < Sensu::Handler
   end
 
   def handle
-    redis = Redis.new(:host => settings['logstash']['server'], :port => settings['logstash']['port'])
+    
     time = Time.now.utc.iso8601
     logstash_msg = {
-      :@timestamp => time,
-      :@version => 1,
-      :source => ::Socket.gethostname,
-      :tags => ["sensu-#{action_to_string}"],
-      :message => @event['check']['output'],
+      :@timestamp    => time,
+      :@version      => 1,
+      :source        => ::Socket.gethostname,
+      :tags          => ["sensu-#{action_to_string}"],
+      :message       => @event['check']['output'],
       :host          => @event['client']['name'],
       :timestamp     => @event['check']['issued'],
       :address       => @event['client']['address'],
@@ -54,6 +55,17 @@ class LogstashHandler < Sensu::Handler
       :action        => @event['action']
     }
     logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
-    redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
+
+    case settings['logstash']['output'] 
+
+    when 'redis'
+      redis = Redis.new(:host => settings['logstash']['server'], :port => settings['logstash']['port'])
+      redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
+    when 'udp'
+      socket = UDPSocket.new
+      socket.send(JSON.parse(logstash_msg), 0, settings['logstash']['server'], settings['logstash']['port'])
+      socket.close
+    end
+
   end
 end
