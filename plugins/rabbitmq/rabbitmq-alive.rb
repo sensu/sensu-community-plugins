@@ -77,6 +77,16 @@ class CheckRabbitMQ < Sensu::Plugin::Check::CLI
       resource = RestClient::Resource.new "http#{ssl ? 's' : ''}://#{host}:#{port}/api/aliveness-test/#{vhost}", username, password
       # Attempt to parse response (just to trigger parse exception)
       _response = JSON.parse(resource.get) == { "status" => "ok" }
+      
+      # see if any connections are being blocked
+      connections = RestClient::Resource.new "http#{ssl ? 's' : ''}://#{host}:#{port}/api/connections", username, password
+      blocking = false
+      JSON.parse(connections.get).each { |conn| conn['state'] == 'blocking' ? blocking = true : false }
+      if blocking
+        { "status" => "critical", "message" => 'the queue is blocking' }
+      end
+
+      # otherwise exit ok
       { "status" => "ok", "message" => "RabbitMQ server is alive" }
     rescue Errno::ECONNREFUSED => e
       { "status" => "critical", "message" => e.message }

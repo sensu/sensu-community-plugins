@@ -72,7 +72,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   def run
     rabbitmq = get_rabbitmq_info
     overview = rabbitmq.overview
-    total = overview['queue_totals']['messages']
+    if overview['queue_totals'].is_a?(Hash) then total = overview['queue_totals']['messages'] else total = 0 end
     message "#{total}"
     critical if total > config[:critical].to_i
     warning if total > config[:warn].to_i
