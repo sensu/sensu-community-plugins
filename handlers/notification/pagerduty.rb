@@ -7,6 +7,8 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# api_key should be set to a SERVICE KEY
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
@@ -49,7 +51,7 @@ class Pagerduty < Sensu::Handler
         end
       end
     rescue Timeout::Error
-      puts 'pagerduty -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key
+      puts 'pagerduty -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key + ' reason: ' + response['errors'].join(', ')
     end
   end
 
