@@ -74,3 +74,7 @@ comment in each source file, changing the copyright holder to your own
 name or organization. If you wish to use a different open source
 license, please submit a pull request adding that license to the repo
 and use that license's boilerplate instead.
+
+## WTF
+
+Since GitLab is charging for this functionality in it's enterprise http://doc.gitlab.com/ee/integration/jenkins.html, I moved it to a private bucket for no more unethical practice.
