@@ -102,11 +102,11 @@ class Slack < Sensu::Handler
   end
 
   def icon_emoji
-    default = ":feelsgood:"
+    default = get_setting('emoji_2') || ':feelsgood:'
     emoji = {
-      0 => ':godmode:',
-      1 => ':hurtrealbad:',
-      2 => ':feelsgood:'
+      0 => get_setting('emoji_0') || ':godmode:',
+      1 => get_setting('emoji_1') || ':hurtrealbad:',
+      2 => get_setting('emoji_2') || ':feelsgood:'
     }
     emoji.fetch(check_status.to_i, default)
   end
