@@ -5,5 +5,3 @@ module.exports = function() {
     callback('Failed');
   });
 };
-
-

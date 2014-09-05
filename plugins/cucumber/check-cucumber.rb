@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 #
-#
 # ===
 #
 # DESCRIPTION:
@@ -20,9 +19,11 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
+require 'optparse'
+require 'timeout'
 require 'json'
+require 'yaml'
 require 'socket'
 
 class CheckCucumber < Sensu::Plugin::Check::CLI
@@ -30,6 +31,8 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
   WARNING = 1
   CRITICAL = 2
   UNKNOWN = 3
+
+  INFINITE_TIMEOUT = 0
 
   option :name,
     :description => "Name to use in sensu events",
@@ -61,65 +64,77 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     :short => '-w WORKING_DIR',
     :long => '--working-dir WORKING_DIR'
 
+  option :timeout,
+    :description => "Amount of seconds to wait for Cucumber to wait before killing the Cucumber process",
+    :short => '-t TIMEOUT',
+    :long => '--timeout TIMEOUT'
+
+  option :env,
+    :description => "Environment variable to pass to Cucumber. Can be specified more than once to set multiple environment variables",
+    :short => '-n NAME=VALUE',
+    :long => '--env NAME=VALUE'
+
+  option :event_data,
+    :description => "Used to add custom data to the sensu events that are raised.  Can be specified more than once to set multiple data items",
+    :short => '-d NAME=VALUE',
+    :long => '--event-data NAME=VALUE'
+
+  option :attachments,
+    :description => "Specifies whether Cucumber attachments should be included in sensu events. " +
+        "Cucumber attachments can be multi-megabyte if they include screenshots",
+    :short => '-a BOOLEAN',
+    :long => '--attachments BOOLEAN'
+
   option :debug,
     :description => "Print debug information",
     :long => '--debug',
     :boolean => true
 
-  def execute_cucumber
-    report = nil
+  def parse_options(argv)
+    env = {}
+    event_data = {}
 
-    IO.popen(config[:command], :chdir => config[:working_dir]) do |io|
-      report = io.read
+    process_env_option = lambda do |config_value|
+      name, value = config_value.split('=', 2)
+      env[name] = value
+      env
     end
 
-    {:report => report, :exit_status => $?.exitstatus}
+    process_event_data_option = lambda do |config_value|
+      name, value = config_value.split('=', 2)
+      event_data[name] = value
+      event_data
+    end
+
+    options[:env][:proc] = process_env_option
+    options[:event_data][:proc] = process_event_data_option
+
+    super(argv)
   end
 
   def run
-    if config[:name].nil?
-      unknown 'No name specified'
+    return unless config_is_valid?
+
+    result = nil
+
+    begin
+      result = execute_cucumber(config[:env], config[:command], config[:working_dir], config[:timeout])
+    rescue Timeout::Error
+      unknown_error "Cucumber exceeded the timeout of #{config[:timeout]} seconds"
       return
     end
-
-    if config[:handler].nil?
-      unknown 'No handler specified'
-      return
-    end
-
-    if config[:metric_handler].nil?
-      unknown 'No metric handler specified'
-      return
-    end
-
-    if config[:metric_prefix].nil?
-      unknown 'No metric prefix specified'
-      return
-    end
-
-    if config[:command].nil?
-      unknown 'No cucumber command line specified'
-      return
-    end
-
-    if config[:working_dir].nil?
-      unknown 'No working directory specified'
-      return
-    end
-
-    result = execute_cucumber
 
     puts "Report: #{result[:report]}" if config[:debug]
     puts "Exit status: #{result[:exit_status]}" if config[:debug]
 
     unless [0, 1].include? result[:exit_status]
-      unknown "Cucumber returned exit code #{result[:exit_status]}"
+      unknown_error "Cucumber returned exit code #{result[:exit_status]}"
       return
     end
 
     report = JSON.parse(result[:report], :symbolize_names => true)
 
-    outcome = OK
+    outcome = :ok
     scenario_count = 0
     statuses = [:passed, :failed, :pending, :undefined]
     status_counts = {}
@@ -128,100 +143,120 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     utc_timestamp = Time.now.getutc.to_i
 
     report.each do |feature|
-      if feature.has_key? :elements
-        feature[:elements].each do |element|
-          if element[:type] == 'scenario'
-            scenario_status = :passed
+      Array(feature[:elements]).each do |element|
+        if element[:type] == 'scenario'
+          event_name = "#{config[:name]}.#{generate_name_from_scenario(feature, element)}"
+          scenario_status = get_scenario_status(element)
 
-            if element.has_key? :steps
-              element[:steps].each do |step|
-                if step.has_key? :result
-                  step_status = step[:result][:status]
+          sensu_events << generate_sensu_event(event_name, feature, element, scenario_status)
 
-                  if ['failed', 'pending', 'undefined'].include? step_status
-                    scenario_status = step_status.to_sym
-                    break
-                  end
-                end
-              end
-            end
+          metrics = generate_metrics_from_scenario(feature, element, scenario_status, utc_timestamp)
 
-            feature_clone = deep_dup(feature)
-            feature_clone[:elements] = [deep_dup(element)]
-            scenario_report = [feature_clone]
-
-            data = {
-              :status => scenario_status,
-              :report => scenario_report
-            }
-
-            event_name = "#{config[:name]}.#{generate_name_from_scenario(element)}"
-
-            sensu_event = {
-              :name => event_name,
-              :handlers => [config[:handler]],
-              :output => data.to_json
-            }
-
-            case scenario_status
-              when :passed
-                sensu_event[:status] = OK
-              when :failed
-                sensu_event[:status] = CRITICAL
-              when :pending, :undefined
-                sensu_event[:status] = WARNING
-            end
-
-            sensu_events << sensu_event
-
-            metrics = generate_metrics_from_scenario(element, scenario_status, utc_timestamp)
-
-            unless metrics.nil?
-              metric_event = {
-                :name => "#{event_name}.metrics",
-                :type => 'metric',
-                :handlers => [config[:metric_handler]],
-                :output => metrics,
-                :status => 0
-              }
-              sensu_events << metric_event
-            end
-
-            scenario_count += 1
-            status_counts[scenario_status] += 1
+          unless metrics.nil?
+            sensu_events << generate_metric_event(event_name, metrics)
           end
+
+          scenario_count += 1
+          status_counts[scenario_status] += 1
         end
       end
     end
 
     puts "Sensu events: #{JSON.pretty_generate(sensu_events)}" if config[:debug]
 
-    raise_sensu_events sensu_events unless sensu_events.length == 0
+    errors = raise_sensu_events(sensu_events)
 
-    message = "scenarios: #{scenario_count}"
-    statuses.each do |status|
-      message << ", #{status}: #{status_counts[status]}" unless status_counts[status] == 0
+    if errors.length > 0
+      outcome = :unknown
+    elsif scenario_count == 0
+      outcome = :warning
     end
 
-    outcome = WARNING if scenario_count == 0
+    data = {
+      'status' => outcome.to_s,
+      'scenarios' => scenario_count
+    }
+
+    statuses.each do |status|
+      data[status.to_s] = status_counts[status] if status_counts[status] > 0
+    end
+
+    data['errors'] = errors if errors.length > 0
+
+    data = dump_yaml(data)
 
     case outcome
-      when OK
-        ok message
-      when WARNING
-        warning message
-      when CRITICAL
-        critical message
-      when UNKNOWN
-        unknown message
+      when :ok
+        ok data
+      when :warning
+        warning data
+      when :unknown
+        unknown data
     end
   end
 
-  def generate_name_from_scenario(scenario)
-    check_name = scenario[:id]
-    check_name += ";#{scenario[:profile]}" if scenario.has_key? :profile
+  def config_is_valid?
+    if config[:name].nil?
+      unknown_error 'No name specified'
+      return false
+    end
 
-    check_name = check_name.gsub(/\./, '-')
+    if config[:handler].nil?
+      unknown_error 'No handler specified'
+      return false
+    end
+
+    if config[:metric_handler].nil?
+      unknown_error 'No metric handler specified'
+      return false
+    end
+
+    if config[:metric_prefix].nil?
+      unknown_error 'No metric prefix specified'
+      return false
+    end
+
+    if config[:command].nil?
+      unknown_error 'No cucumber command line specified'
+      return false
+    end
+
+    if config[:working_dir].nil?
+      unknown_error 'No working directory specified'
+      return false
+    end
+
+    config[:timeout] ||= INFINITE_TIMEOUT
+    config[:timeout] = Float(config[:timeout]) unless config[:timeout].nil?
+    config[:env] ||= {}
+    config[:event_data] ||= {}
+
+    config[:attachments] = 'true' if config[:attachments].nil?
+
+    case config[:attachments]
+      when 'true'
+        config[:attachments] = true
+      when 'false'
+        config[:attachments] = false
+      else
+        unknown_error 'Attachments argument is not a valid boolean'
+        return false
+    end
+
+    true
+  end
+
+  def remove_attachments_from_scenario(scenario)
+    Array(scenario[:steps]).each do |step|
+      step[:embeddings] = [] if step.has_key?(:embeddings)
+    end
+  end
+
+  def generate_name_from_scenario(feature, scenario)
+    name = scenario[:id]
+    name += ";#{feature[:profile]}" if feature.has_key? :profile
+
+    name = name.gsub(/\./, '-')
       .gsub(/;/, '.')
       .gsub(/[^a-zA-Z0-9\._-]/, '-')
       .gsub(/^\.+/, '')
@@ -230,7 +265,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
 
     parts = []
 
-    check_name.split('.').each do |part|
+    name.split('.').each do |part|
       part = part.gsub(/^-+/, '')
         .gsub(/-+$/, '')
         .gsub(/-+/, '-')
@@ -238,25 +273,33 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
       parts << part unless part.length == 0
     end
 
-    check_name = parts.join('.')
-    check_name
+    name = parts.join('.')
+    name
   end
 
   def raise_sensu_events(sensu_events)
+    errors = []
+
     sensu_events.each do |sensu_event|
-      data = sensu_event.to_json
+      data = escape_unicode_characters_in_json(sensu_event.to_json)
 
-      socket = UDPSocket.new
-      socket.send data, 0, '127.0.0.1', 3030
-      socket.close
+      begin
+        send_sensu_event(data)
+      rescue StandardError => error
+        errors << {
+          'message' => "Failed to raise event #{sensu_event[:name]}",
+          'error' => {
+            'message' => error.message,
+            'backtrace' => error.backtrace
+          }
+        }
+      end
     end
+
+    errors
   end
 
-  def deep_dup(obj)
-    Marshal.load(Marshal.dump(obj))
-  end
-
-  def generate_metrics_from_scenario(scenario, scenario_status, utc_timestamp)
+  def generate_metrics_from_scenario(feature, scenario, scenario_status, utc_timestamp)
     metrics = []
 
     if scenario_status == :passed
@@ -264,7 +307,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
 
       if scenario.has_key?(:steps)
         has_step_durations = false
-        scenario_metric_prefix = "#{config[:metric_prefix]}.#{generate_name_from_scenario(scenario)}"
+        scenario_metric_prefix = "#{config[:metric_prefix]}.#{generate_name_from_scenario(feature, scenario)}"
 
         scenario[:steps].each.with_index do |step, step_index|
           if step.has_key?(:result) && step[:result].has_key?(:duration)
@@ -293,6 +336,168 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     end
 
     metrics
+  end
+
+  private
+
+  def output(msg)
+    puts msg
+  end
+
+  def execute_cucumber(env, command, working_dir, timeout)
+    report = nil
+    pipe = nil
+
+    begin
+      begin
+        Timeout.timeout(timeout) do
+          pipe = IO.popen(env, command, :chdir => working_dir, :external_encoding => Encoding::UTF_8)
+          report = pipe.read
+        end
+      rescue Timeout::Error
+        Process.kill 9, pipe.pid
+        raise Timeout::Error, "Cucumber timed out"
+      end
+    ensure
+      pipe.close unless pipe.nil?
+    end
+
+    {:report => report, :exit_status => $?.exitstatus}
+  end
+
+  def send_sensu_event(data)
+    socket = TCPSocket.new('127.0.0.1', 3030)
+    socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+
+    index = 0
+    length = data.length
+
+    while index < length
+      bytes_sent = socket.send data[index..-1], 0
+      index += bytes_sent
+    end
+
+    socket.close
+  end
+
+  def generate_sensu_event(event_name, feature, scenario, scenario_status)
+    scenario_clone = deep_dup(scenario)
+    remove_attachments_from_scenario(scenario_clone) unless config[:attachments]
+    feature_clone = deep_dup(feature)
+    feature_clone[:elements] = [scenario_clone]
+    scenario_report = [feature_clone]
+
+    scenario_output = get_output_for_scenario(scenario, scenario_status)
+
+    scenario_status_code = case scenario_status
+      when :passed
+        OK
+      when :failed
+        CRITICAL
+      when :pending, :undefined
+        WARNING
+    end
+
+    sensu_event = {
+      :name => event_name,
+      :handlers => [config[:handler]],
+      :status => scenario_status_code,
+      :output => scenario_output,
+      :report => scenario_report
+    }
+
+    config[:event_data].each do |key, value|
+      if value =~ /^\A-?[0-9]+\z/
+        value = Integer(value)
+      elsif value =~ /^\A-?[0-9]+\.[0-9]+\z/
+        value = Float(value)
+      elsif value == 'true'
+        value = true
+      elsif value == 'false'
+        value = false
+      end
+      sensu_event[key] = value
+    end
+
+    sensu_event
+  end
+
+  def generate_metric_event(event_name, metrics)
+    metric_event = {
+      :name => "#{event_name}.metrics",
+      :type => 'metric',
+      :handlers => [config[:metric_handler]],
+      :output => metrics,
+      :status => 0
+    }
+
+    metric_event
+  end
+
+  def get_scenario_status(scenario)
+    scenario_status = :passed
+
+    Array(scenario[:steps]).each do |step|
+      if step.has_key? :result
+        step_status = step[:result][:status]
+
+        if ['failed', 'pending', 'undefined'].include? step_status
+          scenario_status = step_status.to_sym
+          break
+        end
+      end
+    end
+
+    scenario_status
+  end
+
+  def get_output_for_scenario(scenario, scenario_status)
+    steps_output = []
+
+    Array(scenario[:steps]).each_with_index do |step, index|
+      has_result = step.has_key?(:result)
+      step_status = has_result ? step[:result][:status] : 'UNKNOWN'
+      step_output = {
+        'step' => "#{step_status.upcase} - #{index + 1} - #{step[:keyword]}#{step[:name]}"
+      }
+
+      if has_result && step[:result].has_key?(:error_message)
+        step_output['error'] = step[:result][:error_message]
+      end
+
+      steps_output << step_output
+    end
+
+    scenario_output = {
+      'status' => scenario_status.to_s,
+      'steps' => steps_output
+    }
+
+    dump_yaml(scenario_output)
+  end
+
+  def unknown_error(message)
+    data = {
+      'status' => 'unknown',
+      'errors' => [
+        {
+          'message' => message
+        }
+      ]
+    }
+    unknown dump_yaml(data)
+  end
+
+  def deep_dup(obj)
+    Marshal.load(Marshal.dump(obj))
+  end
+
+  def dump_yaml(data)
+    data.to_yaml.gsub(/^---\r?\n/, '')
+  end
+
+  def escape_unicode_characters_in_json(json)
+    json.unpack('U*').map {|i| i < 128 ? i.chr : "\\u#{i.to_s(16).rjust(4, '0')}"}.join
   end
 
 end
