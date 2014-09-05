@@ -40,6 +40,12 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--interval SECONDS",
     :default => 1
 
+  option :mappernames,
+    :description => "Display the registered device mapper names for any device mapper devices.  Useful for viewing LVM2 statistics",
+    :short => "-N",
+    :long => "--show-dm-names",
+    :boolean => true
+
   def parse_results(raw)
     stats = {}
     key = nil
@@ -83,6 +89,9 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
       config[:excludedisk].each do |disk|
         cmd += " | grep -v #{disk}"
       end
+    end
+    if config[:mappernames]
+      cmd += " -N"
     end
     stats = parse_results(`#{cmd}`)
 
