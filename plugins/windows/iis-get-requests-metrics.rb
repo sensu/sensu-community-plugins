@@ -29,7 +29,7 @@ class IisGetRequests < Sensu::Plugin::Metric::CLI::Graphite
     io = IO.popen("typeperf -sc 1 \"Web Service(#{config[:site]})\\Get\ Requests\/sec\"")
     get_requests = io.readlines[2].split(',')[1].gsub(/"/, '').to_f
 
-    output [config[:scheme],config[:site]].join('.'), get_requests
+    output [config[:scheme], config[:site]].join('.'), get_requests
     ok
   end
 end

@@ -29,7 +29,7 @@ class IisCurrentConnectionsMetric < Sensu::Plugin::Metric::CLI::Graphite
     io = IO.popen("typeperf -sc 1 \"Web Service(#{config[:site]})\\Current\ Connections\"")
     current_connection = io.readlines[2].split(',')[1].gsub(/"/, '').to_f
 
-    output [config[:scheme],config[:site]].join('.'), current_connection
+    output [config[:scheme], config[:site]].join('.'), current_connection
     ok
   end
 end
