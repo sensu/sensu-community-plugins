@@ -46,7 +46,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
 
   option :request_uri,
     :short => '-p PATH',
-    :long => '--resquest-uri PATH',
+    :long => '--request-uri PATH',
     :description => 'Specify a uri path'
 
   option :header,
