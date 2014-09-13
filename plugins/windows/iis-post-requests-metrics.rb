@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Check IIS Get Requests Metric
+# Check IIS Post Requests Metric
 # ===
 #
 # Tested on Windows 2012RC2.
@@ -14,21 +14,21 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 
-class IisGetRequests < Sensu::Plugin::Metric::CLI::Graphite
+class IisPostRequests < Sensu::Plugin::Metric::CLI::Graphite
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to .$parent.$child",
     :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.iis_get_requests"
+    :default => "#{Socket.gethostname}.iis_post_requests"
 
   option :site,
     :short => '-s sitename',
     :default => '_Total'
 
   def run
-    io = IO.popen("typeperf -sc 1 \"Web Service(#{config[:site]})\\Get\ Requests\/sec\"")
-    get_requests = io.readlines[2].split(',')[1].gsub(/"/, '').to_f
+    io = IO.popen("typeperf -sc 1 \"Web Service(#{config[:site]})\\Post\ Requests\/sec\"")
+    post_requests = io.readlines[2].split(',')[1].gsub(/"/, '').to_f
 
-    output [config[:scheme], config[:site]].join('.'), get_requests
+    output [config[:scheme], config[:site]].join('.'), post_requests
   end
 end
