@@ -78,7 +78,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
   end
 
   def read_df
-    `df -PT`.split("\n").drop(1).each do |line|
+    `df -lPT`.split("\n").drop(1).each do |line|
       begin
         _fs, type, _blocks, _used, _avail, capacity, mnt = line.split
         next if config[:includeline] && !config[:includeline].find { |x| line.match(x) }
@@ -98,7 +98,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
       end
     end
 
-    `df -PTi`.split("\n").drop(1).each do |line|
+    `df -lPTi`.split("\n").drop(1).each do |line|
       begin
         _fs, type, _inodes, _used, _avail, capacity, mnt = line.split
         next if config[:includeline] && !config[:includeline].find { |x| line.match(x) }
