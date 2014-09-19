@@ -37,10 +37,22 @@ class DNS < Sensu::Plugin::Check::CLI
     :long => '--type RECORD',
     :default => 'A'
 
+  option :port,
+    :description => "Port to use for name lookup",
+    :short => '-p PORT',
+    :long => '--port PORT',
+    :default => '53'
+
   option :server,
     :description => "Server to use for resolution",
     :short => '-s SERVER',
     :long => '--server SERVER'
+
+  option :tcp,
+    :description => "Use TCP for lookup",
+    :short => '-c',
+    :long => '--use-tcp-connection',
+    :boolean => false
 
   option :result,
     :description => "A positive result entry",
@@ -62,7 +74,7 @@ class DNS < Sensu::Plugin::Check::CLI
     if config[:type] == 'PTR'
       cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} -x #{config[:domain]} +short +time=1"
     else
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} #{config[:domain]} #{config[:type]} +short +time=1"
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} #{config[:tcp] ? "+tcp" : "-tcp" } -p #{config[:port]} #{config[:domain]} #{config[:type]} +short +time=1"
     end
     puts cmd if config[:debug]
     output = `#{cmd}`
