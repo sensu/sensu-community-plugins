@@ -4,7 +4,7 @@
 # ===
 #
 # Checks the status of all virtual drives of a particular controller
-# 
+#
 # MegaCli/MegaCli64 requires root access
 #
 # Copyright 2014 Magnus Hagdorn <magnus.hagdorn@ed.ac.uk>
@@ -26,19 +26,19 @@ class CheckMegraRAID < Sensu::Plugin::Check::CLI
          :description => "the controller to query",
          :short => '-C ID',
          :long => '--controller ID',
-         :proc => proc {|a| a.to_i },
+         :proc => proc { |a| a.to_i },
          :default => 0
-  
+
   def run
     haveError=false
     error=''
     # get number of virtual drives
     `#{config[:megaraidcmd]} -LDGetNum -a#{config[:controller]} `
-    for i in 0..$?.exitstatus-1
+    (0..$?.exitstatus-1).each do |i|
       # and check them in turn
       stdout = `#{config[:megaraidcmd]} -LDInfo -L#{i} -a#{config[:controller]} `
-      if not Regexp.new('State\s*:\s*Optimal').match(stdout)
-        error << 'virtual drive %d: %s '%[i,stdout[/State\s*:\s*.*/].split(':')[1]]
+      unless Regexp.new('State\s*:\s*Optimal').match(stdout)
+        error = sprintf '%svirtual drive %d: %s ', error, i, stdout[/State\s*:\s*.*/].split(':')[1]
         haveError = true
       end
     end
