@@ -88,10 +88,12 @@ class CheckCephHealth < Sensu::Plugin::Check::CLI
       end
     rescue Timeout::Error
       begin
-        Process.kill(9,pipe.pid)
+        Process.kill(9, pipe.pid)
         Process.wait(pipe.pid)
       rescue Errno::ESRCH, Errno::EPERM
-        # Mask errors from trying to kill the timed-out process
+        # Catch errors from trying to kill the timed-out process
+        # We must do something here to stop travis complaining
+        critical "Execution timed out"
       ensure
         critical "Execution timed out"
       end
