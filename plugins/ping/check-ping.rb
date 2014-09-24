@@ -6,7 +6,7 @@
 #
 # Examples:
 #
-#   check-ping -h host -T timeout
+#   check-ping -h host -T timeout [--report]
 #
 #  Default host is "localhost"
 #
@@ -28,14 +28,67 @@ class CheckPING < Sensu::Plugin::Check::CLI
 
   option :timeout,
     :short => '-T timeout',
+    :proc => Proc.new {|s| s.to_i},
     :default => '5'
 
+  option :count,
+    :short => '-c count',
+    :description => 'The number of ping requests',
+    :proc => Proc.new {|s| s.to_i },
+    :default => 1
+
+  option :interval,
+    :short => '-i interval',
+    :description => 'The number of seconds to wait between ping requests',
+    :proc => Proc.new {|s| s.to_f },
+    :default => 1
+
+  option :warn_ratio,
+    :short => '-W ratio',
+    :description => 'Warn if successful ratio is under this value',
+    :proc => Proc.new {|s| s.to_f },
+    :default => 0.5
+
+  option :critical_ratio,
+    :short => '-C ratio',
+    :description => 'Critical if successful ratio is under this value',
+    :proc => Proc.new {|s| s.to_f },
+    :default => 0.2
+
+  option :report,
+    :short => '-r',
+    :long => '--report',
+    :description => "Attach MTR report if ping is failed",
+    :default => false
+
   def run
+    result = []
     pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
-    if pt.ping?
-      ok "ICMP ping successful for host: #{config[:host]}"
+    config[:count].times do |i|
+      sleep(config[:interval]) unless i == 0
+      result[i] = pt.ping?
+    end
+
+    successful_count = result.count(true)
+    total_count = config[:count]
+    success_ratio = successful_count / total_count.to_f
+
+    if success_ratio > config[:warn_ratio]
+      success_message = "ICMP ping successful for host: #{config[:host]}"
+      ok success_message
     else
-      critical "ICMP ping unsuccessful for host: #{config[:host]}"
+      failure_message = "ICMP ping unsuccessful for host: #{config[:host]} (successful: #{successful_count}/#{total_count})"
+
+      if config[:report]
+        report = `mtr --curses --report-cycles=1 --report --no-dns #{config[:host]}`
+        failure_message = failure_message + "\n" + report
+      end
+
+      if success_ratio <= config[:critical_ratio]
+        critical failure_message
+      else
+        warning failure_message
+      end
     end
   end
 end

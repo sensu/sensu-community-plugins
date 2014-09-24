@@ -2,6 +2,8 @@
 #
 # Check NTP offset - yeah this is horrible.
 #
+# warning and critical values are offsets in milliseconds.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

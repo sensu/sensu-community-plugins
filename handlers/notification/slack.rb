@@ -60,8 +60,6 @@ class Slack < Sensu::Handler
 
   def build_description
     [
-      @event['client']['name'],
-      @event['check']['name'],
       @event['check']['output'],
       @event['client']['address'],
       @event['client']['subscriptions'].join(',')
@@ -83,32 +81,34 @@ class Slack < Sensu::Handler
 
   def verify_response(response)
     case response
-      when Net::HTTPSuccess
-        true
-      else
-        raise response.error!
+    when Net::HTTPSuccess
+      true
+    else
+      raise response.error!
     end
   end
 
   def payload(notice)
     {
-      :link_names => 1,
-      :text => [slack_message_prefix, notice].compact.join(' '),
-      :icon_emoji => icon_emoji
+      :icon_url => 'http://sensuapp.org/img/sensu_logo_large-c92d73db.png',
+      :attachments => [{
+        :text  => [slack_message_prefix, notice].compact.join(' '),
+        :color => color
+      }]
     }.tap do |payload|
       payload[:channel] = slack_channel if slack_channel
       payload[:username] = slack_bot_name if slack_bot_name
     end
   end
 
-  def icon_emoji
-    default = ":feelsgood:"
-    emoji = {
-      0 => ':godmode:',
-      1 => ':hurtrealbad:',
-      2 => ':feelsgood:'
+  def color
+    color = {
+      0 => '#36a64f',
+      1 => '#FFCC00',
+      2 => '#FF0000',
+      3 => '#6600CC'
     }
-    emoji.fetch(check_status.to_i, default)
+    color.fetch(check_status.to_i)
   end
 
   def check_status

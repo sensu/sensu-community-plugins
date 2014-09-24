@@ -19,6 +19,7 @@
 
 require "sensu-plugin/check/cli"
 require "aws-sdk"
+require "time"
 
 class CheckDynamoDB < Sensu::Plugin::Check::CLI
   option :access_key_id,

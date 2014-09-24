@@ -58,7 +58,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :proc => proc {|a| a.to_i },
     :default => 9200
 
-  option :request_timeout,
+  option :timeout,
     :description => "Request timeout to elasticsearch",
     :short => "-t TIMEOUT",
     :long => "--timeout TIMEOUT",
@@ -90,7 +90,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def get_es_resource(resource)
     begin
-      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", :timeout => config[:request_timeout])
+      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", :timeout => config[:timeout])
       JSON.parse(r.get)
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
@@ -142,10 +142,9 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['os.load_average.5']                = node['os']['load_average'][1]
       metrics['os.load_average.15']               = node['os']['load_average'][2]
       metrics['os.mem.free_in_bytes']             = node['os']['mem']['free_in_bytes']
+      # ... Process uptime in millis?
+      metrics['os.uptime']                        = node['os']['uptime_in_millis']
     end
-
-    # ... Process uptime in millis?
-    metrics['os.uptime'] = node['os']['uptime_in_millis']
 
     if process_stats
       metrics['process.mem.resident_in_bytes']    = node['process']['mem']['resident_in_bytes']
@@ -182,7 +181,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     node['indices'].each do |type,  index|
       index.each do |k, v|
         unless (k =~ /(_time|memory|size$)/)
-          metrics["indicies.#{type}.#{k}"] = v
+          metrics["indices.#{type}.#{k}"] = v
         end
       end
     end
@@ -211,7 +210,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     node['thread_pool'].each do |pool, stat|
       stat.each do |k, v|
-        metrics["tread_pool.#{pool}.#{k}"] = v
+        metrics["thread_pool.#{pool}.#{k}"] = v
       end
     end
 

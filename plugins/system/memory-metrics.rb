@@ -23,6 +23,7 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
       mem['cached']    = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Cached/)
       mem['swapTotal'] = line.split(/\s+/)[1].to_i * 1024 if line.match(/^SwapTotal/)
       mem['swapFree']  = line.split(/\s+/)[1].to_i * 1024 if line.match(/^SwapFree/)
+      mem['dirty']     = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Dirty/)
     end
 
     mem['swapUsed'] = mem['swapTotal'] - mem['swapFree']

@@ -197,14 +197,7 @@ class JstatMetricsToGraphiteFormat(object):
       if jstat_option == "-class":
        titles[2] = "Bytes_column2"
        titles[4] = "Bytes_column4"
-      metrics_long =[]
-      for title in titles:
-        for short_title in metric_maps:
-          if title == short_title:
-            metrics_long.append(metric_maps[short_title])
-
-      stats = dict(zip(metrics_long, values))
-      return stats
+      return dict([(metric_maps[title], values[position]) for position, title in enumerate(titles) if title in metric_maps])
 
     # Get lvmid (JVM id)
     try :
