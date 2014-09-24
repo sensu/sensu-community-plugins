@@ -3,9 +3,9 @@
 # Check JSON
 # ===
 #
-# Takes either a URL or a combination of host/path/port/ssl, and checks for
-# valid JSON output in the response. Can also optionally validate simple string
-# key/value pairs.
+# Takes either a URL or a combination of host/path/query/port/ssl, and checks
+# for valid JSON output in the response. Can also optionally validate simple
+# string key/value pairs.
 #
 # Copyright 2013 Matt Revell <nightowlmatt@gmail.com>
 # Based on Check HTTP by Sonian Inc.
@@ -24,6 +24,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
   option :url, :short => '-u URL'
   option :host, :short => '-h HOST'
   option :path, :short => '-p PATH'
+  option :query, :short => '-q QUERY'
   option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
   option :header, :short => '-H HEADER', :long => '--header HEADER'
   option :ssl, :short => '-s', :boolean => true, :default => false
@@ -41,6 +42,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
       uri = URI.parse(config[:url])
       config[:host] = uri.host
       config[:path] = uri.path
+      config[:query] = uri.query
       config[:port] = uri.port
       config[:ssl] = uri.scheme == 'https'
     else
@@ -86,7 +88,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
       end
     end
 
-    req = Net::HTTP::Get.new(config[:path])
+    req = Net::HTTP::Get.new([config[:path], config[:query]].compact.join('?'))
     if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end
