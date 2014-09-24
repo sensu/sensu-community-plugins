@@ -6,9 +6,9 @@
 %% for checks
 %%
 %% Usage:
-%% ./check-erlang-mailboxes.escript -c epic_erlang_cookie -n metrics@127.0.0.1 -r epic_erlang_app@127.0.0.1 -s prod.epic_erlang_app -p named_process1 -d true
+%% ./check-erlang-mailboxes.escript -c epic_erlang_cookie -n metrics@127.0.0.1 -r epic_erlang_app@127.0.0.1 -W 1000 -C 5000 -d true
 %%
-%% Copyright 2013 Panagiotis Papadomitsos <pj@ezgr.net>.
+%% Copyright 2014 Panagiotis Papadomitsos <pj@ezgr.net>.
 %%
 %% Released under the same terms as Sensu (the MIT license); see LICENSE
 %% for details.
