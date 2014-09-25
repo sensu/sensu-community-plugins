@@ -15,8 +15,18 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
   def run
     # Metrics borrowed from hoardd: https://github.com/coredump/hoardd
 
+    mem = metrics_hash
+
+    mem.each do |k, v|
+      output "#{config[:scheme]}.#{k}", v
+    end
+
+    ok
+  end
+
+  def metrics_hash
     mem = {}
-    File.open("/proc/meminfo", "r").each_line do |line|
+    meminfo_output.each_line do |line|
       mem['total']     = line.split(/\s+/)[1].to_i * 1024 if line.match(/^MemTotal/)
       mem['free']      = line.split(/\s+/)[1].to_i * 1024 if line.match(/^MemFree/)
       mem['buffers']   = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Buffers/)
@@ -30,12 +40,12 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
     mem['used'] = mem['total'] - mem['free']
     mem['usedWOBuffersCaches'] = mem['used'] - (mem['buffers'] + mem['cached'])
     mem['freeWOBuffersCaches'] = mem['free'] + (mem['buffers'] + mem['cached'])
+    mem['swapUsedPercentage'] = 100 * mem['swapUsed'] / mem['swapTotal']
 
-    mem.each do |k, v|
-      output "#{config[:scheme]}.#{k}", v
-    end
-
-    ok
+    mem
   end
 
+  def meminfo_output
+    File.open("/proc/meminfo", "r")
+  end
 end
