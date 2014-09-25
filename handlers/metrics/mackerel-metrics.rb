@@ -39,7 +39,7 @@ class Mackerel < Sensu::Handler
 
       metrics = [{
         :hostId => hostid,
-        :name   => "%s.%s" % ['custom', v[0]],
+        :name   => format('%{custom}.%{name}', custom: 'custom', name: v[0]),
         :value  => v[1].to_i,
         :time   => v[2].to_i,
       }]
