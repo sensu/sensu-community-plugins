@@ -3,7 +3,7 @@
 # ===
 #
 # Referred to ram-usage-windows.rb.(Thank you!)
-# Tested on Windows 2012RC2.
+# Tested on Windows Server 2012RC2.
 #
 # Yohei Kawahara <inokara@gmail.com>
 #
