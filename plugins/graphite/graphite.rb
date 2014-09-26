@@ -308,7 +308,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last_values[target]
       percent = last_value / avg_value unless last_value.nil? || avg_value.nil?
       ['fatal', 'error', 'warning'].each do |type|
-        next if not max_values.has_key?(type)
+        next unless max_values.has_key?(type)
         max_value = max_values[type]
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
@@ -343,7 +343,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_array = values_pair.find_all{|v| v.first}.map {|v| v.first if v.first != nil}
       avg_value = values_array.inject{ |sum, el| sum + el if el }.to_f / values_array.size
       ['fatal', 'error', 'warning'].each do |type|
-        next if not max_values.has_key?(type)
+        next unless max_values.has_key?(type)
         max_value = max_values[type]
         var1 = config[:greater_than] ? avg_value : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : avg_value
@@ -381,7 +381,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last_values[target]
       percent = last_value / percentile_value unless last_value.nil? || percentile_value.nil?
       ['fatal', 'error', 'warning'].each do |type|
-        next if not max_values.has_key?(type)
+        next unless max_values.has_key?(type)
         max_value = max_values[type]
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
@@ -415,7 +415,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last.first
       unless last_value.nil?
         ['fatal', 'error', 'warning'].each do |type|
-          next if not max_values.has_key?(type)
+          next unless max_values.has_key?(type)
           max_value = max_values[type]
           var1 = config[:greater_than] ? last_value : max_value.to_f
           var2 = config[:greater_than] ? max_value.to_f : last_value
