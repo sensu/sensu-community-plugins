@@ -50,7 +50,7 @@ class ChefNodesStatusChecker < Sensu::Plugin::Check::CLI
     nodes = connection.get_rest('/nodes')
     nodes.keys.map do |node_name|
       node = connection.get_rest("/nodes/#{node_name}")
-      { node_name => (Time.now - Time.at(node.ohai_time)) > config[:critical_timespan].to_i }
+      { node_name => (Time.now - Time.at(node["ohai_time"])) > config[:critical_timespan].to_i }
     end
   end
 
