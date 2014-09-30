@@ -21,7 +21,8 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
                      'redis_git_dirty', 'redis_git_sha1', 'redis_version', '^role',
                      'run_id', '^slave', 'used_memory_human', 'used_memory_peak_human',
                      'redis_mode', 'os', 'arch_bits', 'tcp_port',
-                     'rdb_last_bgsave_status', 'aof_last_bgrewrite_status']
+                     'rdb_last_bgsave_status', 'aof_last_bgrewrite_status', 'config_file',
+                     'redis_build_id']
 
   option :host,
     :short => "-h HOST",
