@@ -34,7 +34,6 @@ class LogstashHandler < Sensu::Handler
   end
 
   def handle
-    
     time = Time.now.utc.iso8601
     logstash_msg = {
       :@timestamp    => time,
@@ -56,7 +55,7 @@ class LogstashHandler < Sensu::Handler
     }
     logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
 
-    case settings['logstash']['output'] 
+    case settings['logstash']['output']
     when 'redis'
       redis = Redis.new(:host => settings['logstash']['server'], :port => settings['logstash']['port'])
       redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
