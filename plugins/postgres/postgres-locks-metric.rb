@@ -57,16 +57,7 @@ class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
 
-    metrics = {
-        :accessshare          => 0,
-        :rowshare             => 0,
-        :rowexclusive         => 0,
-        :shareupdateexclusive => 0,
-        :share                => 0,
-        :sharerowexclusive    => 0,
-        :exclusive            => 0,
-        :accessexclusive      => 0
-    }
+    metrics = Hash.new(0)
 
     con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, 'postgres', config[:user], config[:password])
     request = [
