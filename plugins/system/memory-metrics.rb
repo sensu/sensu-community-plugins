@@ -6,6 +6,12 @@ require 'socket'
 
 class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
+  option :percentage,
+    :description => "Output percentages instead of absolute values.",
+    :short => "-p",
+    :long => "--percent",
+    :required => false
+
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
     :short => "-s SCHEME",
@@ -40,9 +46,37 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
     mem['used'] = mem['total'] - mem['free']
     mem['usedWOBuffersCaches'] = mem['used'] - (mem['buffers'] + mem['cached'])
     mem['freeWOBuffersCaches'] = mem['free'] + (mem['buffers'] + mem['cached'])
-    mem['swapUsedPercentage'] = 100 * mem['swapUsed'] / mem['swapTotal']
 
-    mem
+    if config[:percentage]
+      memp = {}
+
+      # to prevent division by zero
+      if mem['swapTotal'] == 0
+        swptot = 1
+      else
+        swptot = mem['swapTotal']
+      end
+
+      mem.each do |k, v|
+        # with percentages, used and free are exactly complementary
+        # no need to have both
+        # the one to drop here is "used" because "free" will
+        # stack up neatly to 100% with all the others (except swapUsed)
+        if k != "total" && k !~ /swap/ && k != "used"
+          memp[k] = 100.0 * mem[k] / mem['total']
+        end
+
+        # with percentages, swapUsed and swapFree are exactly complementary
+        # no need to have both
+        if k != "swapTotal" && k =~ /swap/ && k != "swapFree"
+          memp[k] = 100.0 * mem[k] / swptot
+        end
+      end
+
+      memp
+    else
+      mem
+    end
   end
 
   def meminfo_output
