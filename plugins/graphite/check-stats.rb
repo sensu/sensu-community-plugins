@@ -91,6 +91,9 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
       rescue
         []
       end
+
+    unknown "No data from graphite" if data.empty?
+
     data.each do |metric|
       s, msg = danger(metric)
 
