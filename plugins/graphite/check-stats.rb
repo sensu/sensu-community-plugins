@@ -65,9 +65,9 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
       avg = average(datapoints)
 
       if !config[:crit].nil? && avg > config[:crit]
-        [2, "#{metric['target']} is #{avg}"]
+        return [2, "#{metric['target']} is #{avg}"]
       elsif !config[:warn].nil? && avg > config[:warn]
-        [1, "#{metric['target']} is #{avg}"]
+        return [1, "#{metric['target']} is #{avg}"]
       end
     end
     [0, nil]
