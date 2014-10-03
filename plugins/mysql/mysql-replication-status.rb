@@ -76,20 +76,20 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
     :default => 1800,
     :proc => lambda { |s| s.to_i }
 
-  VALID_STATUS = ['ok','warning','critical','unknown']
+  VALID_STATUS = ['ok', 'warning', 'critical', 'unknown']
   option :not_slave_exit_method,
     :short => '-n',
     :long => '--not-slave=VALUE',
     :description => 'Exit method to use if not a slave. Default is ok',
     :default => 'ok',
-    :proc => lambda { |s|
+    :proc => lambda do |s|
       if VALID_STATUS.include?(s)
         s
       else
         abort "Invalid for --not-slave: #{s.inspect}. " +
               "Expecting one of #{VALID_STATUS.join(', ')}."
       end
-    }
+    end
 
   option :help,
     :short => "-h",
