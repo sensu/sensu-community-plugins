@@ -124,7 +124,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
       return
     end
 
-    puts "Report: #{result[:report]}" if config[:debug]
+    puts "Results: #{result[:results]}" if config[:debug]
     puts "Exit status: #{result[:exit_status]}" if config[:debug]
 
     unless [0, 1].include? result[:exit_status]
@@ -132,7 +132,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
       return
     end
 
-    report = JSON.parse(result[:report], :symbolize_names => true)
+    results = JSON.parse(result[:results], :symbolize_names => true)
 
     outcome = :ok
     scenario_count = 0
@@ -142,7 +142,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     sensu_events = []
     utc_timestamp = Time.now.getutc.to_i
 
-    report.each do |feature|
+    results.each do |feature|
       Array(feature[:elements]).each do |element|
         if element[:type] == 'scenario'
           event_name = "#{config[:name]}.#{generate_name_from_scenario(feature, element)}"
@@ -345,14 +345,14 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
   end
 
   def execute_cucumber(env, command, working_dir, timeout)
-    report = nil
+    results = nil
     pipe = nil
 
     begin
       begin
         Timeout.timeout(timeout) do
           pipe = IO.popen(env, command, :chdir => working_dir, :external_encoding => Encoding::UTF_8)
-          report = pipe.read
+          results = pipe.read
         end
       rescue Timeout::Error
         Process.kill 9, pipe.pid
@@ -362,7 +362,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
       pipe.close unless pipe.nil?
     end
 
-    {:report => report, :exit_status => $?.exitstatus}
+    {:results => results, :exit_status => $?.exitstatus}
   end
 
   def send_sensu_event(data)
@@ -385,7 +385,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     remove_attachments_from_scenario(scenario_clone) unless config[:attachments]
     feature_clone = deep_dup(feature)
     feature_clone[:elements] = [scenario_clone]
-    scenario_report = [feature_clone]
+    scenario_results = [feature_clone]
 
     scenario_output = get_output_for_scenario(scenario, scenario_status)
 
@@ -403,7 +403,7 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
       :handlers => [config[:handler]],
       :status => scenario_status_code,
       :output => scenario_output,
-      :report => scenario_report
+      :results => scenario_results
     }
 
     config[:event_data].each do |key, value|
