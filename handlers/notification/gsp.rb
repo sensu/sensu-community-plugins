@@ -45,6 +45,7 @@ class GSP < Sensu::Handler
     @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
+  # convert Timestamp
   def timestamp
     Time.at(@event['client']['timestamp'])
   end
