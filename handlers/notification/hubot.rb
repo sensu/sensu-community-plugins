@@ -51,7 +51,8 @@ class Hubot < Sensu::Handler
   end
 
   def format_message
-    "#{action_to_string} - #{event_name}:" + @event['check']['notification'] || @event['check']['output']
+    message = @event['check']['notification'] || @event['check']['output']
+    "#{action_to_string} - #{event_name}: #{message}"
   end
 
   def handle
