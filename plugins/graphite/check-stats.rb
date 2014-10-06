@@ -20,30 +20,35 @@ require 'net/http'
 require 'sensu-plugin/check/cli'
 
 class CheckGraphiteStat < Sensu::Plugin::Check::CLI
+
   option :host,
     :short => "-h HOST",
     :long => "--host HOST",
     :description => "graphite hostname",
     :proc => proc {|p| p.to_s },
     :default => "graphite"
+
   option :period,
     :short => "-p PERIOD",
     :long => "--period PERIOD",
     :description => "The period back in time to extract from Graphite. Use -24hours, -2days, -15mins, etc, same format as in Graphite",
     :proc => proc {|p| p.to_s },
     :required => true
+
   option :target,
     :short => "-t TARGET",
     :long => "--target TARGET",
     :description => "The graphite metric name. Can include * to query multiple metrics",
     :proc => proc {|p| p.to_s },
     :required => true
+
   option :warn,
     :short => "-w WARN",
     :long => "--warn WARN",
     :description => "Warning level",
     :proc => proc {|p| p.to_f },
     :required => false
+
   option :crit,
     :short => "-c Crit",
     :long => "--crit CRIT",
