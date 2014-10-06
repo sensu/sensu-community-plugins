@@ -43,6 +43,13 @@ this is not recommended that you use master for your production instances.
 Better pick something which works for you and lock it via `:ref` in your
 `chef || puppet || ansible || bash script` you name it. 
 
+If you have installed Sensu using the omnibus package it will use an embedded
+version of ruby, but the ruby plugins here will use the system one. If you want
+to use the embedded ruby, which has the `sensu-plugin` gem installed as well,
+you can set `EMBEDDED_RUBY=true` in `/etc/default/sensu` and restart the Sensu
+services. This will put the embedded ruby first in the $PATH for commands run
+by the Sensu services.
+
 ## Rubocop linting
 
 Rubocop is used to lint the style of the ruby plugins. This is done
