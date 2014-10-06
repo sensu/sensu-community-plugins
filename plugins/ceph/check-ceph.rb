@@ -25,7 +25,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'sensu/io'
+require 'timeout'
 
 class CheckCephHealth < Sensu::Plugin::Check::CLI
 
@@ -75,14 +75,30 @@ class CheckCephHealth < Sensu::Plugin::Check::CLI
          :default => false
 
   def run_cmd(cmd)
+    pipe, status = nil
     begin
       cmd += config[:cluster] if config[:cluster]
       cmd += config[:keyring] if config[:keyring]
       cmd += config[:monitor] if config[:monitor]
-      output, status = Sensu::IO.popen(cmd, 'r', config[:timeout])
-    rescue => error
-      critical "Error: #{error.to_s}"
+      cmd += " 2>&1"
+      Timeout.timeout(config[:timeout]) do
+        pipe = IO.popen(cmd)
+        Process.wait(pipe.pid)
+        status = $?.exitstatus
+      end
+    rescue Timeout::Error
+      begin
+        Process.kill(9, pipe.pid)
+        Process.wait(pipe.pid)
+      rescue Errno::ESRCH, Errno::EPERM
+        # Catch errors from trying to kill the timed-out process
+        # We must do something here to stop travis complaining
+        critical "Execution timed out"
+      ensure
+        critical "Execution timed out"
+      end
     end
+    output = pipe.read
     critical "Command '#{cmd}' returned no output" if output.to_s == ''
     critical output unless status == 0
     output
