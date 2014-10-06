@@ -40,7 +40,7 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
     mem['used'] = mem['total'] - mem['free']
     mem['usedWOBuffersCaches'] = mem['used'] - (mem['buffers'] + mem['cached'])
     mem['freeWOBuffersCaches'] = mem['free'] + (mem['buffers'] + mem['cached'])
-    mem['swapUsedPercentage'] = 100 * mem['swapUsed'] / mem['swapTotal']
+    mem['swapUsedPercentage'] = 100 * mem['swapUsed'] / mem['swapTotal'] if mem['swapTotal'] > 0
 
     mem
   end
