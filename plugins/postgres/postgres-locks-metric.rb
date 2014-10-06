@@ -57,16 +57,7 @@ class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
 
-    metrics = {
-        :accessshare          => 0,
-        :rowshare             => 0,
-        :rowexclusive         => 0,
-        :shareupdateexclusive => 0,
-        :share                => 0,
-        :sharerowexclusive    => 0,
-        :exclusive            => 0,
-        :accessexclusive      => 0
-    }
+    locks_per_type = Hash.new(0)
 
     con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, 'postgres', config[:user], config[:password])
     request = [
@@ -77,12 +68,13 @@ class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     con.exec(request.join(' ')) do |result|
       result.each do |row|
-        metrics[row['mode'].downcase.to_sym] += 1
+        lock_name = row['mode'].downcase.to_sym
+        locks_per_type[lock_name] += 1
       end
     end
 
-    metrics.each do |metric, value|
-      output "#{config[:scheme]}.locks.#{config[:db]}.#{metric}", value, timestamp
+    locks_per_type.each do |lock_type, count|
+      output "#{config[:scheme]}.locks.#{config[:db]}.#{lock_type}", count, timestamp
     end
 
     ok
