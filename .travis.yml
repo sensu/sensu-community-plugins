@@ -1,5 +1,6 @@
 language: ruby
 rvm:
+  - 2.0
   - 2.1
 script:
   - 'bundle exec rake rubocop'
