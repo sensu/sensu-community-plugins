@@ -10,6 +10,17 @@ require 'uri'
 require 'net/http'
 require 'net/https'
 require 'json'
+require 'optparse'
+
+$options = {}
+optparse = OptionParser.new do |opts|
+  opts.banner = 'Usage: victorops.rb [--routingkey ROUTING_KEY]'
+  $options[:routingkey] = false
+  opts.on('-r', '--routingkey ROUTINGKEY', 'Custom routing key') do |key|
+    $options[:routingkey] = key
+  end
+end
+optparse.parse!
 
 class VictorOps < Sensu::Handler
 
@@ -20,6 +31,8 @@ class VictorOps < Sensu::Handler
     description = @event['check']['notification']
     description ||= [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     host = @event['client']['name']
+    routingkey = $options[:routingkey]
+    routingkey ||= config['routing_key']
     entity_id = incident_key
     state_message = description
     begin
@@ -48,7 +61,7 @@ class VictorOps < Sensu::Handler
         payload[:check] = @event['check']
         payload[:client] = @event['client']
 
-        uri   = URI("#{config['api_url'].chomp('/')}/#{config['routing_key']}")
+        uri   = URI("#{config['api_url'].chomp('/')}/#{routingkey}")
         https = Net::HTTP.new(uri.host, uri.port)
 
         https.use_ssl = true
