@@ -3,9 +3,11 @@
 # RabbitMQ check alive plugin
 # ===
 #
-# This plugin checks if RabbitMQ server is alive using the REST API
+# This plugin checks if RabbitMQ server is alive and responding to STOMP
+# requests.
 #
-# Copyright 2013 Milos Gajdos
+# Copyright 2014 Adam Ashley
+# Based on rabbitmq-amqp-alive by Milos Gajdos
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
