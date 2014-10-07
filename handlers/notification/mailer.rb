@@ -32,7 +32,7 @@ class Mailer < Sensu::Handler
   option :json_config,
    :description => 'Config Name',
    :short => '-j JsonConfig',
-   :long => '--jsonConfig JsonConfig',
+   :long => '--json_config JsonConfig',
    :required => false
 
   def short_name
