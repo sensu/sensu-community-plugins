@@ -4,7 +4,7 @@
 # ===
 #
 # DESCRIPTION:
-#   This plugin provides a method for monitoring the inode usage.  It will alert on the percentage used.  
+#   This plugin provides a method for monitoring the inode usage.  It will alert on the percentage used.
 #
 # OUTPUT:
 #   plain-text
