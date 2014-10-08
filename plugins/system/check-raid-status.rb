@@ -33,8 +33,7 @@ exit_code = EXIT_OK
 raid_info = "/proc/mdstat"
 
 def read_file(raid_info)
-  a = File.open(raid_info ,"r")
-  data = a.read
+  a = File.open(raid_info, "r")
   a.close
 end
 
