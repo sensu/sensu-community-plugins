@@ -212,11 +212,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       warning "Certificate will expire #{warn_cert_expire}"
     end
 
-    if res.body.nil?
-      size = "0"
-    else
-      size = res.body.size
-    end
+    size = res.body.nil? ? '0' : 'res.body.size'
 
     case res.code
       when /^2/
