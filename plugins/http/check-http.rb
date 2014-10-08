@@ -212,23 +212,25 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       warning "Certificate will expire #{warn_cert_expire}"
     end
 
+    size = res.body.nil? ? '0' : 'res.body.size'
+
     case res.code
       when /^2/
         if config[:redirectto]
           critical "Expected redirect to #{config[:redirectto]} but got #{res.code}" + body
         elsif config[:pattern]
           if res.body =~ /#{config[:pattern]}/
-            ok "#{res.code}, found /#{config[:pattern]}/ in #{res.body.size} bytes" + body
+            ok "#{res.code}, found /#{config[:pattern]}/ in #{size} bytes" + body
           else
-            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{res.body.size} bytes: #{res.body[0...200]}..."
+            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{size} bytes: #{res.body[0...200]}..."
           end
         else
-          ok("#{res.code}, #{res.body.size} bytes" + body) unless config[:response_code]
+          ok("#{res.code}, #{size} bytes" + body) unless config[:response_code]
         end
       when /^3/
         if config[:redirectok] || config[:redirectto]
           if config[:redirectok]
-            ok("#{res.code}, #{res.body.size} bytes" + body) unless config[:response_code]
+            ok("#{res.code}, #{size} bytes" + body) unless config[:response_code]
           elsif config[:redirectto]
             if config[:redirectto] == res['Location']
               ok "#{res.code} found redirect to #{res['Location']}" + body
@@ -247,7 +249,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
 
     if config[:response_code]
       if config[:response_code] == res.code
-        ok "#{res.code}, #{res.body.size} bytes" + body
+        ok "#{res.code}, #{size} bytes" + body
       else
         critical res.code + body
       end
