@@ -30,14 +30,12 @@ EXIT_WARNING = 1
 EXIT_CRIT = 2
 exit_code = EXIT_OK
 
-
 raid_info = "/proc/mdstat"
 
 def read_file(raid_info)
-  a = File.open(raid_info,"r")
+  a = File.open(raid_info ,"r")
   data = a.read
   a.close
-  return data
 end
 
 if File.exists? "/proc/mdstat"
@@ -53,9 +51,9 @@ k = ""
 v = ""
 
 raid_data.each do |data|
-  if n.even? and n != 0
+  if n.even? && n != 0
     v = data
-    h.store(k,v)
+    h.store(k, v)
   elsif n.odd?
     k = data
   end
@@ -63,7 +61,7 @@ raid_data.each do |data|
 end
 
 h.each do |key, value|
-  raid_state = value.split()[1]
+  raid_state = value.split[1]
   total_dev = value.match(/[0-9]*\/[0-9]*/).to_s[0]
   working_dev = value.match(/[0-9]*\/[0-9]*/).to_s[2]
   failed_dev = value.match(/\[[U,_]*\]/).to_s.count "_"
