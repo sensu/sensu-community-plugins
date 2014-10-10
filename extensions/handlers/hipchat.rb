@@ -14,8 +14,8 @@
 # {
 #   "hipchat": {
 #     "apiversion": "v2",
-#     "apikey": "room notification token",
 #     "room": "room api id number",
+#     "room_api_token": "room notification token",
 #     "from": "Sensu",
 #     "keepalive": {
 #       "room": "room api id number",
@@ -83,10 +83,9 @@ module Sensu::Extension
     def send_hipchat(room, from, message, color, notify)
 
       apiversion = @settings["hipchat"]["apiversion"] || 'v1'
+      room_api_token = @settings["hipchat"]["room_api_token"]
 
-      apikey = @settings["hipchat"]["apikey"]
-
-      hipchatmsg = HipChat::Client.new(apikey, :api_version => apiversion)
+      hipchatmsg = HipChat::Client.new(room_api_token, :api_version => apiversion)
 
       begin
         timeout(3) do
