@@ -16,6 +16,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
+require 'net/https'
 require 'socket'
 require 'csv'
 require 'uri'
@@ -56,6 +57,13 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.haproxy"
 
+  option :use_ssl,
+    :description => "Use SSL to connect to HAproxy web stats",
+    :short => "-S",
+    :long => "--use-ssl",
+    :boolean => true,
+    :default => false
+
   option :backends,
     :description => "comma-separated list of backends to fetch stats from. Default is all backends",
     :short => "-f BACKEND1[,BACKEND2]",
@@ -92,7 +100,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       out = socket.read
       socket.close
     else
-      res = Net::HTTP.start(config[:connection], config[:port]) do |http|
+      res = Net::HTTP.start(config[:connection], config[:port], :use_ssl => config[:use_ssl]) do |http|
         req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
         unless config[:username].nil?
           req.basic_auth config[:username], config[:password]
