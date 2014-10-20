@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 #
-# Copyright 2013 Katherine Daniels (kd@gc.io)
+# Send metric data to your Logentries Account
+# ===
 #
+# Copyright 2014 Stephen Hynes <sthynes8@gmail.com>
 #
 #
 #
@@ -22,7 +24,6 @@ class LogentriesMetrics < Sensu::Handler
 
   def handle
     log_token = settings['logentries']['log_token']
-
     if log_token
       @@uri = URI.parse("https://js.logentries.com/" + log_token)
       @event['check']['output'].split("\n").each do |line|
@@ -30,7 +31,6 @@ class LogentriesMetrics < Sensu::Handler
       send_metric(name, value, timestamp)
     else
       puts "No log token found. Please enter your Log Token in logentries-metrics.json"
-
     end
   end
 
