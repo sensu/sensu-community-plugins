@@ -51,11 +51,11 @@ class FilesizeMetrics < Sensu::Plugin::Metric::CLI::Graphite
     cmd = "/usr/bin/stat --format=\"%s,%b,\" #{config[:filepath]}"
     output = `#{cmd}`
 
-    (bytes, blocks, empty) = output.split(',')
-    unless config[:omitbytes] then
+    (bytes, blocks, _) = output.split(',')
+    unless config[:omitbytes]
       output "#{config[:scheme]}.bytes", bytes
     end
-    unless config[:omitblocks] then
+    unless config[:omitblocks]
       output "#{config[:scheme]}.blocks", blocks
     end
 
@@ -63,4 +63,3 @@ class FilesizeMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
 end
-
