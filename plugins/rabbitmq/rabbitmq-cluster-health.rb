@@ -8,6 +8,9 @@
 # present in the cluster.
 # The plugin is based on the RabbitMQ alive plugin by Abhijith G.
 #
+#  Todo:
+#    - Add ability to specify http vs. https
+#
 # Copyright 2012 Abhijith G <abhi@runa.com> and Runa Inc.
 # Copyright 2014 Tim Smith <tim@cozy.co> and Cozy Services Ltd.
 #
