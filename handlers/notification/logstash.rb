@@ -49,8 +49,6 @@ class LogstashHandler < Sensu::Handler
       :status        => @event['check']['status'],
       :flapping      => @event['check']['flapping'],
       :occurrences   => @event['occurrences'],
-      :flapping      => @event['check']['flapping'],
-      :occurrences   => @event['occurrences'],
       :action        => @event['action']
     }
     logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
