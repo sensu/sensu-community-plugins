@@ -9,7 +9,9 @@
 # integration in slack. You can create the required webhook by visiting
 # https://{your team}.slack.com/services/new/incoming-webhook
 #
-# After you configure your webhook, you'll need to token from the integration.
+# After you configure your webhook, you'll need the token from the integration.
+# The token is the last part of the webhook URL, the string after
+# the last "/" sign.
 # The default channel and bot name entered can be overridden by this handlers
 # configuration.
 #
