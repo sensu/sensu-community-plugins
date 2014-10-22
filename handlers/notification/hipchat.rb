@@ -19,9 +19,10 @@ class HipChatNotif < Sensu::Handler
 
   def handle
     json_config = config[:json_config] || 'hipchat'
+    server_url = settings[json_config]["server_url"] || 'https://api.hipchat.com'
     apiversion = settings[json_config]["apiversion"] || 'v1'
     proxy_url = settings[json_config]["proxy_url"]
-    hipchatmsg = HipChat::Client.new(settings[json_config]["apikey"], :api_version => apiversion, :http_proxy => proxy_url)
+    hipchatmsg = HipChat::Client.new(settings[json_config]["apikey"], :api_version => apiversion, :http_proxy => proxy_url, :server_url => server_url)
     room = settings[json_config]["room"]
     from = settings[json_config]["from"] || 'Sensu'
 
