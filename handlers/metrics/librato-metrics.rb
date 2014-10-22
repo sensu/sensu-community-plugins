@@ -18,7 +18,8 @@ class LibratoMetrics < Sensu::Handler
   end
 
   def handle
-    queue = Librato::Metrics::Queue.new
+    source = settings['librato']['use_sensu_client_hostname_as_source'] ? @event['client']['name'] : nil
+    queue = Librato::Metrics::Queue.new :source => source
     @event['check']['output'].split("\n").each do |line|
       name, value, timestamp = line.split(/\s+/)
       queue.add name => {:measure_time => timestamp.to_i, :value => value.to_f}
