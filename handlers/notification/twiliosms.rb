@@ -50,7 +50,7 @@ class TwilioSMS < Sensu::Handler
     twilio = Twilio::REST::Client.new(account_sid, auth_token)
     recipients.each do |recipient|
       begin
-        twilio.account.sms.messages.create(
+        twilio.account.messages.create(
           :from => from_number,
           :to => recipient,
           :body => message
