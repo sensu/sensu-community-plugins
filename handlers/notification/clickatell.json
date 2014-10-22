@@ -1,0 +1,16 @@
+{
+    "clickatell":{
+                "api_id":"",
+                "api_username":"",
+                "api_password":"",
+                "api_from":"",
+                "recipients":{
+                        "+43111111111": {
+                                "sensu_roles":[], // subscribers
+                                "sensu_checks":[], // checks
+                                "sensu_level": 1 // 1 for warning, 2 for critical alerts
+                        }
+                }
+        }
+
+}
