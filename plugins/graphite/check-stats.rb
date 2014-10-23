@@ -64,7 +64,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
   end
 
   def danger(metric)
-    datapoints = metric['datapoints'].collect {|p| p[0].to_f}
+    datapoints = metric['datapoints'].map(&:first).compact
 
     unless datapoints.empty?
       avg = average(datapoints)
@@ -74,6 +74,8 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
       elsif !config[:warn].nil? && avg > config[:warn]
         return [1, "#{metric['target']} is #{avg}"]
       end
+    else
+      return [3, "#{metric['target']} has no datapoints"]
     end
     [0, nil]
   end
@@ -110,6 +112,8 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
       critical message
     elsif status == 1
       warning message
+    elsif status == 3
+      unknown message
     end
     ok
   end
