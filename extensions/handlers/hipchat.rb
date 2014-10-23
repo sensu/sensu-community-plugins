@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+#
 # Sends events to hipchat for wonderful chatty notifications
 #
 # This extension requires the hipchat gem
@@ -81,7 +81,6 @@ module Sensu::Extension
 
     # Sends an event to the specified hipchat room etc
     def send_hipchat(room, from, message, color, notify)
-
       apiversion = @settings["hipchat"]["apiversion"] || 'v1'
       room_api_token = @settings["hipchat"]["room_api_token"]
 
@@ -101,7 +100,7 @@ module Sensu::Extension
 
     # Log something and return false.
     def bail(msg, event)
-      @logger.info("Hipchat handler: " + msg + ': ' + event[:client][:name] + '/' + event[:check][:name])
+      @logger.info("Hipchat handler: #{msg}: #{event[:client][:name]}/#{event[:check][:name]}")
       false
     end
 
@@ -161,9 +160,7 @@ module Sensu::Extension
       interval    = event[:check][:interval]    || defaults['interval']
       refresh     = event[:check][:refresh]     || defaults['refresh']
 
-      if event[:occurrences] < occurrences
-        return bail 'not enough occurrences', event
-      end
+      return bail 'not enough occurrences', event if event[:occurrences] < occurrences
 
       if event[:occurrences] > occurrences && event[:action] == :create
         number = refresh.fdiv(interval).to_i
@@ -199,8 +196,7 @@ module Sensu::Extension
 
     # Does this event have dependencies?
     def filter_dependencies(event)
-      if event[:check].has_key?(:dependencies)
-        if event[:check][:dependencies].is_a?(Array)
+      if event[:check].has_key?(:dependencies) && event[:check][:dependencies].is_a?(Array)
           event[:check][:dependencies].each do |dependency|
             begin
               timeout(2) do
@@ -213,7 +209,6 @@ module Sensu::Extension
               @logger.warn('timed out while attempting to query the sensu api for an event')
             end
           end
-        end
       end
 
       true
@@ -233,13 +228,13 @@ module Sensu::Extension
 
     def color_to_hex(color)
       if color == "green"
-        return "#09B524"
+        "#09B524"
       elsif color == "red"
-        return "#E31717"
+        "#E31717"
       elsif color == "yellow"
-        return "#FFFF00"
+        "#FFFF00"
       else
-        return "#FFFFFF"
+        "#FFFFFF"
       end
     end
 
@@ -254,15 +249,15 @@ module Sensu::Extension
         begin
           uri = URI.parse(check[:playbook])
           if %w( http https ).include?(uri.scheme)
-            return "[#{build_link(check[:playbook], "Playbook")}]"
+            "[#{build_link(check[:playbook], "Playbook")}]"
           else
-            return "Playbook:  #{check[:playbook]}"
+            "Playbook:  #{check[:playbook]}"
           end
         rescue
-          return "Playbook:  #{check[:playbook]}"
+          "Playbook:  #{check[:playbook]}"
         end
       else
-        return nil
+        nil
       end
     end
 
