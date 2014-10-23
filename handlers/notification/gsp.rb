@@ -8,10 +8,6 @@
 #  - username: Google Account E-mail Address
 #  - apppassword: Google Application Password
 #
-# require gem 'google_drive'
-#
-# Based on fluentd.rb(Thank you!!)
-#
 # Yohei Kawahara <inokara@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -22,17 +18,17 @@ require 'sensu-handler'
 require 'google_drive'
 require 'timeout'
 
-class GSP < Sensu::Handler
+class GAS < Sensu::Handler
   def sheet
-    settings['gsp']['sheet']
+    settings['gas']['sheet']
   end
 
   def username
-    settings['gsp']['username']
+    settings['gas']['username']
   end
 
   def apppassword
-    settings['gsp']['apppassword']
+    settings['gas']['apppassword']
   end
 
   def event_tag
@@ -47,7 +43,6 @@ class GSP < Sensu::Handler
     @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
-  # convert Timestamp
   def timestamp
     Time.at(@event['client']['timestamp'])
   end
@@ -69,22 +64,22 @@ class GSP < Sensu::Handler
   def handle
     begin
       timeout(5) do
-        session = GoogleDrive.login("#{username}", "#{apppassword}")
-        ws = session.spreadsheet_by_key("#{sheet}").worksheets[0]
+        session = GoogleDrive.login(username, apppassword)
+        ws = session.spreadsheet_by_key(sheet).worksheets[0]
         ws.update_cells(1, 1, [COLUMNS.values])
         ws.save
         ws.list.push(
-          COLUMNS[:timestamp] => "#{timestamp}",
-          COLUMNS[:action] => "#{action_to_string}",
-          COLUMNS[:name] => "#{event_name}",
-          COLUMNS[:client] => "#{@event['client']['name']}",
-          COLUMNS[:check_name] => "#{@event['check']['name']}",
-          COLUMNS[:status] => "#{@event['check']['status']}",
-          COLUMNS[:output] => "#{@event['check']['status']}",
-          COLUMNS[:address] => "#{@event['client']['address']}",
-          COLUMNS[:command] => "#{@event['check']['command']}",
-          COLUMNS[:occurrences] => "#{@event['occurrences']}",
-          COLUMNS[:flapping] => "#{@event['check']['flapping']}"
+          COLUMNS[:timestamp] => timestamp,
+          COLUMNS[:action] => action_to_string,
+          COLUMNS[:name] => event_name,
+          COLUMNS[:client] => @event['client']['name'],
+          COLUMNS[:check_name] => @event['check']['name'],
+          COLUMNS[:status] => @event['check']['status'],
+          COLUMNS[:output] => @event['check']['status'],
+          COLUMNS[:address] => @event['client']['address'],
+          COLUMNS[:command] => @event['check']['command'],
+          COLUMNS[:occurrences] => @event['occurrences'],
+          COLUMNS[:flapping] => @event['check']['flapping']
         )
         ws.save
       end
