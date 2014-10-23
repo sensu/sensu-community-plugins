@@ -5,6 +5,8 @@
 #
 # Yohei Kawahara <inokara@gmail.com>
 #
+# Check EC2 Network Metrics by CloudWatch API.
+#
 # How to use
 #  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} --warning-over 1000000 --critical-over 1500000
 #  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkIn --warning-over 1000000 --critical-over 1500000
