@@ -2,8 +2,6 @@
 
 For upstream repo documentation see: https://github.com/sensu/sensu-community-plugins
 
-Please create new branches based on upstream, so you can make pull requests against upstream. You can then merge your changes into our master.
-
 Use newbranch.sh to help you setup these branches:
 
 ```

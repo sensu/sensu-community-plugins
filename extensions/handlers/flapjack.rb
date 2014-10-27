@@ -1,6 +1,6 @@
 # Sends events to Flapjack for notification routing. See http://flapjack.io/
 #
-# This extension requires Flapjack >= 0.8.7
+# This extension requires Flapjack >= 0.8.7 and Sensu >= 0.13.1
 #
 # In order for Flapjack to keep its entities up to date, it is necssary to set
 # metric to "true" for each check that is using the flapjack handler extension.
@@ -48,6 +48,14 @@ module Sensu
         @options
       end
 
+      def definition
+        {
+          :type => "extension",
+          :name => name,
+          :mutator => "ruby_hash"
+        }
+      end
+
       def post_init
         @redis = Sensu::Redis.connect(options)
         @redis.on_error do |error|
@@ -55,11 +63,11 @@ module Sensu
         end
       end
 
-      def run(event_data)
-        event = MultiJson.load(event_data)
+      def run(event)
         client = event[:client]
         check = event[:check]
         tags = []
+        tags.concat(client[:tags]) if client[:tags].is_a?(Array)
         tags.concat(check[:tags]) if check[:tags].is_a?(Array)
         tags << client[:environment] unless client[:environment].nil?
         unless check[:subscribers].nil? || check[:subscribers].empty?
@@ -69,12 +77,13 @@ module Sensu
         end
         details = ['Address:' + client[:address]]
         details << 'Tags:' + tags.join(',')
+        details << "Raw Output: #{check[:output]}" if check[:notification]
         flapjack_event = {
           :entity  => client[:name],
           :check   => check[:name],
           :type    => 'service',
           :state   => Sensu::SEVERITIES[check[:status]] || 'unknown',
-          :summary => check[:output],
+          :summary => check[:notification] || check[:output],
           :details => details.join(' '),
           :time    => check[:executed],
           :tags    => tags

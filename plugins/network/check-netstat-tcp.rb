@@ -79,7 +79,7 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
     state_counts = Hash.new(0)
     TCP_STATES.each_pair { |hex, name| state_counts[name] = 0 }
 
-    protocols.each do |protocol|
+    protocols.select {|p| File.exists?('/proc/net/' + p) }.each do |protocol|
       File.open('/proc/net/' + protocol).each do |line|
         line.strip!
         if m = line.match(/^\s*\d+:\s+(.{8}|.{32}):(.{4})\s+(.{8}|.{32}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition

@@ -181,7 +181,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     node['indices'].each do |type,  index|
       index.each do |k, v|
         unless (k =~ /(_time|memory|size$)/)
-          metrics["indicies.#{type}.#{k}"] = v
+          metrics["indices.#{type}.#{k}"] = v
         end
       end
     end
@@ -208,9 +208,11 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['network.tcp.curr_estab']           = node['network']['tcp']['curr_estab']
     metrics['network.tcp.estab_resets']         = node['network']['tcp']['estab_resets']
 
-    node['thread_pool'].each do |pool, stat|
-      stat.each do |k, v|
-        metrics["thread_pool.#{pool}.#{k}"] = v
+    if tp_stats
+      node['thread_pool'].each do |pool, stat|
+        stat.each do |k, v|
+          metrics["thread_pool.#{pool}.#{k}"] = v
+        end
       end
     end
 

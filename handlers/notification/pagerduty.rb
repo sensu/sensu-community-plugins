@@ -7,6 +7,11 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# Dependencies:
+#
+#   sensu-plugin >= 1.0.0
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
@@ -15,12 +20,11 @@ require 'redphone/pagerduty'
 class Pagerduty < Sensu::Handler
 
   def incident_key
-    @event['client']['name'] + '/' + @event['check']['name']
+    source = @event['check']['source'] || @event['client']['name']
+    [source, @event['check']['name']].join('/')
   end
 
   def handle
-    description = @event['check']['notification']
-    description ||= [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     if @event['check']['pager_team']
       api_key = settings['pagerduty'][@event['check']['pager_team']]['api_key']
     else
@@ -33,7 +37,7 @@ class Pagerduty < Sensu::Handler
           Redphone::Pagerduty.trigger_incident(
             :service_key => api_key,
             :incident_key => incident_key,
-            :description => description,
+            :description => event_summary,
             :details => @event
           )
         when 'resolve'

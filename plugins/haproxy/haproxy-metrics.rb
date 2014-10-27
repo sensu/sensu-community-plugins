@@ -16,6 +16,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
+require 'net/https'
 require 'socket'
 require 'csv'
 require 'uri'
@@ -56,6 +57,13 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.haproxy"
 
+  option :use_ssl,
+    :description => "Use SSL to connect to HAproxy web stats",
+    :short => "-S",
+    :long => "--use-ssl",
+    :boolean => true,
+    :default => false
+
   option :backends,
     :description => "comma-separated list of backends to fetch stats from. Default is all backends",
     :short => "-f BACKEND1[,BACKEND2]",
@@ -92,7 +100,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       out = socket.read
       socket.close
     else
-      res = Net::HTTP.start(config[:connection], config[:port]) do |http|
+      res = Net::HTTP.start(config[:connection], config[:port], :use_ssl => config[:use_ssl]) do |http|
         req = Net::HTTP::Get.new("/#{config[:path]};csv;norefresh")
         unless config[:username].nil?
           req.basic_auth config[:username], config[:password]
@@ -131,6 +139,20 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
         output "#{config[:scheme]}.#{line[0]}.bytes_in", line[8]
         output "#{config[:scheme]}.#{line[0]}.bytes_out", line[9]
         output "#{config[:scheme]}.#{line[0]}.connection_errors", line[13]
+        output "#{config[:scheme]}.#{line[0]}.warning_retries", line[15]
+        output "#{config[:scheme]}.#{line[0]}.warning_redispatched", line[16]
+        output "#{config[:scheme]}.#{line[0]}.response_1xx", line[39]
+        output "#{config[:scheme]}.#{line[0]}.response_2xx", line[40]
+        output "#{config[:scheme]}.#{line[0]}.response_3xx", line[41]
+        output "#{config[:scheme]}.#{line[0]}.response_4xx", line[42]
+        output "#{config[:scheme]}.#{line[0]}.response_5xx", line[43]
+        output "#{config[:scheme]}.#{line[0]}.response_other", line[44]
+        output "#{config[:scheme]}.#{line[0]}.requests_per_second", line[46]
+        output "#{config[:scheme]}.#{line[0]}.requests_per_second_max", line[47]
+        output "#{config[:scheme]}.#{line[0]}.queue_time", line[58]
+        output "#{config[:scheme]}.#{line[0]}.connect_time", line[59]
+        output "#{config[:scheme]}.#{line[0]}.response_time", line[60]
+        output "#{config[:scheme]}.#{line[0]}.average_time", line[61]
       elsif config[:server_metrics]
         output "#{config[:scheme]}.#{line[0]}.#{line[1]}.session_total", line[7]
       end

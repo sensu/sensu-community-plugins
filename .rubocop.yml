@@ -34,6 +34,7 @@ AssignmentInCondition:
 AllCops:
   Excludes:
     - vendor/**
+    - '**/node_modules/**'
 
 ClassLength:
   Enabled: false

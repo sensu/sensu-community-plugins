@@ -107,6 +107,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     if state['OutOfService'].count > 0
       message << " (#{state['OutOfService'].join(', ')})"
     end
+    message << "; Unknown: #{state['Unknown'].count}"
     if state['Unknown'].count > 0
       message << " (#{state['Unknown'].join(', ')})"
     end

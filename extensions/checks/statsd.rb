@@ -28,26 +28,13 @@ module Sensu
       end
     end
 
-    class Statsd < Generic
+    class Statsd < Check
       def name
         'statsd'
       end
 
       def description
         'a statsd implementation'
-      end
-
-      def post_init
-        @flush_timers = []
-        @data = EM::Queue.new
-        @gauges = Hash.new { |h, k| h[k] = 0 }
-        @counters = Hash.new { |h, k| h[k] = 0 }
-        @timers = Hash.new { |h, k| h[k] = [] }
-        @metrics = []
-        setup_rabbitmq
-        setup_flush_timers
-        setup_parser
-        setup_statsd_socket
       end
 
       def options
@@ -59,7 +46,8 @@ module Sensu
           :send_interval => 30,
           :percentile => 90,
           :add_client_prefix => true,
-          :path_prefix => 'statsd'
+          :path_prefix => 'statsd',
+          :handler => 'graphite'
         }
         if @settings[:statsd].is_a?(Hash)
           @options.merge!(@settings[:statsd])
@@ -67,20 +55,39 @@ module Sensu
         @options
       end
 
-      def stop
-        flush!
-        @flush_timers.each do |timer|
-          timer.cancel
-        end
-        yield
+      def definition
+        {
+          :type => 'metric',
+          :name => name,
+          :interval => options[:send_interval],
+          :standalone => true,
+          :handler => options[:handler]
+        }
+      end
+
+      def post_init
+        @flush_timers = []
+        @data = EM::Queue.new
+        @gauges = Hash.new { |h, k| h[k] = 0 }
+        @counters = Hash.new { |h, k| h[k] = 0 }
+        @timers = Hash.new { |h, k| h[k] = [] }
+        @metrics = []
+        setup_flush_timers
+        setup_parser
+        setup_statsd_socket
+      end
+
+      def run
+        output = ''
+        output << @metrics.join("\n") + "\n" unless @metrics.empty?
+        @logger.info('statsd collected metrics', {
+          :count => @metrics.count
+        })
+        @metrics = []
+        yield output, 0
       end
 
       private
-
-      def setup_rabbitmq
-        @rabbitmq = RabbitMQ.connect(@settings[:rabbitmq])
-        @amq = @rabbitmq.channel
-      end
 
       def add_metric(*args)
         value = args.pop
@@ -140,32 +147,9 @@ module Sensu
         @logger.debug('flushed statsd metrics')
       end
 
-      def send!
-        unless @metrics.empty?
-          payload = {
-            :client => @settings[:client][:name],
-            :check => {
-              :name => 'statsd',
-              :type => 'metric',
-              :status => 0,
-              :output => @metrics.join("\n") + "\n",
-              :handler => 'graphite'
-            }
-          }
-          @logger.info('sending statsd metrics to graphite', {
-            :count => @metrics.count
-          })
-          @metrics = []
-          @amq.direct('results').publish(Oj.dump(payload))
-        end
-      end
-
       def setup_flush_timers
         @flush_timers << EM::PeriodicTimer.new(options[:flush_interval]) do
           flush!
-        end
-        @flush_timers << EM::PeriodicTimer.new(options[:send_interval]) do
-          send!
         end
       end
 

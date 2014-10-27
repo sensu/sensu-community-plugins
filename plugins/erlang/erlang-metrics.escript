@@ -135,8 +135,8 @@ collect_metrics(ParsedOptions) ->
         end, MemoryMetrics)
     end, Debug),
     % Total number of processes
-    fetch_rpc_metric(RemoteNode, erlang, processes, [], fun(LiveProcesses) ->
-        print_metric(Scheme, "processes", erlang:length(LiveProcesses), Timestamp)
+    fetch_rpc_metric(RemoteNode, erlang, system_info, [process_count], fun(LiveProcesses) ->
+        print_metric(Scheme, "processes", LiveProcesses, Timestamp)
     end, Debug),
     % Context switches
     fetch_rpc_metric(RemoteNode, erlang, statistics, [context_switches], fun({Switches, 0}) ->

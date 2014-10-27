@@ -28,6 +28,13 @@ module ::Mail
 end
 
 class Mailer < Sensu::Handler
+
+  option :json_config,
+   :description => 'Config Name',
+   :short => '-j JsonConfig',
+   :long => '--json_config JsonConfig',
+   :required => false
+
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -50,11 +57,12 @@ class Mailer < Sensu::Handler
   end
 
   def build_mail_to_list
-    mail_to = settings['mailer']['mail_to']
-    if settings['mailer'].has_key?('subscriptions')
+    json_config = config[:json_config] || 'mailer'
+    mail_to = settings[json_config]['mail_to']
+    if settings[json_config].has_key?('subscriptions')
       @event['check']['subscribers'].each do |sub|
-        if settings['mailer']['subscriptions'].has_key?(sub)
-          mail_to << ", #{settings['mailer']['subscriptions'][sub]['mail_to']}"
+        if settings[json_config]['subscriptions'].has_key?(sub)
+          mail_to << ", #{settings[json_config]['subscriptions'][sub]['mail_to']}"
         end
       end
     end
@@ -62,19 +70,20 @@ class Mailer < Sensu::Handler
   end
 
   def handle
-    admin_gui = settings['mailer']['admin_gui'] || 'http://localhost:8080/'
+    json_config = config[:json_config] || 'mailer'
+    admin_gui = settings[json_config]['admin_gui'] || 'http://localhost:8080/'
     mail_to = build_mail_to_list
-    mail_from =  settings['mailer']['mail_from']
+    mail_from =  settings[json_config]['mail_from']
 
-    delivery_method = settings['mailer']['delivery_method'] || 'smtp'
-    smtp_address = settings['mailer']['smtp_address'] || 'localhost'
-    smtp_port = settings['mailer']['smtp_port'] || '25'
-    smtp_domain = settings['mailer']['smtp_domain'] || 'localhost.localdomain'
+    delivery_method = settings[json_config]['delivery_method'] || 'smtp'
+    smtp_address = settings[json_config]['smtp_address'] || 'localhost'
+    smtp_port = settings[json_config]['smtp_port'] || '25'
+    smtp_domain = settings[json_config]['smtp_domain'] || 'localhost.localdomain'
 
-    smtp_username = settings['mailer']['smtp_username'] || nil
-    smtp_password = settings['mailer']['smtp_password'] || nil
-    smtp_authentication = settings['mailer']['smtp_authentication'] || :plain
-    smtp_enable_starttls_auto = settings['mailer']['smtp_enable_starttls_auto'] == "false" ? false : true
+    smtp_username = settings[json_config]['smtp_username'] || nil
+    smtp_password = settings[json_config]['smtp_password'] || nil
+    smtp_authentication = settings[json_config]['smtp_authentication'] || :plain
+    smtp_enable_starttls_auto = settings[json_config]['smtp_enable_starttls_auto'] == "false" ? false : true
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
