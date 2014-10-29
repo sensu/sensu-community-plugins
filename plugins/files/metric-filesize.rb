@@ -53,10 +53,10 @@ class FilesizeMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     (bytes, blocks, _) = output.split(',')
     unless config[:omitbytes]
-      output "#{config[:scheme]}.bytes", bytes
+      output "#{config[:scheme]}.#{config[:filepath]}.bytes", bytes
     end
     unless config[:omitblocks]
-      output "#{config[:scheme]}.blocks", blocks
+      output "#{config[:scheme]}.#{config[:filepath]}.blocks", blocks
     end
 
     ok
