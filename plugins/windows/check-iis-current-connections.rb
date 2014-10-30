@@ -17,10 +17,12 @@ class CheckIisCurrentConnections < Sensu::Plugin::Check::CLI
 
   option :warning,
     :short => '-w WARNING',
+    :proc => proc { |a| a.to_f },
     :default =>  50
 
   option :critical,
     :short => '-c CRITICAL',
+    :proc => proc { |a| a.to_f },
     :default =>  150
 
   option :site,
