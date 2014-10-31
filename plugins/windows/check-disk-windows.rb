@@ -50,7 +50,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
     end
 
     def read_wmic
-        `wmic volume list brief`.split("\n").drop(1).each do |line|
+        `wmic volume where DriveType=3 list brief`.split("\n").drop(1).each do |line|
             begin
                 capacity, type, _fs, _avail, label, mnt = line.split
                 next if /\S/ !~ line
