@@ -65,7 +65,7 @@ class Mtime < Sensu::Plugin::Check::CLI
     unknown 'No file specified' unless config[:file]
     unknown 'No warn or critical age specified' unless config[:warning_age] || config[:critical_age]
     if File.exists?(config[:file])
-      if File.size?(config[:file]).nil? and !config[:ok_zero_size]
+      if File.size?(config[:file]).nil? && !config[:ok_zero_size]
         critical 'file has zero size'
       end
       age = Time.now.to_i - File.mtime(config[:file]).to_i
