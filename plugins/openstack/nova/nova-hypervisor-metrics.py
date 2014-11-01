@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+
+
+# This plugin gives information about the hypervisors. It works as is if using Python2.7 but to get it working with Python2.6 and
+# before (as well as Python 3.0) require that you number the placeholders in the format method().
+# This way wherever the {} is used, number it starting from 0. e.g., {0}.nova.hypervisor
+
 from argparse import ArgumentParser
 import socket
 import time
