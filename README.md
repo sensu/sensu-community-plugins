@@ -31,7 +31,7 @@ it. We will wait for feedback from you on your pull request for up to
 one month. A lack of feedback in one month may require you to re-open
 your pull request.
 
-There is a Vagrantfile with shell provisioning that will setup the major versions of Ruby and a sensu gemset for each.  To get started install [Vagrant](https://www.vagrantup.com/) then run *Vagrant up* in the root directory of the repo.  Once it is up run *vagrant ssh* to remote into the box and then *cd /vagrant && bundle install* to set all necessary dependencies.
+There is a Vagrantfile with shell provisioning that will setup the major versions of Ruby and a sensu gemset for each if you wish to use it.  To get started install [Vagrant](https://www.vagrantup.com/) then type *vagrant up* in the root directory of the repo.  Once it is up type *vagrant ssh* to remote into the box and then *cd /vagrant && bundle install* to set all necessary dependencies.
 
 The box currently defaults to Ruby 2.1.4 but has 1.8.7, 1.9.3 and 2.0.0 installed as well.  For workflow tips and tricks and further details please see the *sensu-plugin* repo.
 
