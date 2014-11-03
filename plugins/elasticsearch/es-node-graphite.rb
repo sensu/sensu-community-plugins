@@ -62,6 +62,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "Request timeout to elasticsearch",
     :short => "-t TIMEOUT",
     :long => "--timeout TIMEOUT",
+    :proc => proc {|a| a.to_i },
     :default => 30
 
   option :disable_jvm_stats,
