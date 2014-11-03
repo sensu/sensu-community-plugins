@@ -26,10 +26,14 @@ be declared in the header of the plugin/handler file.
 
 Only pull requests passing lint/tests will be merged.
 
-Please do not not abandon your pull request, only you can help us merge 
-it. We will wait for feedback from you on your pull request for up to 
-one month. A lack of feedback in one month may require you to re-open 
+Please do not not abandon your pull request, only you can help us merge
+it. We will wait for feedback from you on your pull request for up to
+one month. A lack of feedback in one month may require you to re-open
 your pull request.
+
+There is a Vagrantfile with shell provisioning that will setup the major versions of Ruby and a sensu gemset for each if you wish to use it.  To get started install [Vagrant](https://www.vagrantup.com/) then type *vagrant up* in the root directory of the repo.  Once it is up type *vagrant ssh* to remote into the box and then *cd /vagrant && bundle install* to set all necessary dependencies.
+
+The box currently defaults to Ruby 2.1.4 but has 1.8.7, 1.9.3 and 2.0.0 installed as well.  For workflow tips and tricks and further details please see the *sensu-plugin* repo.
 
 ## Production usage
 
@@ -37,11 +41,11 @@ Because of the nature of this repository:
 
 * no test coverage
 * specific and exotic software being checked
-* no versioning system for plugins 
+* no versioning system for plugins
 
 this is not recommended that you use master for your production instances.
 Better pick something which works for you and lock it via `:ref` in your
-`chef || puppet || ansible || bash script` you name it. 
+`chef || puppet || ansible || bash script` you name it.
 
 If you have installed Sensu using the omnibus package it will use an embedded
 version of ruby, but the ruby plugins here will use the system one. If you want
