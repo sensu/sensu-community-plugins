@@ -44,10 +44,15 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     :short => "-s SCHEME",
     :default => "#{Socket.gethostname}.mongodb"
 
+  option :dbname,
+    :description => "MongoDB database",
+    :long => "--dbname DBNAME",
+    :default =>"admin"
+
   def run
     host = config[:host]
     port = config[:port]
-    db_name = 'admin'
+    db_name = config[:dbname]
     db_user = config[:user]
     db_password = config[:password]
 
