@@ -29,7 +29,7 @@ class CheckPING < Sensu::Plugin::Check::CLI
   option :timeout,
     :short => '-T timeout',
     :proc => Proc.new {|s| s.to_i},
-    :default => '5'
+    :default => 5
 
   option :count,
     :short => '-c count',
