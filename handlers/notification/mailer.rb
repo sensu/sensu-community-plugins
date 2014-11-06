@@ -98,7 +98,7 @@ class Mailer < Sensu::Handler
             Occurrences:  #{@event['occurrences']}
             #{playbook}
           BODY
-    if @event['check']['notification'].nil? then
+    if @event['check']['notification'].nil?
       subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
     else
       subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
