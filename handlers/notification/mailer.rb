@@ -98,7 +98,11 @@ class Mailer < Sensu::Handler
             Occurrences:  #{@event['occurrences']}
             #{playbook}
           BODY
-    subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
+    if @event['check']['notification'].nil? then
+      subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
+    else
+      subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
+    end
 
     Mail.defaults do
       delivery_options = {
