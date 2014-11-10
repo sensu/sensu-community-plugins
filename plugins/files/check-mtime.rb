@@ -57,8 +57,9 @@ class Mtime < Sensu::Plugin::Check::CLI
   def run
     unknown 'No file specified' unless config[:file]
     unknown 'No warn or critical age specified' unless config[:warning_age] || config[:critical_age]
-    if File.exists?(config[:file])
-      age = Time.now.to_i - File.mtime(config[:file]).to_i
+    f = Dir.glob(config[:file]).first
+    if f
+      age = Time.now.to_i - File.mtime(f).to_i
       run_check(:critical, age) || run_check(:warning, age) || ok("file is #{age} seconds old")
     else
       if config[:ok_no_exist]
