@@ -74,6 +74,7 @@ class Mailer < Sensu::Handler
     admin_gui = settings[json_config]['admin_gui'] || 'http://localhost:8080/'
     mail_to = build_mail_to_list
     mail_from =  settings[json_config]['mail_from']
+    reply_to = settings[json_config]['reply_to'] || mail_from
 
     delivery_method = settings[json_config]['delivery_method'] || 'smtp'
     smtp_address = settings[json_config]['smtp_address'] || 'localhost'
@@ -128,10 +129,11 @@ class Mailer < Sensu::Handler
     begin
       timeout 10 do
         Mail.deliver do
-          to      mail_to
-          from    mail_from
-          subject subject
-          body    body
+          to       mail_to
+          from     mail_from
+          reply_to reply_to
+          subject  subject
+          body     body
         end
 
         puts 'mail -- sent alert for ' + short_name + ' to ' + mail_to.to_s
