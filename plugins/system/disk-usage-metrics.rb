@@ -68,10 +68,16 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
          :boolean => true,
          :default => false
 
+  option :block_size,
+         :description => 'Set block size for sizes printed',
+         :short => '-B BLOCK_SIZE',
+         :long => '--block-size BLOCK_SIZE',
+         :default => 'M'
+
   def run
     delim = config[:flatten] == true ? '_' : '.'
     # Get disk usage from df with used and avail in megabytes
-    `df -PBM #{config[:local] ? '-l' : ''}`.split("\n").drop(1).each do |line|
+    `df -PB#{config[:block_size]} #{config[:local] ? '-l' : ''}`.split("\n").drop(1).each do |line|
       _, _, used, avail, used_p, mnt = line.split
 
       unless %r{/sys|/dev|/run}.match(mnt)
@@ -86,8 +92,8 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
         # Fix subsequent slashes
         mnt = mnt.gsub '/', delim
-        output [config[:scheme], mnt, 'used'].join('.'), used.gsub('M', '')
-        output [config[:scheme], mnt, 'avail'].join('.'), avail.gsub('M', '')
+        output [config[:scheme], mnt, 'used'].join('.'), used.gsub(config[:block_size], '')
+        output [config[:scheme], mnt, 'avail'].join('.'), avail.gsub(config[:block_size], '')
         output [config[:scheme], mnt, 'used_percentage'].join('.'), used_p.gsub('%', '')
       end
     end
