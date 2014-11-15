@@ -162,7 +162,7 @@ IndentationWidth:
 
 # That would be nice to have - check for long methods
 CyclomaticComplexity:
-  Enabled: false
+  Enabled: true
 
 Documentation:
   Enabled: false
