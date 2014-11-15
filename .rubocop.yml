@@ -14,10 +14,10 @@ LineLength:
   Max: 160
 
 AlignParameters:
-  Enabled: true
+  Enabled: false
 
 SpaceAroundOperators:
-  Enabled: true
+  Enabled: false
 
 Encoding:
   Enabled: false
@@ -107,7 +107,7 @@ HashSyntax:
 
 # Single Quotes
 StringLiterals:
-  Enabled: true
+  Enabled: false
 
 UnlessElse:
   Enabled: false
@@ -122,16 +122,16 @@ IfUnlessModifier:
   Enabled: false
 
 ParenthesesAroundCondition:
-  Enabled: true
+  Enabled: false
 
 WhileUntilModifier:
   Enabled: false
 
 Semicolon:
-  Enabled: true
+  Enabled: false
 
 BlockNesting:
-  Enabled: true
+  Enabled: false
 
 Proc:
   Enabled: false
@@ -143,10 +143,10 @@ CollectionMethods:
   Enabled: false
 
 EmptyLineBetweenDefs:
-  Enabled: true
+  Enabled: false
 
 SpaceInsideHashLiteralBraces:
-  Enabled: true
+  Enabled: false
 
 RescueException:
   Enabled: false
@@ -155,14 +155,14 @@ CaseIndentation:
   Enabled: false
 
 EmptyLinesAroundBody:
-  Enabled: true
+  Enabled: false
 
 IndentationWidth:
-  Enabled: true
+  Enabled: false
 
 # That would be nice to have - check for long methods
 CyclomaticComplexity:
-  Enabled: true
+  Enabled: false
 
 Documentation:
   Enabled: false
@@ -171,10 +171,10 @@ AlignHash:
   Enabled: false
 
 SpaceAroundBlockBraces:
-  Enabled: true
+  Enabled: false
 
 SingleLineBlockParams:
   Enabled: false
 
 BracesAroundHashParameters:
-  Enabled: true
+  Enabled: false
