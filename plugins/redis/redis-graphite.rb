@@ -48,8 +48,27 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--scheme SCHEME",
     :default => "#{Socket.gethostname}.redis"
 
+  option :timeout,
+    :description => "Timeout to connect to redis host",
+    :short => "-t TIMEOUT",
+    :long => "--timeout TIMEOUT",
+    :proc => proc {|p| p.to_i },
+    :default => Redis::Client::DEFAULTS[:timeout]
+
+  option :reconnect_attempts,
+    :description => "Reconnect attempts to redis host",
+    :short => "-r ATTEMPTS",
+    :long => "--reconnect ATTEMPTS",
+    :proc => proc {|p| p.to_i },
+    :default => Redis::Client::DEFAULTS[:reconnect_attempts]
+
   def run
-    options = {:host => config[:host], :port => config[:port]}
+    options = {
+      :host => config[:host],
+      :port => config[:port],
+      :timeout => config[:timeout],
+      :reconnect_attempts => config[:reconnect_attempts],
+    }
     options[:password] = config[:password] if config[:password]
     redis = Redis.new(options)
 

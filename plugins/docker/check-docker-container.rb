@@ -1,18 +1,31 @@
-#!/usr/bin/env ruby
-# check-docker-containers
-# ===
+#! /usr/bin/env ruby
 #
+# check-docker-containers
+#
+#
+# DESCRIPTION:
 # This is a simple check script for Sensu to check the number of a Docker Container
 #
-# Requires "docker-api" gem
+# OUTPUT:
+#   plain-text
 #
-# Examples:
+# PLATFORMS:
+#   all
 #
+# DEPENDENCIES:
+#  gem: docker
+#  gem: docker-api
+#
+# EXAMPLES:
 #   check-docker-container.rb -w 3 -c 3
 #     => 1 container running = OK.
 #     => 4 container running = CRITICAL
 #
-#  Author Yohei Kawahara  <inokara@gmail.com>
+# LICENSE:
+#   Author Yohei Kawahara  <inokara@gmail.com>
+#
+# Released under the same terms as Sensu (the MIT license); see LICENSE
+# for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
