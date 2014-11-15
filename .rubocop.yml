@@ -13,8 +13,9 @@ MethodLength:
 LineLength:
   Max: 160
 
+# added MJ
 AlignParameters:
-  Enabled: false
+  Enabled: true
 
 SpaceAroundOperators:
   Enabled: false
@@ -160,6 +161,7 @@ CaseIndentation:
 EmptyLinesAroundBody:
   Enabled: false
 
+# added MJ
 IndentationWidth:
   Enabled: false
 
@@ -170,8 +172,9 @@ CyclomaticComplexity:
 Documentation:
   Enabled: false
 
+# added MJ
 AlignHash:
-  Enabled: false
+  Enabled: true
 
 SpaceAroundBlockBraces:
   Enabled: false
