@@ -2,6 +2,16 @@ language: ruby
 rvm:
   - 2.0
   - 2.1
+notifications:
+  irc: "chat.freenode.net#sensu"
+    on_success: change
+    on_failure: always
+  email:
+    recipients:
+      - mattjones@yieldbot.com
+    on_success: change
+    on_failure: always
+
 script:
   - 'bundle exec rake rubocop'
   - 'bundle exec rake spec'
