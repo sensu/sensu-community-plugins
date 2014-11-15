@@ -48,8 +48,9 @@ RegexpLiteral:
 AccessorMethodName:
   Enabled: false
 
+# added MJ
 NilComparison:
-  Enabled: false
+  Enabled: ture
 
 WhileUntilDo:
   Enabled: false
@@ -63,8 +64,9 @@ SpecialGlobalVars:
 RedundantBegin:
   Enabled: false
 
+# added MJ
 VariableName:
-  Enabled: false
+  Enabled: true
 
 MethodName:
   Enabled: false
@@ -84,8 +86,9 @@ SpaceAfterMethodName:
 DotPosition:
   Enabled: false
 
+# added MJ
 AlignArray:
-  Enabled: false
+  Enabled: true
 
 ConditionPosition:
   Enabled: false
