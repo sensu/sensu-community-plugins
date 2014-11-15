@@ -21,7 +21,7 @@
 #     => 1 container running = OK.
 #     => 4 container running = CRITICAL
 #
-# LICENSE: 
+# LICENSE:
 #   Author Yohei Kawahara  <inokara@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
