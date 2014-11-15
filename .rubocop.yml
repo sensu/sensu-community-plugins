@@ -122,16 +122,16 @@ IfUnlessModifier:
   Enabled: false
 
 ParenthesesAroundCondition:
-  Enabled: false
+  Enabled: true
 
 WhileUntilModifier:
   Enabled: false
 
 Semicolon:
-  Enabled: false
+  Enabled: true
 
 BlockNesting:
-  Enabled: false
+  Enabled: true
 
 Proc:
   Enabled: false
@@ -143,10 +143,10 @@ CollectionMethods:
   Enabled: false
 
 EmptyLineBetweenDefs:
-  Enabled: false
+  Enabled: true
 
 SpaceInsideHashLiteralBraces:
-  Enabled: false
+  Enabled: true
 
 RescueException:
   Enabled: false
@@ -155,26 +155,26 @@ CaseIndentation:
   Enabled: false
 
 EmptyLinesAroundBody:
-  Enabled: false
+  Enabled: true
 
 IndentationWidth:
-  Enabled: false
+  Enabled: true
 
 # That would be nice to have - check for long methods
 CyclomaticComplexity:
   Enabled: false
 
 Documentation:
-  Enabled: false
+  Enabled: true
 
 AlignHash:
   Enabled: false
 
 SpaceAroundBlockBraces:
-  Enabled: false
+  Enabled: true
 
 SingleLineBlockParams:
   Enabled: false
 
 BracesAroundHashParameters:
-  Enabled: false
+  Enabled: true
