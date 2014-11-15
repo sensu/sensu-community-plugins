@@ -107,7 +107,7 @@ HashSyntax:
 
 # Single Quotes
 StringLiterals:
-  Enabled: false
+  Enabled: true
 
 UnlessElse:
   Enabled: false
