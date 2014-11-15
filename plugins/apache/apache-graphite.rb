@@ -1,7 +1,7 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
 # Apache metrics based on mod_status
-# ===
+#
 #
 # DESCRIPTION:
 #   This plugin retrieves machine-readable output of mod_status, parses
@@ -14,14 +14,21 @@
 #   all
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   Apache mod_status module
+#   gem: sensu-plugin
+#   Apache module: mod_status
 #
-# RECOMMENDED:
+# YELLOW
+# needs example command
+#
+# EXAMPLES:
+#
+# Notes:
 #   enable extended mod_status
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -75,6 +82,8 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       http.use_ssl = true
     end
     req = Net::HTTP::Get.new(config[:path])
+    # YELLOW
+    # do we need to explictly test against nil
     if (config[:user] != nil && config[:password] != nil)
       req.basic_auth config[:user], config[:password]
     end

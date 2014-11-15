@@ -1,16 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
 # AutoScaling Group Instance Metrics
-# ===
 #
+#
+# DESCRIPTION:
 # Get a count of instances in a given AutoScaling group
 #
-# Copyright 2013 Bashton Ltd http://www.bashton.com/
+# OUTPUT:
+#   plain-text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   all
 #
-# Needs fog gem
+# DEPENDENCIES:
+#   gem: fog
+#   gem: sensu-plugin
+#
+# YELLOW
+# needs example command
+# EXAMPLES:
+#
+#
+# Notes:
+#
+# LICENSE:
+#   Copyright 2013 Bashton Ltd http://www.bashton.com/
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
