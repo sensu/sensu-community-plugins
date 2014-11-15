@@ -38,41 +38,41 @@ require 'fog/aws'
 class ELBHealth < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
-         :short => '-a AWS_ACCESS_KEY',
-         :long => '--aws-access-key AWS_ACCESS_KEY',
+         :short       => '-a AWS_ACCESS_KEY',
+         :long        => '--aws-access-key AWS_ACCESS_KEY',
          :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-         :required => true,
-         :default => ENV['AWS_ACCESS_KEY_ID']
+         :required    => true,
+         :default     => ENV['AWS_ACCESS_KEY_ID']
 
   option :aws_secret_access_key,
-         :short => '-s AWS_SECRET_ACCESS_KEY',
-         :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         :short       => '-s AWS_SECRET_ACCESS_KEY',
+         :long        => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
          :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-         :required => true,
-         :default => ENV['AWS_SECRET_ACCESS_KEY']
+         :required    => true,
+         :default     => ENV['AWS_SECRET_ACCESS_KEY']
 
   option :aws_region,
-         :short => '-r AWS_REGION',
-         :long => '--aws-region REGION',
+         :short       => '-r AWS_REGION',
+         :long        => '--aws-region REGION',
          :description => "AWS Region (such as eu-west-1). If you do not specify a region, it will be detected by the server the script is run on"
 
   option :elb_name,
-         :short => '-n ELB_NAME',
-         :long => '--elb-name ELB_NAME',
+         :short       => '-n ELB_NAME',
+         :long        => '--elb-name ELB_NAME',
          :description => 'The Elastic Load Balancer name of which you want to check the health',
-         :required => true
+         :required    => true
 
   option :instances,
-         :short => '-i INSTANCES',
-         :long => '--instances INSTANCES',
+         :short       => '-i INSTANCES',
+         :long        => '--instances INSTANCES',
          :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health'
 
   option :verbose,
-         :short => '-v',
-         :long => '--verbose',
+         :short       => '-v',
+         :long        => '--verbose',
          :description => 'Enable a little bit more verbose reports about instance health',
-         :boolean => true,
-         :default => false
+         :boolean     => true,
+         :default     => false
 
   def query_instance_region
     begin

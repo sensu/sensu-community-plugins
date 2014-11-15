@@ -30,24 +30,6 @@
 #   for details.
 #
 
-
-#!/usr/bin/env ruby
-#
-# ===
-#
-# DESCRIPTION:
-#
-# PLATFORMS:
-#   all
-#
-# DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   aws-sdk Ruby gem
-#
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'aws-sdk'
@@ -57,44 +39,44 @@ require 'openssl'
 class CheckELBCerts < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
-         :short => '-a AWS_ACCESS_KEY',
-         :long => '--aws-access-key AWS_ACCESS_KEY',
+         :short       => '-a AWS_ACCESS_KEY',
+         :long        => '--aws-access-key AWS_ACCESS_KEY',
          :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-         :default => ENV['AWS_ACCESS_KEY_ID']
+         :default     => ENV['AWS_ACCESS_KEY_ID']
 
   option :aws_secret_access_key,
-         :short => '-s AWS_SECRET_ACCESS_KEY',
-         :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         :short       => '-s AWS_SECRET_ACCESS_KEY',
+         :long        => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
          :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-         :default => ENV['AWS_SECRET_ACCESS_KEY']
+         :default     => ENV['AWS_SECRET_ACCESS_KEY']
 
   option :aws_region,
-         :short => '-r AWS_REGION',
-         :long => '--aws-region REGION',
+         :short       => '-r AWS_REGION',
+         :long        => '--aws-region REGION',
          :description => "AWS Region (such as eu-west-1).",
-         :default => 'us-east-1'
+         :default     => 'us-east-1'
 
   option :warn_under,
-         :short  => '-w WARN_NUM',
-         :long  => '--warn WARN_NUM',
+         :short       => '-w WARN_NUM',
+         :long        => '--warn WARN_NUM',
          :description => 'Warn on minimum number of days to SSL/TLS certificate expiration',
-         :default => 30,
+         :default     => 30,
          # #YELLOW
-         :proc => proc { |a| a.to_i }
+         :proc        => proc { |a| a.to_i }
 
   option :crit_under,
-         :short  => '-c CRIT_NUM',
-         :long  => '--crit CRIT_NUM',
+         :short       => '-c CRIT_NUM',
+         :long        => '--crit CRIT_NUM',
          :description => 'Minimum number of days to SSL/TLS certificate expiration',
-         :default => 5,
+         :default     => 5,
          # #YELLOW
-         :proc => proc { |a| a.to_i }
+         :proc        => proc { |a| a.to_i }
 
   option :verbose,
-         :short  => '-v',
-         :long  => '--verbose',
+         :short       => '-v',
+         :long        => '--verbose',
          :description => 'Provide SSL/TLS certificate expiration details even when OK',
-         :default => false
+         :default     => false
 
   def cert_message(count, descriptor, limit)
     message = (count == 1 ? "1 ELB cert is " : "#{count} ELB certs are ")
