@@ -165,7 +165,7 @@ CyclomaticComplexity:
   Enabled: false
 
 Documentation:
-  Enabled: true
+  Enabled: false
 
 AlignHash:
   Enabled: false
