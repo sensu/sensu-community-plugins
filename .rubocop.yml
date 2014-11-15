@@ -14,10 +14,10 @@ LineLength:
   Max: 160
 
 AlignParameters:
-  Enabled: false
+  Enabled: true
 
 SpaceAroundOperators:
-  Enabled: false
+  Enabled: true
 
 Encoding:
   Enabled: false
