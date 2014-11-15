@@ -53,7 +53,7 @@ class CheckSSLCert < Sensu::Plugin::Check::CLI
   end
 
   def ssl_pem_expiry
-    OpenSSL::X509::Certificate.new(File.read config[:pem]).not_after    
+    OpenSSL::X509::Certificate.new(File.read config[:pem]).not_after
   end
 
   def validate_opts
