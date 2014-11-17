@@ -72,8 +72,8 @@ class CheckCPU < Sensu::Plugin::Check::CLI
       end
     end
 
-    msg = "total=#{cpu_usage.round(2)}"
-    cpu_stats.each_index {|i| msg += " #{metrics[i]}=#{cpu_stats[i].round(2)}"}
+    msg = "total=#{(cpu_usage*100).round / 100.0}"
+    cpu_stats.each_index {|i| msg += " #{metrics[i]}=#{(cpu_stats[i]*100).round / 100.0}"}
 
     message msg
 
