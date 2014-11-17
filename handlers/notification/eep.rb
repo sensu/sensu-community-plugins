@@ -53,12 +53,12 @@ class Eep < Sensu::Handler
 
   def handle
     # get EEP client config
-    config = settings['eep']
-    bail 'CONFIG ERROR: eep settings not found in /etc/sensu/conf.d/notifications.json' unless config
+    config = settings[EEP]
+    bail 'CONFIG ERROR: eep settings not found in sensu configuration files' unless config
 
     # create EEP client
     api_token = config.delete(API_TOKEN)
-    bail 'CONFIG ERROR: api_token not found in eep settings in /etc/sensu/conf.d/notifications.json' unless api_token
+    bail 'CONFIG ERROR: api_token not found in eep settings in sensu configuration files' unless api_token
 
     # remap config to options hash with sym keys
     options = { }
