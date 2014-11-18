@@ -2,7 +2,7 @@
 #
 # Sensu Handler for sending / clearing events to the Event Enrichment Platform (EEP)
 #
-# Copyright 2011 Sonian, Inc. and contributors.
+# Copyright 2014 Event Enrichment HQ
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE for details.
 #
