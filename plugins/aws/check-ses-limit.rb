@@ -51,11 +51,15 @@ class CheckSESLimit < Sensu::Plugin::Check::CLI
     :default => 90,
     :proc => proc { |a| a.to_i }
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash
+  end
+
   def run
     begin
-      ses = AWS::SES::Base.new(
-        :access_key_id      => config[:aws_access_key],
-        :secret_access_key  => config[:aws_secret_access_key])
+      ses = AWS::SES::Base.new aws_config
 
       response = ses.quota
     rescue AWS::SES::ResponseError => e

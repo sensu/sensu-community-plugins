@@ -78,10 +78,17 @@ class ELBHealth < Sensu::Plugin::Check::CLI
     end
   end
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
+    hash.update region: config[:region] 
+    hash
+  end
+
   def run
     begin
       aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
-      elb = Fog::AWS::ELB.new(:aws_access_key_id => config[:aws_access_key], :aws_secret_access_key => config[:aws_secret_access_key], :region => aws_region)
+      elb = Fog::AWS::ELB.new aws_config
       if config[:instances]
         instances = config[:instances].split(',')
         health = elb.describe_instance_health(config[:elb_name], instances)

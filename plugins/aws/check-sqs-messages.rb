@@ -70,11 +70,14 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
     :default => -1,
     :proc => proc { |a| a.to_i }
 
-  def run
-    AWS.config(
-      :access_key_id      => config[:aws_access_key],
-      :secret_access_key  => config[:aws_secret_access_key])
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash
+  end
 
+  def run
+    AWS.config aws_config
     sqs = AWS::SQS.new
     messages = sqs.queues.named(config[:queue]).approximate_number_of_messages
 

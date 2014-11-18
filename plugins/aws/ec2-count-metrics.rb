@@ -30,14 +30,12 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :required => true
+    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
 
   option :aws_secret_access_key,
     :short => '-k AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true
+    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
 
   option :aws_region,
     :short => '-r AWS_REGION',
@@ -56,12 +54,20 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
       aws_debug = false
 
-      AWS.config(
-        :region => config[:aws_region],
-        :access_key_id      => config[:aws_access_key],
-        :secret_access_key  => config[:aws_secret_access_key],
-        :http_wire_trace    => aws_debug
-      )
+      #The conditional allows for role-based credentialing 
+      if config[:aws_access_key].nil? and config[:aws_secret_access_key].nil?
+        AWS.config(
+          :region => config[:aws_region],
+          :http_wire_trace    => aws_debug
+        )
+      else
+        AWS.config(
+          :region => config[:aws_region],
+          :access_key_id => config[:aws_access_key]
+          :secret_access_key => config[:awsw_secret_access_key]
+          :http_wire_trace => aws_debug
+        )
+      end
 
       client = AWS::EC2::Client.new
 

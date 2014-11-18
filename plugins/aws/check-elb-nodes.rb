@@ -77,12 +77,16 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     :default => -1,
     :proc => proc { |a| a.to_i }
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region] 
+    hash
+  end
+
   def run
     AWS.start_memoizing
-    elb = AWS::ELB.new(
-      :access_key_id      => config[:aws_access_key],
-      :secret_access_key  => config[:aws_secret_access_key],
-      :region             => config[:aws_region])
+    elb = AWS::ELB.new aws_config
 
     begin
       instances = elb.load_balancers[config[:load_balancer]].instances.health

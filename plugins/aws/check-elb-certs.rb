@@ -70,6 +70,13 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
     message += (limit == 1 ? "" : "s") # rubocop:disable UselessAssignment
   end
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:region] 
+    hash
+  end
+
   def run
     ok_message = []
     warning_message = []
@@ -77,10 +84,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
 
     AWS.start_memoizing
 
-    elb = AWS::ELB.new(
-      :access_key_id      => config[:aws_access_key],
-      :secret_access_key  => config[:aws_secret_access_key],
-      :region             => config[:aws_region])
+    elb = AWS::ELB.new aws_config
 
     begin
       elb.load_balancers.each do |lb|

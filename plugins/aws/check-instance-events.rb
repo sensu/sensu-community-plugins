@@ -41,13 +41,17 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region] 
+    hash
+  end
+
   def run
     event_instances = []
 
-    ec2 = AWS::EC2::Client.new(
-      :access_key_id      => config[:aws_access_key],
-      :secret_access_key  => config[:aws_secret_access_key],
-      :region             => config[:aws_region])
+    ec2 = AWS::EC2::Client.new aws_config
 
     begin
       ec2.describe_instance_status[:instance_status_set].each do |i|
