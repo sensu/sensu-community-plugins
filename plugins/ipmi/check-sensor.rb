@@ -27,6 +27,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'rubyipmi'
 require 'socket'
+require 'timeout'
 
 class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
@@ -35,10 +36,10 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.ipmisensor"
 
   option :sensor,
-    :description => "IPMI sensor to gather stats for.  Default is 't_in_ps0'",
+    :description => "IPMI sensor to gather stats for.  Default is ALL",
     :short => "-s SENSOR_NAME",
     :long => "--sensor SENSOR_NAME",
-    :default => "t_in_ps0"
+    :default => "all"
 
   option :username,
     :description => "IPMI Username",
@@ -52,6 +53,13 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--password IPMI_PASSWORD",
     :required => true
 
+  option :privilege,
+    :description => "IPMI privilege level: CALLBACK, USER, OPERATOR, ADMINISTRATOR (defaults to USER)",
+    :short => "-v PRIVILEGE",
+    :long => "--privilege PRIVILEGE",
+    :default => "USER",
+    :required => false
+
   option :host,
     :description => "IPMI Hostname or IP",
     :short => "-h IPMI_HOST",
@@ -64,12 +72,45 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--ipmitool IPMI_PROVIDER",
     :default => "ipmitool"
 
+  option :timeout,
+    :description => "IPMI connection timeout in seconds (defaults to 30)",
+    :short => '-t TIMEOUT',
+    :long => '--timeout TIMEOUT',
+    :default => 30
+
   def conn
-    Rubyipmi.connect(config[:username], config[:password], config[:host], config[:provider])
+    begin
+      timeout(config[:timeout].to_i) do
+        Rubyipmi.connect(config[:username],
+                         config[:password],
+                         config[:host],
+                         config[:provider],
+                         {:privilege => config[:privilege]})
+      end
+    rescue Timeout::Error
+      unknown "Timeout during IPMI operation."
+    rescue Exception => e
+      unknown "An unknown error occured: #{e.inspect}"
+    end
   end
 
   def run
-    output [config[:scheme], config[:sensor]].join("."), conn.sensors.send(config[:sensor])[:value], Time.now.to_i
+    conn.sensors.list.each do |sensor|
+      if config[:sensor] != 'all'
+        next if sensor[1][:name] != config[:sensor]
+      end
+      name = sensor[1][:name]
+      value = sensor[1][:value]
+
+      if name !~ /^error_/
+        begin
+          value = Float(value)
+          output "#{config[:scheme]}.#{name}", value, Time.now.to_i
+        rescue TypeError, ArgumentError
+          # Not a numeric value - no point pushing as a metric
+        end
+      end
+    end
     ok
   end
 end
