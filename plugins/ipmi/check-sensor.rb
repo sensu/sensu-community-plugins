@@ -25,7 +25,6 @@ require 'rubyipmi'
 require 'socket'
 
 class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
     :description => "Metric naming scheme, text to prepend to .$parent.$child",
     :long => "--scheme SCHEME",
@@ -53,22 +52,17 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
     :long => "--host IPMI_HOST"
 
   option :provider,
-    :description => "IPMI Tool Provider (ipmitool OR freeipmi).  Searches for it by default.",
+    :description => "IPMI Tool Provider (ipmitool OR freeipmi).  Default is ipmitool.",
     :short => "-i IPMI_PROVIDER",
-    :long => "--ipmitool IPMI_PROVIDER"
+    :long => "--ipmitool IPMI_PROVIDER",
+    :default => "ipmitool"
+
+  def conn
+    Rubyipmi.connect(config[:username], config[:password], config[:host], config[:provider])
+  end
 
   def run
-    if config[:provider].nil?
-      conn = Rubyipmi.connect(config[:username], config[:password], config[:host])
-    else
-      conn = Rubyipmi.connect(config[:username], config[:password], config[:host], config[:provider])
-    end
-    sensor_val = eval "conn.sensors.#{config[:sensor]}[:value]"
-
-    timestamp = Time.now.to_i
-
-    output [config[:scheme], config[:sensor]].join("."), sensor_val, timestamp
-
+    output [config[:scheme], config[:sensor]].join("."), conn.sensors.send(config[:sensor])[:value], Time.now.to_i
     ok
   end
 end
