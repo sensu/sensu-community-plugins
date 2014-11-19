@@ -50,19 +50,24 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
     :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :required => true
 
   option :aws_secret_access_key,
     :short => '-k AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
     :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true
 
   option :aws_region,
     :short => '-r AWS_REGION',
     :long => '--aws-region REGION',
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
+  
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region] 
+    hash
+  end
 
   def run
     if config[:scheme] == ""
@@ -71,11 +76,9 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
       graphitepath = config[:scheme]
     end
     begin
-      as = Fog::AWS::AutoScaling.new(
-        :aws_access_key_id      => config[:aws_access_key],
-        :aws_secret_access_key  => config[:aws_secret_access_key],
-        :region             => config[:aws_region])
-
+      #Fog is used here to get access to the get method for autoscaling groups. Consider replacing with native
+      #AWS::Autoscaling calls in the future
+      as = Fog::AWS::AutoScaling.new aws_config
       count = as.groups.get(config[:groupname]).instances.map{|i| i.life_cycle_state}.count('InService')
       output graphitepath, count
 

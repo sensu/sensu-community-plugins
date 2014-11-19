@@ -10,7 +10,7 @@
 #
 # Gets latency metrics from CloudWatch and puts them in Graphite for longer term storage
 #
-# Needs fog gem
+# Needs aws-sdk gem
 #
 # Returns latency statistics by default.  You can specify any valid ELB metric type, see
 # http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#elb-metricscollected
@@ -22,7 +22,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
-require 'fog/aws'
+require 'aws-sdk'
 
 class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
@@ -64,16 +64,11 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
 
-  def query_instance_region
-    begin
-      instance_az = nil
-      Timeout.timeout(3) do
-        instance_az = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/placement/availability-zone/'))
-      end
-      instance_az[0...-1]
-    rescue Exception
-      raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?"
-    end
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
+    hash.update region: config[:aws_region] 
+    hash
   end
 
   def run
@@ -93,45 +88,43 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
       'HTTPCode_ELB_4XX' => 'Sum',
       'HTTPCode_ELB_5XX' => 'Sum',
     }
+
     begin
-
-      aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
-      cw = Fog::AWS::CloudWatch.new(
-        :aws_access_key_id      => config[:aws_access_key],
-        :aws_secret_access_key  => config[:aws_secret_access_key],
-        :region                 => aws_region
-      )
-
       et = Time.now - config[:fetch_age]
       st = et - 60
 
-      data = {}
+      cw = AWS::CloudWatch::Client.new aws_config
+
+      options = {
+        'namespace' => 'AWS/ELB',
+        'metric_name' => nil,
+        'dimensions' => [
+          {
+            'name' => 'LoadBalancerName',
+            'value' => nil,
+          }
+        ],
+        'statistics' => nil,
+        'start_time' => st.iso8601,
+        'end_time' => et.iso8601,
+        'period' => 60
+      }
+
+      result = {}
 
       config[:elbname].split(' ').each do |elbname|
         statistic_type.each do |key, value|
-
-          result = cw.get_metric_statistics({
-            'Namespace' => 'AWS/ELB',
-            'MetricName' => key,
-            'Dimensions' => [{
-            'Name' => 'LoadBalancerName',
-            'Value' => elbname,
-          }],
-          'Statistics' => [value],
-          'StartTime' => st.iso8601,
-          'EndTime' => et.iso8601,
-          'Period' => '60'
-          })
-          r =  result.body['GetMetricStatisticsResult']['Datapoints']
-          if r.count > 0
-            data[key] = result.body['GetMetricStatisticsResult']['Datapoints'][0]
-          end
+          options['metric_name'] = key
+          options['dimensions'][0]['value'] = elbname
+          options['statistics'] = [value]
+          r = cw.get_metric_statistics(options)
+          result[key] = r[:datapoints][0] unless r[:datapoints][0].nil?
         end
-
-        unless data.nil?
+        unless result.nil?
           # We only return data when we have some to return
-          data.each do |key, value|
-            output graphitepath + ".#{elbname}.#{key}", value.to_a.last[1], value['Timestamp'].to_i
+          result.each do |key, value|
+            puts key, value
+            output graphitepath + ".#{key}", value.to_a.last[1], value[:timestamp].to_i
           end
         end
       end

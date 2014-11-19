@@ -49,27 +49,19 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
     :description => 'Count by type: status, instance',
     :default => 'instance'
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
+    hash.update region: config[:aws_region] 
+    hash
+  end
+
   def run
     begin
 
       aws_debug = false
 
-      #The conditional allows for role-based credentialing 
-      if config[:aws_access_key].nil? and config[:aws_secret_access_key].nil?
-        AWS.config(
-          :region => config[:aws_region],
-          :http_wire_trace    => aws_debug
-        )
-      else
-        AWS.config(
-          :region => config[:aws_region],
-          :access_key_id => config[:aws_access_key]
-          :secret_access_key => config[:awsw_secret_access_key]
-          :http_wire_trace => aws_debug
-        )
-      end
-
-      client = AWS::EC2::Client.new
+      client = AWS::EC2::Client.new aws_config
 
       def by_instances_status(client)
 

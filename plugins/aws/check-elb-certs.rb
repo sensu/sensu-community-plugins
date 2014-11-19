@@ -73,7 +73,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
   def aws_config
     hash = {}
     hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
-    hash.update region: config[:region] 
+    hash.update region: config[:aws_region] 
     hash
   end
 

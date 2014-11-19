@@ -35,7 +35,6 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     :short => '-s AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
     :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true
 
   option :aws_region,
     :short => '-r AWS_REGION',
@@ -47,7 +46,6 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     :short => '-n ELB_NAME',
     :long => '--name ELB_NAME',
     :description => 'The name of the ELB',
-    :required => true
 
   option :warn_under,
     :short  => '-w WARN_NUM',
