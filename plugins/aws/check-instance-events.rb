@@ -29,6 +29,11 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
     :default => ENV['AWS_ACCESS_KEY_ID']
 
+  option :use_iam_role,
+    :short => '-u',
+    :long => '--use-iam',
+    :description => "Use IAM role authenticiation. Instance must have IAM role assigned for this to work"
+
   option :aws_secret_access_key,
     :short => '-s AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
@@ -43,12 +48,17 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
 
   def run
     event_instances = []
+    aws_config =   {}
 
-    ec2 = AWS::EC2::Client.new(
-      :access_key_id      => config[:aws_access_key],
-      :secret_access_key  => config[:aws_secret_access_key],
-      :region             => config[:aws_region])
+    if config[:use_iam_role].nil?
+      aws_config.merge!(
+        :access_key_id      => config[:aws_access_key],
+        :secret_access_key  => config[:aws_secret_access_key],
+        :region             => config[:aws_region]
+      )
+    end
 
+    ec2 = AWS::EC2::Client.new(aws_config.merge!(:region  => config[:aws_region]))
     begin
       ec2.describe_instance_status[:instance_status_set].each do |i|
         event_instances << i[:instance_id] unless i[:events_set].empty?
