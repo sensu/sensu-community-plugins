@@ -45,7 +45,8 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   option :queue,
     :description => "RabbitMQ queue to monitor",
     :long => "--queue queue_name",
-    :required => true
+    :required => true,
+	  :proc => proc { |a| a.split(',') }
 
   option :warn,
     :short => '-w NUM_MESSAGES',
@@ -75,20 +76,28 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   end
 
   def run
+	  @crit = []
+	  @warn = []
     rabbitmq = get_rabbitmq_info
     queues = rabbitmq.queues
     queues.each do |queue|
-      if queue['name'] == config[:queue]
-        total = queue['messages']
-        message "#{total}"
-        critical if total > config[:critical].to_i
-        warning if total > config[:warn].to_i
-        ok
+		  config[:queue].each do |q|
+        if queue['name'] == q
+          total = queue['messages']
+          message "#{total}"
+					@crit <<  "#{ q }:#{ total }" if total > config[:critical].to_i
+					@warn << "#{ q }:#{ total }" if total > config[:warn].to_i
+        end
       end
-    end
-
+		end
+	  if @crit.empty? && @warn.empty?
+		  ok 
+			elsif not(@crit.empty?)
+			  critical "critical: #{ @crit } \n warning: #{ warn }"
+			elsif not(@warn.empty?)
+			  warning "critical: #{ @crit } \n warning: #{ warn }"
+      end
     warning "No Queue: #{config[:queue]}"
     ok
   end
-
-end
+	end
