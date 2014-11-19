@@ -53,8 +53,7 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     if config[:use_iam_role].nil?
       aws_config.merge!(
         :access_key_id      => config[:aws_access_key],
-        :secret_access_key  => config[:aws_secret_access_key],
-        :region             => config[:aws_region]
+        :secret_access_key  => config[:aws_secret_access_key]
       )
     end
 
