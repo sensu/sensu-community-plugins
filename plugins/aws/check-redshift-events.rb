@@ -21,7 +21,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'aws-sdk'
 
-class CheckInstanceEvents < Sensu::Plugin::Check::CLI
+class CheckRedshiftEvents < Sensu::Plugin::Check::CLI
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
