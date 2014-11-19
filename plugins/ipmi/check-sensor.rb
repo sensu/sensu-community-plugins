@@ -16,6 +16,10 @@
 #    check-sensor.rb -u IPMI_USER -p IPMI_PASS -h 10.1.1.1 -s t_in_ps0
 #    FQDN.ipmisensor.t_in_ps1 32.000 1416346692
 #
+# CAVEATS:  Don't use passwords with characters that require escaping (e.g. !)
+#           Test your IPMI endpoints first to verify sensor names and that your
+#             credentials are working before putting them in a Sensu check.
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
@@ -31,7 +35,7 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
     :default => "#{Socket.gethostname}.ipmisensor"
 
   option :sensor,
-    :description => "IPMI sensor to gather stats for",
+    :description => "IPMI sensor to gather stats for.  Default is 't_in_ps0'",
     :short => "-s SENSOR_NAME",
     :long => "--sensor SENSOR_NAME",
     :default => "t_in_ps0"
@@ -39,17 +43,20 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
   option :username,
     :description => "IPMI Username",
     :short => "-u IPMI_USERNAME",
-    :long => "--username IPMI_USERNAME"
+    :long => "--username IPMI_USERNAME",
+    :required => true
 
   option :password,
     :description => "IPMI Password",
     :short => "-p IPMI_PASSWORD",
-    :long => "--password IPMI_PASSWORD"
+    :long => "--password IPMI_PASSWORD",
+    :required => true
 
   option :host,
     :description => "IPMI Hostname or IP",
     :short => "-h IPMI_HOST",
-    :long => "--host IPMI_HOST"
+    :long => "--host IPMI_HOST",
+    :required => true
 
   option :provider,
     :description => "IPMI Tool Provider (ipmitool OR freeipmi).  Default is ipmitool.",
