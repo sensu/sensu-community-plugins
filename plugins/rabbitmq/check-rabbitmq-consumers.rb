@@ -4,6 +4,7 @@
 # ========================
 #
 # Copyright 2014 Daniel Kerwin <d.kerwin@gini.net>
+# Copyright 2014 Tim Smith <tim@cozy.co>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -12,7 +13,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'carrot-top'
 
-class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
+class CheckRabbitMQConsumers < Sensu::Plugin::Check::CLI
 
   option :host,
     :description => "RabbitMQ management API host",
@@ -42,9 +43,10 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     :default => "guest"
 
   option :queue,
-    :description => "RabbitMQ queue to monitor",
+    :description => "RabbitMQ queue to monitor. To check 2+ queues use a comma separated list",
     :long => "--queue queue_name",
-    :required => true
+    :required => true,
+    :proc => proc { |q| q.split(',') }
 
   option :warn,
     :short => '-w NUM_CONSUMERS',
@@ -75,19 +77,34 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     connection
   end
 
+  def return_condition(missing, critical, warning)
+    if critical.count > 0 || missing.count > 0
+      message = ''
+      message << "Queues in critical state: #{critical.join(', ')}. " if critical.count > 0
+      message << "Queues missing: #{missing.join(', ')}" if missing.count > 0
+      critical(message)
+    elsif warning.count > 0
+      warning("Queues in warning state: #{warning.join(', ')}")
+    else
+      ok
+    end
+  end
+
   def run
+    # create arrays to hold failures
+    missing = config[:queue]
+    critical = []
+    warn = []
+
     rabbit.queues.each do |queue|
-      if queue['name'] == config[:queue]
-        consumers = queue['consumers']
-        message "#{consumers} connected"
-        critical if consumers < config[:critical]
-        warning if consumers < config[:warn]
-        ok
-      end
+      next unless config[:queue].include?(queue['name'])
+      missing.delete(queue['name'])
+      consumers = queue['consumers']
+      critical.push(queue['name']) if consumers < config[:critical]
+      warn.push(queue['name']) if consumers < config[:warn]
     end
 
-    warning "No Queue: #{config[:queue]}"
-    ok
+    return_condition(missing, critical, warn)
   end
 
 end
