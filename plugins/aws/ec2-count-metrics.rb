@@ -3,7 +3,6 @@
 # Count EC2 instances
 # ===
 #
-#
 # DESCRIPTION:
 # This plugin retrives number of EC2 status
 #
