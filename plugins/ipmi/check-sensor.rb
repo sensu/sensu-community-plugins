@@ -12,13 +12,17 @@
 #    - rubyipmi gem (https://github.com/logicminds/rubyipmi)
 #    - ipmitool or freeipmi package
 #
-# EXAMPLE:  Check the IPMI temperature sensor on a power supply named 't_in_ps0'.
+# EXAMPLES:  By default the check returns all sensors.  If you want to check
+#            just the IPMI temperature sensor on a power supply named
+#            't_in_ps0', you do the following.
+#
 #    check-sensor.rb -u IPMI_USER -p IPMI_PASS -h 10.1.1.1 -s t_in_ps0
 #    FQDN.ipmisensor.t_in_ps1 32.000 1416346692
 #
 # CAVEATS:  Don't use passwords with characters that require escaping (e.g. !)
-#           Test your IPMI endpoints first to verify sensor names and that your
-#             credentials are working before putting them in a Sensu check.
+#           Test your IPMI endpoints first to verify any specified sensor names
+#           and that your credentials are working before adding them to a Sensu
+#           check.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -107,7 +111,7 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
           value = Float(value)
           output "#{config[:scheme]}.#{name}", value, Time.now.to_i
         rescue TypeError, ArgumentError
-          # Not a numeric value - no point pushing as a metric
+          'Not numeric' # Not a numeric value - no point pushing as a metric
         end
       end
     end
