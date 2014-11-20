@@ -82,7 +82,7 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
                              password: config[:password]
                            }
     else
-      ldap = Net::LDAP.new host: host, 
+      ldap = Net::LDAP.new host: host,
                            port: config[:port]
     end
 
