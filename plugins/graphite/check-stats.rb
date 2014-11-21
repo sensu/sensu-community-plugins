@@ -56,6 +56,13 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
     :proc => proc {|p| p.to_f },
     :required => false
 
+  option :unknown_ignore,
+    :short => "-u",
+    :long => "--unknown-ignore",
+    :description => "Do nothing for UNKNOWN status (when you wildcard-match a ton of metrics at once and you don't care for a few missing data)",
+    :boolean => true,
+    :default => false
+
   def average(a)
     total = 0
     a.to_a.each {|i| total += i.to_f}
@@ -75,7 +82,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
         return [1, "#{metric['target']} is #{avg}"]
       end
     else
-      return [3, "#{metric['target']} has no datapoints"]
+      return [3, "#{metric['target']} has no datapoints"] if ! config[:unknown_ignore]
     end
     [0, nil]
   end
