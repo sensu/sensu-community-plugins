@@ -76,7 +76,7 @@ class CheckRedshiftEvents < Sensu::Plugin::Check::CLI
     if maint_clusters.empty?
       ok
     else
-      critical("Clusters in maintenance: #{maint_clusters.split(',')}")
+      critical("Clusters in maintenance: #{maint_clusters.join(',')}")
     end
   end
 end
