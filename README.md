@@ -1,8 +1,10 @@
 # Sensu Community Plugins
 
 [![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)
-[![Issues in Backlog](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=ready&title=Backlog)](http://waffle.io/sensu/sensu-community-plugins)
 
+[![Backlog Issues](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=Backlog&title=Issue and Pull Request Backlog)](http://waffle.io/sensu/sensu-community-plugins)
+
+[![Issues In Progress](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/sensu/sensu-community-plugins)
 
 ## Community plugins, extensions, and handlers
 
