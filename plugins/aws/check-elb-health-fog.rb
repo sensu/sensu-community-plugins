@@ -1,7 +1,7 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
 # Checks an ELB's health
-# ===
+#
 #
 # DESCRIPTION:
 #   This plugin checks the health of an Amazon Elastic Load Balancer.
@@ -13,13 +13,21 @@
 #   all
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   fog Ruby gem
+#   gem: fog
+#   gem: sensu-plugin
 #
-# Copyright (c) 2014, Panagiotis Papadomitsos <pj@ezgr.net>
+# EXAMPLES:
+#  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} --warning-over 1000000 --critical-over 1500000
+#  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkIn --warning-over 1000000 --critical-over 1500000
+#  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkOut --warning-over 1000000 --critical-over 1500000
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Panagiotis Papadomitsos <pj@ezgr.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -30,41 +38,41 @@ require 'fog/aws'
 class ELBHealth < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :required => true,
-    :default => ENV['AWS_ACCESS_KEY_ID']
+         :short       => '-a AWS_ACCESS_KEY',
+         :long        => '--aws-access-key AWS_ACCESS_KEY',
+         :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
+         :required    => true,
+         :default     => ENV['AWS_ACCESS_KEY_ID']
 
   option :aws_secret_access_key,
-    :short => '-s AWS_SECRET_ACCESS_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true,
-    :default => ENV['AWS_SECRET_ACCESS_KEY']
+         :short       => '-s AWS_SECRET_ACCESS_KEY',
+         :long        => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
+         :required    => true,
+         :default     => ENV['AWS_SECRET_ACCESS_KEY']
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1). If you do not specify a region, it will be detected by the server the script is run on"
+         :short       => '-r AWS_REGION',
+         :long        => '--aws-region REGION',
+         :description => "AWS Region (such as eu-west-1). If you do not specify a region, it will be detected by the server the script is run on"
 
   option :elb_name,
-    :short => '-n ELB_NAME',
-    :long => '--elb-name ELB_NAME',
-    :description => 'The Elastic Load Balancer name of which you want to check the health',
-    :required => true
+         :short       => '-n ELB_NAME',
+         :long        => '--elb-name ELB_NAME',
+         :description => 'The Elastic Load Balancer name of which you want to check the health',
+         :required    => true
 
   option :instances,
-    :short => '-i INSTANCES',
-    :long => '--instances INSTANCES',
-    :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health'
+         :short       => '-i INSTANCES',
+         :long        => '--instances INSTANCES',
+         :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health'
 
   option :verbose,
-    :short => '-v',
-    :long => '--verbose',
-    :description => 'Enable a little bit more verbose reports about instance health',
-    :boolean => true,
-    :default => false
+         :short       => '-v',
+         :long        => '--verbose',
+         :description => 'Enable a little bit more verbose reports about instance health',
+         :boolean     => true,
+         :default     => false
 
   def query_instance_region
     begin
@@ -94,7 +102,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       end
       unless unhealthy_instances.empty?
         if config[:verbose]
-          critical "Unhealthy instances detected: #{unhealthy_instances.map{|id, state| '[' + id + '::' + state + ']' }.join(' ')}"
+          critical "Unhealthy instances detected: #{unhealthy_instances.map{ |id, state| '[' + id + '::' + state + ']' }.join(' ') }"
         else
           critical "Detected [#{unhealthy_instances.size}] unhealthy instances"
         end
