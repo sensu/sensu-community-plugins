@@ -108,14 +108,14 @@ class CheckInfluxdbQuery < Sensu::Plugin::Check::CLI
     :exit => 0
 
   def run
-    influxdb = InfluxDB::Client.new config[:database], 
-      :host => config[:host], 
+    influxdb = InfluxDB::Client.new config[:database],
+      :host => config[:host],
       :port => config[:port],
-      :username => config[:username], 
+      :username => config[:username],
       :password => config[:password]
 
     value = influxdb.query config[:query]
-    if config[:noresult] and value.empty?
+    if config[:noresult] && value.empty?
       critical "No result for query '#{config[:query]}'"
     end
 
@@ -124,9 +124,9 @@ class CheckInfluxdbQuery < Sensu::Plugin::Check::CLI
       value = json_path.on(value).first || 0
 
       calc = Dentaku::Calculator.new
-      if config[:critical] and calc.evaluate(config[:critical], value: value)
+      if config[:critical] && calc.evaluate(config[:critical], value: value)
         critical "Value '#{value}' matched '#{config[:critical]}' for query '#{config[:query]}'"
-      elsif config[:warning] and calc.evaluate(config[:warning], value: value)
+      elsif config[:warning] && calc.evaluate(config[:warning], value: value)
         warning "Value '#{value}' matched '#{config[:warning]}' for query '#{config[:query]}'"
       else
         ok "Value '#{value}' ok for query '#{config[:query]}'"
@@ -138,5 +138,3 @@ class CheckInfluxdbQuery < Sensu::Plugin::Check::CLI
   end
 
 end
-
-
