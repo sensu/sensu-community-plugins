@@ -2,14 +2,14 @@
 #
 # Skyline handler
 #
-# This handler sends metrics to a Skyline server 
+# This handler sends metrics to a Skyline server
 # (https://github.com/etsy/skyline) via a UDP socket.
 #
 # This takes graphite like metrics (sensu's default)
-# converts them to the skyline msgpack format, and then 
+# converts them to the skyline msgpack format, and then
 # sends them to opentsdb.
 #
-# Skyline 'server' and 'port' must be specified in a 
+# Skyline 'server' and 'port' must be specified in a
 # config file in /etc/sensu/conf.d.
 # See skyline.json for an example.
 #
