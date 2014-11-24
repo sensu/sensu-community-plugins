@@ -15,7 +15,7 @@ LineLength:
 
 # added MJ
 AlignParameters:
-  Enabled: true
+  Enabled: false
 
 SpaceAroundOperators:
   Enabled: false
@@ -51,7 +51,7 @@ AccessorMethodName:
 
 # added MJ
 NilComparison:
-  Enabled: ture
+  Enabled: false
 
 WhileUntilDo:
   Enabled: false
@@ -67,7 +67,7 @@ RedundantBegin:
 
 # added MJ
 VariableName:
-  Enabled: true
+  Enabled: false
 
 MethodName:
   Enabled: false
@@ -89,7 +89,7 @@ DotPosition:
 
 # added MJ
 AlignArray:
-  Enabled: true
+  Enabled: false
 
 ConditionPosition:
   Enabled: false
@@ -174,7 +174,7 @@ Documentation:
 
 # added MJ
 AlignHash:
-  Enabled: true
+  Enabled: false
 
 SpaceAroundBlockBraces:
   Enabled: false
