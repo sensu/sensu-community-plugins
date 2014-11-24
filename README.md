@@ -1,6 +1,8 @@
 # Sensu Community Plugins
 
 [![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)
+[![Issues in Backlog](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=ready&title=Backlog)](http://waffle.io/sensu/sensu-community-plugins)
+
 
 ## Community plugins, extensions, and handlers
 
@@ -26,10 +28,12 @@ be declared in the header of the plugin/handler file.
 
 Only pull requests passing lint/tests will be merged.
 
+If you wish to track the status of your PR or issue, check out our [waffle.io](https://waffle.io/sensu/sensu-community-plugins).  This single location will allow contributers to stay on top of interwinding issues more effectively.
+
 Please do not not abandon your pull request, only you can help us merge
 it. We will wait for feedback from you on your pull request for up to
 one month. A lack of feedback in one month may require you to re-open
-your pull request.
+your pull request.  
 
 There is a Vagrantfile with shell provisioning that will setup the major versions of Ruby and a sensu gemset for each if you wish to use it.  To get started install [Vagrant](https://www.vagrantup.com/) then type *vagrant up* in the root directory of the repo.  Once it is up type *vagrant ssh* to remote into the box and then *cd /vagrant && bundle install* to set all necessary dependencies.
 
