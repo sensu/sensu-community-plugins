@@ -90,7 +90,7 @@ class ProcStatus < Sensu::Plugin::Metric::CLI::Graphite
 
     metric_names.each do |m|
       line = proc_status_lines.select { |x| /^#{m}/.match(x) }.first
-      val = line.split("\t")[1].to_i
+      val = line ? line.split("\t")[1].to_i : nil
       out[cmdline.to_s][m] = val
     end
     out

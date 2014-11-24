@@ -38,7 +38,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :path,
     :short => "-q STATUSPATH",
     :long => "--statspath STATUSPATH",
-    :description => "HAproxy web stats path",
+    :description => "HAproxy web stats path (the / will be prepended to the STATUSPATH e.g stats)",
     :default => "/"
 
   option :username,
