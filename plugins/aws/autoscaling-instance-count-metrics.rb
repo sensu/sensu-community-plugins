@@ -38,7 +38,8 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :groupname,
     :description => "Name of the AutoScaling group",
     :short => "-g GROUP_NAME",
-    :long => "--autoscaling-group GROUP_NAME"
+    :long => "--autoscaling-group GROUP_NAME",
+    :required => true
 
   option :scheme,
     :description => "Metric naming scheme, text to prepend to metric",
@@ -50,11 +51,13 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
     :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
+    :default => ENV['AWS_ACCESS_KEY']
 
   option :aws_secret_access_key,
     :short => '-k AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
     :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
+    :default => ENV['AWS_SECRET_KEY']
 
   option :aws_region,
     :short => '-r AWS_REGION',
@@ -64,12 +67,13 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   
   def aws_config
     hash = {}
-    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update aws_access_key_id: config[:aws_access_key], aws_secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
     hash.update region: config[:aws_region] 
     hash
   end
 
   def run
+    puts aws_config
     if config[:scheme] == ""
       graphitepath = "#{config[:groupname]}.autoscaling.instance_count"
     else

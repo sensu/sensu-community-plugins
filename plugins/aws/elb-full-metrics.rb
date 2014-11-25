@@ -12,9 +12,6 @@
 #
 # Needs aws-sdk gem
 #
-# Returns latency statistics by default.  You can specify any valid ELB metric type, see
-# http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#elb-metricscollected
-#
 # By default fetches statistics from one minute ago.  You may need to fetch further back than this;
 # high traffic ELBs can sometimes experience statistic delays of up to 10 minutes.  If you experience this,
 # raising a ticket with AWS support should get the problem resolved.
@@ -72,16 +69,11 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    if config[:scheme] == ""
-      graphitepath = "#{config[:elbname]}"
-    else
-      graphitepath = config[:scheme]
-    end
     statistic_type = {
       'Latency' => 'Average',
       'RequestCount' => 'Sum',
-      'UnHealthyHostCount' => 'Sum',
-      'HealthyHostCount' => 'Sum',
+      'UnHealthyHostCount' => 'Average',
+      'HealthyHostCount' => 'Average',
       'HTTPCode_Backend_2XX' => 'Sum',
       'HTTPCode_Backend_4XX' => 'Sum',
       'HTTPCode_Backend_5XX' => 'Sum',
@@ -97,23 +89,25 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       options = {
         'namespace' => 'AWS/ELB',
-        'metric_name' => nil,
         'dimensions' => [
           {
             'name' => 'LoadBalancerName',
-            'value' => nil,
+            'value' => config[:elbname]
           }
         ],
-        'statistics' => nil,
         'start_time' => st.iso8601,
         'end_time' => et.iso8601,
         'period' => 60
       }
 
       result = {}
+      graphitepath = config[:scheme]
 
       config[:elbname].split(' ').each do |elbname|
         statistic_type.each do |key, value|
+          if config[:scheme] == ""
+            graphitepath = "#{config[:elbname]}.#{key.downcase}"
+          end
           options['metric_name'] = key
           options['dimensions'][0]['value'] = elbname
           options['statistics'] = [value]
