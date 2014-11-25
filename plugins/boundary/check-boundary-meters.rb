@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
-# 
+#
 # Check Boundary meter connection health
 #
 # DESCRIPTION:
 # This plugin interrogates a boundary api endpoint for the connection health of meters.
-# It reports a list of meters that are currently disconnected. 
-# 
+# It reports a list of meters that are currently disconnected.
+#
 # Based on code from check-chef-nodes.rb
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -54,11 +54,11 @@ class BoundaryMetersChecker < Sensu::Plugin::Check::CLI
   end
 
   def all_meters_connected?
-    meter_connected_status.map(&:values).flatten.all?{|x| x == true}
+    meter_connected_status.map(&:values).flatten.all? { |x| x == true }
   end
 
   def disconnected_names
-    disconnected = meter_connected_status.select{|meter| meter.values.first == 'false' }
+    disconnected = meter_connected_status.select { |meter| meter.values.first == 'false' }
     disconnected.map(&:keys).flatten.sort.join(', ').downcase
   end
 end
