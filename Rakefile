@@ -8,3 +8,8 @@ end
 Rubocop::RakeTask.new
 
 task :default => [:spec, :rubocop]
+
+desc "Calculate technical debt"
+task :calculate_debt do
+  `ruby scripts/tech_debt.rb`
+end
