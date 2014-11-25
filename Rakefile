@@ -11,5 +11,10 @@ task :default => [:spec, :rubocop]
 
 desc "Calculate technical debt"
 task :calculate_debt do
-  `ruby scripts/tech_debt.rb`
+  `/usr/bin/env ruby scripts/tech_debt.rb`
+end
+
+desc "Make all plugins executable"
+task :make_plugins_executable do
+  `chmod -R +x /plugins/*`
 end
