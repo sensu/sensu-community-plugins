@@ -1,3 +1,34 @@
+#! /usr/bin/env ruby
+#
+# Calculate Technical Debt
+#
+#
+# DESCRIPTION:
+#   This will iterate through the repo aggrating all tech debt.
+#   It will then output this in Markdown to a Github issue for review.
+#
+# OUTPUT:
+#   plaint-text
+#
+# PLATFORMS:
+#   all
+#
+# DEPENDENCIES:
+#   gem: github-api
+#
+# EXAMPLES:
+#   ./tech_debt.rb
+#   rake calculate_debt
+#
+# NOTES:
+#
+#
+# LICENSE:
+#   Copyright 2014 Yieldbot, Inc  <devops@yieldbot.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require 'github_api'
 
 sensu_path = ''
@@ -8,12 +39,10 @@ tech_debt_orange = 'ORANGE'
 tech_debt_red = 'RED'
 
 github = Github.new do |c|
-  c.oauth_token = ''
+  c.oauth_token = API_TOKEN
 end
 
-yellow_debt = ''
-orange_debt = ''
-red_debt = ''
+yellow_debt, orange_debt, red_debt = ''
 
 Dir.glob('**/*').each do |file|
   next unless File.file?(file)
