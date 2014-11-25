@@ -16,12 +16,12 @@
 #   gem: fog
 #   gem: sensu-plugin
 #
-# YELLOW
+# #YELLOW
 # needs example command
 # EXAMPLES:
 #
 #
-# Notes:
+# NOTES:
 #
 # LICENSE:
 #   Copyright 2013 Bashton Ltd http://www.bashton.com/
@@ -42,10 +42,10 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
     :required => true
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => ""
+    :description => 'Metric naming scheme, text to prepend to metric',
+    :short       => '-s SCHEME',
+    :long        => '--scheme SCHEME',
+    :default     => ''
 
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',

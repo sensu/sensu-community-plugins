@@ -13,6 +13,7 @@ MethodLength:
 LineLength:
   Max: 160
 
+# added MJ
 AlignParameters:
   Enabled: false
 
@@ -48,6 +49,7 @@ RegexpLiteral:
 AccessorMethodName:
   Enabled: false
 
+# added MJ
 NilComparison:
   Enabled: false
 
@@ -63,6 +65,7 @@ SpecialGlobalVars:
 RedundantBegin:
   Enabled: false
 
+# added MJ
 VariableName:
   Enabled: false
 
@@ -84,6 +87,7 @@ SpaceAfterMethodName:
 DotPosition:
   Enabled: false
 
+# added MJ
 AlignArray:
   Enabled: false
 
@@ -157,6 +161,7 @@ CaseIndentation:
 EmptyLinesAroundBody:
   Enabled: false
 
+# added MJ
 IndentationWidth:
   Enabled: false
 
@@ -167,6 +172,7 @@ CyclomaticComplexity:
 Documentation:
   Enabled: false
 
+# added MJ
 AlignHash:
   Enabled: false
 

@@ -3,8 +3,7 @@
 # ===
 #
 # DESCRIPTION:
-#   This plugin looks up all instances in an account and alerts if one or more have a scheduled
-#   event (reboot, retirement, etc)
+#   This plugin checks redshift clusters for maintenance events
 #
 # PLATFORMS:
 #   all
@@ -22,17 +21,12 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'aws-sdk'
 
-class CheckInstanceEvents < Sensu::Plugin::Check::CLI
+class CheckRedshiftEvents < Sensu::Plugin::Check::CLI
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',
     :long => '--aws-access-key AWS_ACCESS_KEY',
     :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
     :default => ENV['AWS_ACCESS_KEY_ID']
-
-  option :use_iam_role,
-    :short => '-u',
-    :long => '--use-iam',
-    :description => "Use IAM role authenticiation. Instance must have IAM role assigned for this to work"
 
   option :aws_secret_access_key,
     :short => '-s AWS_SECRET_ACCESS_KEY',
@@ -46,30 +40,34 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     :description => "AWS Region (such as eu-west-1).",
     :default => 'us-east-1'
 
-  def aws_config
-    hash = {}
-    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
-    hash.update region: config[:aws_region] 
-    hash
-  end
-
   def run
-    event_instances = []
-    aws_config =   {}
+    redshift = AWS::Redshift::Client.new(
+      :access_key_id      => config[:aws_access_key],
+      :secret_access_key  => config[:aws_secret_access_key],
+      :region             => config[:aws_region])
 
-    ec2 = AWS::EC2::Client.new aws_config
     begin
-      ec2.describe_instance_status[:instance_status_set].each do |i|
-        event_instances << i[:instance_id] unless i[:events_set].empty?
+      # fetch all clusters identifiers
+      clusters = redshift.describe_clusters[:clusters].collect { |c| c[:cluster_identifier] }
+      maint_clusters = []
+
+      # fetch the last 2 hours of events for each cluster
+      clusters.each do |cluster_name|
+        events_record = redshift.describe_events({:start_time => (Time.now - 7200).iso8601, :source_type => 'cluster', :source_identifier => cluster_name })
+
+        next if events_record[:events].empty?
+
+        # if the last event is a start maint event then the cluster is still in maint
+        maint_clusters.push(cluster_name) if events_record[:events][-1][:event_id] == 'REDSHIFT-EVENT-2003'
       end
     rescue Exception => e
-      unknown "An error occurred processing AWS EC2 API: #{e.message}"
+      unknown "An error occurred processing AWS Redshift API: #{e.message}"
     end
 
-    if event_instances.count > 0
-      critical("#{event_instances.count} instances #{event_instances.count > 1 ? 'have' : 'has'} upcoming scheduled events: #{event_instances.join(',')}")
-    else
+    if maint_clusters.empty?
       ok
+    else
+      critical("Clusters in maintenance: #{maint_clusters.split(',')}")
     end
   end
 end
