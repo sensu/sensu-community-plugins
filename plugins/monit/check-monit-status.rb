@@ -60,7 +60,7 @@ class CheckMonit < Sensu::Plugin::Check::CLI
 
       next if ignored.include? name
 
-      unless monitored == '1'
+      unless %w( 1 5 ).include? monitored
         unknown "#{name} status unkown"
       end
 
