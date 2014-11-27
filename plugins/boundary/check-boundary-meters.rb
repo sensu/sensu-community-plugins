@@ -54,7 +54,7 @@ class BoundaryMetersChecker < Sensu::Plugin::Check::CLI
   end
 
   def all_meters_connected?
-    meter_connected_status.map(&:values).flatten.all? { |x| x == true }
+    meter_connected_status.map(&:values).flatten.all? { |x| x == 'true' }
   end
 
   def disconnected_names
