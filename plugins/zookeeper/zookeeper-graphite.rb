@@ -68,8 +68,5 @@ class ZookeeperGraphite < Sensu::Plugin::Metric::CLI::Graphite
     rescue Timeout::Error
       unknown "timed out connecting to zookeeper on #{config[:host]}:#{config[:port]}"
     end
-#    rescue
-#     puts "Can't connect to port #{config[:port]}"
-#     exit(1)
   end
 end
