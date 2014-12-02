@@ -17,19 +17,6 @@
 # DEPENDENCIES:
 #  gem zendesk_api
 #
-# EXAMPLES:
-#   "zendesk": {
-#        "url": "https://mydesk.zendesk.com/api/v2",
-#        "username" : "login.email@zendesk.com",
-#        "token": "your zendesk token",
-#        "password": "your zendesk password",
-#        "type": "incident",
-#        "priority": "urgent",
-#        "tags": ["tag1"],
-#        "subscriptions_to_tags": false,
-#        "status_to_use": [2]
-#  }
-#
 # 2014, Diogo Gomes <diogo.gomes@ideais.com.br> @_diogo
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
