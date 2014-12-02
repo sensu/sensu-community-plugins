@@ -32,11 +32,19 @@ class CheckCPU < Sensu::Plugin::Check::CLI
   end
 
   def get_cpu_stats
+    # Return an array of the time spent, in Jiffies, in each space,
+    # totalled across ALL CPUs.
+    mp_stats = []
     File.open("/proc/stat", "r").each_line do |line|
       info = line.split(/\s+/)
       name = info.shift
-      return info.map{|i| i.to_f} if name.match(/^cpu$/)
+      if name.match(/^cpu[0-9]*$/)
+        info.each_with_index do |stat,i|
+          mp_stats[i] = !mp_stats[i] ? stat.to_f : mp_stats[i] + stat.to_f
+        end
+      end
     end
+    return mp_stats
   end
 
   def run
