@@ -75,6 +75,22 @@ Rubocop is used to lint the style of the ruby plugins. This is done
 to standardize the style used within these plugins, and ensure high
 quality code.  All current rules with the exception of <b>Style/FileName</b> are currently in effect.
 
+You can test rubocop conpliance for yourself by installing the gem and running <i>rubocop</i> from the command line.
+Running <i>rubocop -a</i> will attempt to autocorrect any issues, saving yourself considerable time in large files.
+
+If it truely makes sense for your code to violate a rule you can disable that rule with your code by either using
+```shell
+# rubocop:disable <rule>, <rule>
+``` 
+at the end of the line in violation or
+```shell
+rubocop:disable <rule>, <rule>
+<code block>
+rubocop:enable <rule>, <rule>
+```
+
+If you use either of these methods please mention in the PR as this should be kept to an absolute minium at times, especially concerning method length and complexity, it makes sense to use on of the above methods.
+
 ### Rspec
 
 Currently we have RSpec as a [test framework](https://github.com/sensu/sensu-plugin-spec). Please add coverage for your check.  Checks will not be considered production grade and stable until they have complete coverage.
