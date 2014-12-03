@@ -38,7 +38,7 @@ class CheckUnicornQueue < Sensu::Plugin::Check::CLI
   
   option :critical,
     :short => '-c critical',
-    :proc => proc { |w| w.to_i }
+    :proc => proc { |c| c.to_i }
 
   def run
     @queued = queued
