@@ -13,7 +13,16 @@ exec plugins and handlers on Windows.
 
 When developing your plugins please use the [sensu plugin class](https://github.com/sensu/sensu-plugin).  This will ensure that all plugins have an identical run structure.
 
-Each plugin, handler, mutator, extension needs to have a standard header
+When using options please try and follow the following structure.  At the very least your option needs to include a description to assist the user with configration and deployment
+```ruby
+option :port,
+       short: '-p PORT',
+       long: '--port PORT',
+       description: 'Port',
+       default: '1234'
+```
+
+Each plugin, handler, mutator, extension should use the following standard header
 
 ````
 #! /usr/bin/env ruby
