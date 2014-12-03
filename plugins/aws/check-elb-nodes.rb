@@ -1,23 +1,36 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
 # Checks the number of in service nodes in an AWS ELB
-# ===
+#
 #
 # DESCRIPTION:
 #   This plugin checks an AWS Elastic Load Balancer to ensure a minimum number
 #   or percentage of nodes are InService on the ELB
 #
+# OUTPUT:
+#   plain-text
+#
 # PLATFORMS:
 #   all
 #
 # DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   aws-sdk Ruby gem
+#   gem: aws-sdk
+#   gem: sensu-plugin
 #
-# Copyright (c) 2013, Justin Lambert <jlambert@letsevenup.com>
+# EXAMPLES:
+#     # Warning if any load balancer's latency is over 1 second, critical if over 3 seconds.
+#     check-elb-latency --warning-over 1 --critical-over 3
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+#     # Critical if "app" load balancer's latency is over 5 seconds, maximum of last one hour
+#     check-elb-latency --elb-names app --critical-over 5 --statistics maximum --period 3600
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2013, Justin Lambert <jlambert@letsevenup.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -26,56 +39,60 @@ require 'aws-sdk'
 class CheckELBNodes < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :required => true
+         :short => '-a AWS_ACCESS_KEY',
+         :long => '--aws-access-key AWS_ACCESS_KEY',
+         :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
+         :required => true
 
   option :aws_secret_access_key,
-    :short => '-s AWS_SECRET_ACCESS_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true
+         :short => '-s AWS_SECRET_ACCESS_KEY',
+         :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
+         :required => true
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1).",
-    :default => 'us-east-1'
+         :short => '-r AWS_REGION',
+         :long => '--aws-region REGION',
+         :description => "AWS Region (such as eu-west-1).",
+         :default => 'us-east-1'
 
   option :load_balancer,
-    :short => '-n ELB_NAME',
-    :long => '--name ELB_NAME',
-    :description => 'The name of the ELB',
-    :required => true
+         :short => '-n ELB_NAME',
+         :long => '--name ELB_NAME',
+         :description => 'The name of the ELB',
+         :required => true
 
   option :warn_under,
-    :short  => '-w WARN_NUM',
-    :long  => '--warn WARN_NUM',
-    :description => 'Minimum number of nodes InService on the ELB to be considered a warning',
-    :default => -1,
-    :proc => proc { |a| a.to_i }
+         :short  => '-w WARN_NUM',
+         :long  => '--warn WARN_NUM',
+         :description => 'Minimum number of nodes InService on the ELB to be considered a warning',
+         :default => -1,
+         # #YELLOW
+         :proc => proc { |a| a.to_i }
 
   option :crit_under,
-    :short  => '-c CRIT_NUM',
-    :long  => '--crit CRIT_NUM',
-    :description => 'Minimum number of nodes InService on the ELB to be considered critical',
-    :default => -1,
-    :proc => proc { |a| a.to_i }
+         :short  => '-c CRIT_NUM',
+         :long  => '--crit CRIT_NUM',
+         :description => 'Minimum number of nodes InService on the ELB to be considered critical',
+         :default => -1,
+         # #YELLOW
+         :proc => proc { |a| a.to_i }
 
   option :warn_percent,
-    :short => '-W WARN_PERCENT',
-    :long => '--warn_perc WARN_PERCENT',
-    :description => 'Warn when the percentage of InService nodes is at or below this number',
-    :default => -1,
-    :proc => proc { |a| a.to_i }
+         :short => '-W WARN_PERCENT',
+         :long => '--warn_perc WARN_PERCENT',
+         :description => 'Warn when the percentage of InService nodes is at or below this number',
+         :default => -1,
+         # #YELLOW
+         :proc => proc { |a| a.to_i }
 
   option :crit_percent,
-    :short => '-C CRIT_PERCENT',
-    :long => '--crit_perc CRIT_PERCENT',
-    :description => 'Minimum percentage of nodes needed to be InService',
-    :default => -1,
-    :proc => proc { |a| a.to_i }
+         :short => '-C CRIT_PERCENT',
+         :long => '--crit_perc CRIT_PERCENT',
+         :description => 'Minimum percentage of nodes needed to be InService',
+         :default => -1,
+         # #YELLOW
+         :proc => proc { |a| a.to_i }
 
   def run
     AWS.start_memoizing
