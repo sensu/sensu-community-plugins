@@ -91,10 +91,10 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
       end
     end
     if @crit.empty? && @warn.empty?
-      ok 
-    elsif not(@crit.empty?)
+      ok
+    elsif !(@crit.empty?)
       critical "critical: #{ @crit } \n warning: #{ warn }"
-    elsif not(@warn.empty?)
+    elsif !(@warn.empty?)
       warning "critical: #{ @crit } \n warning: #{ warn }"
     end
   end
