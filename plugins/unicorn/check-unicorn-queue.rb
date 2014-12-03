@@ -35,7 +35,7 @@ class CheckUnicornQueue < Sensu::Plugin::Check::CLI
   option :warn,
     :short => '-w warn',
     :proc => proc { |w| w.to_i }
- 
+
   option :critical,
     :short => '-c critical',
     :proc => proc { |c| c.to_i }
