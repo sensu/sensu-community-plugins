@@ -63,6 +63,8 @@ class NzbgetMetric < Sensu::Plugin::Metric::CLI::Graphite
       warning "Resource not found: #{resource}"
     rescue Errno::ECONNREFUSED
       warning 'Connection refused'
+    rescue Errno::ECONNRESET
+      warning 'Connection reset'
     rescue RestClient::RequestFailed
       warning 'Request failed'
     rescue RestClient::RequestTimeout
@@ -71,6 +73,8 @@ class NzbgetMetric < Sensu::Plugin::Metric::CLI::Graphite
       warning 'Missing or incorrect NZBGet API credentials'
     rescue JSON::ParserError
       warning 'NZBGet API returned invalid JSON'
+    rescue OpenSSL::SSL::SSLError => e
+      warning "SSL error: #{e}"
     end
   end
 
