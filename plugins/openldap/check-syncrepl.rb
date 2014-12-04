@@ -3,8 +3,10 @@
 #   check-syncrepl
 #
 # DESCRIPTION:
-#   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working
-#   This currently only works with TLS and binding as a user
+#   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working.
+#   The plugin will attempt to use an unauthenticated connection if no
+#   user name (with the -u or --user option) and password (with the -p 
+#   or --password option) are specified.
 #
 # OUTPUT:
 #   plain text
