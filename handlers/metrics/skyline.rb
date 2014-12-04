@@ -4,7 +4,7 @@
 #
 #
 # DESCRIPTION:
-#   This handler sends graphite like metrics (sensu's default) to a Skyline server 
+#   This handler sends graphite like metrics (sensu's default) to a Skyline server
 #   (https://github.com/etsy/skyline) via a UDP socket.
 #
 # OUTPUT:
