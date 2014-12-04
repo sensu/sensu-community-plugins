@@ -5,7 +5,7 @@
 # DESCRIPTION:
 #   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working.
 #   The plugin will attempt to use an unauthenticated connection if no
-#   user name (with the -u or --user option) and password (with the -p 
+#   user name (with the -u or --user option) and password (with the -p
 #   or --password option) are specified.
 #
 # OUTPUT:
