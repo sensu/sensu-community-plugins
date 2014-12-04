@@ -1,23 +1,55 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Skyline handler
+#   skyline.rb
 #
-# This handler sends metrics to a Skyline server
-# (https://github.com/etsy/skyline) via a UDP socket.
 #
-# This takes graphite like metrics (sensu's default)
-# converts them to the skyline msgpack format, and then
-# sends them to opentsdb.
+# DESCRIPTION:
+#   This handler sends graphite like metrics (sensu's default) to a Skyline server 
+#   (https://github.com/etsy/skyline) via a UDP socket.
 #
-# Skyline 'server' and 'port' must be specified in a
-# config file in /etc/sensu/conf.d.
-# See skyline.json for an example.
+# OUTPUT:
+#   msgpack binary format [<metric name>, [<timestamp>, <value>]] over UDP
 #
-# Written by Derek Tracy -- http://github.com/tracyde
+# PLATFORMS:
+#   Linux, Windows
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-handler
+#   gem: msgpack
 #
+# USAGE:
+#   example commands
+#   {
+#     "skyline": {
+#       "port": "2025",
+#       "server": "skyline.example.com"
+#     },
+#     {
+#       "handlers": {
+#         "sentry": {
+#           "type": "pipe",
+#           "command": "/etc/sensu/handlers/skyline.rb",
+#           "severities": [
+#             "ok",
+#             "warning",
+#             "critical",
+#             "unknown"
+#           ]
+#         }
+#       }
+#     }
+#   }
+#
+# NOTES:
+#   Skyline 'server' and 'port' must be specified in a config file in /etc/sensu/conf.d.
+#   See skyline.json for an example.
+#
+# LICENSE:
+#   Derek Tracy  tracyde@gmail.com
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'socket'
