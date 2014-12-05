@@ -19,7 +19,17 @@
 #   gem: net-ldap
 #
 # USAGE:
-#   #YELLOW
+#   bind to LDAP without authorisation
+#   ----------------------------------
+#   ./check-syncrepl.rb -h 'ldap1.domain,ldap2.domain'
+#   will compare the contextCSN of the ldap servers ldap1.domain and
+#   ldap2.domain
+#
+#   bind to LDAP requiring authorisation
+#   ------------------------------------
+#   ./check-syncrepl.rb -h 'ldap1.domain,ldap2.domain' -u auser -p passwd
+#   will bind to the ldap servers ldap1.domain and ldap2.domain as user
+#   auser with password passwd and compare the contextCSN
 #
 # NOTES:
 #
