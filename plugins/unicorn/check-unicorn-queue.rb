@@ -14,11 +14,16 @@
 #   bsd
 #
 # DEPENDENCIES:
-#   sensu-plugin ruby gem
-#   raindrops ruby gem
+#   gem: sensu-plugin
+#   gem: raindrops
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   check-unicorn-queue.rb -w 20 -c 50 -a 127.0.0.1:8080
+#
+# LICENSE:
+#   Nathan Williams <nath.e.will@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -27,18 +32,22 @@ require 'raindrops'
 class CheckUnicornQueue < Sensu::Plugin::Check::CLI
 
   option :addr,
-    :short => '-a address'
+    :short => '-a address',
+    :description => 'tcp address and port (e.g. 127.0.0.1:8080)'
 
   option :socket,
-    :short => '-s socket'
+    :short => '-s socket',
+    :description => 'path to unix socket (e.g. /run/unicorn.sock)'
 
   option :warn,
     :short => '-w warn',
-    :proc => proc { |w| w.to_i }
+    :proc => proc { |w| w.to_i },
+    :description => 'request queue warn threshold'
 
   option :critical,
     :short => '-c critical',
-    :proc => proc { |c| c.to_i }
+    :proc => proc { |c| c.to_i },
+    :description => 'request queue critical threshold'
 
   def run
     @queued = queued
