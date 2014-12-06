@@ -30,7 +30,6 @@ require 'sensu-plugin/check/cli'
 require 'raindrops'
 
 class CheckUnicornQueue < Sensu::Plugin::Check::CLI
-
   option :addr,
     :short => '-a address',
     :description => 'tcp address and port (e.g. 127.0.0.1:8080)'
