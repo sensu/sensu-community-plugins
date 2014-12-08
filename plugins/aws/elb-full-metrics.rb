@@ -85,8 +85,8 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
     statistic_type = {
       'Latency' => 'Average',
       'RequestCount' => 'Sum',
-      'UnHealthyHostCount' => 'Sum',
-      'HealthyHostCount' => 'Sum',
+      'UnHealthyHostCount' => 'Average',
+      'HealthyHostCount' => 'Average',
       'HTTPCode_Backend_2XX' => 'Sum',
       'HTTPCode_Backend_4XX' => 'Sum',
       'HTTPCode_Backend_5XX' => 'Sum',
