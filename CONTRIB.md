@@ -1,6 +1,6 @@
 # Developer Guidelines
 
-If you have a new plugin or handler, send a pull request! Don't be afraid on pushing your PR with non-ruby code. Just let someone from [team](https://github.com/sensu?tab=members) know. Maybe we can help you to rewrite your check to Ruby or even we can invent something completely new to test your work. Just don't hesitate to contact us.
+If you have a new plugin or handler, send a pull request! Don't be afraid on pushing your PR with non-ruby code. Just let someone from [team](https://github.com/sensu?tab=members) know. Maybe we can help you to rewrite your check to Ruby or even invent something completely new to test your work. Just don't hesitate to contact us.
  
 ## Naming Conventions
 
@@ -13,13 +13,73 @@ exec plugins and handlers on Windows.
 
 When developing your plugins please use the [sensu plugin class](https://github.com/sensu/sensu-plugin).  This will ensure that all plugins have an identical run structure.
 
-Each plugin, handler, mutator, extension should have a standard header, details can be found [here](https://github.com/sensu/sensu-community-plugins/issues/868)
+When using options please try and follow the following structure.  At the very least your option needs to include a description to assist the user with configration and deployment
+```ruby
+option :port,
+       short: '-p PORT',
+       long: '--port PORT',
+       description: 'Port',
+       default: '1234'
+```
 
+Each plugin, handler, mutator, extension should use the following standard header
+
+````
+#! /usr/bin/env ruby
+#
+#   <script name>
+#
+#
+# DESCRIPTION:
+#   <description> what is this thing supposed to do, monitor.  How do alerts or
+#   alarms work.
+#
+# OUTPUT:
+#   <output> plain text, metric data, etc
+#
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   <your name>  <your email>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+````
+
+## Documentation
+
+All documentation will be handled by [RDoc](https://github.com/rdoc/rdoc) and we are using the default rdoc markup at this time. A brief introduction RDoc markup can be found [here](http://docs.seattlerb.org/rdoc/RDoc/Markup.html). All scripts should have as much documentation coverage as possible, ideally 100%.  You can test your coverage by installing RDoc locally and running
+
+```shell
+rdoc -C <filename>
+```
+
+The output will tell you how much coverage you have without spending the time building the docs.  
+
+Documentation can always be made better, if you would like to contribute to it, have at it and submit a PR.
 
 ## Dependency Managment
 
 Dependencies (ruby gems, packages, etc) and other requirements should
-be declared in the header of the plugin/handler file.
+be declared in the header of the plugin/handler file.  Try to use the standard library or the same dependencies as other plugins to keep the stack as small as possible.  If you have questions about using a specific gem feel free to ask.
+
+All scripts should contain the following dependency to ensure full compatibility.
+
+
+```ruby
+require 'rubygems' if RUBY_VERSION < '1.9.0'
+```
 
 ## Vagrant Box
 
@@ -34,18 +94,27 @@ Only pull requests passing lint/tests will be merged.
 
 Rubocop is used to lint the style of the ruby plugins. This is done
 to standardize the style used within these plugins, and ensure high
-quality code.  Feel free to submit changes to .rubocop.yml with
-pull requests.
+quality code.  All current rules with the exception of <b>Style/FileName</b> are currently in effect.
 
+You can test rubocop conpliance for yourself by installing the gem and running <i>rubocop</i> from the command line.
+Running <i>rubocop -a</i> will attempt to autocorrect any issues, saving yourself considerable time in large files.
 
+If it truely makes sense for your code to violate a rule you can disable that rule with your code by either using
+```shell
+# rubocop:disable <rule>, <rule>
+``` 
+at the end of the line in violation or
+```shell
+rubocop:disable <rule>, <rule>
+<code block>
+rubocop:enable <rule>, <rule>
 ```
-bundle install
-bundle exec rubocop
-```
+
+If you use either of these methods please mention in the PR as this should be kept to an absolute minium at times, especially concerning method length and complexity, it makes sense to use on of the above methods.
 
 ### Rspec
 
-Currently we have RSpec as a [test framework](https://github.com/sensu/sensu-plugin-spec). Please add coverage for your check.
+Currently we have RSpec as a [test framework](https://github.com/sensu/sensu-plugin-spec). Please add coverage for your check.  Checks will not be considered production grade and stable until they have complete coverage.
 This is ~~little bit hard~~ almost impossible for non-ruby checks. Let someone from [team](https://github.com/sensu?tab=members) know and maybe can can help.
 
 ### Issue and PR Tracking
@@ -61,17 +130,20 @@ your pull request.
 
 For those who don't deal with or understand technical debt, it is debt incurred when designing or developing software.  All the #FIXME, #HACK, etc littered through a script add up over time, this is your technical debt.
 
-### Levels
+#### Technical Debt Levels
 
 **YELLOW**
+
 * simple issues that require basic Ruby and no more than 4 hours to fix
 
 **ORANGE**
+
 * these may require 4 - 8 hours but still only a basic or intermediate Ruby skillset
 
 **RED**
+
 * may require 8+ hours or some domain specific Ruby skills such as Amazon, or Elastic Search
 
-If you want to help out just grab a file and tag it for fixing by either the original maintainer or another community member or fix it yourself if you can and submit a PR.
-
 In order to quantify it and see what we actually have there is a rake task *calculate_debt*.  In order to run it you will need an auth token and write access to the repo.
+
+There are three locked issues on Github corresponding the to level of debt, if you want to help out just grab a file and tag it for fixing by either the original maintainer or another community member or fix it yourself if you can and submit a PR.
