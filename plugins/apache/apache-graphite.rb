@@ -68,7 +68,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
          :description => 'Metric naming scheme, text to prepend to .$parent.$child',
          :long        => '--scheme SCHEME',
-         :default     => '#{Socket.gethostname}'
+         :default     => "#{Socket.gethostname}"
 
   option :secure,
          :short       => '-s',
