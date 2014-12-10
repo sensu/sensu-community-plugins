@@ -12,7 +12,6 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'mysql'
 
 class CheckMySQLHealth < Sensu::Plugin::Check::CLI
 
@@ -65,6 +64,7 @@ class CheckMySQLHealth < Sensu::Plugin::Check::CLI
 
   def run
     begin
+        require 'mysql'
         db = Mysql.real_connect(config[:hostname], config[:user], config[:password], config[:database], config[:port].to_i, config[:socket])
         max_con = db.
             query("SHOW VARIABLES LIKE 'max_connections'").
@@ -86,6 +86,8 @@ class CheckMySQLHealth < Sensu::Plugin::Check::CLI
             warning "Max connections reached in MySQL: #{used_con} out of #{max_con}" if used_con >= config[:maxwarn].to_i
             ok "Max connections is under limit in MySQL: #{used_con} out of #{max_con}"
         end
+    rescue LoadError => le
+        unknown le
     rescue Mysql::Error => e
         critical "MySQL check failed: #{e.error}"
     ensure
