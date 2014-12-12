@@ -76,9 +76,11 @@ class CheckSupervisorSocket < Sensu::Plugin::Check::CLI
       request.exec(@super, "1.1", "/RPC2")
 
       # wait for and parse the http response
-      begin
+      loop do
         response = Net::HTTPResponse.read_new(@super)
-      end while response.kind_of?(Net::HTTPContinue)
+      	break unless response.kind_of?(Net::HTTPContinue)
+      end
+
       response.reading_body(@super, request.response_body_permitted?) { }
     rescue
       critical "Tried requesting XMLRPC 'supervisor.getAllProcessInfo' from UNIX domain socket #{config[:socket]} but failed"
