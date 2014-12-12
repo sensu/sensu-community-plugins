@@ -75,7 +75,7 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     if config[:include_name]
       event_instances_with_names = []
       event_instances.each do |id|
-        name = "" 
+        name = ""
         begin
           instance = ec2.describe_instances(instance_ids: [id])
           # Harvests the 'Name' tag for the instance
@@ -83,8 +83,8 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
         rescue Exception => e
           puts "Issue getting instance details for #{id}.  Exception = #{e}"
         end
-          # Pushes 'name(i-xxx)' if the Name tag was found, else it just pushes the id
-          event_instances_with_names << (name == "" ? id : "#{name}(#{id})")
+         # Pushes 'name(i-xxx)' if the Name tag was found, else it just pushes the id
+         event_instances_with_names << (name == "" ? id : "#{name}(#{id})")
       end
       event_instances = event_instances_with_names
     end
