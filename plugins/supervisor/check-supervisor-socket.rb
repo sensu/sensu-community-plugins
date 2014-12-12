@@ -78,7 +78,7 @@ class CheckSupervisorSocket < Sensu::Plugin::Check::CLI
       # wait for and parse the http response
       loop do
         response = Net::HTTPResponse.read_new(@super)
-      	break unless response.kind_of?(Net::HTTPContinue)
+        break unless response.kind_of?(Net::HTTPContinue)
       end
 
       response.reading_body(@super, request.response_body_permitted?) { }
