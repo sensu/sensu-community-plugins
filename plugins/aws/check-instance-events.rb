@@ -99,7 +99,7 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
           puts "Issue getting instance details for #{id}.  Exception = #{e}"
         end
           # Pushes 'name(i-xxx)' if the Name tag was found, else it just pushes the id
-          event_instances_with_names << name == "" ? id : "#{name}(#{id})"
+          event_instances_with_names << (name == "" ? id : "#{name}(#{id})")
       end
       event_instances = event_instances_with_names
     end
