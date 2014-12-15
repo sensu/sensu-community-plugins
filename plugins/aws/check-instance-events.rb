@@ -66,7 +66,22 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     ec2 = AWS::EC2::Client.new(aws_config.merge!(:region  => config[:aws_region]))
     begin
       ec2.describe_instance_status[:instance_status_set].each do |i|
-        event_instances << i[:instance_id] unless i[:events_set].empty?
+
+        unless i[:events_set].empty?
+          # Exclude completed reboots since the events API appearently returns these even after they have been completed:
+          # Example:
+          #  "events_set": [
+          #     {
+          #         "code": "system-reboot",
+          #         "description": "[Completed] Scheduled reboot",
+          #         "not_before": "2015-01-05 12:00:00 UTC",
+          #         "not_after": "2015-01-05 18:00:00 UTC"
+          #     }
+          # ]
+          unless i[:events_set].select{|x| x[:code] == "system-reboot" and x[:description] =~ /\[Completed\]/ }
+            event_instances << i[:instance_id]
+          end
+        end
       end
     rescue Exception => e
       unknown "An error occurred processing AWS EC2 API: #{e.message}"
