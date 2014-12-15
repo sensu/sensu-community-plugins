@@ -34,6 +34,12 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     :long => '--use-iam',
     :description => "Use IAM role authenticiation. Instance must have IAM role assigned for this to work"
 
+  option :include_name,
+    :short => '-n',
+    :long => '--include-name',
+    :description => "Includes any offending instance's 'Name' tag in the check output",
+    :default => false
+
   option :aws_secret_access_key,
     :short => '-s AWS_SECRET_ACCESS_KEY',
     :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
@@ -64,6 +70,23 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
       end
     rescue Exception => e
       unknown "An error occurred processing AWS EC2 API: #{e.message}"
+    end
+
+    if config[:include_name]
+      event_instances_with_names = []
+      event_instances.each do |id|
+        name = ""
+        begin
+          instance = ec2.describe_instances(instance_ids: [id])
+          # Harvests the 'Name' tag for the instance
+          name = instance[:reservation_index][id][:instances_set][0][:tag_set].select {|tag| tag[:key] == "Name"}[0][:value]
+        rescue Exception => e
+          puts "Issue getting instance details for #{id}.  Exception = #{e}"
+        end
+        # Pushes 'name(i-xxx)' if the Name tag was found, else it just pushes the id
+        event_instances_with_names << (name == "" ? id : "#{name}(#{id})")
+      end
+      event_instances = event_instances_with_names
     end
 
     if event_instances.count > 0
