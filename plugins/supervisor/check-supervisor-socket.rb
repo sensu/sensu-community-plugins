@@ -1,22 +1,29 @@
 #!/usr/bin/env ruby
 #
-# Check Supervisor, via it's UNIX domain socket, see unix_http_server section in http://supervisord.org/configuration.html
-# ===
+# check-supervisor-socket
 #
-# Check all supervisor processes are running, via it's UNIX domain socket
 #
-#   Author: Mathias Bogaert
-#   Copyright (c) 2014 Buttercoin
+# DESCRIPTION:
+#   Check that all supervisor processes are running using its UNIX domain socket. See unix_http_server section in
+#   http://supervisord.org/configuration.html.
+#
+# OUTPUT:
+#   Plain text, 'All processes running' or eg. 'redis-server not running: FATAL'
 #
 # PLATFORMS:
-#   all
+#   All
 #
 # DEPENDENCIES:
-#   gem: libxml-xmlrpc
 #   gem: sensu-plugin
+#   gem: libxml-xmlrpc
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   check-supervisor-socket.rb
+#
+# LICENSE:
+#   Mathias Bogaert, mathias.bogaert@gmail.com
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 
 require 'rubygems' if RUBY_VERSION < "1.9"
 require 'sensu-plugin/check/cli'
