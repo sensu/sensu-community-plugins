@@ -94,7 +94,7 @@ class CheckSupervisorSocket < Sensu::Plugin::Check::CLI
     end
 
     XML::XMLRPC::Parser.new(response.body).params do |process|
-      critical "#{process["name"]} not running: #{process["statename"].downcase}" if config[:critical].include?(process["statename"])
+      critical "#{process["name"]} not running: #{process["statename"].upcase}" if config[:critical].include?(process["statename"])
     end
 
     ok "All processes running"
