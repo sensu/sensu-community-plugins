@@ -27,9 +27,9 @@ class CheckNTP < Sensu::Plugin::Check::CLI
       unknown "NTP command Failed"
     end
 
-    critical if offset >= config[:crit] || offset <= -config[:crit]
-    warning if offset >= config[:warn] || offset <= -config[:warn]
-    ok
+    critical("Offset=#{offset}ms") if offset >= config[:crit] || offset <= -config[:crit]
+    warning("Offset=#{offset}ms") if offset >= config[:warn] || offset <= -config[:warn]
+    ok("Offset=#{offset}ms")
 
   end
 end
