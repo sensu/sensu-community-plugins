@@ -1,31 +1,31 @@
 #! /usr/bin/env ruby
 #
-# Apache metrics based on mod_status
-#
+# apache-graphite
 #
 # DESCRIPTION:
 #   This plugin retrieves machine-readable output of mod_status, parses
 #   it, and generates Apache process metrics formatted for Graphite.
 #
 # OUTPUT:
-#   Graphite plain-text format (name value timestamp\n)
+#   metric data
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
 #   Apache module: mod_status
 #
 # #YELLOW
-# needs example command
+# needs usage
 #
-# EXAMPLES:
+# USAGE:
 #
 # NOTES:
 #   enable extended mod_status
 #
 # LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
@@ -36,54 +36,52 @@ require 'net/http'
 require 'net/https'
 
 class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-         :short       => '-h HOST',
-         :long        => '--host HOST',
-         :description => 'HOST to check mod_status output',
-         :default     => 'localhost'
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'HOST to check mod_status output',
+         default: 'localhost'
 
   option :port,
-         :short       => '-p PORT',
-         :long        => '--port PORT',
-         :description => 'Port to check mod_status output',
-         :default     => '80'
+         short: '-p PORT',
+         long: '--port PORT',
+         description: 'Port to check mod_status output',
+         default: '80'
 
   option :path,
-         :short       => '-path PATH',
-         :long        => '--path PATH',
-         :description => 'PATH to check mod_status output',
-         :default     => '/server-status?auto'
+         short: '-path PATH',
+         long: '--path PATH',
+         description: 'PATH to check mod_status output',
+         default: '/server-status?auto'
 
   option :user,
-         :short       => '-user USER',
-         :long        => '--user USER',
-         :description => 'User if HTTP Basic is used'
+         short: '-user USER',
+         long: '--user USER',
+         description: 'User if HTTP Basic is used'
 
   option :password,
-         :short       => '-password USER',
-         :long        => '--password USER',
-         :description => 'Password if HTTP Basic is used'
+         short: '-password USER',
+         long: '--password USER',
+         description: 'Password if HTTP Basic is used'
 
   option :scheme,
-         :description => 'Metric naming scheme, text to prepend to .$parent.$child',
-         :long        => '--scheme SCHEME',
-         :default     => "#{Socket.gethostname}"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}"
 
   option :secure,
-         :short       => '-s',
-         :long        => '--secure',
-         :description => 'Use SSL'
+         short: '-s',
+         long: '--secure',
+         description: 'Use SSL'
 
-  def get_mod_status
+  def acquire_mod_status
     http = Net::HTTP.new(config[:host], config[:port])
     if config[:secure]
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.use_ssl = true
     end
     req = Net::HTTP::Get.new(config[:path])
-    # #YELLOW
-    if config[:user] != nil && config[:password] != nil
+    if !config[:user].nil? && !config[:password].nil?
       req.basic_auth config[:user], config[:password]
     end
     res = http.request(req)
@@ -98,7 +96,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
     stats = {}
-    get_mod_status.split("\n").each do |line|
+    acquire_mod_status.split("\n").each do |line|
       name, value = line.split(': ')
       case name
       when 'Total Accesses'
@@ -134,7 +132,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
     end
     metrics = {
-      :apache => stats
+      apache: stats
     }
     metrics.each do |parent, children|
       children.each do |child, value|
