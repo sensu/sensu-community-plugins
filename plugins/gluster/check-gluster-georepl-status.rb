@@ -16,12 +16,14 @@ class GlusterGeoReplStatus < Sensu::Plugin::Check::CLI
          description: 'Comma delimited states (case sensitive)',
          short: '-s STATE',
          long: '--state STATE',
-         proc: lambda { |o| o.split(/[\s,]+/) },
+         # #YELLOW
+         proc: lambda { |o| o.split(/[\s,]+/) }, # rubocop:disable Style/Lambda
          required: true
 
   def run
     errors = []
-    `sudo gluster volume geo-replication status`.each_line do |l|
+    # #YELLOW
+    `sudo gluster volume geo-replication status`.each_line do |l| # rubocop:disable Style/Next
       # Don't match those lines or conditions.
       unless l =~ /(^geo-replication|^Another|^No active geo-replication sessions|^MASTER|^\s*$|^-)/
         unless config[:states].include?(l.split[4])

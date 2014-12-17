@@ -61,7 +61,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
          proc: proc(&:to_i),
          default: 0
 
-  def get_es_version
+  def acquire_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
@@ -78,7 +78,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
   end
 
   def acquire_heap_used
-    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+    if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
       stats = get_es_resource('_nodes/_local/stats?jvm=true')
       node = stats['nodes'].keys.first
     else

@@ -39,7 +39,8 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
          long: '--port=VALUE',
          description: 'Database port',
          default: 3306,
-         proc: lambda { |s| s.to_i }
+         # #YELLOW
+         proc: lambda { |s| s.to_i } # rubocop:disable Style/Lambda
 
   option :socket,
          short: '-s SOCKET',
@@ -66,14 +67,16 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
          long: '--warning=VALUE',
          description: 'Warning threshold for replication lag',
          default: 900,
-         proc: lambda { |s| s.to_i }
+         # #YELLOW
+         proc: lambda { |s| s.to_i }  # rubocop:disable Style/Lambda
 
   option :crit,
          short: '-c',
          long: '--critical=VALUE',
          description: 'Critical threshold for replication lag',
          default: 1800,
-         proc: lambda { |s| s.to_i }
+         # #YELLOW
+         proc: lambda { |s| s.to_i }  # rubocop:disable Style/Lambda
 
   option :help,
          short: '-h',

@@ -90,12 +90,12 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     warning 'Github API returned invalid JSON'
   end
 
-  def get_org_repos
+  def acquire_org_repos
     api_request("/orgs/#{config[:owner]}/repos?type=sources").map { |r| r[:name] }
   end
 
   def run
-    ([config[:repo] || get_org_repos].flatten).each do |repo|
+    ([config[:repo] || acquire_org_repos].flatten).each do |repo|
       schema = "#{config[:scheme]}.#{config[:owner]}.#{repo}"
       now = Time.now.to_i
       %w(pulls branches tags contributors languages).each do |resource|

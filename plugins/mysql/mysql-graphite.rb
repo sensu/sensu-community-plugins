@@ -229,12 +229,11 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       begin
         slave_results = mysql.query('SHOW SLAVE STATUS')
         # should return a single element array containing one hash
-        slave_results.first.each do |key, value|
+        # #YELLOW
+        slave_results.first.each do |key, value| # rubocop:disable Style/Next
           if metrics['general'].include?(key)
             # Replication lag being null is bad, very bad, so negativate it here
-            if key == 'Seconds_Behind_Master' && value.nil?
-              value = -1
-            end
+            value = -1 if key == 'Seconds_Behind_Master' && value.nil?
             output "#{config[:scheme]}.#{mysql_shorthostname}.general.#{metrics['general'][key]}", value
           end
         end

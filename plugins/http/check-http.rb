@@ -138,7 +138,8 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       config[:request_uri] = uri.request_uri
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] && config[:request_uri]
+      # #YELLOW
+      unless config[:host] && config[:request_uri] # rubocop:disable Style/IfUnlessModifier
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -146,7 +147,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
 
     begin
       timeout(config[:timeout]) do
-        get_resource
+        acquire_resource
       end
     rescue Timeout::Error
       critical 'Request timed out'
@@ -155,7 +156,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
   end
 
-  def get_resource
+  def acquire_resource
     http = Net::HTTP.new(config[:host], config[:port])
 
     warn_cert_expire = nil
@@ -166,12 +167,8 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         http.cert = OpenSSL::X509::Certificate.new(cert_data)
         http.key = OpenSSL::PKey::RSA.new(cert_data, nil)
       end
-      if config[:cacert]
-        http.ca_file = config[:cacert]
-      end
-      if config[:insecure]
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
+      http.ca_file = config[:cacert] if config[:cacert]
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if config[:insecure]
 
       unless config[:expiry].nil?
         expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
@@ -214,39 +211,42 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     size = res.body.nil? ? '0' : res.body.size
 
     case res.code
-      when /^2/
-        if config[:redirectto]
-          critical "Expected redirect to #{config[:redirectto]} but got #{res.code}" + body
-        elsif config[:pattern]
-          if res.body =~ /#{config[:pattern]}/
-            ok "#{res.code}, found /#{config[:pattern]}/ in #{size} bytes" + body
-          else
-            critical "#{res.code}, did not find /#{config[:pattern]}/ in #{size} bytes: #{res.body[0...200]}..."
-          end
+    when /^2/
+      if config[:redirectto]
+        critical "Expected redirect to #{config[:redirectto]} but got #{res.code}" + body
+      elsif config[:pattern]
+        if res.body =~ /#{config[:pattern]}/
+          ok "#{res.code}, found /#{config[:pattern]}/ in #{size} bytes" + body
         else
-          ok("#{res.code}, #{size} bytes" + body) unless config[:response_code]
+          critical "#{res.code}, did not find /#{config[:pattern]}/ in #{size} bytes: #{res.body[0...200]}..."
         end
-      when /^3/
-        if config[:redirectok] || config[:redirectto]
-          if config[:redirectok]
-            ok("#{res.code}, #{size} bytes" + body) unless config[:response_code]
-          elsif config[:redirectto]
-            if config[:redirectto] == res['Location']
-              ok "#{res.code} found redirect to #{res['Location']}" + body
-            else
-              critical "Expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body
-            end
-          end
-        else
-          warning res.code + body
-        end
-      when /^4/, /^5/
-        critical(res.code + body) unless config[:response_code]
       else
-        warning(res.code + body) unless config[:response_code]
-    end
+        ok("#{res.code}, #{size} bytes" + body) unless config[:response_code]
+      end
+    when /^3/
+      if config[:redirectok] || config[:redirectto]
+        if config[:redirectok]
+          # #YELLOW
+          ok("#{res.code}, #{size} bytes" + body) unless config[:response_code] # rubocop:disable Metrics/BlockNesting
+        elsif config[:redirectto]
+          # #YELLOW
+          if config[:redirectto] == res['Location'] # rubocop:disable Metrics/BlockNesting
+            ok "#{res.code} found redirect to #{res['Location']}" + body
+          else
+            critical "Expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body
+          end
+        end
+      else
+        warning res.code + body
+      end
+    when /^4/, /^5/
+      critical(res.code + body) unless config[:response_code]
+    else
+      warning(res.code + body) unless config[:response_code]
+  end
 
-    if config[:response_code]
+    # #YELLOW
+    if config[:response_code] # rubocop:disable Style/GuardClause
       if config[:response_code] == res.code
         ok "#{res.code}, #{size} bytes" + body
       else

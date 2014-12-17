@@ -45,7 +45,8 @@ class CheckJson < Sensu::Plugin::Check::CLI
       config[:port] = uri.port
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] && config[:path]
+      # #YELLOW
+      unless config[:host] && config[:path] # rubocop:disable Style/IfUnlessModifier
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -53,7 +54,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
 
     begin
       timeout(config[:timeout]) do
-        get_resource
+        acquire_resource
       end
     rescue Timeout::Error
       critical 'Connection timed out'
@@ -69,7 +70,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
     return false
   end
 
-  def get_resource
+  def acquire_resource
     http = Net::HTTP.new(config[:host], config[:port])
 
     if config[:ssl]
@@ -79,12 +80,8 @@ class CheckJson < Sensu::Plugin::Check::CLI
         http.cert = OpenSSL::X509::Certificate.new(cert_data)
         http.key = OpenSSL::PKey::RSA.new(cert_data, nil)
       end
-      if config[:cacert]
-        http.ca_file = config[:cacert]
-      end
-      if config[:insecure]
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
+      http.ca_file = config[:cacert] if config[:cacert]
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if config[:insecure]
     end
 
     req = Net::HTTP::Get.new([config[:path], config[:query]].compact.join('?'))
@@ -104,7 +101,8 @@ class CheckJson < Sensu::Plugin::Check::CLI
       if json_valid?(res.body)
         if !config[:key].nil? && !config[:value].nil?
           json = JSON.parse(res.body)
-          if json[config[:key]].to_s == config[:value].to_s
+          # #YELLOW
+          if json[config[:key]].to_s == config[:value].to_s # rubocop:disable Metrics/BlockNesting
             ok 'Valid JSON and key present and correct'
           else
             critical 'JSON key check failed'

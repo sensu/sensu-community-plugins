@@ -63,7 +63,7 @@ class CheckFluentdMonitorAgent < Sensu::Plugin::Check::CLI
 
     begin
       timeout(config[:timeout]) do
-        get_resource
+        acquire_resource
       end
     rescue Timeout::Error
       critical 'Connection timed out'
@@ -72,7 +72,7 @@ class CheckFluentdMonitorAgent < Sensu::Plugin::Check::CLI
     end
   end
 
-  def get_resource
+  def acquire_resource
     http = Net::HTTP.new(config[:host], config[:port])
     response = http.get(config[:request_uri])
     result = JSON.parse(response.body)

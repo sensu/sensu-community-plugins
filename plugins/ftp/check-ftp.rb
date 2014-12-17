@@ -57,9 +57,7 @@ class CheckFTP < Sensu::Plugin::Check::CLI
   def ftps_login
     require 'double_bag_ftps'
     verify = OpenSSL::SSL::VERIFY_PEER
-    if config[:noverify]
-      verify = OpenSSL::SSL::VERIFY_NONE
-    end
+    verify = OpenSSL::SSL::VERIFY_NONE if config[:noverify]
 
     begin
       ftps = DoubleBagFTPS.new

@@ -86,7 +86,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
 
   def run
     if config[:service] || config[:all_services]
-      services = get_services
+      services = acquire_services
     else
       unknown 'No service specified'
     end
@@ -119,7 +119,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
     end
   end
 
-  def get_services
+  def acquire_services
     uri = URI.parse(config[:stats_source])
 
     if uri.is_a?(URI::Generic) && File.socket?(uri.path)
@@ -152,7 +152,8 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
       regexp = config[:exact_match] ? Regexp.new("^#{config[:service]}$") : Regexp.new("#{config[:service]}")
       haproxy_stats.select do |svc|
         svc[:pxname] =~ regexp
-      end.reject do |svc|
+        # #YELLOW
+      end.reject do |svc| # rubocop: disable Style/MultilineBlockChain
         %w(FRONTEND BACKEND).include?(svc[:svname])
       end
     end

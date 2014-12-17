@@ -67,21 +67,21 @@ class RblCheck < Sensu::Plugin::Check::CLI
     msg_string  = ''
     criticality = 0
 
-    dnsbl_ret.each do |dnsbl_result|
+    # #YELLOW
+    dnsbl_ret.each do |dnsbl_result| # rubocop:disable Style/Next
 
       if dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~ /blacklist/i
         unless ignored_bls_set.member?(dnsbl_result.dnsbl)
           msg_string =  "#{msg_string} #{dnsbl_result.dnsbl}"
         end
 
-        if critical_bls_set.member?(dnsbl_result.dnsbl)
-          criticality += 1
-        end
+        criticality += 1 if critical_bls_set.member?(dnsbl_result.dnsbl)
       end
 
     end
 
-    unless msg_string.empty?
+    # YELLOW
+    unless msg_string.empty? # rubocop:disable Style/UnlessElse
       if criticality > 0
         critical "#{ip_add} Blacklisted in#{msg_string}"
       else

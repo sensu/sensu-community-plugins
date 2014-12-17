@@ -47,7 +47,7 @@ class CheckBanner < Sensu::Plugin::Check::CLI
          proc: proc(&:to_i),
          default: 30
 
-  def get_banner
+  def acquire_banner
     timeout(config[:timeout]) do
       sock = TCPSocket.new(config[:host], config[:port])
       sock.puts config[:write] if config[:write]
@@ -64,7 +64,7 @@ class CheckBanner < Sensu::Plugin::Check::CLI
   end
 
   def run
-    banner = get_banner
+    banner = acquire_banner
     message banner
     banner =~ /#{config[:pattern]}/ ? ok : warning
   end

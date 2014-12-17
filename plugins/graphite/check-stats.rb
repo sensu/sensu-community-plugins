@@ -72,7 +72,8 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
   def danger(metric)
     datapoints = metric['datapoints'].map(&:first).compact
 
-    unless datapoints.empty?
+    # #YELLOW
+    unless datapoints.empty? # rubocop:disable Style/UnlessElse
       avg = average(datapoints)
 
       if !config[:crit].nil? && avg > config[:crit]

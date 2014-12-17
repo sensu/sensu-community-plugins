@@ -101,9 +101,7 @@ class CheckMySQLInnoDBLock < Sensu::Plugin::Check::CLI
     is_crit = false
     res.each_hash do |row|
       h = {}
-      if row['seconds'].to_i > crit
-        is_crit = true
-      end
+      is_crit = true if row['seconds'].to_i > crit
       h['blocking_id'] = row['blocking_id']
       h['requesting_id'] = row['requesting_id']
       h['blocking_host'] = row['blocking_host']

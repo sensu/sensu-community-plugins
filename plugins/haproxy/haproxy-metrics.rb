@@ -90,7 +90,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: 1,
          proc: proc(&:to_i)
 
-  def get_stats
+  def acquire_stats
     uri = URI.parse(config[:connection])
 
     if uri.is_a?(URI::Generic) && File.socket?(uri.path)
@@ -116,7 +116,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     out = nil
     1.upto(config[:retries]) do |_i|
-      out = get_stats
+      out = acquire_stats
       break unless out.to_s.length.zero?
       sleep(config[:retry_interval])
     end

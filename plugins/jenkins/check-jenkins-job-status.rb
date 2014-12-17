@@ -64,7 +64,8 @@ class JenkinsJobChecker < Sensu::Plugin::Check::CLI
 
   def jobs_statuses
     if config[:job_list] =~ /\^/
-      jenkins_api_client.job.list(config[:job_list]).reduce({}) do |listing, job_name|
+      # #YELLOW
+      jenkins_api_client.job.list(config[:job_list]).reduce({}) do |listing, job_name| # rubocop:disable Style/EachWithObject
         listing[job_name] = job_status(job_name)
         listing
       end

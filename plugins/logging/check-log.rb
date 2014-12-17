@@ -145,16 +145,13 @@ class CheckLog < Sensu::Plugin::Check::CLI
 
   def search_log
     log_file_size = @log.stat.size
-    if log_file_size < @bytes_to_skip
-      @bytes_to_skip = 0
-    end
+    @bytes_to_skip = 0 if log_file_size < @bytes_to_skip
     bytes_read = 0
     n_warns = 0
     n_crits = 0
-    if @bytes_to_skip > 0
-      @log.seek(@bytes_to_skip, File::SEEK_SET)
-    end
-    @log.each_line do |line|
+    @log.seek(@bytes_to_skip, File::SEEK_SET) if @bytes_to_skip > 0
+    # #YELLOW
+    @log.each_line do |line| # rubocop:disable Style/Next
       bytes_read += line.size
       if config[:case_insensitive]
         m = line.downcase.match(config[:pattern].downcase) unless line.match(config[:exclude])

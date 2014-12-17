@@ -159,8 +159,6 @@ class TripwireCheck < Sensu::Plugin::Check::CLI
         warning violation.to_json
       end
     end
-    if violations.size == 0
-      ok 'no violations'
-    end
+    ok 'no violations' if violations.size == 0
   end
 end

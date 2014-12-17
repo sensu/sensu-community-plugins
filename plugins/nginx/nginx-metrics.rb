@@ -70,7 +70,8 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
     end # until
 
-    response.body.split(/\r?\n/).each do |line|
+    # #YELLOW
+    response.body.split(/\r?\n/).each do |line|  # rubocop:disable Style/Next
       if line.match(/^Active connections:\s+(\d+)/)
         connections = line.match(/^Active connections:\s+(\d+)/).to_a
         output "#{config[:scheme]}.active_connections", connections[1]

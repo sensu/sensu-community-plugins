@@ -85,7 +85,8 @@ class CheckMysqlDisk < Sensu::Plugin::Check::CLI
 
       unless results.nil?
         results.each_hash do |row|
-          total_size = total_size + row['total_size'].to_f
+          # #YELLOW
+          total_size = total_size + row['total_size'].to_f # rubocop:disable Style/SelfAssignment
         end
       end
 

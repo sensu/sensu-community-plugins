@@ -100,9 +100,7 @@ class CheckJournal < Sensu::Plugin::Check::CLI
     IO.popen("journalctl #{journalctl_args}") do |cmd|
       cmd.each do |line|
         puts line if config[:verbose]
-        if line.match(config[:pattern])
-          n_matches += 1
-        end
+        n_matches += 1 if line.match(config[:pattern])
       end
     end
     n_matches
