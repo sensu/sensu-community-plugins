@@ -16,23 +16,22 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class DiskUsageMetric < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.disk_usage"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.disk_usage"
 
   option :ignore_mnt,
-    :description => 'Ignore mounts matching pattern(s)',
-    :short => '-i MNT[,MNT]',
-    :long => '--ignore-mount',
-    :proc => proc { |a| a.split(',') }
+         description: 'Ignore mounts matching pattern(s)',
+         short: '-i MNT[,MNT]',
+         long: '--ignore-mount',
+         proc: proc { |a| a.split(',') }
 
   option :include_mnt,
-    :description => 'Include only mounts matching pattern(s)',
-    :short => '-I MNT[,MNT]',
-    :long => '--include-mount',
-    :proc => proc { |a| a.split(',') }
+         description: 'Include only mounts matching pattern(s)',
+         short: '-I MNT[,MNT]',
+         long: '--include-mount',
+         proc: proc { |a| a.split(',') }
 
   BYTES_TO_MBYTES = 1024 * 1024
 

@@ -27,48 +27,45 @@ require 'sensu-plugin/check/cli'
 require 'jenkins_api_client'
 
 class JenkinsJobChecker < Sensu::Plugin::Check::CLI
-
   option :server_api_url,
-         :description => 'hostname running Jenkins API',
-         :short => '-u JENKINS-API-HOST',
-         :long => '--url JENKINS-API-HOST',
-         :required => true
+         description: 'hostname running Jenkins API',
+         short: '-u JENKINS-API-HOST',
+         long: '--url JENKINS-API-HOST',
+         required: true
 
   option :job_list,
-         :description => 'Name of a job/pattern to query. Wrap with quotes. E.g. \'^GCC\'',
-         :short => '-j JOB-LIST',
-         :long => '--jobs JOB-LIST',
-         :required => true
+         description: 'Name of a job/pattern to query. Wrap with quotes. E.g. \'^GCC\'',
+         short: '-j JOB-LIST',
+         long: '--jobs JOB-LIST',
+         required: true
 
   option :client_log_level,
-         :description => 'log level option 0..3 to client',
-         :short => '-v CLIENT-LOG-LEVEL',
-         :long => '--verbose CLIENT-LOG-LEVEL',
-         :default => 3
+         description: 'log level option 0..3 to client',
+         short: '-v CLIENT-LOG-LEVEL',
+         long: '--verbose CLIENT-LOG-LEVEL',
+         default: 3
 
   def run
-
     if failed_jobs.any?
       critical "Jobs reporting failure: #{failed_jobs_names}"
     else
       ok 'All queried jobs reports success'
     end
-
   end
 
   private
 
   def jenkins_api_client
     @jenkins_api_client ||= JenkinsApi::Client.new(
-        :server_ip => config[:server_api_url],
-        :log_level => config[:client_log_level].to_i
+        server_ip: config[:server_api_url],
+        log_level: config[:client_log_level].to_i
     )
   end
 
   def jobs_statuses
-
     if config[:job_list] =~ /\^/
-      jenkins_api_client.job.list(config[:job_list]).inject({}) do |listing, job_name|
+      # #YELLOW
+      jenkins_api_client.job.list(config[:job_list]).reduce({}) do |listing, job_name| # rubocop:disable Style/EachWithObject
         listing[job_name] = job_status(job_name)
         listing
       end
@@ -82,11 +79,10 @@ class JenkinsJobChecker < Sensu::Plugin::Check::CLI
   end
 
   def failed_jobs
-    jobs_statuses.select{|job_name, status| status == 'failure'}
+    jobs_statuses.select { |_job_name, status| status == 'failure' }
   end
 
   def failed_jobs_names
     failed_jobs.keys.join(', ')
   end
-
 end

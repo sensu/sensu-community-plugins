@@ -15,7 +15,6 @@ require 'sensu-handler'
 require 'timeout'
 
 class Pushover < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -24,10 +23,10 @@ class Pushover < Sensu::Handler
     apiurl = settings['pushover']['apiurl'] || 'https://api.pushover.net/1/messages'
 
     params = {
-      :title => event_name,
-      :user => settings['pushover']['userkey'],
-      :token => settings['pushover']['token'],
-      :message => @event['check']['output']
+      title: event_name,
+      user: settings['pushover']['userkey'],
+      token: settings['pushover']['token'],
+      message: @event['check']['output']
     }
 
     begin
@@ -45,5 +44,4 @@ class Pushover < Sensu::Handler
       puts 'pushover -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + event_name
     end
   end
-
 end

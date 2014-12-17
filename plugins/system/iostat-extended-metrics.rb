@@ -16,35 +16,34 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.iostat"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.iostat"
 
   option :disk,
-    :description => "Disk to gather stats for",
-    :short => "-d DISK",
-    :long => "--disk DISK",
-    :required => false
+         description: 'Disk to gather stats for',
+         short: '-d DISK',
+         long: '--disk DISK',
+         required: false
 
   option :excludedisk,
-    :description => "List of disks to exclude",
-    :short => "-x DISK[,DISK]",
-    :long => "--exclude-disk",
-    :proc => proc { |a| a.split(',') }
+         description: 'List of disks to exclude',
+         short: '-x DISK[,DISK]',
+         long: '--exclude-disk',
+         proc: proc { |a| a.split(',') }
 
   option :interval,
-    :description => "Period over which statistics are calculated (in seconds)",
-    :short => "-i SECONDS",
-    :long => "--interval SECONDS",
-    :default => 1
+         description: 'Period over which statistics are calculated (in seconds)',
+         short: '-i SECONDS',
+         long: '--interval SECONDS',
+         default: 1
 
   option :mappernames,
-    :description => "Display the registered device mapper names for any device mapper devices.  Useful for viewing LVM2 statistics",
-    :short => "-N",
-    :long => "--show-dm-names",
-    :boolean => true
+         description: 'Display the registered device mapper names for any device mapper devices.  Useful for viewing LVM2 statistics',
+         short: '-N',
+         long: '--show-dm-names',
+         boolean: true
 
   def parse_results(raw)
     stats = {}
@@ -64,7 +63,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
         next
       when /^(Device):/
         stage = :device
-        headers = line.gsub(/%/, 'pct_').split(/\s+/).map{|h| h.gsub(/\//, '_per_')}
+        headers = line.gsub(/%/, 'pct_').split(/\s+/).map { |h| h.gsub(/\//, '_per_') }
         headers.shift
         next
       end
@@ -72,34 +71,29 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
       fields = line.split(/\s+/)
 
-      if stage == :device
-        key = fields.shift
-      end
-      stats[key] = Hash[headers.zip(fields.map{|f| f.to_f})]
+      key = fields.shift if stage == :device
+      stats[key] = Hash[headers.zip(fields.map(&:to_f))]
     end
     stats
   end
 
   def run
     cmd = "iostat -x #{config[:interval]} 2"
-    if config[:disk]
-      cmd += " #{File.basename(config[:disk])}"
-    end
+
+    cmd += " #{File.basename(config[:disk])}" if config[:disk]
     if config[:excludedisk]
       config[:excludedisk].each do |disk|
         cmd += " | grep -v #{disk}"
       end
     end
-    if config[:mappernames]
-      cmd += " -N"
-    end
+    cmd += ' -N' if config[:mappernames]
     stats = parse_results(`#{cmd}`)
 
     timestamp = Time.now.to_i
 
     stats.each do |disk, metrics|
       metrics.each do |metric, value|
-        output [config[:scheme], disk, metric].join("."), value, timestamp
+        output [config[:scheme], disk, metric].join('.'), value, timestamp
       end
     end
     ok

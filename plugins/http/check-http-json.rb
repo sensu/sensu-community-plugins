@@ -20,22 +20,21 @@ require 'net/http'
 require 'net/https'
 
 class CheckJson < Sensu::Plugin::Check::CLI
-
-  option :url, :short => '-u URL'
-  option :host, :short => '-h HOST'
-  option :path, :short => '-p PATH'
-  option :query, :short => '-q QUERY'
-  option :port, :short => '-P PORT', :proc => proc { |a| a.to_i }
-  option :header, :short => '-H HEADER', :long => '--header HEADER'
-  option :ssl, :short => '-s', :boolean => true, :default => false
-  option :insecure, :short => '-k', :boolean => true, :default => false
-  option :user, :short => '-U', :long => '--username USER'
-  option :password, :short => '-a', :long => '--password PASS'
-  option :cert, :short => '-c FILE'
-  option :cacert, :short => '-C FILE'
-  option :timeout, :short => '-t SECS', :proc => proc { |a| a.to_i }, :default => 15
-  option :key, :short => '-K KEY', :long => '--key KEY'
-  option :value, :short => '-v VALUE', :long => '--value VALUE'
+  option :url, short: '-u URL'
+  option :host, short: '-h HOST'
+  option :path, short: '-p PATH'
+  option :query, short: '-q QUERY'
+  option :port, short: '-P PORT', proc: proc(&:to_i)
+  option :header, short: '-H HEADER', long: '--header HEADER'
+  option :ssl, short: '-s', boolean: true, default: false
+  option :insecure, short: '-k', boolean: true, default: false
+  option :user, short: '-U', long: '--username USER'
+  option :password, short: '-a', long: '--password PASS'
+  option :cert, short: '-c FILE'
+  option :cacert, short: '-C FILE'
+  option :timeout, short: '-t SECS', proc: proc(&:to_i), default: 15
+  option :key, short: '-K KEY', long: '--key KEY'
+  option :value, short: '-v VALUE', long: '--value VALUE'
 
   def run
     if config[:url]
@@ -46,7 +45,8 @@ class CheckJson < Sensu::Plugin::Check::CLI
       config[:port] = uri.port
       config[:ssl] = uri.scheme == 'https'
     else
-      unless config[:host] && config[:path]
+      # #YELLOW
+      unless config[:host] && config[:path] # rubocop:disable IfUnlessModifier
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -54,10 +54,10 @@ class CheckJson < Sensu::Plugin::Check::CLI
 
     begin
       timeout(config[:timeout]) do
-        get_resource
+        acquire_resource
       end
     rescue Timeout::Error
-      critical "Connection timed out"
+      critical 'Connection timed out'
     rescue => e
       critical "Connection error: #{e.message}"
     end
@@ -70,7 +70,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
     return false
   end
 
-  def get_resource
+  def acquire_resource
     http = Net::HTTP.new(config[:host], config[:port])
 
     if config[:ssl]
@@ -80,16 +80,12 @@ class CheckJson < Sensu::Plugin::Check::CLI
         http.cert = OpenSSL::X509::Certificate.new(cert_data)
         http.key = OpenSSL::PKey::RSA.new(cert_data, nil)
       end
-      if config[:cacert]
-        http.ca_file = config[:cacert]
-      end
-      if config[:insecure]
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
+      http.ca_file = config[:cacert] if config[:cacert]
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if config[:insecure]
     end
 
     req = Net::HTTP::Get.new([config[:path], config[:query]].compact.join('?'))
-    if (config[:user] != nil && config[:password] != nil)
+    if !config[:user].nil? && !config[:password].nil?
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
@@ -103,18 +99,19 @@ class CheckJson < Sensu::Plugin::Check::CLI
     case res.code
     when /^2/
       if json_valid?(res.body)
-        if (config[:key] != nil && config[:value] != nil)
+        if !config[:key].nil? && !config[:value].nil?
           json = JSON.parse(res.body)
-          if json[config[:key]].to_s == config[:value].to_s
-            ok "Valid JSON and key present and correct"
+          # #YELLOW
+          if json[config[:key]].to_s == config[:value].to_s # rubocop:disable BlockNesting
+            ok 'Valid JSON and key present and correct'
           else
-            critical "JSON key check failed"
+            critical 'JSON key check failed'
           end
         else
-          ok "Valid JSON returned"
+          ok 'Valid JSON returned'
         end
       else
-        critical "Response contains invalid JSON"
+        critical 'Response contains invalid JSON'
       end
     else
       critical res.code

@@ -354,7 +354,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
         # a column family metric
         # #YELLOW
         if config[:filter_regex]
-          unless cf.match(config[:filter_regex]) # rubocop:disable Style/IfUnlessModifier
+          unless cf.match(config[:filter_regex]) # rubocop:disable IfUnlessModifier
             next
           end
         end

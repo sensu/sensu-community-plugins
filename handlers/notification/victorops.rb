@@ -12,7 +12,6 @@ require 'net/https'
 require 'json'
 
 class VictorOps < Sensu::Handler
-
   def handle
     config = settings['victorops']
     incident_key = @event['client']['name'] + '/' + @event['check']['name']
@@ -42,7 +41,7 @@ class VictorOps < Sensu::Handler
         payload[:state_message] = state_message.chomp
         payload[:entity_id] = entity_id
         payload[:host_name] = host
-        payload[:monitoring_tool] = "sensu"
+        payload[:monitoring_tool] = 'sensu'
 
         # Add in client data
         payload[:check] = @event['check']
@@ -68,5 +67,4 @@ class VictorOps < Sensu::Handler
       puts 'victorops -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key
     end
   end
-
 end

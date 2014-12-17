@@ -21,25 +21,24 @@ require 'memcached'
 require 'socket'
 
 class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-         :short       => "-h HOST",
-         :long        => "--host HOST",
-         :description => "Memcached Host to connect to",
-         :default     => 'localhost'
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Memcached Host to connect to',
+         default: 'localhost'
 
   option :port,
-         :short       => "-p PORT",
-         :long        => "--port PORT",
-         :description => "Memcached Port to connect to",
-         :proc        => proc { |p| p.to_i },
-         :default     => 11211
+         short: '-p PORT',
+         long: '--port PORT',
+         description: 'Memcached Port to connect to',
+         proc: proc(&:to_i),
+         default: 11_211
 
   option :scheme,
-         :description => "Metric naming scheme, text to prepend to metric",
-         :short       => "-s SCHEME",
-         :long        => "--scheme SCHEME",
-         :default     => "#{::Socket.gethostname}.memcached"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{::Socket.gethostname}.memcached"
 
   def run
     cache = Memcached.new("#{config[:host]}:#{config[:port]}")
@@ -50,5 +49,4 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
     ok
   end
-
 end

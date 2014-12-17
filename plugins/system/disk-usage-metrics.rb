@@ -36,48 +36,48 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-         :description => 'Metric naming scheme, text to prepend to .$parent.$child',
-         :long => '--scheme SCHEME',
-         :default => "#{Socket.gethostname}.disk_usage"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.disk_usage"
 
   option :ignore_mnt,
-         :description => 'Ignore mounts matching pattern(s)',
-         :short => '-i MNT[,MNT]',
-         :long => '--ignore-mount',
-         :proc => proc { |a| a.split(',') }
+         description: 'Ignore mounts matching pattern(s)',
+         short: '-i MNT[,MNT]',
+         long: '--ignore-mount',
+         proc: proc { |a| a.split(',') }
 
   option :include_mnt,
-         :description => 'Include only mounts matching pattern(s)',
-         :short => '-I MNT[,MNT]',
-         :long => '--include-mount',
-         :proc => proc { |a| a.split(',') }
+         description: 'Include only mounts matching pattern(s)',
+         short: '-I MNT[,MNT]',
+         long: '--include-mount',
+         proc: proc { |a| a.split(',') }
 
   option :flatten,
-         :description => 'Output mounts with underscore rather than dot',
-         :short => '-f',
-         :long => '--flatten',
-         :boolean => true,
-         :default => false
+         description: 'Output mounts with underscore rather than dot',
+         short: '-f',
+         long: '--flatten',
+         boolean: true,
+         default: false
 
   option :local,
-         :description => 'Only check local filesystems (df -l option)',
-         :short => '-l',
-         :long => '--local',
-         :boolean => true,
-         :default => false
+         description: 'Only check local filesystems (df -l option)',
+         short: '-l',
+         long: '--local',
+         boolean: true,
+         default: false
 
   option :block_size,
-         :description => 'Set block size for sizes printed',
-         :short => '-B BLOCK_SIZE',
-         :long => '--block-size BLOCK_SIZE',
-         :default => 'M'
+         description: 'Set block size for sizes printed',
+         short: '-B BLOCK_SIZE',
+         long: '--block-size BLOCK_SIZE',
+         default: 'M'
 
   def run
     delim = config[:flatten] == true ? '_' : '.'
     # Get disk usage from df with used and avail in megabytes
-    `df -PB#{config[:block_size]} #{config[:local] ? '-l' : ''}`.split("\n").drop(1).each do |line|
+    # #YELLOW
+    `df -PB#{config[:block_size]} #{config[:local] ? '-l' : ''}`.split("\n").drop(1).each do |line| # rubocop:disable Style/Next
       _, _, used, avail, used_p, mnt = line.split
 
       unless %r{/sys|/dev|/run}.match(mnt)

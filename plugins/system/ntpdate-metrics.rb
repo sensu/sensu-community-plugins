@@ -14,20 +14,20 @@ require 'socket'
 
 class NtpdateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :server,
-    :description => 'NTP server(s)',
-    :long => '--server SERVER1[,SERVER2,..]',
-    :default => ['localhost'],
-    :proc => Proc.new {|str| str.split(',') }
+         description: 'NTP server(s)',
+         long: '--server SERVER1[,SERVER2,..]',
+         default: ['localhost'],
+         proc: proc { |str| str.split(',') }
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => Socket.gethostname
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: Socket.gethostname
 
   def run
     stats = get_ntpdate(config[:server])
-    critical "Failed to get/parse ntpdate -q output" if stats[:delay].nil?
+    critical 'Failed to get/parse ntpdate -q output' if stats[:delay].nil?
     stats.each do |key, value|
       output([config[:scheme], :ntpdate, key].join('.'), value)
     end
@@ -37,7 +37,7 @@ class NtpdateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def get_ntpdate(servers)
     float = /-?\d+\.\d+/
     pattern = /offset (#{float}), delay (#{float})/
-    stats = { :offset => nil, :delay => nil }
+    stats = { offset: nil, delay: nil }
     `ntpdate -q #{servers.join(' ')}`.scan(pattern).each do |parsed|
       offset, delay = parsed
       offset = Float(offset)

@@ -26,43 +26,41 @@ require 'uri'
 require 'nori'
 
 class TwilioRecordings < Sensu::Plugin::Check::CLI
-
   option :account_sid,
-    :short => '-s ACCOUNT_SID',
-    :long => '--account-sid ACCOUNT_SID',
-    :description => "SID for the account being checked",
-    :required => true
+         short: '-s ACCOUNT_SID',
+         long: '--account-sid ACCOUNT_SID',
+         description: 'SID for the account being checked',
+         required: true
 
   option :account_token,
-    :short => '-t ACCOUNT_TOKEN',
-    :long => '--account-token ACCOUNT_TOKEN',
-    :description => "Secret token for the account being checked",
-    :required => true
+         short: '-t ACCOUNT_TOKEN',
+         long: '--account-token ACCOUNT_TOKEN',
+         description: 'Secret token for the account being checked',
+         required: true
 
   option :warning,
-    :short  => '-w WARN_NUM',
-    :long  => '--warnnum WARN_NUM',
-    :description => 'Number of recordings considered to be a warning',
-    :required => true
+         short: '-w WARN_NUM',
+         long: '--warnnum WARN_NUM',
+         description: 'Number of recordings considered to be a warning',
+         required: true
 
   option :critical,
-    :short  => '-c CRIT_NUM',
-    :long  => '--critnum CRIT_NUM',
-    :description => 'Number of recordings considered to be critical',
-    :required => true
+         short: '-c CRIT_NUM',
+         long: '--critnum CRIT_NUM',
+         description: 'Number of recordings considered to be critical',
+         required: true
 
   option :name,
-    :short => '-n NAME',
-    :long => '--name NAME',
-    :description => 'Human readable description for the account'
+         short: '-n NAME',
+         long: '--name NAME',
+         description: 'Human readable description for the account'
 
   option :root_ca,
-    :long => '--root-ca ROOT_CA_FILE',
-    :description => 'Root CA file that should be used for SSL verification',
-    :default => '/etc/pki/tls/certs/ca-bundle.crt'
+         long: '--root-ca ROOT_CA_FILE',
+         description: 'Root CA file that should be used for SSL verification',
+         default: '/etc/pki/tls/certs/ca-bundle.crt'
 
   def run
-
     name = config[:name] || config[:account_sid]
 
     # Set up HTTP request
@@ -71,7 +69,7 @@ class TwilioRecordings < Sensu::Plugin::Check::CLI
     http.use_ssl = true
 
     # Verify SSL cert if possible
-    if (File.exist?(config[:root_ca]) && http.use_ssl?)
+    if File.exist?(config[:root_ca]) && http.use_ssl?
       http.ca_file = config[:root_ca]
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       http.verify_depth = 5
@@ -87,7 +85,7 @@ class TwilioRecordings < Sensu::Plugin::Check::CLI
     unknown "Received #{response.code} response code from Twilio checking account #{name}" if response.code != '200'
 
     # Parse Twilio XML
-    messages = Nori.new(:advanced_typecasting => false, :advanced_typecasting => false).parse(response.body)
+    messages = Nori.new(advanced_typecasting: false, advanced_typecasting: false).parse(response.body)
     total = messages['TwilioResponse']['Recordings']['@total'].to_i
 
     if total >= config[:critical].to_i
@@ -98,5 +96,4 @@ class TwilioRecordings < Sensu::Plugin::Check::CLI
       ok "#{total} recordings pending in Twilio account #{name}"
     end
   end
-
 end

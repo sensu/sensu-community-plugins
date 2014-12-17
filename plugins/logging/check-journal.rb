@@ -40,46 +40,45 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckJournal < Sensu::Plugin::Check::CLI
-
   option :pattern,
-         :description => "Pattern to search for",
-         :short => '-q PAT',
-         :long => '--pattern PAT'
+         description: 'Pattern to search for',
+         short: '-q PAT',
+         long: '--pattern PAT'
 
   option :journalctl_args,
-         :description => 'Pass additional arguments to journalctl, eg: "-u nginx.service"',
-         :short => '-j "ARGS1 ARGS2 ..."',
-         :long => '--journalctl_args "ARGS1 ARGS2 ..."',
-         :default => ''
+         description: 'Pass additional arguments to journalctl, eg: "-u nginx.service"',
+         short: '-j "ARGS1 ARGS2 ..."',
+         long: '--journalctl_args "ARGS1 ARGS2 ..."',
+         default: ''
 
   option :since,
-         :description => 'Query journal entries on or newer than the specified date/time.',
-         :default => '-1minutes',
-         :short => '-s TIMESPEC',
-         :long => '--since TIMESPEC'
+         description: 'Query journal entries on or newer than the specified date/time.',
+         default: '-1minutes',
+         short: '-s TIMESPEC',
+         long: '--since TIMESPEC'
 
   option :warning_count,
-         :description => "Number of matches to consider a warning",
-         :short => '-w COUNT',
-         :long => '--warning COUNT',
-         :default => 1,
-         :proc => proc {|arg| arg.to_i }
+         description: 'Number of matches to consider a warning',
+         short: '-w COUNT',
+         long: '--warning COUNT',
+         default: 1,
+         proc: proc(&:to_i)
 
   option :critical_count,
-         :description => "Number of matches to consider a critical issue.",
-         :short => '-c COUNT',
-         :long => '--critical COUNT',
-         :default => 1,
-         :proc => proc {|arg| arg.to_i }
+         description: 'Number of matches to consider a critical issue.',
+         short: '-c COUNT',
+         long: '--critical COUNT',
+         default: 1,
+         proc: proc(&:to_i)
 
   option :verbose,
-         :description => 'Verbose output. Helpful for debugging the plugin.',
-         :short => '-v',
-         :boolean => true,
-         :default => false
+         description: 'Verbose output. Helpful for debugging the plugin.',
+         short: '-v',
+         boolean: true,
+         default: false
 
   def run
-    unknown "No pattern specified" unless config[:pattern]
+    unknown 'No pattern specified' unless config[:pattern]
     journalctl_args = '--no-pager -a ' + config[:journalctl_args] + " --since=#{config[:since]}"
 
     n_matches = search_journal(journalctl_args)
@@ -101,12 +100,9 @@ class CheckJournal < Sensu::Plugin::Check::CLI
     IO.popen("journalctl #{journalctl_args}") do |cmd|
       cmd.each do |line|
         puts line if config[:verbose]
-        if line.match(config[:pattern])
-          n_matches += 1
-        end
+        n_matches += 1 if line.match(config[:pattern])
       end
     end
     n_matches
   end
-
 end

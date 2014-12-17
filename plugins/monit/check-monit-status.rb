@@ -26,28 +26,27 @@ require 'rexml/document'
 require 'net/http'
 
 class CheckMonit < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h host',
-    :default => '127.0.0.1'
+         short: '-h host',
+         default: '127.0.0.1'
 
   option :port,
-    :short => '-p port',
-    :default => 2812
+         short: '-p port',
+         default: 2812
 
   option :user,
-    :short => '-U user'
+         short: '-U user'
 
   option :pass,
-    :short => '-P pass'
+         short: '-P pass'
 
   option :uri,
-    :short => '-u uri',
-    :default => '/_status?format=xml'
+         short: '-u uri',
+         default: '/_status?format=xml'
 
   option :ignore,
-    :short => '-i ignore',
-    :default => ''
+         short: '-i ignore',
+         default: ''
 
   def run
     status_doc = REXML::Document.new(monit_status)
@@ -60,23 +59,26 @@ class CheckMonit < Sensu::Plugin::Check::CLI
 
       next if ignored.include? name
 
-      unless %w( 1 5 ).include? monitored
+      # #YELLOW
+      unless %w( 1 5 ).include? monitored # rubocop:disable IfUnlessModifier
         unknown "#{name} status unkown"
       end
 
-      unless status == '0'
+      # #YELLOW
+      unless status == '0' # rubocop:disable IfUnlessModifier
         critical "#{name} status failed"
       end
     end
 
-    ok "All services OK"
+    ok 'All services OK'
   end
 
   def monit_status
     res = Net::HTTP.start(config[:host], config[:port]) do |http|
       req = Net::HTTP::Get.new(config[:uri])
 
-      unless config[:user].nil?
+      # #YELLOW
+      unless config[:user].nil? # rubocop:disable IfUnlessModifier
         req.basic_auth config[:user], config[:pass]
       end
 

@@ -27,61 +27,58 @@ require 'rest-client'
 require 'json'
 
 class ESHeap < Sensu::Plugin::Check::CLI
-
   option :host,
-    :description => 'Elasticsearch host',
-    :short => '-h HOST',
-    :long => '--host HOST',
-    :default => 'localhost'
+         description: 'Elasticsearch host',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :port,
-    :description => 'Elasticsearch port',
-    :short => '-p PORT',
-    :long => '--port PORT',
-    :proc => proc {|a| a.to_i },
-    :default => 9200
+         description: 'Elasticsearch port',
+         short: '-p PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         default: 9200
 
   option :warn,
-    :short => '-w N',
-    :long => '--warn N',
-    :description => 'Heap used in bytes WARNING threshold',
-    :proc => proc {|a| a.to_i },
-    :default => 0
+         short: '-w N',
+         long: '--warn N',
+         description: 'Heap used in bytes WARNING threshold',
+         proc: proc(&:to_i),
+         default: 0
 
   option :timeout,
-    :description => 'Sets the connection timeout for REST client',
-    :short => '-t SECS',
-    :long => '--timeout SECS',
-    :proc => proc {|a| a.to_i },
-    :default => 30
+         description: 'Sets the connection timeout for REST client',
+         short: '-t SECS',
+         long: '--timeout SECS',
+         proc: proc(&:to_i),
+         default: 30
 
   option :crit,
-    :short => '-c N',
-    :long => '--crit N',
-    :description => 'Heap used in bytes CRITICAL threshold',
-    :proc => proc {|a| a.to_i },
-    :default => 0
+         short: '-c N',
+         long: '--crit N',
+         description: 'Heap used in bytes CRITICAL threshold',
+         proc: proc(&:to_i),
+         default: 0
 
-  def get_es_version
+  def acquire_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
 
   def get_es_resource(resource)
-    begin
-      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
-      JSON.parse(r.get)
-    rescue Errno::ECONNREFUSED
-      warning 'Connection refused'
-    rescue RestClient::RequestTimeout
-      warning 'Connection timed out'
-    rescue JSON::ParserError
-      warning 'Elasticsearch API returned invalid JSON'
-    end
+    r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
+    JSON.parse(r.get)
+  rescue Errno::ECONNREFUSED
+    warning 'Connection refused'
+  rescue RestClient::RequestTimeout
+    warning 'Connection timed out'
+  rescue JSON::ParserError
+    warning 'Elasticsearch API returned invalid JSON'
   end
 
-  def get_heap_used
-    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+  def acquire_heap_used
+    if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
       stats = get_es_resource('_nodes/_local/stats?jvm=true')
       node = stats['nodes'].keys.first
     else
@@ -96,7 +93,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
   end
 
   def run
-    heap_used = get_heap_used
+    heap_used = acquire_heap_used
     message "Heap used in bytes #{heap_used}"
     if heap_used >= config[:crit]
       critical
@@ -106,5 +103,4 @@ class ESHeap < Sensu::Plugin::Check::CLI
       ok
     end
   end
-
 end

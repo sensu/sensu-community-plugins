@@ -24,32 +24,32 @@ require 'sensu-plugin/check/cli'
 require 'fileutils'
 
 class Mtime < Sensu::Plugin::Check::CLI
-
   option :file,
-    :description => 'File to check last modified time',
-    :short => '-f FILE',
-    :long => '--file FILE'
+         description: 'File to check last modified time',
+         short: '-f FILE',
+         long: '--file FILE'
 
   option :warning_age,
-    :description => 'Warn if mtime greater than provided age in seconds',
-    :short => '-w SECONDS',
-    :long => '--warning SECONDS'
+         description: 'Warn if mtime greater than provided age in seconds',
+         short: '-w SECONDS',
+         long: '--warning SECONDS'
 
   option :critical_age,
-    :description => 'Critical if mtime greater than provided age in seconds',
-    :short => '-c SECONDS',
-    :long => '--critical SECONDS'
+         description: 'Critical if mtime greater than provided age in seconds',
+         short: '-c SECONDS',
+         long: '--critical SECONDS'
 
   option :ok_no_exist,
-    :description => 'OK if file does not exist',
-    :short => '-o',
-    :long => '--ok-no-exist',
-    :boolean => true,
-    :default => false
+         description: 'OK if file does not exist',
+         short: '-o',
+         long: '--ok-no-exist',
+         boolean: true,
+         default: false
 
   def run_check(type, age)
     to_check = config["#{type}_age".to_sym].to_i
-    if to_check > 0 && age >= to_check
+    # #YELLOW
+    if to_check > 0 && age >= to_check # rubocop:disable GuardClause
       send(type, "file is #{age - to_check} seconds past #{type}")
     end
   end
@@ -69,5 +69,4 @@ class Mtime < Sensu::Plugin::Check::CLI
       end
     end
   end
-
 end

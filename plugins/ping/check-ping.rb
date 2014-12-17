@@ -21,45 +21,44 @@ require 'sensu-plugin/check/cli'
 require 'net/ping'
 
 class CheckPING < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h host',
-    :default => 'localhost'
+         short: '-h host',
+         default: 'localhost'
 
   option :timeout,
-    :short => '-T timeout',
-    :proc => Proc.new {|s| s.to_i},
-    :default => 5
+         short: '-T timeout',
+         proc: proc(&:to_i),
+         default: 5
 
   option :count,
-    :short => '-c count',
-    :description => 'The number of ping requests',
-    :proc => Proc.new {|s| s.to_i },
-    :default => 1
+         short: '-c count',
+         description: 'The number of ping requests',
+         proc: proc(&:to_i),
+         default: 1
 
   option :interval,
-    :short => '-i interval',
-    :description => 'The number of seconds to wait between ping requests',
-    :proc => Proc.new {|s| s.to_f },
-    :default => 1
+         short: '-i interval',
+         description: 'The number of seconds to wait between ping requests',
+         proc: proc(&:to_f),
+         default: 1
 
   option :warn_ratio,
-    :short => '-W ratio',
-    :description => 'Warn if successful ratio is under this value',
-    :proc => Proc.new {|s| s.to_f },
-    :default => 0.5
+         short: '-W ratio',
+         description: 'Warn if successful ratio is under this value',
+         proc: proc(&:to_f),
+         default: 0.5
 
   option :critical_ratio,
-    :short => '-C ratio',
-    :description => 'Critical if successful ratio is under this value',
-    :proc => Proc.new {|s| s.to_f },
-    :default => 0.2
+         short: '-C ratio',
+         description: 'Critical if successful ratio is under this value',
+         proc: proc(&:to_f),
+         default: 0.2
 
   option :report,
-    :short => '-r',
-    :long => '--report',
-    :description => "Attach MTR report if ping is failed",
-    :default => false
+         short: '-r',
+         long: '--report',
+         description: 'Attach MTR report if ping is failed',
+         default: false
 
   def run
     result = []

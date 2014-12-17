@@ -28,30 +28,29 @@ require 'carrier-pigeon'
 require 'timeout'
 
 class IRC < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def action_to_string
-   @event['action'].eql?('resolve') ? "\x0300,03RESOLVED\x03" : "\x0301,04ALERT\x03"
+    @event['action'].eql?('resolve') ? "\x0300,03RESOLVED\x03" : "\x0301,04ALERT\x03"
   end
 
   def handle
     params = {
-      :uri => settings["irc"]["irc_server"],
-      :message => "#{action_to_string} #{event_name}: #{@event['check']['output']}",
-      :ssl => settings["irc"]["irc_ssl"],
-      :join => true,
+      uri: settings['irc']['irc_server'],
+      message: "#{action_to_string} #{event_name}: #{@event['check']['output']}",
+      ssl: settings['irc']['irc_ssl'],
+      join: true
     }
-    if settings["irc"].has_key?("irc_password")
-      params[:channel_password] = settings["irc"]["irc_password"]
+    if settings['irc'].key?('irc_password')
+      params[:channel_password] = settings['irc']['irc_password']
     end
 
-    if settings["irc"].has_key?("nickserv_command")
-      params[:nickserv_command] = settings["irc"]["nickserv_command"]
-    elsif settings["irc"].has_key?("nickserv_password")
-      params[:nickserv_password] = settings["irc"]["nickserv_password"]
+    if settings['irc'].key?('nickserv_command')
+      params[:nickserv_command] = settings['irc']['nickserv_command']
+    elsif settings['irc'].key?('nickserv_password')
+      params[:nickserv_password] = settings['irc']['nickserv_password']
     end
 
     begin
@@ -63,5 +62,4 @@ class IRC < Sensu::Handler
       puts 'irc -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + event_name
     end
   end
-
 end

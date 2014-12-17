@@ -98,7 +98,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       unhealthy_instances[instance['InstanceId']] = instance['State'] unless instance['State'].eql?('InService')
     end
     # #YELLOW
-    unless unhealthy_instances.empty? # rubocop:disable Style/UnlessElse
+    unless unhealthy_instances.empty? # rubocop:disable UnlessElse
       if config[:verbose]
         critical "Unhealthy instances detected: # {unhealthy_instances.map{ |id, state| '[' + id + '::' + state + ']' }.join(' ') }"
       else

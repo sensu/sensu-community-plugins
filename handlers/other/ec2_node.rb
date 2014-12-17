@@ -96,11 +96,11 @@ require 'sensu-handler'
 require 'fog'
 
 class Ec2Node < Sensu::Handler
-
   def filter; end
 
   def handle
-    unless ec2_node_exists?
+    # #YELLOW
+    unless ec2_node_exists? # rubocop:disable UnlessElse
       delete_sensu_client!
     else
       puts "[EC2 Node] #{@event['client']['name']} appears to exist in EC2"
@@ -113,9 +113,9 @@ class Ec2Node < Sensu::Handler
   end
 
   def ec2_node_exists?
-    states = get_valid_states
+    states = acquire_valid_states
     filtered_instances = ec2.servers.select { |s| states.include?(s.state) }
-    instance_ids = filtered_instances.collect { |s| s.id }
+    instance_ids = filtered_instances.map(&:id)
     instance_ids.each do |id|
       return true if id == @event['client']['name']
     end
@@ -127,12 +127,10 @@ class Ec2Node < Sensu::Handler
       key = settings['aws']['access_key'] || ENV['AWS_ACCESS_KEY_ID']
       secret = settings['aws']['secret_key'] || ENV['AWS_SECRET_ACCESS_KEY']
       region = settings['aws']['region'] || ENV['EC2_REGION']
-      Fog::Compute.new({
-        :provider => 'AWS',
-        :aws_access_key_id => key,
-        :aws_secret_access_key => secret,
-        :region => region
-      })
+      Fog::Compute.new(provider: 'AWS',
+                       aws_access_key_id: key,
+                       aws_secret_access_key: secret,
+                       region: region)
     end
   end
 
@@ -149,12 +147,11 @@ class Ec2Node < Sensu::Handler
     end
   end
 
-  def get_valid_states
-    if @event['client'].has_key?('ec2_states')
+  def acquire_valid_states
+    if @event['client'].key?('ec2_states')
       return @event['client']['ec2_states']
     else
       return ['running']
     end
   end
-
 end

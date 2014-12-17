@@ -100,13 +100,13 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       critical "An issue occured while communicating with the AWS EC2 API: #{e.message}"
     end
     # #YELLOW
-    unless health.empty? # rubocop:disable Style/UnlessElse
+    unless health.empty? # rubocop:disable UnlessElse
       unhealthy_instances = {}
       health.each do |instance|
         unhealthy_instances[instance[:instance_id]] = instance[:state] unless instance[:state].eql?('InService')
       end
       # #YELLOW
-      unless unhealthy_instances.empty? # rubocop:disable Style/UnlessElse
+      unless unhealthy_instances.empty? # rubocop:disable UnlessElse
         if config[:verbose]
           critical "Unhealthy instances detected: #{unhealthy_instances.map { |id, state| '[' + id + '::' + state + ']' }.join(' ')}"
         else

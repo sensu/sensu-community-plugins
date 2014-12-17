@@ -121,7 +121,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
     end
     message << "; Unknown: #{state['Unknown'].count}"
     # #YELLOW
-    if state['Unknown'].count > 0 # rubocop:disable Style/IfUnlessModifier
+    if state['Unknown'].count > 0 # rubocop:disable IfUnlessModifier
       message << " (#{state['Unknown'].join(', ')})"
     end
 

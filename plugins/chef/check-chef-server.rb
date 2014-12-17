@@ -41,7 +41,7 @@ class CheckChefServer < Sensu::Plugin::Check::CLI
         end
       end
       if failed_processes.count > 0
-        critical("chef-server service(s): #{failed_processes.join(', ')} #{failed_processes.count == 1 ? "is" : "are"} failed, down, or in warning state")
+        critical("chef-server service(s): #{failed_processes.join(', ')} #{failed_processes.count == 1 ? 'is' : 'are'} failed, down, or in warning state")
       else
         ok
       end

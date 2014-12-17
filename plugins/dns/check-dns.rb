@@ -25,57 +25,56 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class DNS < Sensu::Plugin::Check::CLI
-
   option :domain,
-    :description => "Domain to resolve (or ip if type PTR)",
-    :short => '-d DOMAIN',
-    :long => '--domain DOMAIN'
+         description: 'Domain to resolve (or ip if type PTR)',
+         short: '-d DOMAIN',
+         long: '--domain DOMAIN'
 
   option :type,
-    :description => "Record type to resolve (A, AAAA, TXT, etc) use PTR for reverse lookup",
-    :short => '-t RECORD',
-    :long => '--type RECORD',
-    :default => 'A'
+         description: 'Record type to resolve (A, AAAA, TXT, etc) use PTR for reverse lookup',
+         short: '-t RECORD',
+         long: '--type RECORD',
+         default: 'A'
 
   option :server,
-    :description => "Server to use for resolution",
-    :short => '-s SERVER',
-    :long => '--server SERVER'
+         description: 'Server to use for resolution',
+         short: '-s SERVER',
+         long: '--server SERVER'
 
   option :result,
-    :description => "A positive result entry",
-    :short => '-r RESULT',
-    :long => '--result RESULT'
+         description: 'A positive result entry',
+         short: '-r RESULT',
+         long: '--result RESULT'
 
   option :warn_only,
-    :description => "Warn instead of critical on failure",
-    :short => '-w',
-    :long => '--warn-only',
-    :boolean => true
+         description: 'Warn instead of critical on failure',
+         short: '-w',
+         long: '--warn-only',
+         boolean: true
 
   option :debug,
-    :description => "Print debug information",
-    :long => '--debug',
-    :boolean => true
+         description: 'Print debug information',
+         long: '--debug',
+         boolean: true
 
   def resolve_domain
     if config[:type] == 'PTR'
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} -x #{config[:domain]} +short +time=1"
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ''} -x #{config[:domain]} +short +time=1"
     else
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} #{config[:domain]} #{config[:type]} +short +time=1"
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ''} #{config[:domain]} #{config[:type]} +short +time=1"
     end
     puts cmd if config[:debug]
     output = `#{cmd}`
     puts output if config[:debug]
     # Trim, split, remove comments and empty lines
-    entries = output.strip.split("\n").reject{|l| l.match('^;') || l.match('^$')}
+    entries = output.strip.split("\n").reject { |l| l.match('^;') || l.match('^$') }
     puts "Entries: #{entries}" if config[:debug]
     entries
   end
 
   def run
     if config[:domain].nil?
-      unknown "No domain specified"
+      unknown 'No domain specified'
     else
       entries = resolve_domain
       if entries.length.zero?
@@ -86,8 +85,9 @@ class DNS < Sensu::Plugin::Check::CLI
         end
       else
         if config[:result]
-          if entries.include?(config[:result])
-            ok "Resolved #{config[:domain]} including #{config[:result]}"
+          # #YELLOW
+          if entries.include?(config[:result])  # rubocop:disable BlockNesting
+            ok "Resolved #{config[:domain]} including # {config[:result]}"
           else
             critical "Resolved #{config[:domain]} did not include #{config[:result]}"
           end
@@ -97,5 +97,4 @@ class DNS < Sensu::Plugin::Check::CLI
       end
     end
   end
-
 end

@@ -22,7 +22,6 @@ require 'sensu-handler'
 require 'json'
 
 class Slack < Sensu::Handler
-
   def slack_token
     get_setting('token')
   end
@@ -52,7 +51,7 @@ class Slack < Sensu::Handler
   end
 
   def get_setting(name)
-    settings["slack"][name]
+    settings['slack'][name]
   end
 
   def handle
@@ -86,16 +85,16 @@ class Slack < Sensu::Handler
     when Net::HTTPSuccess
       true
     else
-      raise response.error!
+      fail response.error!
     end
   end
 
   def payload(notice)
     {
-      :icon_url => 'http://sensuapp.org/img/sensu_logo_large-c92d73db.png',
-      :attachments => [{
-        :text  => [slack_message_prefix, notice].compact.join(' '),
-        :color => color
+      icon_url: 'http://sensuapp.org/img/sensu_logo_large-c92d73db.png',
+      attachments: [{
+        text: [slack_message_prefix, notice].compact.join(' '),
+        color: color
       }]
     }.tap do |payload|
       payload[:channel] = slack_channel if slack_channel
@@ -121,5 +120,4 @@ class Slack < Sensu::Handler
     url = "https://#{slack_team_name}.slack.com/services/hooks/incoming-webhook?token=#{token}"
     URI(url)
   end
-
 end

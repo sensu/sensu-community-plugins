@@ -20,33 +20,32 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckSSLCert < Sensu::Plugin::Check::CLI
-
   option :critical,
-    :description => 'Numbers of days left',
-    :short => '-c',
-    :long => '--critical DAYS',
-    :required => true
+         description: 'Numbers of days left',
+         short: '-c',
+         long: '--critical DAYS',
+         required: true
 
   option :warning,
-    :description => 'Numbers of days left',
-    :short => '-w',
-    :long => '--warning DAYS',
-    :required => true
+         description: 'Numbers of days left',
+         short: '-w',
+         long: '--warning DAYS',
+         required: true
 
   option :pem,
-    :description => 'Path to PEM file',
-    :short => '-P',
-    :long => '--pem PEM'
+         description: 'Path to PEM file',
+         short: '-P',
+         long: '--pem PEM'
 
   option :host,
-    :description => 'Host to validate',
-    :short => '-h',
-    :long => '--host HOST'
+         description: 'Host to validate',
+         short: '-h',
+         long: '--host HOST'
 
   option :port,
-    :description => 'Port to validate',
-    :short => '-p',
-    :long => '--port PORT'
+         description: 'Port to validate',
+         short: '-p',
+         long: '--port PORT'
 
   def ssl_cert_expiry
     `openssl s_client -connect #{config[:host]}:#{config[:port]} < /dev/null 2>&1 | openssl x509 -enddate -noout`.split('=').last
@@ -58,9 +57,9 @@ class CheckSSLCert < Sensu::Plugin::Check::CLI
 
   def validate_opts
     if !config[:pem]
-      unknown "Host and port required" unless config[:host] && config[:port]
+      unknown 'Host and port required' unless config[:host] && config[:port]
     elsif config[:pem]
-      unknown "No such cert" unless File.exist? config[:pem]
+      unknown 'No such cert' unless File.exist? config[:pem]
     end
   end
 

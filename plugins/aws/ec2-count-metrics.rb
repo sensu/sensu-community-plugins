@@ -79,7 +79,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
       def by_instances_status(client)
         # #YELLOW
-        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable Style/IfUnlessModifier
+        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable IfUnlessModifier
           config[:scheme] += '.count'
         end
 
@@ -101,7 +101,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         end
 
         # #YELLOW
-        unless data.nil? # rubocop:disable Style/GuardClause
+        unless data.nil? # rubocop:disable GuardClause
           # We only return data when we have some to return
           output config[:scheme] + '.total', total
           status.each do |name, count|
@@ -112,7 +112,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
       def by_instances_type(client)
         # #YELLOW
-        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable Style/IfUnlessModifier
+        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable IfUnlessModifier
           config[:scheme] += '.types'
         end
 
@@ -131,7 +131,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         end
 
         # #YELLOW
-        unless data.nil? # rubocop:disable Style/GuardClause
+        unless data.nil? # rubocop:disable GuardClause
           # We only return data when we have some to return
           data.each do |name, count|
             output config[:scheme] + ".#{name}", count

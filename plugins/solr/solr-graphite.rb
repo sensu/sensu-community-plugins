@@ -18,36 +18,35 @@ require 'uri'
 require 'crack'
 
 class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "Solr Host to connect to",
-    :required => true
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Solr Host to connect to',
+         required: true
 
   option :port,
-    :short => "-p PORT",
-    :long => "--port PORT",
-    :description => "Solr Port to connect to",
-    :proc => proc {|p| p.to_i },
-    :required => true
+         short: '-p PORT',
+         long: '--port PORT',
+         description: 'Solr Port to connect to',
+         proc: proc(&:to_i),
+         required: true
 
   option :core,
-    :description => "Solr Core to check",
-    :short => "-c CORE",
-    :long => "--core CORE",
-    :default => nil
+         description: 'Solr Core to check',
+         short: '-c CORE',
+         long: '--core CORE',
+         default: nil
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.solr"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.solr"
 
   def run
     cores = []
     if config[:core]
-        cores = [config[:core]]
+      cores = [config[:core]]
     else
       # If no core is specified, provide statistics for all cores
       status_url = "http://#{config[:host]}:#{config[:port]}/solr/admin/cores?action=STATUS&wt=json"
@@ -69,22 +68,22 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
       resp = Net::HTTP.get_response(URI.parse(ping_url))
       ping = JSON.parse(resp.body)
 
-      output "#{graphitepath}.solr.QueryTime", ping["responseHeader"]["QTime"]
-      output "#{graphitepath}.solr.Status", ping["responseHeader"]["status"]
+      output "#{graphitepath}.solr.QueryTime", ping['responseHeader']['QTime']
+      output "#{graphitepath}.solr.Status", ping['responseHeader']['status']
 
       stats_url = "http://#{config[:host]}:#{config[:port]}/solr/#{core}/admin/stats.jsp"
 
-      xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n", "")
+      xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n", '')
       stats  = Crack::XML.parse(xml_data)
 
       # this xml is an ugly beast.
-      core_searcher = stats["solr"]["solr_info"]["CORE"]["entry"].find_all {|v| v["name"].strip! == "searcher"}.first["stats"]["stat"]
-      standard = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"].strip! == "standard"}.first["stats"]["stat"]
-      update = stats["solr"]["solr_info"]["QUERYHANDLER"]["entry"].find_all {|v| v["name"] == "/update"}.first["stats"]["stat"]
-      updatehandler = stats["solr"]["solr_info"]["UPDATEHANDLER"]["entry"]["stats"]["stat"]
-      querycache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"].strip! == "queryResultCache"}.first["stats"]["stat"]
-      documentcache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "documentCache"}.first["stats"]["stat"]
-      filtercache = stats["solr"]["solr_info"]["CACHE"]["entry"].find_all {|v| v["name"] == "filterCache"}.first["stats"]["stat"]
+      core_searcher = stats['solr']['solr_info']['CORE']['entry'].select { |v| v['name'].strip! == 'searcher' }.first['stats']['stat']
+      standard = stats['solr']['solr_info']['QUERYHANDLER']['entry'].select { |v| v['name'].strip! == 'standard' }.first['stats']['stat']
+      update = stats['solr']['solr_info']['QUERYHANDLER']['entry'].select { |v| v['name'] == '/update' }.first['stats']['stat']
+      updatehandler = stats['solr']['solr_info']['UPDATEHANDLER']['entry']['stats']['stat']
+      querycache = stats['solr']['solr_info']['CACHE']['entry'].select { |v| v['name'].strip! == 'queryResultCache' }.first['stats']['stat']
+      documentcache = stats['solr']['solr_info']['CACHE']['entry'].select { |v| v['name'] == 'documentCache' }.first['stats']['stat']
+      filtercache = stats['solr']['solr_info']['CACHE']['entry'].select { |v| v['name'] == 'filterCache' }.first['stats']['stat']
 
       output "#{graphitepath}.core.maxdocs", core_searcher[2].strip!
       output "#{graphitepath}.core.maxdocs", core_searcher[3].strip!
@@ -150,5 +149,4 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
     ok
   end
-
 end

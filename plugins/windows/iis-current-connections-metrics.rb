@@ -15,15 +15,14 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class IisCurrentConnectionsMetric < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.iis_current_connetcions"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.iis_current_connetcions"
 
   option :site,
-    :short => '-s sitename',
-    :default => '_Total'
+         short: '-s sitename',
+         default: '_Total'
 
   def run
     io = IO.popen("typeperf -sc 1 \"Web Service(#{config[:site]})\\Current\ Connections\"")

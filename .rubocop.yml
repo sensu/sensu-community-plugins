@@ -3,7 +3,7 @@ MethodLength:
   Max: 200
 
 LineLength:
-  Enabled: 160
+  Max: 160
 
 FileName:
   Enabled: false
@@ -18,4 +18,7 @@ ClassLength:
   Enabled: false
 
 Documentation:
+  Enabled: false
+
+IfUnlessModifier:
   Enabled: false

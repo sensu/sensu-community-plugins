@@ -7,14 +7,14 @@ end
 
 Rubocop::RakeTask.new
 
-task :default => [:spec, :rubocop]
+task default: [:spec, :rubocop]
 
-desc "Calculate technical debt"
+desc 'Calculate technical debt'
 task :calculate_debt do
   `/usr/bin/env ruby scripts/tech_debt.rb`
 end
 
-desc "Make all plugins executable"
+desc 'Make all plugins executable'
 task :make_plugins_executable do
   `chmod -R +x /plugins/*`
 end

@@ -66,7 +66,7 @@ class CheckBeanstalkWatchersToBuried < Sensu::Plugin::Check::CLI
       warning "Tube #{config[:tube]} not found"
     end
     # #YELLOW
-    unless watchers # rubocop:disable Style/IfUnlessModifier
+    unless watchers # rubocop:disable IfUnlessModifier
       watchers = 0
     end
 

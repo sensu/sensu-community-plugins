@@ -51,7 +51,8 @@ class CheckSmartArrayStatus < Sensu::Plugin::Check::CLI
   end
 
   def parse_disks!(data, controller)
-    data.lines.each do |line|
+    # #YELLOW
+    data.lines.each do |line|    # rubocop:disable Style/Next
       unless line.empty?
         splitted = line.split
         if /^physicaldrive$/ =~ splitted[0]

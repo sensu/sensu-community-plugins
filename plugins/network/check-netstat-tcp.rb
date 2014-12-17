@@ -47,40 +47,40 @@ TCP_STATES = {
 }
 
 class CheckNetstatTCP < Sensu::Plugin::Check::CLI
-
   option :states,
-    :description => "Comma delimited list of states to check",
-    :short => "-s STATES",
-    :long => "--states STATES",
-    :default => ["ESTABLISHED"],
-    :proc => proc {|a| a.split(',') }
+         description: 'Comma delimited list of states to check',
+         short: '-s STATES',
+         long: '--states STATES',
+         default: ['ESTABLISHED'],
+         proc: proc { |a| a.split(',') }
 
   option :critical,
-    :description => "Comma delimited list of state values to set critical at (order follows 'states')",
-    :short => "-c CRITICAL",
-    :long => "--critical CRITICAL",
-    :default => [1000],
-    :proc => proc {|a| a.split(',').map(&:to_i) }
+         description: "Comma delimited list of state values to set critical at (order follows 'states')",
+         short: '-c CRITICAL',
+         long: '--critical CRITICAL',
+         default: [1000],
+         proc: proc { |a| a.split(',').map(&:to_i) }
 
   option :warning,
-    :description => "Comma delimited list of state values to set warning at (order follows 'states')",
-    :short => "-w WARNING",
-    :long => "--warning WARNING",
-    :default => [500],
-    :proc => proc {|a| a.split(',').map(&:to_i) }
+         description: "Comma delimited list of state values to set warning at (order follows 'states')",
+         short: '-w WARNING',
+         long: '--warning WARNING',
+         default: [500],
+         proc: proc { |a| a.split(',').map(&:to_i) }
 
   option :port,
-    :description => "Port you wish to check values on (default: all)",
-    :short => "-p PORT",
-    :long => "--port PORT",
-    :proc => proc {|a| a.to_i }
+         description: 'Port you wish to check values on (default: all)',
+         short: '-p PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i)
 
   def netstat(protocols = ['tcp'])
     state_counts = Hash.new(0)
-    TCP_STATES.each_pair { |hex, name| state_counts[name] = 0 }
+    TCP_STATES.each_pair { |_hex, name| state_counts[name] = 0 }
 
-    protocols.select {|p| File.exists?('/proc/net/' + p) }.each do |protocol|
-      File.open('/proc/net/' + protocol).each do |line|
+    protocols.select { |p| File.exist?('/proc/net/' + p) }.each do |protocol|
+      # #YELLOW
+      File.open('/proc/net/' + protocol).each do |line| # rubocop:disable Style/Next
         line.strip!
         if m = line.match(/^\s*\d+:\s+(.{8}|.{32}):(.{4})\s+(.{8}|.{32}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
           connection_state = m[5]
@@ -99,10 +99,10 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
   end
 
   def run
-    state_counts = netstat(['tcp', 'tcp6'])
+    state_counts = netstat(%w(tcp tcp6))
     is_critical = false
     is_warning = false
-    message = ""
+    message = ''
 
     config[:states].each_index do |i|
       if state_counts[config[:states][i]] >= config[:critical][i]
@@ -119,7 +119,5 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
     critical message if is_critical
     warning message if is_warning
     ok message
-
   end
-
 end

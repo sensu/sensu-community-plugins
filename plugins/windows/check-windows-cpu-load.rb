@@ -14,14 +14,13 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckWindowsCpuLoad < Sensu::Plugin::Check::CLI
-
   option :warning,
-    :short => '-w WARNING',
-    :default => 85
+         short: '-w WARNING',
+         default: 85
 
   option :critical,
-    :short => '-c CRITICAL',
-    :default => 95
+         short: '-c CRITICAL',
+         default: 95
 
   def run
     io = IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\"")
