@@ -1,12 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Boundary meter connection health
+# check-boundary-meters
 #
 # DESCRIPTION:
-# This plugin interrogates a boundary api endpoint for the connection health of meters.
-# It reports a list of meters that are currently disconnected.
+#   This plugin interrogates a boundary api endpoint for the connection health of meters.
+#   It reports a list of meters that are currently disconnected.
 #
-# Based on code from check-chef-nodes.rb
+# OUTPUT:
+#   metric-data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: beaneater
+#   gem: json
+#   gem: sensu-plugin
+#
+# #YELLOW
+# EXAMPLES:
+#
+# NOTES:
+#  Based on code from check-chef-nodes.rb
+#
+# LICENSE:
+#   Copyright 2014 Heavy Water Operations, LLC <support@sensuapp.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
