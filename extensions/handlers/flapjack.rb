@@ -71,7 +71,7 @@ module Sensu
         tags.concat(check[:tags]) if check[:tags].is_a?(Array)
         tags << client[:environment] unless client[:environment].nil?
         # #YELLOW
-        unless check[:subscribers].nil? || check[:subscribers].empty? # rubocop:disable Style/UnlessElse
+        unless check[:subscribers].nil? || check[:subscribers].empty? # rubocop:disable UnlessElse
           tags.concat(client[:subscriptions] - (client[:subscriptions] - check[:subscribers]))
         else
           tags.concat(client[:subscriptions])

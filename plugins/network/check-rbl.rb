@@ -81,7 +81,7 @@ class RblCheck < Sensu::Plugin::Check::CLI
     end
 
     # YELLOW
-    unless msg_string.empty? # rubocop:disable Style/UnlessElse
+    unless msg_string.empty? # rubocop:disable UnlessElse
       if criticality > 0
         critical "#{ip_add} Blacklisted in#{msg_string}"
       else

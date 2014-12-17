@@ -306,7 +306,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
       # #YELLOW
-      avg_value = values_array.reduce { |sum, el| sum + el if el }.to_f / values_array.size # rubocop:disable Style/SingleLineBlockParams
+      avg_value = values_array.reduce { |sum, el| sum + el if el }.to_f / values_array.size # rubocop:disable SingleLineBlockParams
       last_value = last_values[target]
       percent = last_value / avg_value unless last_value.nil? || avg_value.nil?
       # #YELLOW
@@ -345,7 +345,7 @@ class Graphite < Sensu::Plugin::Check::CLI
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
       # #YELLOW
-      avg_value = values_array.reduce { |sum, el| sum + el if el }.to_f / values_array.size # rubocop:disable Style/SingleLineBlockParams
+      avg_value = values_array.reduce { |sum, el| sum + el if el }.to_f / values_array.size # rubocop:disable SingleLineBlockParams
       # YELLOW
       %w(fatal error warning).each do |type|  # rubocop:disable Style/Next
         next unless max_values.key?(type)

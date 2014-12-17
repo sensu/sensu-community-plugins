@@ -98,11 +98,11 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     uri = "/aggregates/#{check}"
     issued = api_request(uri + "?age=#{config[:age]}")
     # #YELLOW
-    unless issued.empty? # rubocop:disable Style/UnlessElse
+    unless issued.empty? # rubocop:disable UnlessElse
       issued_sorted = issued.sort
       time = issued_sorted.pop
       # #YELLOW
-      unless time.nil? # rubocop:disable Style/UnlessElse
+      unless time.nil? # rubocop:disable UnlessElse
         uri += "/#{time}"
         [time, api_request(uri)]
       else

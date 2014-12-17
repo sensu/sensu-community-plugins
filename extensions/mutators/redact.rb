@@ -33,7 +33,7 @@ module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
     def run(event_data, settings)
       event = JSON.parse(event_data, symbolize_names: true)
       # #YELLOW
-      unless event[:client][:redact] # rubocop:disable Style/UnlessElse
+      unless event[:client][:redact] # rubocop:disable UnlessElse
         keys = settings['redact'] unless settings['redact'].nil?
         keys ||= nil # just so we can pass the variable in to redact_sensitive
       else

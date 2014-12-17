@@ -15,7 +15,7 @@ class GraphiteOccurrences < Sensu::Handler
   def handle
     hostname = @event['client']['name'].split('.').first
     # #YELLOW
-    check_name = @event['check']['name'].gsub(%r{[ \.]}, '_')  # rubocop:disable Style/RegexpLiteral
+    check_name = @event['check']['name'].gsub(%r{[ \.]}, '_')  # rubocop:disable RegexpLiteral
     value = @event['action'] == 'create' ? @event['occurrences'] : 0
     now = Time.now.to_i
 

@@ -70,7 +70,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     acquire_rabbitmq_queues.each do |queue|
       if config[:filter]
         # #YELLOW
-        unless queue['name'].match(config[:filter]) # rubocop:disable Style/IfUnlessModifier
+        unless queue['name'].match(config[:filter]) # rubocop:disable IfUnlessModifier
           next
         end
       end

@@ -60,12 +60,12 @@ class CheckMonit < Sensu::Plugin::Check::CLI
       next if ignored.include? name
 
       # #YELLOW
-      unless %w( 1 5 ).include? monitored # rubocop:disable Style/IfUnlessModifier
+      unless %w( 1 5 ).include? monitored # rubocop:disable IfUnlessModifier
         unknown "#{name} status unkown"
       end
 
       # #YELLOW
-      unless status == '0' # rubocop:disable Style/IfUnlessModifier
+      unless status == '0' # rubocop:disable IfUnlessModifier
         critical "#{name} status failed"
       end
     end
@@ -78,7 +78,7 @@ class CheckMonit < Sensu::Plugin::Check::CLI
       req = Net::HTTP::Get.new(config[:uri])
 
       # #YELLOW
-      unless config[:user].nil? # rubocop:disable Style/IfUnlessModifier
+      unless config[:user].nil? # rubocop:disable IfUnlessModifier
         req.basic_auth config[:user], config[:pass]
       end
 

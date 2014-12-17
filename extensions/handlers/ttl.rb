@@ -116,7 +116,7 @@ module Sensu
           req.basic_auth(options['api']['user'], options['api']['password'])
         end
         # #YELLOW
-        unless payload.nil? # rubocop:disable Style/IfUnlessModifier
+        unless payload.nil? # rubocop:disable IfUnlessModifier
           req.body = payload
         end
         http.request(req)

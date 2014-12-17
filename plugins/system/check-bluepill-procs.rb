@@ -104,7 +104,7 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
     # Check if Bluepill is installed
     `which bluepill`
     # #YELLOW
-    unless $CHILD_STATUS.success? # rubocop:disable Style/IfUnlessModifier
+    unless $CHILD_STATUS.success? # rubocop:disable IfUnlessModifier
       ok 'bluepill not installed'
     end
 
@@ -138,7 +138,7 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
           if line =~ /^\s \d\.\s/
             app_name = line.split(/^\s \d\.\s/)[1].strip
             # #YELLOW
-            puts "***** DEBUG: found an application: #{app_name} *****" if config[:debug] # rubocop:disable Metrics/BlockNesting
+            puts "***** DEBUG: found an application: #{app_name} *****" if config[:debug] # rubocop:disable BlockNesting
             out = merge_output(out, bluepill_application_status(app_name))
           end
         end

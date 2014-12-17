@@ -92,7 +92,7 @@ module Sensu
           read_chunk = proc do
             content << file.read(chunk_size)
             # #YELLOW
-            unless file.eof? # rubocop:disable Style/UnlessElse
+            unless file.eof? # rubocop:disable UnlessElse
               EM.next_tick(read_chunk)
             else
               yield content

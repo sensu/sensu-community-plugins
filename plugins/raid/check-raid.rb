@@ -21,7 +21,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
       unless mg.empty?
         sg = mg.to_s.lines.grep(/\]\(F\)/)
         # #YELLOW
-        unless sg.empty? # rubocop:disable Style/UnlessElse
+        unless sg.empty? # rubocop:disable UnlessElse
           warning 'Software RAID warning'
         else
           ok 'Software RAID OK'
@@ -36,7 +36,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
       contents = `/usr/bin/cciss_vol_status /dev/sg0`
       c = contents.lines.grep(/status\: OK\./)
       # #YELLOW
-      unless c.empty?  # rubocop:disable Style/UnlessElse
+      unless c.empty?  # rubocop:disable UnlessElse
         ok 'HP RAID OK'
       else
         warning 'HP RAID warning'
@@ -51,7 +51,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
       mg = contents.lines.grep(/Controller Status/)
       # #YELLOW
-      unless mg.empty?  # rubocop:disable Style/UnlessElse
+      unless mg.empty?  # rubocop:disable UnlessElse
         sg = mg.to_s.lines.grep(/Optimal/)
         warning 'Adaptec Physical RAID Controller Failure' if sg.empty?
       else
@@ -60,7 +60,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
       mg = contents.lines.grep(/Status of logical device/)
       # #YELLOW
-      unless mg.empty?   # rubocop:disable Style/UnlessElse
+      unless mg.empty?   # rubocop:disable UnlessElse
         sg = mg.to_s.lines.grep(/Optimal/)
         warning 'Adaptec Logical RAID Controller Failure' if sg.empty?
       else
@@ -69,7 +69,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
       mg = contents.lines.grep(/S\.M\.A\.R\.T\.   /)
       # #YELLOW
-      unless mg.empty?   # rubocop:disable Style/UnlessElse
+      unless mg.empty?   # rubocop:disable UnlessElse
         sg = mg.to_s.lines.grep(/No/)
         warning 'Adaptec S.M.A.R.T. Disk Failed' if sg.empty?
       else
@@ -86,7 +86,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
       contents = `/usr/sbin/megacli -AdpAllInfo -aALL`
       c = contents.lines.grep(/(Critical|Failed) Disks\s+\: 0/)
       # #YELLOW
-      unless c.empty?   # rubocop:disable Style/UnlessElse
+      unless c.empty?   # rubocop:disable UnlessElse
         ok 'MegaRaid RAID OK'
       else
         warning 'MegaRaid RAID warning'

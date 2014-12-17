@@ -233,7 +233,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
     if config[:metric]
       # #YELLOW
-      count = procs.map { |p| p[config[:metric]].to_i }.reduce { |a, b| a + b } # rubocop:disable Style/SingleLineBlockParams
+      count = procs.map { |p| p[config[:metric]].to_i }.reduce { |a, b| a + b } # rubocop:disable SingleLineBlockParams
       msg += "; #{config[:metric]} == #{count}"
     else
       count = procs.size

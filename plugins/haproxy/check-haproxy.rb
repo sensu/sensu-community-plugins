@@ -153,7 +153,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
       haproxy_stats.select do |svc|
         svc[:pxname] =~ regexp
         # #YELLOW
-      end.reject do |svc| # rubocop: disable Style/MultilineBlockChain
+      end.reject do |svc| # rubocop: disable MultilineBlockChain
         %w(FRONTEND BACKEND).include?(svc[:svname])
       end
     end

@@ -32,7 +32,7 @@ class CheckCMDStatus < Sensu::Plugin::Check::CLI
   def acquire_cmd_status
     stdout = `#{config[:command]}`
     # #YELLOW
-    unless $CHILD_STATUS.exitstatus.to_s == config[:status] # rubocop:disable Style/UnlessElse
+    unless $CHILD_STATUS.exitstatus.to_s == config[:status] # rubocop:disable UnlessElse
       critical "#{config[:command]} exited with #{$CHILD_STATUS.exitstatus}"
     else
       if config[:check_output]

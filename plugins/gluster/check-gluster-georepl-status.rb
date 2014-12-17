@@ -17,7 +17,7 @@ class GlusterGeoReplStatus < Sensu::Plugin::Check::CLI
          short: '-s STATE',
          long: '--state STATE',
          # #YELLOW
-         proc: lambda { |o| o.split(/[\s,]+/) }, # rubocop:disable Style/Lambda
+         proc: lambda { |o| o.split(/[\s,]+/) }, # rubocop:disable Lambda
          required: true
 
   def run

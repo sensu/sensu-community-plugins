@@ -79,7 +79,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
       def by_instances_status(client)
         # #YELLOW
-        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable Style/IfUnlessModifier
+        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable IfUnlessModifier
           config[:scheme] += '.count'
         end
 
@@ -112,7 +112,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
 
       def by_instances_type(client)
         # #YELLOW
-        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable Style/IfUnlessModifier
+        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable IfUnlessModifier
           config[:scheme] += '.types'
         end
 

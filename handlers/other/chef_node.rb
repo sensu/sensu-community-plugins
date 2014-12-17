@@ -85,7 +85,7 @@ class ChefNode < Sensu::Handler
 
   def handle
     # #YELLOW
-    unless chef_node_exists?  # rubocop:disable Style/GuardClause, Style/IfUnlessModifier
+    unless chef_node_exists?  # rubocop:disable Style/GuardClause, IfUnlessModifier
       delete_sensu_client!
     end
   end

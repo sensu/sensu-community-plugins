@@ -43,7 +43,7 @@ class CheckPostgresReplicationStatus < Sensu::Plugin::Check::CLI
          description: 'Warning threshold for replication lag (in MB)',
          default: 900,
          # #YELLOW
-         proc: lambda { |s| s.to_i }) # rubocop:disable Style/Lambda
+         proc: lambda { |s| s.to_i }) # rubocop:disable Lambda
 
   option(:crit,
          short: '-c',
@@ -51,7 +51,7 @@ class CheckPostgresReplicationStatus < Sensu::Plugin::Check::CLI
          description: 'Critical threshold for replication lag (in MB)',
          default: 1800,
          # #YELLOW
-         proc: lambda { |s| s.to_i }) # rubocop:disable Style/Lambda
+         proc: lambda { |s| s.to_i }) # rubocop:disable Lambda
 
   def compute_lag(master, slave, m_segbytes)
     m_segment, m_offset = master.split('/')

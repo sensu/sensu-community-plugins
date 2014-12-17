@@ -29,7 +29,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def sum_cpu_metrics(metrics)
     # #YELLOW
-    metrics.values.reduce { |sum, metric| sum + metric } # rubocop:disable Style/SingleLineBlockParams
+    metrics.values.reduce { |sum, metric| sum + metric } # rubocop:disable SingleLineBlockParams
   end
 
   def run

@@ -22,7 +22,7 @@ class CheckDiskFail < Sensu::Plugin::Check::CLI
     %w(Read Write Smart).each do |v|
       found = dmesg.grep(/failed command\: #{v.upcase}/)
       # #YELLOW
-      unless found.empty?  # rubocop:disable Style/IfUnlessModifier
+      unless found.empty?  # rubocop:disable IfUnlessModifier
         critical "Disk #{v} Failure"
       end
     end

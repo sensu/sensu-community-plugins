@@ -46,7 +46,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
       config[:ssl] = uri.scheme == 'https'
     else
       # #YELLOW
-      unless config[:host] && config[:path] # rubocop:disable Style/IfUnlessModifier
+      unless config[:host] && config[:path] # rubocop:disable IfUnlessModifier
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -102,7 +102,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
         if !config[:key].nil? && !config[:value].nil?
           json = JSON.parse(res.body)
           # #YELLOW
-          if json[config[:key]].to_s == config[:value].to_s # rubocop:disable Metrics/BlockNesting
+          if json[config[:key]].to_s == config[:value].to_s # rubocop:disable BlockNesting
             ok 'Valid JSON and key present and correct'
           else
             critical 'JSON key check failed'

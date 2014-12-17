@@ -139,7 +139,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       config[:ssl] = uri.scheme == 'https'
     else
       # #YELLOW
-      unless config[:host] && config[:request_uri] # rubocop:disable Style/IfUnlessModifier
+      unless config[:host] && config[:request_uri] # rubocop:disable IfUnlessModifier
         unknown 'No URL specified'
       end
       config[:port] ||= config[:ssl] ? 443 : 80
@@ -227,10 +227,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       if config[:redirectok] || config[:redirectto]
         if config[:redirectok]
           # #YELLOW
-          ok("#{res.code}, #{size} bytes" + body) unless config[:response_code] # rubocop:disable Metrics/BlockNesting
+          ok("#{res.code}, #{size} bytes" + body) unless config[:response_code] # rubocop:disable BlockNesting
         elsif config[:redirectto]
           # #YELLOW
-          if config[:redirectto] == res['Location'] # rubocop:disable Metrics/BlockNesting
+          if config[:redirectto] == res['Location'] # rubocop:disable BlockNesting
             ok "#{res.code} found redirect to #{res['Location']}" + body
           else
             critical "Expected redirect to #{config[:redirectto]} instead redirected to #{res['Location']}" + body

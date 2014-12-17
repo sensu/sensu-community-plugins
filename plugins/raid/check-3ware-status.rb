@@ -64,7 +64,7 @@ class Check3wareStatus < Sensu::Plugin::Check::CLI
           unit = splitted[2]
           if unit != '-' && unit != 'NOT-PRESENT'
             # #YELLOW
-            if status == 'OK' # rubocop:disable Metrics/BlockNesting
+            if status == 'OK' # rubocop:disable BlockNesting
               @good_disks << controller + unit + name + ': ' + status
             else
               @bad_disks << controller + unit + name + ': ' + status

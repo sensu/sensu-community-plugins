@@ -37,7 +37,7 @@ class Zendesk < Sensu::Handler
 
       # Choose one of the following depending on your authentication choice
       # #YELOW
-      unless settings['zendesk']['token'].nil? # rubocop:disable Style/UnlessElse
+      unless settings['zendesk']['token'].nil? # rubocop:disable UnlessElse
         config.token = settings['zendesk']['token']
       else
         config.password = settings['zendesk']['password']

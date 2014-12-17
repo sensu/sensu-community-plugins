@@ -178,7 +178,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     node['indices'].each do |type,  index|
       index.each do |k, v|
         # #YELLOW
-        unless k =~ /(_time|memory|size$)/ # rubocop:disable Style/IfUnlessModifier
+        unless k =~ /(_time|memory|size$)/ # rubocop:disable IfUnlessModifier
           metrics["indices.#{type}.#{k}"] = v
         end
       end
@@ -186,7 +186,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     node['transport'].each do |k, v|
       # #YELLOW
-      unless k =~ /(_size$)/ # rubocop:disable Style/IfUnlessModifier
+      unless k =~ /(_size$)/ # rubocop:disable IfUnlessModifier
         metrics["transport.#{k}"] = v
       end
     end
