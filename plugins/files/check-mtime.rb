@@ -48,7 +48,8 @@ class Mtime < Sensu::Plugin::Check::CLI
 
   def run_check(type, age)
     to_check = config["#{type}_age".to_sym].to_i
-    if to_check > 0 && age >= to_check
+    # #YELLOW
+    if to_check > 0 && age >= to_check # rubocop:disable Style/GuardClause
       send(type, "file is #{age - to_check} seconds past #{type}")
     end
   end

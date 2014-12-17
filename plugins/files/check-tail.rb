@@ -59,7 +59,8 @@ class Tail < Sensu::Plugin::Check::CLI
   end
 
   def pattern_match?
-    !!tail_file.match(config[:pattern])
+    # #YELLOW
+    !!tail_file.match(config[:pattern]) # rubocop:disable Style/DoubleNegation
   end
 
   def run
@@ -69,7 +70,8 @@ class Tail < Sensu::Plugin::Check::CLI
       if !config[:absent]
         if pattern_match?
           send(
-            config[:warn_only] ? :warning : :critical,
+            # #YELLOW
+            config[:warn_only] ? :warning : :critical,  # rubocop:disable Metrics/BlockNesting
             "Pattern matched: #{config[:pattern]}"
           )
         else
@@ -80,7 +82,8 @@ class Tail < Sensu::Plugin::Check::CLI
           ok 'Match found'
         else
           send(
-            config[:warn_only] ? :warning : :critical,
+            # #YELLOW
+            config[:warn_only] ? :warning : :critical, # rubocop:disable Metrics/BlockNesting
             "Pattern not found: #{config[:pattern]}"
           )
         end
