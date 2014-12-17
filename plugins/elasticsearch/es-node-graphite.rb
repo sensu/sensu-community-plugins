@@ -97,7 +97,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     warning 'Connection timed out'
   end
 
-  def get_es_version
+  def acquire_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
@@ -122,7 +122,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       'thread_pool=true'
     ].join('&')
 
-    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+    if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
       stats = get_es_resource("_nodes/_local/stats?#{stats_query_string}")
     else
       stats = get_es_resource("_cluster/nodes/_local/stats?#{stats_query_string}")
@@ -177,14 +177,16 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     node['indices'].each do |type,  index|
       index.each do |k, v|
-        unless k =~ /(_time|memory|size$)/
+        # #YELLOW
+        unless k =~ /(_time|memory|size$)/ # rubocop:disable Style/IfUnlessModifier
           metrics["indices.#{type}.#{k}"] = v
         end
       end
     end
 
     node['transport'].each do |k, v|
-      unless k =~ /(_size$)/
+      # #YELLOW
+      unless k =~ /(_size$)/ # rubocop:disable Style/IfUnlessModifier
         metrics["transport.#{k}"] = v
       end
     end

@@ -68,7 +68,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     warning 'Connection timed out'
   end
 
-  def get_open_fds
+  def acquire_open_fds
     stats = get_es_resource('/_nodes/_local/stats?process=true')
     begin
       keys = stats['nodes'].keys
@@ -78,7 +78,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
     end
   end
 
-  def get_max_fds
+  def acquire_max_fds
     info = get_es_resource('/_nodes/_local?process=true')
     begin
       keys = info['nodes'].keys
@@ -89,8 +89,8 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    open = get_open_fds
-    max = get_max_fds
+    open = acquire_open_fds
+    max = acquire_max_fds
     used_percent = ((open.to_f / max.to_f) * 100).to_i
 
     if used_percent >= config[:critical]

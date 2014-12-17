@@ -77,7 +77,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
     warning 'Elasticsearch API returned invalid JSON'
   end
 
-  def get_heap_used
+  def acquire_heap_used
     if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
       stats = get_es_resource('_nodes/_local/stats?jvm=true')
       node = stats['nodes'].keys.first
@@ -93,7 +93,7 @@ class ESHeap < Sensu::Plugin::Check::CLI
   end
 
   def run
-    heap_used = get_heap_used
+    heap_used = acquire_heap_used
     message "Heap used in bytes #{heap_used}"
     if heap_used >= config[:crit]
       critical

@@ -1315,85 +1315,85 @@ def generate_sensu_event(options = {})
   feature[:elements] = [scenario]
 
   case options[:type]
-    when :metric
-      name = options[:name] || "example-name.Feature-#{feature_index}.scenario-#{scenario_index}.metrics"
-      metrics = []
+  when :metric
+    name = options[:name] || "example-name.Feature-#{feature_index}.scenario-#{scenario_index}.metrics"
+    metrics = []
 
-      if options[:status] == :passed
-        scenario_duration = 0
-        has_durations = false
+    if options[:status] == :passed
+      scenario_duration = 0
+      has_durations = false
 
-        scenario[:steps].each.with_index do |step, step_index|
-          if step.key?(:result)
-            metrics << "#{metric_prefix}.step-#{step_index + 1}.duration #{step[:result][:duration]} 123"
-            scenario_duration += step[:result][:duration]
-            has_durations = true
-          end
-        end
-
-        if has_durations
-          metrics.unshift([
-            "#{metric_prefix}.duration #{scenario_duration} 123",
-            "#{metric_prefix}.step-count #{scenario[:steps].length} 123"
-          ])
+      scenario[:steps].each.with_index do |step, step_index|
+        if step.key?(:result)
+          metrics << "#{metric_prefix}.step-#{step_index + 1}.duration #{step[:result][:duration]} 123"
+          scenario_duration += step[:result][:duration]
+          has_durations = true
         end
       end
 
-      metrics = metrics.join("\n")
+      if has_durations
+        metrics.unshift([
+          "#{metric_prefix}.duration #{scenario_duration} 123",
+          "#{metric_prefix}.step-count #{scenario[:steps].length} 123"
+        ])
+      end
+    end
 
-      sensu_event = {
-        name: name,
-        type: 'metric',
-        handlers: ['example-metric-handler'],
-        output: metrics,
-        status: 0
-      }
+    metrics = metrics.join("\n")
+
+    sensu_event = {
+      name: name,
+      type: 'metric',
+      handlers: ['example-metric-handler'],
+      output: metrics,
+      status: 0
+    }
     else
-      name = options[:name] || "example-name.Feature-#{feature_index}.scenario-#{scenario_index}"
-      data = {
-        'status' => options[:status].to_s
+    name = options[:name] || "example-name.Feature-#{feature_index}.scenario-#{scenario_index}"
+    data = {
+      'status' => options[:status].to_s
+    }
+
+    steps = []
+
+    Array(scenario[:steps]).each_with_index do |step, index|
+      status = step.key?(:result) ? step[:result][:status] : 'unknown'
+
+      steps << {
+        'step' => "#{status.upcase} - #{index + 1} - #{step[:keyword]}#{step[:name]}"
       }
+    end
 
-      steps = []
+    data['steps'] = steps
 
-      Array(scenario[:steps]).each_with_index do |step, index|
-        status = step.key?(:result) ? step[:result][:status] : 'unknown'
+    status_code_map = {
+      passed: 0,
+      failed: 2,
+      pending: 1,
+      undefined: 1
+    }
 
-        steps << {
-          'step' => "#{status.upcase} - #{index + 1} - #{step[:keyword]}#{step[:name]}"
-        }
-      end
+    sensu_event = {
+      name: name,
+      handlers: ['example-handler'],
+      status: status_code_map[options[:status]],
+      output: dump_yaml(data),
+      results: [feature]
+    }
 
-      data['steps'] = steps
-
-      status_code_map = {
-        passed: 0,
-        failed: 2,
-        pending: 1,
-        undefined: 1
-      }
-
-      sensu_event = {
-        name: name,
-        handlers: ['example-handler'],
-        status: status_code_map[options[:status]],
-        output: dump_yaml(data),
-        results: [feature]
-      }
-
-      if options[:exclude_attachments]
-        sensu_event[:results][0][:elements].each do |element|
-          element[:steps].each do |step|
-            step[:embeddings] = []
-          end
+    if options[:exclude_attachments]
+      sensu_event[:results][0][:elements].each do |element|
+        element[:steps].each do |step|
+          step[:embeddings] = []
         end
       end
+    end
 
-      if options.key?(:event_data)
-        options[:event_data].each do |key, value|
-          sensu_event[key] = value
-        end
+    if options.key?(:event_data)
+      options[:event_data].each do |key, value|
+        sensu_event[key] = value
       end
+    end
   end
 
   sensu_event

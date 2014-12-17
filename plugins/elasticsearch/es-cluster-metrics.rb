@@ -44,7 +44,7 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
          proc: proc(&:to_i),
          default: 30
 
-  def get_es_version
+  def acquire_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
@@ -58,9 +58,9 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     warning 'Connection timed out'
   end
 
-  def is_master
+  def master?
     state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
-    if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
+    if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
       local = get_es_resource('/_nodes/_local')
     else
       local = get_es_resource('/_cluster/nodes/_local')
@@ -68,23 +68,23 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     local['nodes'].keys.first == state['master_node']
   end
 
-  def get_health
+  def acquire_health
     health = get_es_resource('/_cluster/health').reject { |k, _v| %w(cluster_name timed_out).include?(k) }
     health['status'] = %w(red yellow green).index(health['status'])
     health
   end
 
-  def get_document_count
+  def acquire_document_count
     document_count = get_es_resource('/_count?q=*:*')
     document_count['count']
   end
 
   def run
-    if is_master
-      get_health.each do |k, v|
+    if master?
+      acquire_health.each do |k, v|
         output(config[:scheme] + '.' + k, v)
       end
-      output(config[:scheme] + '.document_count', get_document_count)
+      output(config[:scheme] + '.document_count', acquire_document_count)
     end
     ok
   end

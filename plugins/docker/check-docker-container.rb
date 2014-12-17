@@ -69,13 +69,17 @@ class CheckDockerContainers < Sensu::Plugin::Check::CLI
     count = conn.size.to_i
     puts "#{count} Running Containers..."
 
-    if !!config[:crit_under] && count < config[:crit_under]
+    # #YELLOW
+    if !!config[:crit_under] && count < config[:crit_under] # rubocop:disable Style/DoubleNegation
       puts critical
-    elsif !!config[:crit_over] && count > config[:crit_over]
+    # #YELLOW
+    elsif !!config[:crit_over] && count > config[:crit_over] # rubocop:disable Style/DoubleNegation
       puts critical
-    elsif !!config[:warn_under] && count < config[:warn_under]
+    # #YELLOW
+    elsif !!config[:warn_under] && count < config[:warn_under] # rubocop:disable Style/DoubleNegation
       puts warning
-    elsif !!config[:warn_over] && count > config[:warn_over]
+    # #YELLOW
+    elsif !!config[:warn_over] && count > config[:warn_over] # rubocop:disable Style/DoubleNegation
       puts warning
     else
       puts ok

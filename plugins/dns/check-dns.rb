@@ -85,8 +85,9 @@ class DNS < Sensu::Plugin::Check::CLI
         end
       else
         if config[:result]
-          if entries.include?(config[:result])
-            ok "Resolved #{config[:domain]} including #{config[:result]}"
+          # #YELLOW
+          if entries.include?(config[:result])  # rubocop:disable Metrics/BlockNesting
+            ok "Resolved #{config[:domain]} including # {config[:result]}"
           else
             critical "Resolved #{config[:domain]} did not include #{config[:result]}"
           end

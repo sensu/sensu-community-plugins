@@ -143,7 +143,8 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     utc_timestamp = Time.now.getutc.to_i
 
     results.each do |feature|
-      Array(feature[:elements]).each do |element|
+      # #YELLOW
+      Array(feature[:elements]).each do |element| # rubocop:disable Style/Next
         if element[:type] == 'scenario'
           event_name = "#{config[:name]}.#{generate_name_from_scenario(feature, element)}"
           scenario_status = get_scenario_status(element)
@@ -186,12 +187,12 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     data = dump_yaml(data)
 
     case outcome
-      when :ok
-        ok data
-      when :warning
-        warning data
-      when :unknown
-        unknown data
+    when :ok
+      ok data
+    when :warning
+      warning data
+    when :unknown
+      unknown data
     end
   end
 
@@ -234,13 +235,13 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     config[:attachments] = 'true' if config[:attachments].nil?
 
     case config[:attachments]
-      when 'true'
-        config[:attachments] = true
-      when 'false'
-        config[:attachments] = false
-      else
-        unknown_error 'Attachments argument is not a valid boolean'
-        return false
+    when 'true'
+      config[:attachments] = true
+    when 'false'
+      config[:attachments] = false
+    else
+      unknown_error 'Attachments argument is not a valid boolean'
+      return false
     end
 
     true
@@ -390,12 +391,12 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     scenario_output = get_output_for_scenario(scenario, scenario_status)
 
     scenario_status_code = case scenario_status
-      when :passed
-        OK
-      when :failed
-        CRITICAL
-      when :pending, :undefined
-        WARNING
+                           when :passed
+                             OK
+                           when :failed
+                             CRITICAL
+                           when :pending, :undefined
+                             WARNING
     end
 
     sensu_event = {
@@ -437,7 +438,8 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
   def get_scenario_status(scenario)
     scenario_status = :passed
 
-    Array(scenario[:steps]).each do |step|
+    # #YELLOW
+    Array(scenario[:steps]).each do |step| # rubocop:disable Style/Next
       if step.key? :result
         step_status = step[:result][:status]
 

@@ -94,7 +94,8 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       request.giaddr = IPAddr.new(sendsock.addr.last).to_i
     end
 
-    if config[:debug]
+    # #YELLOW
+    if config[:debug] # rubocop:disable Style/IfUnlessModifier
       puts request
     end
 
@@ -105,7 +106,8 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       data = listensock.recvfrom_nonblock(1500)
     rescue IO::WaitReadable
       # Socket not yet readable - wait until it is, or timeout reached
-      unless IO.select([listensock], nil, nil, config[:timeout].to_i)
+      # #YELLOW
+      unless IO.select([listensock], nil, nil, config[:timeout].to_i) # rubocop:disable Style/UnlessElse
         # timeout reached
         critical "Timeout reached awaiting response from DHCP server #{config[:server]}"
       else
@@ -128,9 +130,11 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       if config[:offer] || config[:ipaddr]
         # Is the response an DHCP Offer?
         if response.is_a?(DHCP::Offer)
-          if config[:ipaddr]
+          # #YELLOW
+          if config[:ipaddr] # rubocop:disable Metrics/BlockNesting
             offer = IPAddr.new(response.yiaddr, Socket::AF_INET).to_s
-            if offer == config[:ipaddr]
+            # #YELLOW
+            if offer == config[:ipaddr] # rubocop:disable Metrics/BlockNesting
               ok "Received DHCP offer of IP address #{offer}"
             else
               critical "Received DHCP offer of IP address #{offer}, expected #{config[:ipaddr]}"
