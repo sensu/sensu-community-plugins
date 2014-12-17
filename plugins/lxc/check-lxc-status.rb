@@ -22,10 +22,9 @@ require 'sensu-plugin/check/cli'
 require 'lxc'
 
 class CheckLXCSTATUS < Sensu::Plugin::Check::CLI
-
   option :name,
-    :short => '-n name',
-    :default => "testdebian"
+         short: '-n name',
+         default: 'testdebian'
 
   def run
     conn = LXC.container("#{config[:name]}")
@@ -38,7 +37,7 @@ class CheckLXCSTATUS < Sensu::Plugin::Check::CLI
         ok "container  #{config[:name]} is Running"
       end
       else
-      critical "container #{config[:name]} does not Exists"
+        critical "container #{config[:name]} does not Exists"
     end
   end
 end

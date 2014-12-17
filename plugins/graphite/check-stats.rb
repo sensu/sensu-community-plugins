@@ -20,52 +20,51 @@ require 'net/http'
 require 'sensu-plugin/check/cli'
 
 class CheckGraphiteStat < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "graphite hostname",
-    :proc => proc {|p| p.to_s },
-    :default => "graphite"
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'graphite hostname',
+         proc: proc(&:to_s),
+         default: 'graphite'
 
   option :period,
-    :short => "-p PERIOD",
-    :long => "--period PERIOD",
-    :description => "The period back in time to extract from Graphite. Use -24hours, -2days, -15mins, etc, same format as in Graphite",
-    :proc => proc {|p| p.to_s },
-    :required => true
+         short: '-p PERIOD',
+         long: '--period PERIOD',
+         description: 'The period back in time to extract from Graphite. Use -24hours, -2days, -15mins, etc, same format as in Graphite',
+         proc: proc(&:to_s),
+         required: true
 
   option :target,
-    :short => "-t TARGET",
-    :long => "--target TARGET",
-    :description => "The graphite metric name. Can include * to query multiple metrics",
-    :proc => proc {|p| p.to_s },
-    :required => true
+         short: '-t TARGET',
+         long: '--target TARGET',
+         description: 'The graphite metric name. Can include * to query multiple metrics',
+         proc: proc(&:to_s),
+         required: true
 
   option :warn,
-    :short => "-w WARN",
-    :long => "--warn WARN",
-    :description => "Warning level",
-    :proc => proc {|p| p.to_f },
-    :required => false
+         short: '-w WARN',
+         long: '--warn WARN',
+         description: 'Warning level',
+         proc: proc(&:to_f),
+         required: false
 
   option :crit,
-    :short => "-c Crit",
-    :long => "--crit CRIT",
-    :description => "Critical level",
-    :proc => proc {|p| p.to_f },
-    :required => false
+         short: '-c Crit',
+         long: '--crit CRIT',
+         description: 'Critical level',
+         proc: proc(&:to_f),
+         required: false
 
   option :unknown_ignore,
-    :short => "-u",
-    :long => "--unknown-ignore",
-    :description => "Do nothing for UNKNOWN status (when you wildcard-match a ton of metrics at once and you don't care for a few missing data)",
-    :boolean => true,
-    :default => false
+         short: '-u',
+         long: '--unknown-ignore',
+         description: "Do nothing for UNKNOWN status (when you wildcard-match a ton of metrics at once and you don't care for a few missing data)",
+         boolean: true,
+         default: false
 
   def average(a)
     total = 0
-    a.to_a.each {|i| total += i.to_f}
+    a.to_a.each { |i| total += i.to_f }
 
     total / a.length
   end
@@ -93,7 +92,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
         uri = URI("http://#{config[:host]}/render?format=json&target=#{config[:target]}&from=#{config[:period]}")
         res = Net::HTTP.get_response(uri)
         res.body
-      rescue Exception => e
+      rescue => e
         warning "Failed to query graphite: #{e.inspect}"
       end
 
@@ -106,7 +105,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
         []
       end
 
-    unknown "No data from graphite" if data.empty?
+    unknown 'No data from graphite' if data.empty?
 
     data.each do |metric|
       s, msg = danger(metric)

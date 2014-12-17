@@ -30,26 +30,24 @@ require 'sensu-plugin/check/cli'
 require 'json'
 
 class CheckPorts < Sensu::Plugin::Check::CLI
-
   option :host,
-    :description => 'Resolving name or IP address of target host',
-    :short       => '-h HOST',
-    :long        => '--host HOST',
-    :default     => 'localhost'
+         description: 'Resolving name or IP address of target host',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :ports,
-    :description => 'TCP port(s) you wish to get status for',
-    :short       => '-t PORT,PORT...',
-    :long        => '--ports PORT,PORT...'
+         description: 'TCP port(s) you wish to get status for',
+         short: '-t PORT,PORT...',
+         long: '--ports PORT,PORT...'
 
   option :level,
-    :description => 'Alert level crit(critical) or warn(warning)',
-    :short       => '-l crit|warn',
-    :long        => '--level crit|warn',
-    :default     => 'WARN'
+         description: 'Alert level crit(critical) or warn(warning)',
+         short: '-l crit|warn',
+         long: '--level crit|warn',
+         default: 'WARN'
 
   def run
-
     stdout, stderr = Open3.capture3(
       ENV,
       "nmap -P0 -p #{ config[:ports] } #{ config[:host] }"

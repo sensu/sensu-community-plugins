@@ -26,21 +26,20 @@ require 'net/http'
 require 'json'
 
 class CheckEyeHttp < Sensu::Plugin::Check::CLI
-
   option :host,
-    short: '-h host',
-    default: '127.0.0.1'
+         short: '-h host',
+         default: '127.0.0.1'
 
   option :port,
-    short: '-p port',
-    default: 12345
+         short: '-p port',
+         default: 12_345
 
   option :uri,
-    short: '-u uri',
-    default: '/api/info?filter=all'
+         short: '-u uri',
+         default: '/api/info?filter=all'
 
   option :debug,
-    short: '-d'
+         short: '-d'
 
   def run
     out = { ok: [], warn: [], crit: [] }

@@ -24,17 +24,16 @@ require 'uri'
 require 'crack'
 
 class VarnishMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.varnish"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.varnish"
 
   option :varnish_name,
-    :description => "The varnishd instance to get data from",
-    :short => "-n VARNISH_NAME",
-    :long => "--name VARNISH_NAME"
+         description: 'The varnishd instance to get data from',
+         short: '-n VARNISH_NAME',
+         long: '--name VARNISH_NAME'
 
   def graphite_path_sanitize(path)
     # accept only a small set of chars in a graphite path and convert anything else
@@ -52,16 +51,15 @@ class VarnishMetrics < Sensu::Plugin::Metric::CLI::Graphite
       stats = Crack::XML.parse(varnishstat)
       stats['varnishstat']['stat'].each do |stat|
         path = "#{config[:scheme]}"
-        path += "." + graphite_path_sanitize(stat['type'])    if stat['type']
-        path += "." + graphite_path_sanitize(stat['ident'])   if stat['ident']
-        path += "." + graphite_path_sanitize(stat['name'])
+        path += '.' + graphite_path_sanitize(stat['type'])    if stat['type']
+        path += '.' + graphite_path_sanitize(stat['ident'])   if stat['ident']
+        path += '.' + graphite_path_sanitize(stat['name'])
         output path, stat['value']
       end
-    rescue Exception => e
+    rescue => e
       puts "Error: exception: #{e}"
       critical
     end
     ok
   end
-
 end

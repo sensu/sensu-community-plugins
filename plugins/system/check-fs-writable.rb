@@ -33,21 +33,20 @@ require 'sensu-plugin/check/cli'
 require 'tempfile'
 
 class CheckFSWritable < Sensu::Plugin::Check::CLI
-
   option :dir,
-         :description => 'Directory to check for writability',
-         :short       => '-d DIRECTORY',
-         :long        => '--directory DIRECTORY',
-         :proc        => proc { |a| a.split(',') }
+         description: 'Directory to check for writability',
+         short: '-d DIRECTORY',
+         long: '--directory DIRECTORY',
+         proc: proc { |a| a.split(',') }
 
   option :auto,
-         :description => 'Auto discover mount points via fstab',
-         :short       => '-a',
-         :long        => '--auto-discover'
+         description: 'Auto discover mount points via fstab',
+         short: '-a',
+         long: '--auto-discover'
 
   option :debug,
-         :description => 'Print debug statements',
-         :long        => '--debug'
+         description: 'Print debug statements',
+         long: '--debug'
 
   def initialize
     super
@@ -75,15 +74,15 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
 
   def is_rw_test(mount_info)
     mount_info.each do |pt|
-    (Dir.exist? pt.split[0]) || (@crit_pt_test << "#{ pt.split[0] }")
-    file = Tempfile.new('.sensu', pt.split[0])
-    puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
-    # #YELLOW
-    #  need to add a check here to validate permissions, if none it pukes
-    file.write('mops') || @crit_pt_test <<  "#{ pt.split[0] }"
-    file.read || @crit_pt_test <<  "#{ pt.split[0] }"
-    file.close
-    file.unlink
+      (Dir.exist? pt.split[0]) || (@crit_pt_test << "#{ pt.split[0] }")
+      file = Tempfile.new('.sensu', pt.split[0])
+      puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
+      # #YELLOW
+      #  need to add a check here to validate permissions, if none it pukes
+      file.write('mops') || @crit_pt_test <<  "#{ pt.split[0] }"
+      file.read || @crit_pt_test <<  "#{ pt.split[0] }"
+      file.close
+      file.unlink
     end
   end
 

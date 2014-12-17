@@ -38,17 +38,17 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
   # a single application to monitor, or multiple applications, comma-separated.
   # check all applications if option not provided.
   option :apps,
-    :short => '-a [APPS]',
-    :long => '--applications [APPS]'
+         short: '-a [APPS]',
+         long: '--applications [APPS]'
 
   option :debug,
-    :long => "--debug",
-    :description => "Verbose output"
+         long: '--debug',
+         description: 'Verbose output'
 
   option :sudo,
-    :short => '-s',
-    :long => "--sudo",
-    :description => "exec bluepill with sudo (needs passwordless)"
+         short: '-s',
+         long: '--sudo',
+         description: 'exec bluepill with sudo (needs passwordless)'
 
   def merge_output(orig, add)
     orig.keys.each { |k| orig[k].push(*add[k]) }
@@ -100,29 +100,29 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
   end
 
   def run
-     # Check if Bluepill is installed
+    # Check if Bluepill is installed
     `which bluepill`
     unless $CHILD_STATUS.success?
-      ok "bluepill not installed"
+      ok 'bluepill not installed'
     end
 
     out = { name: [], ok: [], warn: [], crit: [], err: [] }
 
     if config[:apps]
-      requested_apps = config[:apps].split(',').collect(&:strip) || []
+      requested_apps = config[:apps].split(',').map(&:strip) || []
       puts "***** DEBUG: requested applications: #{requested_apps }*****" if config[:debug]
       requested_apps.each do |a|
         out = merge_output(out, bluepill_application_status(a))
       end
     else
-      puts "***** DEBUG: checking all applications *****" if config[:debug]
+      puts '***** DEBUG: checking all applications *****' if config[:debug]
       bluepill_status = `#{config[:sudo] ? 'sudo ' : nil }bluepill status 2>&1`
       if $CHILD_STATUS.success?
         # we have only one application loaded and bluepill is
         # 'helpfully' showing us only the status of that
         # application's processes. We can't get the name of the
         # application, however.
-        puts "***** DEBUG: bluepill status short-circuited to show status of a single unknown application *****" if config[:debug]
+        puts '***** DEBUG: bluepill status short-circuited to show status of a single unknown application *****' if config[:debug]
         out = merge_output(out, bluepill_application_status(''))
       else
         # We either have multiple applications or no applications,

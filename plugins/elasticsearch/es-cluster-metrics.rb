@@ -18,32 +18,31 @@ require 'rest-client'
 require 'json'
 
 class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.elasticsearch.cluster"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.elasticsearch.cluster"
 
   option :host,
-    :description => 'Elasticsearch host',
-    :short => '-h HOST',
-    :long => '--host HOST',
-    :default => 'localhost'
+         description: 'Elasticsearch host',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :port,
-    :description => 'Elasticsearch port',
-    :short => '-p PORT',
-    :long => '--port PORT',
-    :proc => proc {|a| a.to_i },
-    :default => 9200
+         description: 'Elasticsearch port',
+         short: '-p PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         default: 9200
 
   option :timeout,
-    :description => 'Sets the connection timeout for REST client',
-    :short => '-t SECS',
-    :long => '--timeout SECS',
-    :proc => proc {|a| a.to_i },
-    :default => 30
+         description: 'Sets the connection timeout for REST client',
+         short: '-t SECS',
+         long: '--timeout SECS',
+         proc: proc(&:to_i),
+         default: 30
 
   def get_es_version
     info = get_es_resource('/')
@@ -51,14 +50,12 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def get_es_resource(resource)
-    begin
-      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
-      JSON.parse(r.get)
-    rescue Errno::ECONNREFUSED
-      warning 'Connection refused'
-    rescue RestClient::RequestTimeout
-      warning 'Connection timed out'
-    end
+    r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
+    JSON.parse(r.get)
+  rescue Errno::ECONNREFUSED
+    warning 'Connection refused'
+  rescue RestClient::RequestTimeout
+    warning 'Connection timed out'
   end
 
   def is_master
@@ -72,8 +69,8 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def get_health
-    health = get_es_resource('/_cluster/health').reject {|k, v| %w[cluster_name timed_out].include?(k)}
-    health['status'] = ['red', 'yellow', 'green'].index(health['status'])
+    health = get_es_resource('/_cluster/health').reject { |k, _v| %w(cluster_name timed_out).include?(k) }
+    health['status'] = %w(red yellow green).index(health['status'])
     health
   end
 
@@ -91,5 +88,4 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
     ok
   end
-
 end

@@ -18,23 +18,23 @@ require 'sensu-plugin/check/cli'
 
 class CheckMegraRAID < Sensu::Plugin::Check::CLI
   option :megaraidcmd,
-         :description => "the MegaCli executable",
-         :short => '-c CMD',
-         :long => '--command CMD',
-         :default => '/opt/MegaRAID/MegaCli/MegaCli64'
+         description: 'the MegaCli executable',
+         short: '-c CMD',
+         long: '--command CMD',
+         default: '/opt/MegaRAID/MegaCli/MegaCli64'
   option :controller,
-         :description => "the controller to query",
-         :short => '-C ID',
-         :long => '--controller ID',
-         :proc => proc { |a| a.to_i },
-         :default => 0
+         description: 'the controller to query',
+         short: '-C ID',
+         long: '--controller ID',
+         proc: proc(&:to_i),
+         default: 0
 
   def run
-    haveError=false
-    error=''
+    haveError = false
+    error = ''
     # get number of virtual drives
     `#{config[:megaraidcmd]} -LDGetNum -a#{config[:controller]} `
-    (0..$?.exitstatus-1).each do |i|
+    (0..$CHILD_STATUS.exitstatus - 1).each do |i|
       # and check them in turn
       stdout = `#{config[:megaraidcmd]} -LDInfo -L#{i} -a#{config[:controller]} `
       unless Regexp.new('State\s*:\s*Optimal').match(stdout)

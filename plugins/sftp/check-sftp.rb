@@ -26,64 +26,64 @@ require 'net/sftp'
 # Checks sFTP site
 class CheckSftp < Sensu::Plugin::Check::CLI
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "Sftp Host",
-    :required => true
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Sftp Host',
+         required: true
 
   option :port,
-    :short => "-P PORT",
-    :long => "--port PORT",
-    :description => "Sftp Port",
-    :proc => proc { |p| p.to_i },
-    :default => 22
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'Sftp Port',
+         proc: proc(&:to_i),
+         default: 22
 
   option :username,
-    :short => "-u USERNAME",
-    :long => "--user USERNAME",
-    :description => "Sftp Username",
-    :required => true
+         short: '-u USERNAME',
+         long: '--user USERNAME',
+         description: 'Sftp Username',
+         required: true
 
   option :password,
-    :short => "-s PASSWORD",
-    :long => "--pass PASSWORD",
-    :description => "Sftp Password",
-    :default => "",
-    :required => true
+         short: '-s PASSWORD',
+         long: '--pass PASSWORD',
+         description: 'Sftp Password',
+         default: '',
+         required: true
 
   option :timeout,
-    :short => "-t TIMEOUT",
-    :long => "--timeout TIMEOUT",
-    :proc => proc { |a| a.to_i },
-    :description => "Sftp Timeout",
-    :default => 60
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         proc: proc(&:to_i),
+         description: 'Sftp Timeout',
+         default: 60
 
   option :directory,
-    :short => "-d DIRECTORY",
-    :long => "--directory DIRECTORY",
-    :description => "Directory to use for file checks",
-    :default => "/"
+         short: '-d DIRECTORY',
+         long: '--directory DIRECTORY',
+         description: 'Directory to use for file checks',
+         default: '/'
 
   option :match,
-    :short => "-m MATCH",
-    :long => "--match MATCH",
-    :description => "Match files with this pattern for counting/file aging checks (**, **/*)."
+         short: '-m MATCH',
+         long: '--match MATCH',
+         description: 'Match files with this pattern for counting/file aging checks (**, **/*).'
 
   option :check_prefix,
-    :short => "-x PREFIX",
-    :description => "Prefix for temporary file write check. Blank for none."
+         short: '-x PREFIX',
+         description: 'Prefix for temporary file write check. Blank for none.'
 
   option :check_count,
-    :short => "-n COUNT",
-    :long => "--number COUNT",
-    :proc => proc { |a| a.to_i },
-    :description => "Alert if files > COUNT in directory"
+         short: '-n COUNT',
+         long: '--number COUNT',
+         proc: proc(&:to_i),
+         description: 'Alert if files > COUNT in directory'
 
   option :check_older,
-    :short => "-o OLDER_THAN",
-    :long => "--older_than OLDER_THAN",
-    :proc => proc { |a| a.to_i },
-    :description => "Alert if any file age > OLDER_THAN seconds"
+         short: '-o OLDER_THAN',
+         long: '--older_than OLDER_THAN',
+         proc: proc(&:to_i),
+         description: 'Alert if any file age > OLDER_THAN seconds'
 
   def run
     if sftp
@@ -109,8 +109,8 @@ class CheckSftp < Sensu::Plugin::Check::CLI
 
   def check_file_write
     if config[:check_prefix]
-      io = StringIO.new("Generated from Sensu at "+Time.now.to_s)
-      remote_path = File.join('', config[:directory], config[:check_prefix]+"_#{Time.now.to_i}.txt")
+      io = StringIO.new('Generated from Sensu at ' + Time.now.to_s)
+      remote_path = File.join('', config[:directory], config[:check_prefix] + "_#{Time.now.to_i}.txt")
       sftp.upload!(io, remote_path)
       sftp.remove!(remote_path)
     end
@@ -127,7 +127,7 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   def check_file_age
     if config[:check_older]
       run_at    = Time.now
-      old_files = matching_files.find_all { |f| (run_at.to_i - f.attributes.mtime) > config[:check_older] }
+      old_files = matching_files.select { |f| (run_at.to_i - f.attributes.mtime) > config[:check_older] }
       unless old_files.empty?
         critical "Files too old - #{config[:directory]} has #{old_files.count} matching files older than #{config[:check_older]}s"
       end
@@ -135,10 +135,10 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   end
 
   def matching_files
-    @matching_files ||= sftp.dir.glob(config[:directory], config[:match]).find_all { |f| f.attributes.file? }
+    @matching_files ||= sftp.dir.glob(config[:directory], config[:match]).select { |f| f.attributes.file? }
   end
 
   def sftp
-    @sftp ||= Net::SFTP.start(config[:host], config[:username], :password => config[:password], :timeout => config[:timeout], :port => config[:port])
+    @sftp ||= Net::SFTP.start(config[:host], config[:username], password: config[:password], timeout: config[:timeout], port: config[:port])
   end
 end

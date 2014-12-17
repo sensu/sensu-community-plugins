@@ -72,16 +72,16 @@ Dir.glob('**/*').each do |file|
 end
 
 github.issues.edit user: 'sensu',
-repo: 'sensu-community-plugins',
-number: '891',
-body: "#{ yellow_debt }"
+                   repo: 'sensu-community-plugins',
+                   number: '891',
+                   body: "#{ yellow_debt }"
 
 github.issues.edit user: 'sensu',
-repo: 'sensu-community-plugins',
-number: '892',
-body: "#{ orange_debt }"
+                   repo: 'sensu-community-plugins',
+                   number: '892',
+                   body: "#{ orange_debt }"
 
 github.issues.edit user: 'sensu',
-repo: 'sensu-community-plugins',
-number: '893',
-body: "#{ red_debt }"
+                   repo: 'sensu-community-plugins',
+                   number: '893',
+                   body: "#{ red_debt }"

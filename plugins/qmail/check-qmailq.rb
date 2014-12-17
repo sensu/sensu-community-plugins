@@ -20,25 +20,24 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckQMAILQ < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h host',
-    :default => "127.0.0.1"
+         short: '-h host',
+         default: '127.0.0.1'
 
   option :warn,
-    :short => '-w warn',
-    :default => "100"
+         short: '-w warn',
+         default: '100'
 
   option :critical,
-    :short => '-c critical',
-    :default => "200"
+         short: '-c critical',
+         default: '200'
 
   option :type,
-    :short => '-t type',
-    :default => "remote"
+         short: '-t type',
+         default: 'remote'
 
-  def checkq (qtype)
-    queue= `/var/qmail/bin/qmail-qread | grep #{qtype} | grep -v done | wc -l`
+  def checkq(qtype)
+    queue = `/var/qmail/bin/qmail-qread | grep #{qtype} | grep -v done | wc -l`
     queue.to_i
   end
 

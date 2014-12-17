@@ -14,9 +14,9 @@ require 'java'
 require 'pp'
 
 include Java
-include_class('java.lang.Integer') { |package, name| "J#{name}" }
-include_class('java.lang.Long')    { |package, name| "J#{name}" }
-include_class('java.lang.Boolean') { |package, name| "J#{name}" }
+include_class('java.lang.Integer') { |_package, name| "J#{name}" }
+include_class('java.lang.Long')    { |_package, name| "J#{name}" }
+include_class('java.lang.Boolean') { |_package, name| "J#{name}" }
 
 import org.apache.hadoop.hbase.client.HBaseAdmin
 import org.apache.hadoop.hbase.client.HTable
@@ -24,11 +24,11 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.log4j.Logger
 
-packages = ["org.apache.zookeeper", "org.apache.hadoop", "org.apache.hadoop.hbase"]
+packages = ['org.apache.zookeeper', 'org.apache.hadoop', 'org.apache.hadoop.hbase']
 
 packages.each do |package|
   logger = org.apache.log4j.Logger.getLogger(package)
-  logger.setLevel(org.apache.log4j.Level::ERROR);
+  logger.setLevel(org.apache.log4j.Level::ERROR)
 end
 
 module SensuUtils
@@ -38,7 +38,7 @@ module SensuUtils
     'OK' => 0,
     'WARNING' => 1,
     'CRITICAL' => 2,
-    'UNKNOWN' => 3,
+    'UNKNOWN' => 3
   }
 
   def output(fn, *args)
@@ -51,7 +51,6 @@ module SensuUtils
       exit(code)
     end
   end
-
 end
 
 include SensuUtils
@@ -66,12 +65,12 @@ def check_hbase_status
   count = dead_servers.length
 
   if count == 0
-    ok "Alive"
+    ok 'Alive'
   else
-    critical "Dead: #{dead_servers.join(" ")}"
+    critical "Dead: #{dead_servers.join(' ')}"
   end
 
-  unknown "No output from plugin"
+  unknown 'No output from plugin'
 end
 
 check_hbase_status

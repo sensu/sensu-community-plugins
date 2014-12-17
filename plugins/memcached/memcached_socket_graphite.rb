@@ -12,52 +12,49 @@ require 'socket'
 require 'timeout'
 
 class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-         :short       => "-h HOST",
-         :long        => "--host HOST",
-         :description => "Memcached Host to connect to",
-         :default     => 'localhost'
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Memcached Host to connect to',
+         default: 'localhost'
 
   option :port,
-         :short       => "-p PORT",
-         :long        => "--port PORT",
-         :description => "Memcached Port to connect to",
-         :proc        => proc { |p| p.to_i },
-         :default     => 11211
+         short: '-p PORT',
+         long: '--port PORT',
+         description: 'Memcached Port to connect to',
+         proc: proc(&:to_i),
+         default: 11_211
 
   option :scheme,
-         :description => "Metric naming scheme, text to prepend to metric",
-         :short       => "-s SCHEME",
-         :long        => "--scheme SCHEME",
-         :default     => "#{::Socket.gethostname}.memcached"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{::Socket.gethostname}.memcached"
   def run
-    begin
-      stats = {}
-      metrics = {}
-      Timeout.timeout(30) do
-        TCPSocket.open("#{config[:host]}", "#{config[:port]}") do |socket|
-          socket.print "stats\r\n"
-          socket.close_write
-          recv = socket.read
-          recv.each_line do |line|
-            if line.match('STAT')
-              stats[line.split(' ')[1]] = line.split(' ')[2]
-            end
-          end
-          metrics.update(sortMetrics(stats))
-          metrics.each do |k, v|
-            output "#{config[:scheme]}.#{k}", v
+    stats = {}
+    metrics = {}
+    Timeout.timeout(30) do
+      TCPSocket.open("#{config[:host]}", "#{config[:port]}") do |socket|
+        socket.print "stats\r\n"
+        socket.close_write
+        recv = socket.read
+        recv.each_line do |line|
+          if line.match('STAT')
+            stats[line.split(' ')[1]] = line.split(' ')[2]
           end
         end
+        metrics.update(sortMetrics(stats))
+        metrics.each do |k, v|
+          output "#{config[:scheme]}.#{k}", v
+        end
       end
-      ok
-    rescue Timeout::Error
-     puts "timed out connecting to memcached on port #{config[:port]}"
-    rescue
-     puts "Can't connect to port #{config[:port]}"
-     exit(1)
     end
+    ok
+  rescue Timeout::Error
+    puts "timed out connecting to memcached on port #{config[:port]}"
+  rescue
+    puts "Can't connect to port #{config[:port]}"
+    exit(1)
   end
 
   def sortMetrics(stats)

@@ -23,24 +23,23 @@ require 'sensu-plugin/check/cli'
 require 'fileutils'
 
 class DirCount < Sensu::Plugin::Check::CLI
-
   option :directory,
-    :description => 'Directory to count files in',
-    :short => '-d DIR',
-    :long => '--dir DIR',
-    :required => true
+         description: 'Directory to count files in',
+         short: '-d DIR',
+         long: '--dir DIR',
+         required: true
 
   option :warning_num,
-    :description => 'Warn if count of files is greater than provided number',
-    :short => '-w NUM',
-    :long => '--warning NUM',
-    :required => true
+         description: 'Warn if count of files is greater than provided number',
+         short: '-w NUM',
+         long: '--warning NUM',
+         required: true
 
   option :critical_num,
-    :description => 'Critical if count of files is greater than provided number',
-    :short => '-c NUM',
-    :long => '--critical NUM',
-    :required => true
+         description: 'Critical if count of files is greater than provided number',
+         short: '-c NUM',
+         long: '--critical NUM',
+         required: true
 
   def run
     begin

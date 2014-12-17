@@ -14,11 +14,10 @@
 
 module Sensu::Extension
   class Redact < Mutator
-
     def definition
       {
         type: 'extension',
-        name: 'redact',
+        name: 'redact'
       }
     end
 
@@ -44,12 +43,12 @@ module Sensu::Extension
     end
 
     def redact_sensitive(hash, keys = nil)
-      keys ||= %w[
+      keys ||= %w(
         password passwd pass
         api_key api_token
         access_key secret_key
         private_key secret
-      ]
+      )
       hash = hash.dup
       hash.each do |key, value|
         if keys.include?(key.to_s)
@@ -60,6 +59,5 @@ module Sensu::Extension
       end
       hash
     end
-
   end
 end

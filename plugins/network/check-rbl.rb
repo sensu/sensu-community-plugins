@@ -27,23 +27,22 @@ require 'dnsbl-client'
 require 'set'
 
 class RblCheck < Sensu::Plugin::Check::CLI
-
   option :ip,
-    :short => '-i IPADDRESS',
-    :long  => '--ip IPADDRESS',
-    :description => 'IP of the server to check'
+         short: '-i IPADDRESS',
+         long: '--ip IPADDRESS',
+         description: 'IP of the server to check'
 
   option :ignored_bls,
-    :short => '-I BLACKLISTNAME',
-    :long  => '--ignored_bls BLACKLISTNAME',
-    :description => 'Comma Separated String of ignored blacklists from default list',
-    :default => 'null'
+         short: '-I BLACKLISTNAME',
+         long: '--ignored_bls BLACKLISTNAME',
+         description: 'Comma Separated String of ignored blacklists from default list',
+         default: 'null'
 
   option :critical_bls,
-    :short => '-C BLACKLISTNAME',
-    :long  => '--critical_bls BLACKLISTNAME',
-    :description => 'Comma Separated String of critical blacklists from default list',
-    :default => 'null'
+         short: '-C BLACKLISTNAME',
+         long: '--critical_bls BLACKLISTNAME',
+         description: 'Comma Separated String of critical blacklists from default list',
+         default: 'null'
 
   def run
     c = DNSBL::Client.new
@@ -51,7 +50,7 @@ class RblCheck < Sensu::Plugin::Check::CLI
     if config[:ip]
       ip_add = config[:ip]
     else
-      critical "plugin failed. Required Argument -i (ip address of the client)"
+      critical 'plugin failed. Required Argument -i (ip address of the client)'
     end
 
     if config[:ignored_bls]
@@ -65,17 +64,17 @@ class RblCheck < Sensu::Plugin::Check::CLI
     end
 
     dnsbl_ret   = c.lookup("#{ip_add}")
-    msg_string  = ""
+    msg_string  = ''
     criticality = 0
 
     dnsbl_ret.each do |dnsbl_result|
 
-      if (dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~ /blacklist/i)
-        unless (ignored_bls_set.member?(dnsbl_result.dnsbl))
+      if dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~ /blacklist/i
+        unless ignored_bls_set.member?(dnsbl_result.dnsbl)
           msg_string =  "#{msg_string} #{dnsbl_result.dnsbl}"
         end
 
-        if (critical_bls_set.member?(dnsbl_result.dnsbl))
+        if critical_bls_set.member?(dnsbl_result.dnsbl)
           criticality += 1
         end
       end
@@ -83,7 +82,7 @@ class RblCheck < Sensu::Plugin::Check::CLI
     end
 
     unless msg_string.empty?
-      if (criticality > 0)
+      if criticality > 0
         critical "#{ip_add} Blacklisted in#{msg_string}"
       else
         warning "#{ip_add} Blacklisted in#{msg_string}"
@@ -92,6 +91,5 @@ class RblCheck < Sensu::Plugin::Check::CLI
       msg_txt = "All is well. #{ip_add} has good reputation."
       ok "#{msg_txt}"
     end
-
   end
 end

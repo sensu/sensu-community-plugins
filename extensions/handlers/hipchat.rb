@@ -49,9 +49,7 @@ require 'timeout'
 require 'net/http'
 
 module Sensu::Extension
-
   class Hipchat < Handler
-
     # The post_init hook is called after the main event loop has started
     # At this time EventMachine is available for interaction.
     def post_init
@@ -81,20 +79,20 @@ module Sensu::Extension
 
     # Sends an event to the specified hipchat room etc
     def send_hipchat(room, from, message, color, notify)
-      apiversion = @settings["hipchat"]["apiversion"] || 'v1'
-      room_api_token = @settings["hipchat"]["room_api_token"]
+      apiversion = @settings['hipchat']['apiversion'] || 'v1'
+      room_api_token = @settings['hipchat']['room_api_token']
 
-      hipchatmsg = HipChat::Client.new(room_api_token, :api_version => apiversion)
+      hipchatmsg = HipChat::Client.new(room_api_token, api_version: apiversion)
 
       begin
         timeout(3) do
-          hipchatmsg[room].send(from, "#{message}.", :color => color, :notify => notify)
-          return "Sent hipchat message"
+          hipchatmsg[room].send(from, "#{message}.", color: color, notify: notify)
+          return 'Sent hipchat message'
         end
       rescue Timeout::Error
         return "Timed out while attempting to message #{room} [#{message}]"
       rescue HipChat::UnknownResponseCode
-        return "Hipchat returned an unknown response code (rate limited?)"
+        return 'Hipchat returned an unknown response code (rate limited?)'
       end
     end
 
@@ -105,7 +103,7 @@ module Sensu::Extension
     end
 
     # Lifted from the sensu-plugin gem, makes an api request to sensu
-    def api_request(method, path, &blk)
+    def api_request(method, path, &_blk)
       http = Net::HTTP.new(@settings['api']['host'], @settings['api']['port'])
       req = net_http_req_class(method).new(path)
       if @settings['api']['user'] && @settings['api']['password']
@@ -139,7 +137,7 @@ module Sensu::Extension
 
     # Has this check been disabled from handlers?
     def filter_disabled(event)
-      if event[:check].has_key?(:alert)
+      if event[:check].key?(:alert)
         if event[:check][:alert] == false
           bail 'alert disabled', event
         end
@@ -196,19 +194,19 @@ module Sensu::Extension
 
     # Does this event have dependencies?
     def filter_dependencies(event)
-      if event[:check].has_key?(:dependencies) && event[:check][:dependencies].is_a?(Array)
-          event[:check][:dependencies].each do |dependency|
-            begin
-              timeout(2) do
-                check, client = dependency.split('/').reverse
-                if event_exists?(client || event[:client][:name], check)
-                  return bail 'check dependency event exists', event
-                end
+      if event[:check].key?(:dependencies) && event[:check][:dependencies].is_a?(Array)
+        event[:check][:dependencies].each do |dependency|
+          begin
+            timeout(2) do
+              check, client = dependency.split('/').reverse
+              if event_exists?(client || event[:client][:name], check)
+                return bail 'check dependency event exists', event
               end
-            rescue Timeout::Error
-              @logger.warn('timed out while attempting to query the sensu api for an event')
             end
+          rescue Timeout::Error
+            @logger.warn('timed out while attempting to query the sensu api for an event')
           end
+        end
       end
 
       true
@@ -227,14 +225,14 @@ module Sensu::Extension
     end
 
     def color_to_hex(color)
-      if color == "green"
-        "#09B524"
-      elsif color == "red"
-        "#E31717"
-      elsif color == "yellow"
-        "#FFFF00"
+      if color == 'green'
+        '#09B524'
+      elsif color == 'red'
+        '#E31717'
+      elsif color == 'yellow'
+        '#FFFF00'
       else
-        "#FFFFFF"
+        '#FFFFFF'
       end
     end
 
@@ -249,7 +247,7 @@ module Sensu::Extension
         begin
           uri = URI.parse(check[:playbook])
           if %w( http https ).include?(uri.scheme)
-            "[#{build_link(check[:playbook], "Playbook")}]"
+            "[#{build_link(check[:playbook], 'Playbook')}]"
           else
             "Playbook:  #{check[:playbook]}"
           end
@@ -301,11 +299,11 @@ module Sensu::Extension
 
       # Is this event a keepalive?
       # Adding extra config on every client is annoying. Just make some extra settings for it.
-      keepalive = @settings["hipchat"]["keepalive"] || {}
-      if event[:check][:name] == "keepalive"
-        event[:check][:occurrences] = keepalive["occurrences"] || 6
-        event[:check][:hipchat_room] = keepalive["room"] || @settings["hipchat"]["room"]
-        event[:check][:hipchat_from] = keepalive["from"] || @settings["hipchat"]["from"] || 'Sensu'
+      keepalive = @settings['hipchat']['keepalive'] || {}
+      if event[:check][:name] == 'keepalive'
+        event[:check][:occurrences] = keepalive['occurrences'] || 6
+        event[:check][:hipchat_room] = keepalive['room'] || @settings['hipchat']['room']
+        event[:check][:hipchat_from] = keepalive['from'] || @settings['hipchat']['from'] || 'Sensu'
       end
 
       # If this event is resolved, or in one of the 'bad' states, and it passes all the filters,
@@ -313,8 +311,8 @@ module Sensu::Extension
       if (resolved || [1, 2, 3].include?(event[:check][:status])) && filters(event)
         check = event[:check]
 
-        room = check[:hipchat_room] || @settings["hipchat"]["room"]
-        from = check[:hipchat_from] || @settings["hipchat"]["from"] || 'Sensu'
+        room = check[:hipchat_room] || @settings['hipchat']['room']
+        from = check[:hipchat_from] || @settings['hipchat']['from'] || 'Sensu'
         state = check[:status]
         state_msg, color, notify = clarify_state(state, check)
         status_msg = "#{event[:action].to_s.upcase}:"
@@ -322,11 +320,11 @@ module Sensu::Extension
         hipchat_msg = build_hipchat_message(event, state_msg, status_msg)
 
         operation = proc { send_hipchat(room, from, hipchat_msg, color, notify) }
-        callback = proc {|result| yield "Hipchat message: #{result}", 0 }
+        callback = proc { |result| yield "Hipchat message: #{result}", 0 }
 
         EM.defer(operation, callback)
       else
-        yield "Hipchat not handling", 0
+        yield 'Hipchat not handling', 0
       end
     end
 
@@ -334,6 +332,5 @@ module Sensu::Extension
     def stop
       true
     end
-
   end
 end

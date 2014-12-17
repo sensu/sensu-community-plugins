@@ -38,66 +38,63 @@ require 'rest-client'
 require 'json'
 
 class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to queue_name.metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.elasticsearch"
+         description: 'Metric naming scheme, text to prepend to queue_name.metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.elasticsearch"
 
   option :server,
-    :description => "Elasticsearch server host.",
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :default => "localhost"
+         description: 'Elasticsearch server host.',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :port,
-    :description => "Elasticsearch port.",
-    :short => "-p PORT",
-    :long => "--port PORT",
-    :proc => proc {|a| a.to_i },
-    :default => 9200
+         description: 'Elasticsearch port.',
+         short: '-p PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         default: 9200
 
   option :timeout,
-    :description => "Request timeout to elasticsearch",
-    :short => "-t TIMEOUT",
-    :long => "--timeout TIMEOUT",
-    :proc => proc {|a| a.to_i },
-    :default => 30
+         description: 'Request timeout to elasticsearch',
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         proc: proc(&:to_i),
+         default: 30
 
   option :disable_jvm_stats,
-    :description => "Disable JVM statistics",
-    :long => "--disable-jvm-stats",
-    :boolean => true,
-    :default => false
+         description: 'Disable JVM statistics',
+         long: '--disable-jvm-stats',
+         boolean: true,
+         default: false
 
   option :disable_os_stats,
-    :description => "Disable OS Stats",
-    :long => "--disable-os-stat",
-    :boolean => true,
-    :default => false
+         description: 'Disable OS Stats',
+         long: '--disable-os-stat',
+         boolean: true,
+         default: false
 
   option :disable_process_stats,
-    :description => "Disable process statistics",
-    :long => "--disable-process-stats",
-    :boolean => true,
-    :default => false
+         description: 'Disable process statistics',
+         long: '--disable-process-stats',
+         boolean: true,
+         default: false
 
   option :disable_thread_pool_stats,
-    :description => "Disable thread-pool statistics",
-    :long => "--disable-thread-pool-stats",
-    :boolean => true,
-    :default => false
+         description: 'Disable thread-pool statistics',
+         long: '--disable-thread-pool-stats',
+         boolean: true,
+         default: false
 
   def get_es_resource(resource)
-    begin
-      r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", :timeout => config[:timeout])
-      JSON.parse(r.get)
-    rescue Errno::ECONNREFUSED
-      warning 'Connection refused'
-    rescue RestClient::RequestTimeout
-      warning 'Connection timed out'
-    end
+    r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/#{resource}?pretty", timeout: config[:timeout])
+    JSON.parse(r.get)
+  rescue Errno::ECONNREFUSED
+    warning 'Connection refused'
+  rescue RestClient::RequestTimeout
+    warning 'Connection timed out'
   end
 
   def get_es_version
@@ -106,7 +103,6 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-
     # invert various stats depending on if some flags are set
     os_stat = !config[:disable_os_stats]
     process_stats = !config[:disable_process_stats]
@@ -114,16 +110,16 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     tp_stats = !config[:disable_thread_pool_stats]
 
     stats_query_string = [
-        "clear=true",
-        "indices=true",
-        "http=true",
-        "jvm=#{jvm_stats}",
-        "network=true",
-        "os=#{os_stat}",
-        "process=#{process_stats}",
-        "thread_pool=#{tp_stats}",
-        "transport=true",
-        "thread_pool=true"
+      'clear=true',
+      'indices=true',
+      'http=true',
+      "jvm=#{jvm_stats}",
+      'network=true',
+      "os=#{os_stat}",
+      "process=#{process_stats}",
+      "thread_pool=#{tp_stats}",
+      'transport=true',
+      'thread_pool=true'
     ].join('&')
 
     if Gem::Version.new(get_es_version) >= Gem::Version.new('1.0.0')
@@ -169,7 +165,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
         gc_value.each do |k, v|
           # this contains stupid things like '28ms' and '2s', and there's already
           # something that counts in millis, which makes more sense
-          unless k.end_with? "collection_time"
+          unless k.end_with? 'collection_time'
             metrics["jvm.gc.collectors.#{gc}.#{k}"] = v
           end
         end
@@ -181,14 +177,14 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     node['indices'].each do |type,  index|
       index.each do |k, v|
-        unless (k =~ /(_time|memory|size$)/)
+        unless k =~ /(_time|memory|size$)/
           metrics["indices.#{type}.#{k}"] = v
         end
       end
     end
 
     node['transport'].each do |k, v|
-      unless (k =~ /(_size$)/)
+      unless k =~ /(_size$)/
         metrics["transport.#{k}"] = v
       end
     end
@@ -218,9 +214,8 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     metrics.each do |k, v|
-      output([config[:scheme], k].join("."), v, timestamp)
+      output([config[:scheme], k].join('.'), v, timestamp)
     end
     ok
   end
-
 end

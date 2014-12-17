@@ -15,47 +15,46 @@ require 'sensu-plugin/check/cli'
 require 'mysql'
 
 class CheckMysqlDisk < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h',
-    :long => '--host=VALUE',
-    :description => 'Database host'
+         short: '-h',
+         long: '--host=VALUE',
+         description: 'Database host'
 
   option :user,
-    :short => '-u',
-    :long => '--username=VALUE',
-    :description => 'Database username'
+         short: '-u',
+         long: '--username=VALUE',
+         description: 'Database username'
 
   option :pass,
-    :short => '-p',
-    :long => '--password=VALUE',
-    :description => 'Database password'
+         short: '-p',
+         long: '--password=VALUE',
+         description: 'Database password'
 
   option :size,
-    :short => '-s',
-    :long => '--size=VALUE',
-    :description => 'Database size'
+         short: '-s',
+         long: '--size=VALUE',
+         description: 'Database size'
 
   option :warn,
-    :short => '-w',
-    :long => '--warning=VALUE',
-    :description => 'Warning threshold',
-    :default => '85'
+         short: '-w',
+         long: '--warning=VALUE',
+         description: 'Warning threshold',
+         default: '85'
 
   option :crit,
-    :short => '-c',
-    :long => '--critical=VALUE',
-    :description => 'Critical threshold',
-    :default => '95'
+         short: '-c',
+         long: '--critical=VALUE',
+         description: 'Critical threshold',
+         default: '95'
 
   option :help,
-    :short => "-h",
-    :long => "--help",
-    :description => "Check RDS disk usage",
-    :on => :tail,
-    :boolean => true,
-    :show_options => true,
-    :exit => 0
+         short: '-h',
+         long: '--help',
+         description: 'Check RDS disk usage',
+         on: :tail,
+         boolean: true,
+         show_options: true,
+         exit: 0
 
   def run
     db_host = config[:host]
@@ -65,8 +64,8 @@ class CheckMysqlDisk < Sensu::Plugin::Check::CLI
     critical_usage = config[:crit].to_f
     warning_usage = config[:warn].to_f
 
-    if [db_host, db_user, db_pass, disk_size].any? {|v| v.nil? }
-      unknown "Must specify host, user, password and size"
+    if [db_host, db_user, db_pass, disk_size].any?(&:nil?)
+      unknown 'Must specify host, user, password and size'
     end
 
     begin
@@ -103,7 +102,7 @@ class CheckMysqlDisk < Sensu::Plugin::Check::CLI
 
     rescue Mysql::Error => e
       errstr = "Error code: #{e.errno} Error message: #{e.error}"
-      critical "#{errstr} SQLSTATE: #{e.sqlstate}" if e.respond_to?("sqlstate")
+      critical "#{errstr} SQLSTATE: #{e.sqlstate}" if e.respond_to?('sqlstate')
 
     rescue => e
       critical e
@@ -112,5 +111,4 @@ class CheckMysqlDisk < Sensu::Plugin::Check::CLI
       db.close if db
     end
   end
-
 end

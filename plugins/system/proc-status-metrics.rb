@@ -37,48 +37,48 @@ require 'socket'
 # monkeypatch for helping validate PID strings
 class String
   def integer?
-    self.to_i.to_s == self
+    to_i.to_s == self
   end
 end
 
 # /proc/[PID]/status memory metrics plugin
 class ProcStatus < Sensu::Plugin::Metric::CLI::Graphite
   option :user,
-    :description => "Query processes owned by a user",
-    :short => "-u USER",
-    :long => "--user USER"
+         description: 'Query processes owned by a user',
+         short: '-u USER',
+         long: '--user USER'
 
   option :processname,
-    :description => "Process name substring to match against, not a regex.",
-    :short => "-p PROCESSNAME",
-    :long => "--process-name PROCESSNAME"
+         description: 'Process name substring to match against, not a regex.',
+         short: '-p PROCESSNAME',
+         long: '--process-name PROCESSNAME'
 
   option :scheme,
-    :description => "Metric naming scheme",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.proc"
+         description: 'Metric naming scheme',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.proc"
 
   option :metrics,
-    :description => "Memory metrics to collect from /proc/[PID]/status, comma-separated",
-    :short => "-m METRICS",
-    :long => "--metrics METRICS",
-    :default => "VmSize,VmRSS,VmSwap"
+         description: 'Memory metrics to collect from /proc/[PID]/status, comma-separated',
+         short: '-m METRICS',
+         long: '--metrics METRICS',
+         default: 'VmSize,VmRSS,VmSwap'
 
   def pgrep_command
-    pgrep_command = "pgrep "
+    pgrep_command = 'pgrep '
     pgrep_command << "-u #{config[:user]} " if config[:user]
     pgrep_command << "-f #{config[:processname]} " if config[:processname]
-    pgrep_command << "2<&1"
+    pgrep_command << '2<&1'
   end
 
   def get_valid_pids(pgrep_output)
-    res = pgrep_output.split("\n").collect(&:strip)
+    res = pgrep_output.split("\n").map(&:strip)
     pids = res.reject { |x| !x.integer? }
     pids
   end
 
   def get_stats_for_pid(pid)
-    return nil unless ::File.exists?(::File.join('/proc', pid, 'cmdline'))
+    return nil unless ::File.exist?(::File.join('/proc', pid, 'cmdline'))
 
     cmdline_raw = `cat /proc/#{pid}/cmdline`
     cmdline = cmdline_raw.strip.gsub(/[^[:alnum:]]/, '_')
@@ -97,7 +97,7 @@ class ProcStatus < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    fail "You must supply -u USER or -p PROCESSNAME" unless (config[:user] || config[:processname])
+    fail 'You must supply -u USER or -p PROCESSNAME' unless config[:user] || config[:processname]
     metrics = {}
     pgrep_output = `#{pgrep_command}`
     pids = get_valid_pids(pgrep_output)
@@ -111,7 +111,7 @@ class ProcStatus < Sensu::Plugin::Metric::CLI::Graphite
 
     metrics.each do |proc_name, stats|
       stats.each do |stat_name, value|
-        output [config[:scheme], proc_name, stat_name].join("."), value, timestamp
+        output [config[:scheme], proc_name, stat_name].join('.'), value, timestamp
       end
     end
     ok

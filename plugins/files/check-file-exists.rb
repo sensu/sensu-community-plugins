@@ -27,29 +27,27 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckFileExists < Sensu::Plugin::Check::CLI
-
   option :critical,
-    :short => '-c CRITICAL_FILE',
-    :default => '/tmp/CRITICAL'
+         short: '-c CRITICAL_FILE',
+         default: '/tmp/CRITICAL'
 
   option :warning,
-    :short => '-w WARNING_FILE',
-    :default => '/tmp/WARNING'
+         short: '-w WARNING_FILE',
+         default: '/tmp/WARNING'
 
   option :unknown,
-    :short => '-u UNKNOWN_FILE',
-    :default => '/tmp/UNKNOWN'
+         short: '-u UNKNOWN_FILE',
+         default: '/tmp/UNKNOWN'
 
   def run
-    if config[:critical] && File.exists?(config[:critical])
+    if config[:critical] && File.exist?(config[:critical])
       critical "#{config[:critical]} exists!"
-    elsif config[:warning] && File.exists?(config[:warning])
+    elsif config[:warning] && File.exist?(config[:warning])
       warning "#{config[:warning]} exists!"
-    elsif config[:unknown] && File.exists?(config[:unknown])
+    elsif config[:unknown] && File.exist?(config[:unknown])
       unknown "#{config[:unknown]} exists!"
     else
-      ok "No test files exist"
+      ok 'No test files exist'
     end
   end
-
 end

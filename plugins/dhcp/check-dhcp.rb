@@ -36,37 +36,35 @@ require 'ipaddr'
 require 'socket'
 
 class CheckDHCP < Sensu::Plugin::Check::CLI
-
   option :server,
-    :description => "IP address of DHCP Server - will use unicast",
-    :short => '-s SERVER',
-    :long => '--server SERVER'
+         description: 'IP address of DHCP Server - will use unicast',
+         short: '-s SERVER',
+         long: '--server SERVER'
 
   option :timeout,
-    :description => "Time to wait for DHCP responses (in seconds)",
-    :short => '-t TIMEOUT',
-    :long => '--timeout TIMEOUT',
-    :default => '10'
+         description: 'Time to wait for DHCP responses (in seconds)',
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         default: '10'
 
   option :offer,
-    :description => "Must the DHCP response be an offer?",
-    :short => '-o',
-    :long => '--offer',
-    :boolean => true
+         description: 'Must the DHCP response be an offer?',
+         short: '-o',
+         long: '--offer',
+         boolean: true
 
   option :ipaddr,
-    :description => "IP address the DHCP server should offer",
-    :short => '-i IPADDR',
-    :long => '--ipaddr IPADDR'
+         description: 'IP address the DHCP server should offer',
+         short: '-i IPADDR',
+         long: '--ipaddr IPADDR'
 
   option :debug,
-    :description => "Enable verbose debugging output",
-    :short => '-d',
-    :long => '--debug',
-    :boolean => true
+         description: 'Enable verbose debugging output',
+         short: '-d',
+         long: '--debug',
+         boolean: true
 
   def dhcp_discover
-
     request = DHCP::Discover.new
 
     listensock = UDPSocket.new
@@ -83,7 +81,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
     else
       # Use broadcast, and listen on dhcp client port
       sendsock.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
-      sendaddr = "<broadcast>"
+      sendaddr = '<broadcast>'
       listenport = 68
     end
 
@@ -120,7 +118,6 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
 
     # Returns a DHCP::Message object, or nil if not parseable
     DHCP::Message.from_udp_payload(data[0])
-
   end
 
   def run
@@ -139,7 +136,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
               critical "Received DHCP offer of IP address #{offer}, expected #{config[:ipaddr]}"
             end
           else
-            ok "Received DHCP offer"
+            ok 'Received DHCP offer'
           end
         else
           critical "Message received from #{config[:server]} not a DHCP offer"
@@ -147,7 +144,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       else
         # Is response a DHCP message?
         if response.is_a?(DHCP::Message)
-          ok "Received DHCP response"
+          ok 'Received DHCP response'
         else
           critical "Message received from #{config[:server]} not a valid DHCP response"
         end

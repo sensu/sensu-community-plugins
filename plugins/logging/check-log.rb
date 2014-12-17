@@ -19,100 +19,99 @@ require 'sensu-plugin/check/cli'
 require 'fileutils'
 
 class CheckLog < Sensu::Plugin::Check::CLI
-
   BASE_DIR = '/var/cache/check-log'
 
   option :state_auto,
-         :description => "Set state file dir automatically using name",
-         :short => '-n NAME',
-         :long => '--name NAME',
-         :proc => proc {|arg| "#{BASE_DIR}/#{arg}" }
+         description: 'Set state file dir automatically using name',
+         short: '-n NAME',
+         long: '--name NAME',
+         proc: proc { |arg| "#{BASE_DIR}/#{arg}" }
 
   option :state_dir,
-         :description => "Dir to keep state files under",
-         :short => '-s DIR',
-         :long => '--state-dir DIR',
-         :default => "#{BASE_DIR}/default"
+         description: 'Dir to keep state files under',
+         short: '-s DIR',
+         long: '--state-dir DIR',
+         default: "#{BASE_DIR}/default"
 
   option :log_file,
-         :description => "Path to log file",
-         :short => '-f FILE',
-         :long => '--log-file FILE'
+         description: 'Path to log file',
+         short: '-f FILE',
+         long: '--log-file FILE'
 
   option :pattern,
-         :description => "Pattern to search for",
-         :short => '-q PAT',
-         :long => '--pattern PAT'
+         description: 'Pattern to search for',
+         short: '-q PAT',
+         long: '--pattern PAT'
 
   option :exclude,
-         :description => "Pattern to exclude from matching",
-         :short => '-E PAT',
-         :long => '--exclude PAT',
-         :proc => proc {|s| Regexp.compile s},
-         :default => /(?!)/
+         description: 'Pattern to exclude from matching',
+         short: '-E PAT',
+         long: '--exclude PAT',
+         proc: proc { |s| Regexp.compile s },
+         default: /(?!)/
 
   option :encoding,
-         :description => "Explicit encoding page to read log file with",
-         :short => '-e ENCODING-PAGE',
-         :long => '--encoding ENCODING-PAGE'
+         description: 'Explicit encoding page to read log file with',
+         short: '-e ENCODING-PAGE',
+         long: '--encoding ENCODING-PAGE'
 
   option :warn,
-         :description => "Warning level if pattern has a group",
-         :short => '-w N',
-         :long => '--warn N',
-         :proc => proc {|a| a.to_i }
+         description: 'Warning level if pattern has a group',
+         short: '-w N',
+         long: '--warn N',
+         proc: proc(&:to_i)
 
   option :crit,
-         :description => "Critical level if pattern has a group",
-         :short => '-c N',
-         :long => '--crit N',
-         :proc => proc {|a| a.to_i }
+         description: 'Critical level if pattern has a group',
+         short: '-c N',
+         long: '--crit N',
+         proc: proc(&:to_i)
 
   option :only_warn,
-         :description => "Warn instead of critical on match",
-         :short => '-o',
-         :long => '--warn-only',
-         :boolean => true
+         description: 'Warn instead of critical on match',
+         short: '-o',
+         long: '--warn-only',
+         boolean: true
 
   option :case_insensitive,
-         :description => "Run a case insensitive match",
-         :short => '-i',
-         :long => '--icase',
-         :boolean => true,
-         :default => false
+         description: 'Run a case insensitive match',
+         short: '-i',
+         long: '--icase',
+         boolean: true,
+         default: false
 
   option :file_pattern,
-         :description => "Check a pattern of files, instead of one file",
-         :short => '-F FILE',
-         :long => '--filepattern FILE'
+         description: 'Check a pattern of files, instead of one file',
+         short: '-F FILE',
+         long: '--filepattern FILE'
 
   def run
-    unknown "No log file specified" unless config[:log_file] || config[:file_pattern]
-    unknown "No pattern specified" unless config[:pattern]
+    unknown 'No log file specified' unless config[:log_file] || config[:file_pattern]
+    unknown 'No pattern specified' unless config[:pattern]
     file_list = []
     file_list << config[:log_file] if config[:log_file]
     if config[:file_pattern]
-        dir_str = config[:file_pattern].slice(0, config[:file_pattern].to_s.rindex('/'))
-        file_pat = config[:file_pattern].slice((config[:file_pattern].to_s.rindex('/') + 1), config[:file_pattern].length)
-        Dir.foreach(dir_str) do |file|
-            if config[:case_insensitive]
-                file_list << "#{dir_str}/#{file}" if file.to_s.downcase.match(file_pat.downcase)
-            else
-                file_list << "#{dir_str}/#{file}" if file.to_s.match(file_pat)
-            end
+      dir_str = config[:file_pattern].slice(0, config[:file_pattern].to_s.rindex('/'))
+      file_pat = config[:file_pattern].slice((config[:file_pattern].to_s.rindex('/') + 1), config[:file_pattern].length)
+      Dir.foreach(dir_str) do |file|
+        if config[:case_insensitive]
+          file_list << "#{dir_str}/#{file}" if file.to_s.downcase.match(file_pat.downcase)
+        else
+          file_list << "#{dir_str}/#{file}" if file.to_s.match(file_pat)
         end
+      end
     end
     n_warns_overall = 0
     n_crits_overall = 0
     file_list.each do |log_file|
-        begin
-          open_log log_file
-        rescue => e
-          unknown "Could not open log file: #{e}"
-        end
-        n_warns, n_crits = search_log
-        n_warns_overall += n_warns
-        n_crits_overall += n_crits
+      begin
+        open_log log_file
+      rescue => e
+        unknown "Could not open log file: #{e}"
+      end
+      n_warns, n_crits = search_log
+      n_warns_overall += n_warns
+      n_crits_overall += n_crits
     end
     message "#{n_warns_overall} warnings, #{n_crits_overall} criticals for pattern #{config[:pattern]}"
     if n_crits_overall > 0
@@ -158,9 +157,9 @@ class CheckLog < Sensu::Plugin::Check::CLI
     @log.each_line do |line|
       bytes_read += line.size
       if config[:case_insensitive]
-         m = line.downcase.match(config[:pattern].downcase) unless line.match(config[:exclude])
+        m = line.downcase.match(config[:pattern].downcase) unless line.match(config[:exclude])
       else
-         m = line.match(config[:pattern]) unless line.match(config[:exclude])
+        m = line.match(config[:pattern]) unless line.match(config[:exclude])
       end
       if m
         if m[1]
@@ -184,5 +183,4 @@ class CheckLog < Sensu::Plugin::Check::CLI
     end
     [n_warns, n_crits]
   end
-
 end

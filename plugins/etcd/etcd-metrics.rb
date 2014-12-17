@@ -24,31 +24,30 @@ require 'etcd'
 require 'socket'
 
 class EtcdMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => 'Metric naming scheme',
-    :short => '-s SCHEME',
-    :long => '--scheme SCHEME',
-    :default => "#{Socket.gethostname}.etcd"
+         description: 'Metric naming scheme',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.etcd"
 
   option :etcd_host,
-    :description => 'Etcd host, defaults to localhost',
-    :short => '-h HOST',
-    :long => '--host HOST',
-    :default => 'localhost'
+         description: 'Etcd host, defaults to localhost',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :etcd_port,
-    :description => 'Etcd port, defaults to 4001',
-    :short => '-p PORT',
-    :long => '--port PORT',
-    :default => '4001'
+         description: 'Etcd port, defaults to 4001',
+         short: '-p PORT',
+         long: '--port PORT',
+         default: '4001'
 
   option :leader_stats,
-    :description => 'Show leader stats',
-    :short => '-l',
-    :long => '--leader-stats',
-    :boolean => true,
-    :default => false
+         description: 'Show leader stats',
+         short: '-l',
+         long: '--leader-stats',
+         boolean: true,
+         default: false
 
   def run
     client = Etcd.client(host: config[:etcd_host], port: config[:etcd_port])

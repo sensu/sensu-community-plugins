@@ -5,7 +5,6 @@ require 'sensu-handler'
 require 'dogapi'
 
 class DatadogNotif < Sensu::Handler
-
   def handle
     filter
     datadog
@@ -52,18 +51,18 @@ class DatadogNotif < Sensu::Handler
         dog = Dogapi::Client.new(settings['datadog']['api_key'], settings['datadog']['app_key'])
         response = dog.emit_event(Dogapi::Event.new(
                                             description,
-                                            :msg_title => @event['check']['name'],
-                                            :tags => tags,
-                                            :alert_type => action,
-                                            :priority => priority,
-                                            :source_type_name => 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
-                                            :aggregation_key => @event['check']['name']
-                                          ), :host => @event['client']['name']
+                                            msg_title: @event['check']['name'],
+                                            tags: tags,
+                                            alert_type: action,
+                                            priority: priority,
+                                            source_type_name: 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
+                                            aggregation_key: @event['check']['name']
+                                          ), host: @event['client']['name']
                         )
 
         begin
-          if response[0] == "202"
-            puts "Submitted event to Datadog"
+          if response[0] == '202'
+            puts 'Submitted event to Datadog'
           else
             puts "Unexpected response from Datadog: HTTP code #{response[0]}"
           end

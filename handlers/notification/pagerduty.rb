@@ -18,7 +18,6 @@ require 'sensu-handler'
 require 'redphone/pagerduty'
 
 class Pagerduty < Sensu::Handler
-
   def incident_key
     source = @event['check']['source'] || @event['client']['name']
     [source, @event['check']['name']].join('/')
@@ -35,15 +34,15 @@ class Pagerduty < Sensu::Handler
         response = case @event['action']
         when 'create'
           Redphone::Pagerduty.trigger_incident(
-            :service_key => api_key,
-            :incident_key => incident_key,
-            :description => event_summary,
-            :details => @event
+            service_key: api_key,
+            incident_key: incident_key,
+            description: event_summary,
+            details: @event
           )
         when 'resolve'
           Redphone::Pagerduty.resolve_incident(
-            :service_key => api_key,
-            :incident_key => incident_key
+            service_key: api_key,
+            incident_key: incident_key
           )
         end
         if response['status'] == 'success'
@@ -56,5 +55,4 @@ class Pagerduty < Sensu::Handler
       puts 'pagerduty -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key
     end
   end
-
 end

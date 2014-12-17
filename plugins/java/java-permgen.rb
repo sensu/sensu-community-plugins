@@ -12,18 +12,17 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckJavaPermGen < Sensu::Plugin::Check::CLI
+  check_name 'Java PermGen'
 
-  check_name "Java PermGen"
-
-  option :warn, :short => '-w WARNLEVEL', :default => '85'
-  option :crit, :short => '-c CRITLEVEL', :default => '95'
+  option :warn, short: '-w WARNLEVEL', default: '85'
+  option :crit, short: '-c CRITLEVEL', default: '95'
 
   def run
     warn_procs = []
     crit_procs = []
     java_pids = []
 
-    IO.popen("jps -q") do |cmd|
+    IO.popen('jps -q') do |cmd|
       java_pids = cmd.read.split
     end
 
@@ -33,13 +32,13 @@ class CheckJavaPermGen < Sensu::Plugin::Check::CLI
       IO.popen("jstat -gcpermcapacity #{java_proc} 1 1 2>&1") do |cmd|
         pgcmx = cmd.read.split[9]
       end
-      exit_code = $?.exitstatus
+      exit_code = $CHILD_STATUS.exitstatus
       next if exit_code != 0
 
       IO.popen("jstat -gcold #{java_proc} 1 1 2>&1") do |cmd|
         pu = cmd.read.split[9]
       end
-      exit_code = $?.exitstatus
+      exit_code = $CHILD_STATUS.exitstatus
       next if exit_code != 0
 
       proc_permgen = (pu.to_f / pgcmx.to_f) * 100
@@ -56,8 +55,7 @@ class CheckJavaPermGen < Sensu::Plugin::Check::CLI
     elsif !warn_procs.empty?
       warning "Java processes Over PermGen WARN threshold of #{config[:warn]}%: #{warn_procs.join(', ')}"
     else
-      ok "No Java processes over PermGen thresholds"
+      ok 'No Java processes over PermGen thresholds'
     end
   end
-
 end

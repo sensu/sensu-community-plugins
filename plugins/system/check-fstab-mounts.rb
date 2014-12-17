@@ -18,11 +18,11 @@ require 'pathname'
 
 class CheckFstabMounts < Sensu::Plugin::Check::CLI
   option :fstypes,
-    :description => 'Filesystem types to check, comma-separated',
-    :short => '-t TYPES',
-    :long => '--types TYPES',
-    :proc => proc {|a| a.split(',')},
-    :required => false
+         description: 'Filesystem types to check, comma-separated',
+         short: '-t TYPES',
+         long: '--types TYPES',
+         proc: proc { |a| a.split(',') },
+         required: false
 
   def initialize
     super
@@ -41,11 +41,11 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
       next if fields[1] == 'none' || (fields[3].include? 'noauto')
       next if config[:fstypes] && !config[:fstypes].include?(fields[2])
       if fields[2] != 'swap'
-        if @mtab.select {|m| m.split(/\s+/)[1] == fields[1]}.empty?
+        if @mtab.select { |m| m.split(/\s+/)[1] == fields[1] }.empty?
           @missing_mounts << fields[1]
         end
       else
-        if @swap_mounts.select {|m| m.split(/\s+/)[0] == Pathname.new(fields[0]).realpath.to_s}.empty?
+        if @swap_mounts.select { |m| m.split(/\s+/)[0] == Pathname.new(fields[0]).realpath.to_s }.empty?
           @missing_mounts << fields[1]
         end
       end

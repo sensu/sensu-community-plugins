@@ -21,7 +21,7 @@ URL_SCHEME = 'https'
 module Sensu
   class Handler
     def self.run
-      handler = self.new
+      handler = new
       handler.filter
       handler.alert
     end
@@ -46,15 +46,15 @@ module Sensu
 
     def splunkstorm
       incident_key = @event['client']['name'] + ' ' + @event['check']['name']
-      event_params = {:sourcetype => 'sensu-server', :host => @event['client']['name'], :project => settings['splunkstorm']['project_id']}
+      event_params = { sourcetype: 'sensu-server', host: @event['client']['name'], project: settings['splunkstorm']['project_id'] }
 
       begin
         timeout(3) do
           api_url = "#{URL_SCHEME}://#{API_HOST}"
-          api_params = URI.escape(event_params.collect{|k, v| "#{k}=#{v}"}.join('&'))
+          api_params = URI.escape(event_params.map { |k, v| "#{k}=#{v}" }.join('&'))
           endpoint_path = "#{API_VERSION}/#{API_ENDPOINT}?#{api_params}"
 
-          request = RestClient::Resource.new(api_url, :user => 'sensu', :password => settings['splunkstorm']['access_token'])
+          request = RestClient::Resource.new(api_url, user: 'sensu', password: settings['splunkstorm']['access_token'])
 
           response = request[endpoint_path].post(JSON.dump(@event))
           puts response

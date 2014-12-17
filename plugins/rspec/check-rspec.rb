@@ -28,36 +28,35 @@ require 'rspec'
 require 'sensu-plugin/check/cli'
 
 class CheckRspec < Sensu::Plugin::Check::CLI
-
   option :ruby_bin,
-         :short   => '-b ruby',
-         :long    => '--ruby-bin ruby',
-         :default => 'ruby'
+         short: '-b ruby',
+         long: '--ruby-bin ruby',
+         default: 'ruby'
 
   option :rspec_bin,
-         :short   => '-i rspec',
-         :long    => '--rspec-bin rspec',
-         :default => 'rspec'
+         short: '-i rspec',
+         long: '--rspec-bin rspec',
+         default: 'rspec'
 
   option :tests_dir,
-         :short    => '-d /tmp/my_tests',
-         :long     => '--tests-dir /tmp/my_tests',
-         :required => true
+         short: '-d /tmp/my_tests',
+         long: '--tests-dir /tmp/my_tests',
+         required: true
 
   option :spec_dir,
-         :short   => '-s spec',
-         :long    => '--spec-dir spec',
-         :default => 'spec'
+         short: '-s spec',
+         long: '--spec-dir spec',
+         default: 'spec'
 
   option :environment_variables,
-         :short    => '-e aws_access_key_id=XXX',
-         :long     => '--env-var aws_access_key_id=XXX',
-         :required => false
+         short: '-e aws_access_key_id=XXX',
+         long: '--env-var aws_access_key_id=XXX',
+         required: false
 
   option :handler,
-         :short   => '-l HANDLER',
-         :long    => '--handler HANDLER',
-         :default => 'default'
+         short: '-l HANDLER',
+         long: '--handler HANDLER',
+         default: 'default'
 
   def sensu_client_socket(msg)
     u = UDPSocket.new
@@ -114,5 +113,4 @@ class CheckRspec < Sensu::Plugin::Check::CLI
         unknown message
     end
   end
-
 end

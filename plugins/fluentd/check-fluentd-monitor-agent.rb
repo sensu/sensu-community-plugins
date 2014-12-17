@@ -25,23 +25,23 @@ require 'json'
 
 class CheckFluentdMonitorAgent < Sensu::Plugin::Check::CLI
   option :url,
-    short: '-u URL',
-    long: '--url URL',
-    description: 'A URL to connect to',
-    default: 'http://localhost:24220/api/plugins.json'
+         short: '-u URL',
+         long: '--url URL',
+         description: 'A URL to connect to',
+         default: 'http://localhost:24220/api/plugins.json'
 
   option :warn,
-    short: '-w WARN',
-    proc: proc { |a| a.to_i }
+         short: '-w WARN',
+         proc: proc(&:to_i)
 
   option :crit,
-    short: '-c CRIT',
-    proc: proc { |a| a.to_i }
+         short: '-c CRIT',
+         proc: proc(&:to_i)
 
   option :metric,
-    short: '--m METRIC',
-    long: '--metric METRIC',
-    description: 'Check monitor_agent metric'
+         short: '--m METRIC',
+         long: '--metric METRIC',
+         description: 'Check monitor_agent metric'
 
   def run
     if !config[:metric]

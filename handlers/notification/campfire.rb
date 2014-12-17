@@ -21,31 +21,30 @@ require 'sensu-handler'
 require 'tinder'
 
 class Campfire < Sensu::Handler
-
   def incident_key
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def campfire
-    Tinder::Campfire.new(settings["campfire"]["account"], :ssl => true, :token => settings["campfire"]["token"])
+    Tinder::Campfire.new(settings['campfire']['account'], ssl: true, token: settings['campfire']['token'])
   end
 
   def room
-    unless settings["campfire"]["room_id"].nil?
-      return campfire.find_room_by_id(settings["campfire"]["room_id"])
+    unless settings['campfire']['room_id'].nil?
+      return campfire.find_room_by_id(settings['campfire']['room_id'])
     else
-      return campfire.find_room_by_name(settings["campfire"]["room"])
+      return campfire.find_room_by_name(settings['campfire']['room'])
     end
   end
 
   def handle
     description = @event['notification'] || [
-                                               @event['client']['name'],
-                                               @event['check']['name'],
-                                               @event['check']['output'],
-                                               @event['client']['address'],
-                                               @event['client']['subscriptions'].join(',')
-                                            ].join(' : ')
+      @event['client']['name'],
+      @event['check']['name'],
+      @event['check']['output'],
+      @event['client']['address'],
+      @event['client']['subscriptions'].join(',')
+    ].join(' : ')
     begin
       timeout(3) do
         if room.speak("#{incident_key}: #{description}")
@@ -58,5 +57,4 @@ class Campfire < Sensu::Handler
       puts 'campfire -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + incident_key
     end
   end
-
 end

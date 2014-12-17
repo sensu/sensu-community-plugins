@@ -12,13 +12,12 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckHardwareFail < Sensu::Plugin::Check::CLI
-
   def run
     errors = `dmesg`.lines.grep(/\[Hardware Error\]/)
     unless errors.empty?
-      critical "Hardware Error Detected"
+      critical 'Hardware Error Detected'
     end
 
-    ok "Hardware OK"
+    ok 'Hardware OK'
   end
 end

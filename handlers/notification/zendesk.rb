@@ -28,64 +28,62 @@ require 'sensu-handler'
 require 'zendesk_api'
 
 class Zendesk < Sensu::Handler
+  def handle
+    client = ZendeskAPI::Client.new do |config|
+      config.url = settings['zendesk']['url']
 
-    def handle
-        client = ZendeskAPI::Client.new do |config|
-            config.url = settings["zendesk"]["url"]
+      # Basic / Token Authentication
+      config.username = settings['zendesk']['username']
 
-            # Basic / Token Authentication
-            config.username = settings["zendesk"]["username"]
-
-            # Choose one of the following depending on your authentication choice
-            unless settings["zendesk"]["token"].nil?
-                config.token = settings["zendesk"]["token"]
-            else
-                config.password = settings["zendesk"]["password"]
-            end
-            config.retry = true
-        end
-
-        def ticket_subject
-            'Alert - ' + @event['client']['name'] + ' - ' + @event['check']['name']
-        end
-
-        def ticket_description
-            "Sensu Alert\r\n" +
-                "Client: " + @event['client']['name'] + "\r\n" +
-                "Address: " + @event['client']['address'] + "\r\n" +
-                "Subscriptions: " + @event['client']['subscriptions'].join(", ") + "\r\n" +
-                "Check: " + @event['check']['name'] + "\r\n" +
-                "Output: " + @event['check']['output'] + "\r\n"
-        end
-
-        def ticket_tags
-            tags = []
-            unless settings["zendesk"]["tags"].nil?
-                tags << settings["zendesk"]["tags"]
-            end
-            if settings["zendesk"]["subscriptions_to_tags"]
-                tags << @event['client']['subscriptions']
-            end
-            tags
-        end
-
-        begin
-            timeout(60) do
-                if settings["zendesk"]["status_to_use"].include?(@event['check']['status'])
-                    ZendeskAPI::Ticket.create(
-                        client,
-                        :subject => ticket_subject,
-                        :comment => { :value => ticket_description },
-                        :submitter_id => client.current_user.id,
-                        :priority => settings["zendesk"]["priority"] || "urgent",
-                        :type => settings["zendesk"]["type"] || "incident",
-                        :tags => ticket_tags
-                    )
-                end
-            end
-        rescue Timeout::Error
-            puts 'zendesk -- timed out while attempting to create a ticket for #{ticket_subject} --'
-        end
+      # Choose one of the following depending on your authentication choice
+      unless settings['zendesk']['token'].nil?
+        config.token = settings['zendesk']['token']
+      else
+        config.password = settings['zendesk']['password']
+      end
+      config.retry = true
     end
 
+    def ticket_subject
+      'Alert - ' + @event['client']['name'] + ' - ' + @event['check']['name']
+    end
+
+    def ticket_description
+      "Sensu Alert\r\n" \
+          'Client: ' + @event['client']['name'] + "\r\n" \
+          'Address: ' + @event['client']['address'] + "\r\n" \
+          'Subscriptions: ' + @event['client']['subscriptions'].join(', ') + "\r\n" \
+          'Check: ' + @event['check']['name'] + "\r\n" \
+          'Output: ' + @event['check']['output'] + "\r\n"
+    end
+
+    def ticket_tags
+      tags = []
+      unless settings['zendesk']['tags'].nil?
+        tags << settings['zendesk']['tags']
+      end
+      if settings['zendesk']['subscriptions_to_tags']
+        tags << @event['client']['subscriptions']
+      end
+      tags
+    end
+
+    begin
+      timeout(60) do
+        if settings['zendesk']['status_to_use'].include?(@event['check']['status'])
+          ZendeskAPI::Ticket.create(
+              client,
+              subject: ticket_subject,
+              comment: { value: ticket_description },
+              submitter_id: client.current_user.id,
+              priority: settings['zendesk']['priority'] || 'urgent',
+              type: settings['zendesk']['type'] || 'incident',
+              tags: ticket_tags
+          )
+        end
+      end
+  rescue Timeout::Error
+    puts 'zendesk -- timed out while attempting to create a ticket for #{ticket_subject} --'
+    end
+  end
 end

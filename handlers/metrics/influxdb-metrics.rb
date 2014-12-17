@@ -14,11 +14,11 @@ class SensuToInfluxDB < Sensu::Handler
     influxdb_pass   = settings['influxdb']['password']
     influxdb_db     = settings['influxdb']['database']
 
-    influxdb_data = InfluxDB::Client.new influxdb_db, :host => influxdb_server,
-                                                      :username => influxdb_user,
-                                                      :password => influxdb_pass,
-                                                      :port => influxdb_port,
-                                                      :server => influxdb_server
+    influxdb_data = InfluxDB::Client.new influxdb_db, host: influxdb_server,
+                                                      username: influxdb_user,
+                                                      password: influxdb_pass,
+                                                      port: influxdb_port,
+                                                      server: influxdb_server
     mydata = []
     @event['check']['output'].each do |metric|
       m = metric.split
@@ -26,8 +26,8 @@ class SensuToInfluxDB < Sensu::Handler
       key = m[0].split('.', 2)[1]
       key.gsub!('.', '_')
       value = m[1].to_f
-      mydata = {:host => @event['client']['name'], :value => value,
-                :ip => @event['client']['address']
+      mydata = { host: @event['client']['name'], value: value,
+                ip: @event['client']['address']
                }
       influxdb_data.write_point(key, mydata)
     end

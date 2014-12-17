@@ -16,32 +16,31 @@ require 'json'
 require 'uri'
 
 class UchiwaHealthCheck < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short       => '-h HOST',
-    :long        => '--host HOST',
-    :description => 'Your uchiwa endpoint',
-    :required    => true,
-    :default     => 'localhost'
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Your uchiwa endpoint',
+         required: true,
+         default: 'localhost'
 
   option :port,
-    :short       => '-P PORT',
-    :long        => '--port PORT',
-    :description => 'Your uchiwa port',
-    :required    => true,
-    :default     => 3000
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'Your uchiwa port',
+         required: true,
+         default: 3000
 
   option :username,
-    :short       => '-u USERNAME',
-    :long        => '--username USERNAME',
-    :description => 'Your uchiwa username',
-    :required    => false
+         short: '-u USERNAME',
+         long: '--username USERNAME',
+         description: 'Your uchiwa username',
+         required: false
 
   option :password,
-    :short       => '-p PASSWORD',
-    :long        => '--password PASSWORD',
-    :description => 'Your uchiwa password',
-    :required    => false
+         short: '-p PASSWORD',
+         long: '--password PASSWORD',
+         description: 'Your uchiwa password',
+         required: false
 
   def json_valid?(str)
     JSON.parse(str)
@@ -61,7 +60,7 @@ class UchiwaHealthCheck < Sensu::Plugin::Check::CLI
         http.request(req)
       end
     rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError, Net::HTTPBadResponse,
-      Net::HTTPHeaderSyntaxError, Net::ProtocolError, Errno::ECONNREFUSED => e
+           Net::HTTPHeaderSyntaxError, Net::ProtocolError, Errno::ECONNREFUSED => e
       critical e
     end
 
@@ -87,7 +86,5 @@ class UchiwaHealthCheck < Sensu::Plugin::Check::CLI
     end
 
     ok
-
   end
-
 end

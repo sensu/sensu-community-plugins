@@ -38,12 +38,11 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class LinuxPacketMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.net"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.net"
 
   def run
     timestamp = Time.now.to_i
@@ -68,5 +67,4 @@ class LinuxPacketMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
     ok
   end
-
 end

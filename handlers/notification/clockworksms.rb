@@ -15,7 +15,6 @@ require 'clockwork'
 require 'timeout'
 
 class ClockWorkSmsNotif < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -33,12 +32,11 @@ class ClockWorkSmsNotif < Sensu::Handler
   end
 
   def handle
+    key = settings['clockworksms']['key']
+    to = settings['clockworksms']['to']
 
-    key = settings["clockworksms"]["key"]
-    to = settings["clockworksms"]["to"]
-
-    raise 'Please define a valid SMS key' if key.nil?
-    raise 'Please define a valid set of SMS recipients to use this handler' if (to.nil? || !to.is_a?(Hash))
+    fail 'Please define a valid SMS key' if key.nil?
+    fail 'Please define a valid set of SMS recipients to use this handler' if to.nil? || !to.is_a?(Hash)
 
     message = @event['check']['notification'] || @event['check']['output']
 
@@ -63,5 +61,4 @@ class ClockWorkSmsNotif < Sensu::Handler
       end
     end
   end
-
 end

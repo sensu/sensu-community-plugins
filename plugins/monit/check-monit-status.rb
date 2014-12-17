@@ -26,28 +26,27 @@ require 'rexml/document'
 require 'net/http'
 
 class CheckMonit < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h host',
-    :default => '127.0.0.1'
+         short: '-h host',
+         default: '127.0.0.1'
 
   option :port,
-    :short => '-p port',
-    :default => 2812
+         short: '-p port',
+         default: 2812
 
   option :user,
-    :short => '-U user'
+         short: '-U user'
 
   option :pass,
-    :short => '-P pass'
+         short: '-P pass'
 
   option :uri,
-    :short => '-u uri',
-    :default => '/_status?format=xml'
+         short: '-u uri',
+         default: '/_status?format=xml'
 
   option :ignore,
-    :short => '-i ignore',
-    :default => ''
+         short: '-i ignore',
+         default: ''
 
   def run
     status_doc = REXML::Document.new(monit_status)
@@ -69,7 +68,7 @@ class CheckMonit < Sensu::Plugin::Check::CLI
       end
     end
 
-    ok "All services OK"
+    ok 'All services OK'
   end
 
   def monit_status

@@ -28,46 +28,44 @@ require 'json'
 
 class ESClusterStatus < Sensu::Plugin::Check::CLI
   option :host,
-    :description => 'Elasticsearch host',
-    :short => '-h HOST',
-    :long => '--host HOST',
-    :default => 'localhost'
+         description: 'Elasticsearch host',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :port,
-    :description => 'Elasticsearch port',
-    :short => '-p PORT',
-    :long => '--port PORT',
-    :proc => proc {|a| a.to_i },
-    :default => 9200
+         description: 'Elasticsearch port',
+         short: '-p PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         default: 9200
 
   option :timeout,
-    :description => 'Sets the connection timeout for REST client',
-    :short => '-t SECS',
-    :long => '--timeout SECS',
-    :proc => proc {|a| a.to_i },
-    :default => 30
+         description: 'Sets the connection timeout for REST client',
+         short: '-t SECS',
+         long: '--timeout SECS',
+         proc: proc(&:to_i),
+         default: 30
 
   option :critical,
-    :description => 'Critical percentage of FD usage',
-    :short       => '-c PERCENTAGE',
-    :proc        => proc { |a| a.to_i },
-    :default     => 90
+         description: 'Critical percentage of FD usage',
+         short: '-c PERCENTAGE',
+         proc: proc(&:to_i),
+         default: 90
 
   option :warning,
-    :description => 'Warning percentage of FD usage',
-    :short       => '-w PERCENTAGE',
-    :proc        => proc { |a| a.to_i },
-    :default     => 80
+         description: 'Warning percentage of FD usage',
+         short: '-w PERCENTAGE',
+         proc: proc(&:to_i),
+         default: 80
 
   def get_es_resource(resource)
-    begin
-      r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", :timeout => config[:timeout])
-      JSON.parse(r.get)
-    rescue Errno::ECONNREFUSED
-      warning 'Connection refused'
-    rescue RestClient::RequestTimeout
-      warning 'Connection timed out'
-    end
+    r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
+    JSON.parse(r.get)
+  rescue Errno::ECONNREFUSED
+    warning 'Connection refused'
+  rescue RestClient::RequestTimeout
+    warning 'Connection timed out'
   end
 
   def get_open_fds
@@ -76,7 +74,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
       keys = stats['nodes'].keys
       stats['nodes'][keys[0]]['process']['open_file_descriptors'].to_i
     rescue NoMethodError
-      warning "Failed to retrieve open_file_descriptors"
+      warning 'Failed to retrieve open_file_descriptors'
     end
   end
 
@@ -86,7 +84,7 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
       keys = info['nodes'].keys
       info['nodes'][keys[0]]['process']['max_file_descriptors'].to_i
     rescue NoMethodError
-      warning "Failed to retrieve max_file_descriptors"
+      warning 'Failed to retrieve max_file_descriptors'
     end
   end
 

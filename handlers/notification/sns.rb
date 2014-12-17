@@ -48,30 +48,28 @@ class SnsNotifier < Sensu::Handler
   end
 
   def handle
-    if (useAmiRole)
-      AWS.config(:region => region)
+    if useAmiRole
+      AWS.config(region: region)
     else
-      AWS.config({
-        :access_key_id => awsAccessKey,
-        :secret_access_key => awsAccessSecret,
-        :region => region
-      })
+      AWS.config(access_key_id: awsAccessKey,
+                 secret_access_key: awsAccessSecret,
+                 region: region)
     end
 
     sns = AWS::SNS.new
 
     t = sns.topics[topic_arn]
 
-    if @event['action'].eql?("resolve")
+    if @event['action'].eql?('resolve')
       subject = "RESOLVED - [#{event_name}]"
-      options = { :subject => subject }
+      options = { subject: subject }
       t.publish("#{subject} - #{message}", options)
     else
       subject = "ALERT - [#{event_name}]"
-      options = { :subject => subject }
+      options = { subject: subject }
       t.publish("#{subject} - #{message}", options)
     end
-  rescue Exception => e
+  rescue => e
     puts "Exception occured in SnsNotifier: #{e.message}", e.backtrace
   end
 end

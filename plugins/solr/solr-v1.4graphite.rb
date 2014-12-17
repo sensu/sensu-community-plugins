@@ -10,24 +10,24 @@ require 'open-uri'
 
 class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
   option :host,
-    :short       => "-h HOST",
-    :long        => "--host HOST",
-    :description => "Solr host to connect to",
-    :default     => "#{Socket.gethostname}"
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Solr host to connect to',
+         default: "#{Socket.gethostname}"
 
   option :port,
-    :short       => "-p PORT",
-    :long        => "--port PORT",
-    :description => "Solr port to connect",
-    :proc        => proc {|p| p.to_i},
-    :required    => true
+         short: '-p PORT',
+         long: '--port PORT',
+         description: 'Solr port to connect',
+         proc: proc(&:to_i),
+         required: true
 
   option :scheme,
-    :short       => "-s SCHEME",
-    :long        => "--scheme",
-    :default     => "#{Socket.gethostname}"
+         short: '-s SCHEME',
+         long: '--scheme',
+         default: "#{Socket.gethostname}"
 
-  def lookingfor (needle, haystack)
+  def lookingfor(needle, haystack)
     haystack.each_with_index do |element, index|
       if element.css('name').text.strip == needle
         return index
@@ -37,24 +37,23 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     end
   end
 
-  def outputstats (section, queryindex, statpage, metrics, label)
+  def outputstats(section, queryindex, statpage, metrics, label)
     metrics.each do |value|
       stat = statpage.css("#{section} entry")[queryindex].css("stats stat[name=#{value}]").text.strip
-      output [config[:scheme], label, value].join("."), stat, Time.now.to_i
+      output [config[:scheme], label, value].join('.'), stat, Time.now.to_i
     end
   end
 
   def run
-
     # Capture initial stats page XML data. Sol4 1.4 takes a while to load stats page, the timeout accomidates that.
-    doc = Nokogiri::XML(open("http://#{config[:host]}:#{config[:port]}/solr/admin/stats.jsp", :read_timeout => 300))
+    doc = Nokogiri::XML(open("http://#{config[:host]}:#{config[:port]}/solr/admin/stats.jsp", read_timeout: 300))
 
     # Go through each core and get the appropriate data
     doc.css('CORE entry').each do |coreinfo|
-      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'numDocs'].join("."), coreinfo.css("stats stat[name='numDocs']").text.strip, \
+      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'numDocs'].join('.'), coreinfo.css("stats stat[name='numDocs']").text.strip, \
              Time.now.to_i
-      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'maxDoc'].join("."), coreinfo.css("stats stat[name='maxDoc']").text.strip, Time.now.to_i
-      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'warmupTime'].join("."), coreinfo.css("stats stat[name='warmupTime']").text.strip, \
+      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'maxDoc'].join('.'), coreinfo.css("stats stat[name='maxDoc']").text.strip, Time.now.to_i
+      output [config[:scheme], 'CORE', coreinfo.css('name').text.strip, 'warmupTime'].join('.'), coreinfo.css("stats stat[name='warmupTime']").text.strip, \
              Time.now.to_i
     end
 

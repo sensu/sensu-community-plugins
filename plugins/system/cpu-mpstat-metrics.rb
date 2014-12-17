@@ -12,23 +12,22 @@ require 'socket'
 require 'linux/kstat'
 
 class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.cpu"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.cpu"
 
   def get_mpstats
     kstat = Linux::Kstat.new
     mpstat = {}
-    i = ""
-    until kstat[:"cpu#{i}"].nil? do
+    i = ''
+    until kstat[:"cpu#{i}"].nil?
       mpstat[:"cpu#{i}"] = kstat[:"cpu#{i}"]
-      if i == ""
+      if i == ''
         i = 0
       else
-        i +=1
+        i += 1
       end
     end
     mpstat
@@ -55,13 +54,12 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
     delta_cpus.each_pair do |cpu, columns|
       # assumes architecture's jiffie is 1/100th of a second
       columns.each_pair do |task, time|
-        if "#{cpu}" == "cpu"
-          time = time/cpu_count
+        if "#{cpu}" == 'cpu'
+          time = time / cpu_count
         end
         output "#{config[:scheme]}.#{cpu}.#{task}", time
       end
     end
     ok
   end
-
 end

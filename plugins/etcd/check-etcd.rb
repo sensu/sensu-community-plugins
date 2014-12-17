@@ -25,25 +25,22 @@ require 'rest-client'
 require 'json'
 
 class EtcdNodeStatus < Sensu::Plugin::Check::CLI
-
   option :server,
-    :description => 'etcd server',
-    :short => '-s SERVER',
-    :long => '--server SERVER',
-    :default => 'localhost'
+         description: 'etcd server',
+         short: '-s SERVER',
+         long: '--server SERVER',
+         default: 'localhost'
 
   def run
-    begin
-      r = RestClient::Resource.new("http://#{config[:server]}:4001/v2/stats/self", :timeout => 5).get
-      if r.code == 200
-        ok "etcd is up"
-      else
-        critical "Etcd is not responding"
-      end
-    rescue Errno::ECONNREFUSED
-      critical "Etcd is not responding"
-    rescue RestClient::RequestTimeout
-      critical 'Etcd Connection timed out'
+    r = RestClient::Resource.new("http://#{config[:server]}:4001/v2/stats/self", timeout: 5).get
+    if r.code == 200
+      ok 'etcd is up'
+    else
+      critical 'Etcd is not responding'
     end
+  rescue Errno::ECONNREFUSED
+    critical 'Etcd is not responding'
+  rescue RestClient::RequestTimeout
+    critical 'Etcd Connection timed out'
   end
 end

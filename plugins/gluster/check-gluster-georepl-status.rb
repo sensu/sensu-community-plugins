@@ -12,16 +12,15 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class GlusterGeoReplStatus < Sensu::Plugin::Check::CLI
-
   option :states,
-    :description => 'Comma delimited states (case sensitive)',
-    :short => '-s STATE',
-    :long => '--state STATE',
-    :proc => lambda { |o| o.split(/[\s,]+/) },
-    :required => true
+         description: 'Comma delimited states (case sensitive)',
+         short: '-s STATE',
+         long: '--state STATE',
+         proc: lambda { |o| o.split(/[\s,]+/) },
+         required: true
 
   def run
-    errors = Array.new
+    errors = []
     `sudo gluster volume geo-replication status`.each_line do |l|
       # Don't match those lines or conditions.
       unless l =~ /(^geo-replication|^Another|^No active geo-replication sessions|^MASTER|^\s*$|^-)/

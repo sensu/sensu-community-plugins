@@ -58,56 +58,56 @@ require 'json'
 
 class SmartCheck < Sensu::Plugin::Check::CLI
   option :binary,
-    :short => "-b path/to/smartctl",
-    :long => "--binary /usr/sbin/smartctl",
-    :description => "smartctl binary to use, in case you hide yours",
-    :required => false,
-    :default => 'smartctl'
+         short: '-b path/to/smartctl',
+         long: '--binary /usr/sbin/smartctl',
+         description: 'smartctl binary to use, in case you hide yours',
+         required: false,
+         default: 'smartctl'
 
   option :defaults,
-    :short => "-d 0,0,0,0",
-    :long => "--defaults 0,0,0,0",
-    :description => "default threshold for crit_min,warn_min,warn_max,crit_max",
-    :required => false,
-    :default => '0,0,0,0'
+         short: '-d 0,0,0,0',
+         long: '--defaults 0,0,0,0',
+         description: 'default threshold for crit_min,warn_min,warn_max,crit_max',
+         required: false,
+         default: '0,0,0,0'
 
   option :attributes,
-    :short => "-a 1,5,9,230",
-    :long => "--attributes 1,5,9,230",
-    :description => "SMART attributes to check",
-    :required => false,
-    :default => 'all'
+         short: '-a 1,5,9,230',
+         long: '--attributes 1,5,9,230',
+         description: 'SMART attributes to check',
+         required: false,
+         default: 'all'
 
   option :threshold,
-    :short => "-t 194,5,10,50,60",
-    :long => "--threshold 194,5,10,50,60",
-    :description => "Custom threshold for SMART attributes. (id,crit_min,warn_min,warn_max,crit_max)",
-    :required => false
+         short: '-t 194,5,10,50,60',
+         long: '--threshold 194,5,10,50,60',
+         description: 'Custom threshold for SMART attributes. (id,crit_min,warn_min,warn_max,crit_max)',
+         required: false
 
   option :overall,
-    :short => "-o off",
-    :long => "--overall off",
-    :description => "Overall SMART health check",
-    :required => false,
-    :default => 'on'
+         short: '-o off',
+         long: '--overall off',
+         description: 'Overall SMART health check',
+         required: false,
+         default: 'on'
 
   option :devices,
-    :short => "-d sda,sdb,sdc",
-    :long => "--device sda,sdb,sdc",
-    :description => "Devices to check",
-    :required => false,
-    :default => 'all'
+         short: '-d sda,sdb,sdc',
+         long: '--device sda,sdb,sdc',
+         description: 'Devices to check',
+         required: false,
+         default: 'all'
 
   option :debug,
-    :long => "--debug on",
-    :description => "Turn debug output on",
-    :required => false,
-    :default => 'off'
+         long: '--debug on',
+         description: 'Turn debug output on',
+         required: false,
+         default: 'off'
 
   option :debug_file,
-    :long => "--debugfile test_hdd.txt",
-    :description => "Process a debug file for testing",
-    :required => false
+         long: '--debugfile test_hdd.txt',
+         description: 'Process a debug file for testing',
+         required: false
 
   def run
     @smartAttributes = JSON.parse(IO.read(File.dirname(__FILE__) + '/smart.json'), symbolize_names: true)[:smart][:attributes]
@@ -115,7 +115,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
 
     # Set default threshold
     defaultThreshold = config[:defaults].split(',')
-    raise 'Invalid default threshold parameter count' unless defaultThreshold.size == 4
+    fail 'Invalid default threshold parameter count' unless defaultThreshold.size == 4
     @smartAttributes.each do |att|
       att[:crit_min] = defaultThreshold[0].to_i if att[:crit_min].nil?
       att[:warn_min] = defaultThreshold[1].to_i if att[:warn_min].nil?
@@ -127,12 +127,12 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     unless config[:threshold].nil?
       thresholds = config[:threshold].split(',')
       # Check threshold parameter length
-      raise 'Invalid threshold parameter count' unless thresholds.size % 5 == 0
+      fail 'Invalid threshold parameter count' unless thresholds.size % 5 == 0
 
-      (0..(thresholds.size/5-1)).each do |i|
-        att_id = @smartAttributes.index{|att| att[:id] == thresholds[i+0].to_i}
-        thash = {crit_min: thresholds[i+1].to_i, warn_min: thresholds[i+2].to_i,
-          warn_max: thresholds[i+3].to_i, crit_max: thresholds[i+4].to_i }
+      (0..(thresholds.size / 5 - 1)).each do |i|
+        att_id = @smartAttributes.index { |att| att[:id] == thresholds[i + 0].to_i }
+        thash = { crit_min: thresholds[i + 1].to_i, warn_min: thresholds[i + 2].to_i,
+          warn_max: thresholds[i + 3].to_i, crit_max: thresholds[i + 4].to_i }
         @smartAttributes[att_id].merge! thash
       end
     end
@@ -144,7 +144,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     devices = config[:debug_file].nil? ? findDevices : ['sda']
 
     # Overall health and attributes parameter
-    parameters = "-H -A"
+    parameters = '-H -A'
 
     # Get attributes in raw48 format
     attCheckList.each do |att|
@@ -160,7 +160,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       if config[:debug_file].nil?
         output[dev] = `sudo #{config[:binary]} #{parameters} /dev/#{dev}`
       else
-        test_file = File.open(config[:debug_file], "rb")
+        test_file = File.open(config[:debug_file], 'rb')
         output[dev] = test_file.read
         test_file.close
       end
@@ -173,9 +173,9 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       output[dev].split("\n").each do |line|
         fields = line.split
         if fields.size == 10 && fields[0].to_i != 0 && attCheckList.include?(fields[0].to_i)
-          smartAtt = @smartAttributes.find{|att| att[:id] == fields[0].to_i}
+          smartAtt = @smartAttributes.find { |att| att[:id] == fields[0].to_i }
           attValue = fields[9].to_i
-          attValue = self.send(smartAtt[:read], attValue) unless smartAtt[:read].nil?
+          attValue = send(smartAtt[:read], attValue) unless smartAtt[:read].nil?
           if attValue < smartAtt[:crit_min] || attValue > smartAtt[:crit_max]
             criticals << "#{dev} critical #{fields[0]} #{smartAtt[:name]}: #{attValue}"
             puts "#{fields[0]} #{smartAtt[:name]}: #{attValue} (critical)" if @smartDebug
@@ -196,7 +196,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     elsif warnings.size != 0
       warning warnings.join("\n")
     else
-      ok "All device operating properly"
+      ok 'All device operating properly'
     end
   end
 
@@ -219,7 +219,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     all = `cat /proc/partitions`.split("\n")
 
     # Delete first two row (header and empty line)
-    (1..2).each {all.delete_at(0)}
+    (1..2).each { all.delete_at(0) }
 
     # Search for devices without number
     devices = []

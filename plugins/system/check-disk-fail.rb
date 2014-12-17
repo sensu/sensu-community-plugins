@@ -16,11 +16,10 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckDiskFail < Sensu::Plugin::Check::CLI
-
   def run
     dmesg = `dmesg`.lines
 
-    ['Read', 'Write', 'Smart'].each do |v|
+    %w(Read Write Smart).each do |v|
       found = dmesg.grep(/failed command\: #{v.upcase}/)
       unless found.empty?
         critical "Disk #{v} Failure"
@@ -29,5 +28,4 @@ class CheckDiskFail < Sensu::Plugin::Check::CLI
 
     ok
   end
-
 end

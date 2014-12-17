@@ -20,116 +20,115 @@ require 'net/http'
 require 'net/https'
 
 class CheckHTTP < Sensu::Plugin::Check::CLI
-
   option :ua,
-    :short => '-x USER-AGENT',
-    :long => '--user-agent USER-AGENT',
-    :description => 'Specify a USER-AGENT',
-    :default => 'Sensu-HTTP-Check'
+         short: '-x USER-AGENT',
+         long: '--user-agent USER-AGENT',
+         description: 'Specify a USER-AGENT',
+         default: 'Sensu-HTTP-Check'
 
   option :url,
-    :short => '-u URL',
-    :long => '--url URL',
-    :description => 'A URL to connect to'
+         short: '-u URL',
+         long: '--url URL',
+         description: 'A URL to connect to'
 
   option :host,
-    :short => '-h HOST',
-    :long => '--hostname HOSTNAME',
-    :description => 'A HOSTNAME to connect to'
+         short: '-h HOST',
+         long: '--hostname HOSTNAME',
+         description: 'A HOSTNAME to connect to'
 
   option :port,
-    :short => '-P PORT',
-    :long => '--port PORT',
-    :proc => proc { |a| a.to_i },
-    :description => 'Select another port',
-    :default => 80
+         short: '-P PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         description: 'Select another port',
+         default: 80
 
   option :request_uri,
-    :short => '-p PATH',
-    :long => '--request-uri PATH',
-    :description => 'Specify a uri path'
+         short: '-p PATH',
+         long: '--request-uri PATH',
+         description: 'Specify a uri path'
 
   option :header,
-    :short => '-H HEADER',
-    :long => '--header HEADER',
-    :description => 'Check for a HEADER'
+         short: '-H HEADER',
+         long: '--header HEADER',
+         description: 'Check for a HEADER'
 
   option :ssl,
-    :short => '-s',
-    :boolean => true,
-    :description => 'Enabling SSL connections',
-    :default => false
+         short: '-s',
+         boolean: true,
+         description: 'Enabling SSL connections',
+         default: false
 
   option :insecure,
-    :short => '-k',
-    :boolean => true,
-    :description => 'Enabling insecure connections',
-    :default => false
+         short: '-k',
+         boolean: true,
+         description: 'Enabling insecure connections',
+         default: false
 
   option :user,
-    :short => '-U',
-    :long => '--username USER',
-    :description => 'A username to connect as'
+         short: '-U',
+         long: '--username USER',
+         description: 'A username to connect as'
 
   option :password,
-    :short => '-a',
-    :long => '--password PASS',
-    :description => 'A password to use for the username'
+         short: '-a',
+         long: '--password PASS',
+         description: 'A password to use for the username'
 
   option :cert,
-    :short => '-c FILE',
-    :long => '--cert FILE',
-    :description => 'Cert to use'
+         short: '-c FILE',
+         long: '--cert FILE',
+         description: 'Cert to use'
 
   option :cacert,
-    :short => '-C FILE',
-    :long => '--cacert FILE',
-    :description => 'A CA Cert to use'
+         short: '-C FILE',
+         long: '--cacert FILE',
+         description: 'A CA Cert to use'
 
   option :expiry,
-    :short => '-e EXPIRY',
-    :long => '--expiry EXPIRY',
-    :proc => proc { |a| a.to_i },
-    :description => 'Warn EXPIRE days before cert expires'
+         short: '-e EXPIRY',
+         long: '--expiry EXPIRY',
+         proc: proc(&:to_i),
+         description: 'Warn EXPIRE days before cert expires'
 
   option :pattern,
-    :short => '-q PAT',
-    :long => '--query PAT',
-    :description => 'Query for a specific pattern'
+         short: '-q PAT',
+         long: '--query PAT',
+         description: 'Query for a specific pattern'
 
   option :timeout,
-    :short => '-t SECS',
-    :long => '--timeout SECS',
-    :proc => proc { |a| a.to_i },
-    :description => 'Set the timeout',
-    :default => 15
+         short: '-t SECS',
+         long: '--timeout SECS',
+         proc: proc(&:to_i),
+         description: 'Set the timeout',
+         default: 15
 
   option :redirectok,
-    :short => '-r',
-    :boolean => true,
-    :description => 'Check if a redirect is ok',
-    :default => false
+         short: '-r',
+         boolean: true,
+         description: 'Check if a redirect is ok',
+         default: false
 
   option :redirectto,
-    :short => '-R URL',
-    :long => '--redirect-to URL',
-    :description => 'Redirect to another page'
+         short: '-R URL',
+         long: '--redirect-to URL',
+         description: 'Redirect to another page'
 
   option :response_bytes,
-    :short => '-b BYTES',
-    :long => '--response-bytes BYTES',
-    :description => 'Print BYTES of the output',
-    :proc => proc { |a| a.to_i }
+         short: '-b BYTES',
+         long: '--response-bytes BYTES',
+         description: 'Print BYTES of the output',
+         proc: proc(&:to_i)
 
   option :require_bytes,
-    :short => '-B BYTES',
-    :long => '--require-bytes BYTES',
-    :description => 'Check the response contains exactly BYTES bytes',
-    :proc => proc { |a| a.to_i }
+         short: '-B BYTES',
+         long: '--require-bytes BYTES',
+         description: 'Check the response contains exactly BYTES bytes',
+         proc: proc(&:to_i)
 
   option :response_code,
-    :long => '--response-code CODE',
-    :description => 'Check for a specific response code'
+         long: '--response-code CODE',
+         description: 'Check for a specific response code'
 
   def run
     if config[:url]
@@ -150,7 +149,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         get_resource
       end
     rescue Timeout::Error
-      critical "Request timed out"
+      critical 'Request timed out'
     rescue => e
       critical "Request error: #{e.message}"
     end
@@ -174,10 +173,10 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
 
-      if config[:expiry] != nil
+      unless config[:expiry].nil?
         expire_warn_date = Time.now + (config[:expiry] * 60 * 60 * 24)
         # We can't raise inside the callback, have to check when we finish.
-        http.verify_callback = proc do |preverify_ok, ssl_context|
+        http.verify_callback = proc do |_preverify_ok, ssl_context|
           if ssl_context.current_cert.not_after <= expire_warn_date
             warn_cert_expire = ssl_context.current_cert.not_after
           end
@@ -185,9 +184,9 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       end
     end
 
-    req = Net::HTTP::Get.new(config[:request_uri], {'User-Agent' => config[:ua]})
+    req = Net::HTTP::Get.new(config[:request_uri], 'User-Agent' => config[:ua])
 
-    if (config[:user] != nil && config[:password] != nil)
+    if !config[:user].nil? && !config[:password].nil?
       req.basic_auth config[:user], config[:password]
     end
     if config[:header]
@@ -208,7 +207,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       critical "Response was #{res.body.length} bytes instead of #{config[:require_bytes]}" + body
     end
 
-    if warn_cert_expire != nil
+    unless warn_cert_expire.nil?
       warning "Certificate will expire #{warn_cert_expire}"
     end
 
@@ -254,6 +253,5 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
         critical res.code + body
       end
     end
-
   end
 end

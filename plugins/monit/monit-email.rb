@@ -41,28 +41,28 @@ class ParseEmail
 
   def failure?
     array_failure = [
-      "Checksum failed",
-      "Connection failed",
-      "Content failed",
-      "Data access error",
-      "Execution failed",
-      "Filesystem flags failed",
-      "GID failed",
-      "ICMP failed",
-      "Monit instance changed",
-      "Invalid type",
-      "Does not exist",
-      "Permission failed",
-      "PID failed",
-      "PPID failed",
-      "Resource limit matched",
-      "Size failed",
-      "Status failed",
-      "Timeout",
-      "Timestamp failed",
-      "UID failed",
-      "Uptime failed",
-      "process is not running."
+      'Checksum failed',
+      'Connection failed',
+      'Content failed',
+      'Data access error',
+      'Execution failed',
+      'Filesystem flags failed',
+      'GID failed',
+      'ICMP failed',
+      'Monit instance changed',
+      'Invalid type',
+      'Does not exist',
+      'Permission failed',
+      'PID failed',
+      'PPID failed',
+      'Resource limit matched',
+      'Size failed',
+      'Status failed',
+      'Timeout',
+      'Timestamp failed',
+      'UID failed',
+      'Uptime failed',
+      'process is not running.'
     ]
     array_failure.include?(alert)
   end
@@ -92,11 +92,11 @@ class ParseEmail
       /^Uptime succeeded$/,
       /^process is running with pid \d+.$/
     ]
-    !array_recovery.find {|r| alert.match r}.nil?
+    !array_recovery.find { |r| alert.match r }.nil?
   end
 
   def to_json
-    {'output' => body, 'name' => service, 'status' => alert_level, 'type' => 'monit'}.to_json
+    { 'output' => body, 'name' => service, 'status' => alert_level, 'type' => 'monit' }.to_json
   end
 
   def alert_level
@@ -108,7 +108,6 @@ class ParseEmail
       3
     end
   end
-
 end
 
 email = ParseEmail.new
