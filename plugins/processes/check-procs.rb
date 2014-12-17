@@ -27,6 +27,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
+require 'English'
 
 class CheckProcs < Sensu::Plugin::Check::CLI
   option :warn_over,
