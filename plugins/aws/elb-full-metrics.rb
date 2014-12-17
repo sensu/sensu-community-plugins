@@ -1,4 +1,35 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+# check-instance-events
+#
+# DESCRIPTION:
+#   This plugin looks up all instances in an account and alerts if one or more have a scheduled
+#   event (reboot, retirement, etc)
+#
+# OUTPUT:
+#   plain-text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: aws-sdk
+#   gem: sensu-plugin
+#
+# #YELLOW
+# needs example command
+# EXAMPLES:
+#
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Tim Smith, tim@cozy.co
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+# !/usr/bin/env ruby
 #
 # Fetch ELB metrics from CloudWatch
 # ===
@@ -25,59 +56,56 @@ require 'sensu-plugin/metric/cli'
 require 'fog/aws'
 
 class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :elbname,
-    :description => "Name of the Elastic Load Balancer",
-    :short => "-n ELB_NAME",
-    :long => "--name ELB_NAME"
+         description: 'Name of the Elastic Load Balancer',
+         short: '-n ELB_NAME',
+         long: '--name ELB_NAME'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => ""
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: ''
 
   option :fetch_age,
-    :description => "How long ago to fetch metrics for",
-    :short => "-f AGE",
-    :long => "--fetch_age",
-    :default => 60,
-    :proc => proc { |a| a.to_i }
+         description: 'How long ago to fetch metrics for',
+         short: '-f AGE',
+         long: '--fetch_age',
+         default: 60,
+         proc: proc(&:to_i)
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
-    :required => true,
-    :default => ENV['AWS_ACCESS_KEY']
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
+         required: true,
+         default: ENV['AWS_ACCESS_KEY']
 
   option :aws_secret_access_key,
-    :short => '-k AWS_SECRET_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
-    :required => true,
-    :default => ENV['AWS_SECRET_KEY']
+         short: '-k AWS_SECRET_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
+         required: true,
+         default: ENV['AWS_SECRET_KEY']
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1).",
-    :default => 'us-east-1'
+         short: '-r AWS_REGION',
+         long: '--aws-region REGION',
+         description: 'AWS Region (such as eu-west-1).',
+         default: 'us-east-1'
 
   def query_instance_region
-    begin
-      instance_az = nil
-      Timeout.timeout(3) do
-        instance_az = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/placement/availability-zone/'))
-      end
-      instance_az[0...-1]
-    rescue Exception
-      raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?"
+    instance_az = nil
+    Timeout.timeout(3) do
+      instance_az = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/placement/availability-zone/'))
     end
+    instance_az[0...-1]
+  rescue
+    raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?"
   end
 
   def run
-    if config[:scheme] == ""
+    if config[:scheme] == ''
       graphitepath = "#{config[:elbname]}"
     else
       graphitepath = config[:scheme]
@@ -91,15 +119,15 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
       'HTTPCode_Backend_4XX' => 'Sum',
       'HTTPCode_Backend_5XX' => 'Sum',
       'HTTPCode_ELB_4XX' => 'Sum',
-      'HTTPCode_ELB_5XX' => 'Sum',
+      'HTTPCode_ELB_5XX' => 'Sum'
     }
     begin
 
       aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
       cw = Fog::AWS::CloudWatch.new(
-        :aws_access_key_id      => config[:aws_access_key],
-        :aws_secret_access_key  => config[:aws_secret_access_key],
-        :region                 => aws_region
+        aws_access_key_id: config[:aws_access_key],
+        aws_secret_access_key: config[:aws_secret_access_key],
+        region: aws_region
       )
 
       et = Time.now - config[:fetch_age]
@@ -107,21 +135,20 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       data = {}
 
-      config[:elbname].split(' ').each do |elbname|
+      # #YELLOW
+      config[:elbname].split(' ').each do |elbname| # rubocop:disable Style/Next
         statistic_type.each do |key, value|
 
-          result = cw.get_metric_statistics({
-            'Namespace' => 'AWS/ELB',
-            'MetricName' => key,
-            'Dimensions' => [{
-            'Name' => 'LoadBalancerName',
-            'Value' => elbname,
-          }],
-          'Statistics' => [value],
-          'StartTime' => st.iso8601,
-          'EndTime' => et.iso8601,
-          'Period' => '60'
-          })
+          result = cw.get_metric_statistics('Namespace' => 'AWS/ELB',
+                                            'MetricName' => key,
+                                            'Dimensions' => [{
+                                              'Name' => 'LoadBalancerName',
+                                              'Value' => elbname
+                                            }],
+                                            'Statistics' => [value],
+                                            'StartTime' => st.iso8601,
+                                            'EndTime' => et.iso8601,
+                                            'Period' => '60                                  ')
           r =  result.body['GetMetricStatisticsResult']['Datapoints']
           if r.count > 0
             data[key] = result.body['GetMetricStatisticsResult']['Datapoints'][0]
@@ -135,10 +162,9 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
       end
-    rescue Exception => e
+    rescue => e
       critical "Error: exception: #{e}"
     end
     ok
   end
-
 end

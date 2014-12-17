@@ -1,4 +1,35 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+# check-instance-events
+#
+# DESCRIPTION:
+#   This plugin looks up all instances in an account and alerts if one or more have a scheduled
+#   event (reboot, retirement, etc)
+#
+# OUTPUT:
+#   plain-text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: aws-sdk
+#   gem: sensu-plugin
+#
+# #YELLOW
+# needs example command
+# EXAMPLES:
+#
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Tim Smith, tim@cozy.co
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+# !/usr/bin/env ruby
 #
 # Count EC2 instances
 # ===
@@ -20,36 +51,35 @@ require 'sensu-plugin/metric/cli'
 require 'aws-sdk'
 
 class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "sensu.aws.ec2"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: 'sensu.aws.ec2'
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :required => true
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
+         required: true
 
   option :aws_secret_access_key,
-    :short => '-k AWS_SECRET_ACCESS_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :required => true
+         short: '-k AWS_SECRET_ACCESS_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
+         required: true
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as us-east-1).",
-    :default => 'us-east-1'
+         short: '-r AWS_REGION',
+         long: '--aws-region REGION',
+         description: 'AWS Region (such as us-east-1).',
+         default: 'us-east-1'
 
   option :type,
-    :short => '-t METRIC type',
-    :long => '--type METRIC type',
-    :description => 'Count by type: status, instance',
-    :default => 'instance'
+         short: '-t METRIC type',
+         long: '--type METRIC type',
+         description: 'Count by type: status, instance',
+         default: 'instance'
 
   def run
     begin
@@ -57,21 +87,21 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
       aws_debug = false
 
       AWS.config(
-        :region => config[:aws_region],
-        :access_key_id      => config[:aws_access_key],
-        :secret_access_key  => config[:aws_secret_access_key],
-        :http_wire_trace    => aws_debug
+        region: config[:aws_region],
+        access_key_id: config[:aws_access_key],
+        secret_access_key: config[:aws_secret_access_key],
+        http_wire_trace: aws_debug
       )
 
       client = AWS::EC2::Client.new
 
       def by_instances_status(client)
-
-        if config[:scheme] == "sensu.aws.ec2"
-          config[:scheme] += ".count"
+        # #YELLOW
+        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable Style/IfUnlessModifier
+          config[:scheme] += '.count'
         end
 
-        options = {:include_all_instances => true}
+        options = { include_all_instances: true }
         data = client.describe_instance_status(options)
 
         total = data[:instance_status_set].count
@@ -80,7 +110,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         unless total.nil?
           data[:instance_status_set].each do |value|
             stat = value[:instance_state][:name]
-            if status[stat] == nil
+            if status[stat].nil?
               status[stat] = 1
             else
               status[stat] = status[stat] + 1
@@ -88,9 +118,10 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
 
-        unless data.nil?
+        # #YELLOW
+        unless data.nil? # rubocop:disable Style/GuardClause
           # We only return data when we have some to return
-          output config[:scheme] + ".total", total
+          output config[:scheme] + '.total', total
           status.each do |name, count|
             output config[:scheme] + ".#{name}", count
           end
@@ -98,9 +129,9 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
       end
 
       def by_instances_type(client)
-
-        if config[:scheme] == "sensu.aws.ec2"
-          config[:scheme] += ".types"
+        # #YELLOW
+        if config[:scheme] == 'sensu.aws.ec2' # rubocop:disable Style/IfUnlessModifier
+          config[:scheme] += '.types'
         end
 
         data = {}
@@ -109,7 +140,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         instances[:reservation_set].each do |i|
           i[:instances_set].each do |instance|
             type = instance[:instance_type]
-            if data[type] == nil
+            if data[type].nil?
               data[type] = 1
             else
               data[type] = data[type] + 1
@@ -117,7 +148,8 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
 
-        unless data.nil?
+        # #YELLOW
+        unless data.nil? # rubocop:disable Style/GuardClause
           # We only return data when we have some to return
           data.each do |name, count|
             output config[:scheme] + ".#{name}", count
@@ -131,11 +163,10 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         by_instances_status(client)
       end
 
-    rescue Exception => e
+    rescue => e
       puts "Error: exception: #{e}"
       critical
     end
     ok
   end
-
 end

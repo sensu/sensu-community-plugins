@@ -10,7 +10,7 @@
 #   plain-text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: aws-sdk
@@ -28,6 +28,7 @@
 #   for details.
 #
 
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'aws-sdk'
 require 'time'
@@ -65,8 +66,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
          short:       '-p N',
          long:        '--period SECONDS',
          default:     60,
-         # #YELLOW
-         proc:        proc { |a| a.to_i },
+         proc:        proc(&:to_i),
          description: 'CloudWatch metric statistics period'
 
   option :statistics,
@@ -86,8 +86,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
   %w(warning critical).each do |severity|
     option :"#{severity}_over",
            long:        "--#{severity}-over N",
-           # #YELLOW
-           proc:        proc { |a| a.to_f },
+           proc:        proc(&:to_f),
            description: "Trigger a #{severity} if throttle is over the given number"
   end
 
@@ -122,7 +121,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
       start_time: config[:end_time] - config[:period],
       end_time:   config[:end_time],
       statistics: [config[:statistics].to_s.capitalize],
-      period:     config[:period],
+      period:     config[:period]
     }
   end
 
@@ -159,7 +158,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
     @message    = "#{tables.size} tables total"
     @severities = {
       critical: false,
-      warning: false,
+      warning: false
     }
 
     tables.each { |table| check_throttle table }
