@@ -86,7 +86,8 @@ module Sensu
 
       def check_and_expire_ttl_stash(stash, now)
         expiry = stash['content']['ttl'].to_i unless stash['content'].nil?
-        if !expiry.nil? && expiry <= now
+        # #YELLOW
+        if !expiry.nil? && expiry <= now # rubocop:disable Style/GuardClause
           client_name, check_name = names_from_path(stash['path'])
           age = (now - expiry).to_s
           @logger.info("TTL - entry for #{client_name}_#{check_name} expired #{age} seconds ago")
@@ -114,7 +115,8 @@ module Sensu
         if options['api']['user'] && options['api']['password']
           req.basic_auth(options['api']['user'], options['api']['password'])
         end
-        unless payload.nil?
+        # #YELLOW
+        unless payload.nil? # rubocop:disable Style/IfUnlessModifier
           req.body = payload
         end
         http.request(req)

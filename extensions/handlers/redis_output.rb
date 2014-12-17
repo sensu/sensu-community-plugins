@@ -1,6 +1,7 @@
 require 'sensu/redis'
 
-module Sensu::Extension
+# #YELLOW
+module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
   class RedisOutput < Handler
     def name
       'redis_output'

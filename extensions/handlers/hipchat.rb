@@ -48,7 +48,8 @@ require 'hipchat'
 require 'timeout'
 require 'net/http'
 
-module Sensu::Extension
+# #YELLOW
+module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
   class Hipchat < Handler
     # The post_init hook is called after the main event loop has started
     # At this time EventMachine is available for interaction.
@@ -138,9 +139,7 @@ module Sensu::Extension
     # Has this check been disabled from handlers?
     def filter_disabled(event)
       if event[:check].key?(:alert)
-        if event[:check][:alert] == false
-          bail 'alert disabled', event
-        end
+        bail 'alert disabled', event if event[:check][:alert] == false
       end
 
       true
@@ -180,9 +179,7 @@ module Sensu::Extension
       stashes.each do |(scope, path)|
         begin
           timeout(2) do
-            if stash_exists?(path)
-              return bail scope + ' alerts silenced', event
-            end
+            return bail scope + ' alerts silenced', event if stash_exists?(path)
           end
         rescue Timeout::Error
           @logger.warn('timed out while attempting to query the sensu api for a stash')

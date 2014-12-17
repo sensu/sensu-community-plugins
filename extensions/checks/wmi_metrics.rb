@@ -83,9 +83,7 @@ module Sensu
       def add_metric(*args)
         value = args.pop
         path = []
-        if options[:add_client_prefix]
-          path << settings[:client][:name]
-        end
+        path << settings[:client][:name] if options[:add_client_prefix]
         path << options[:path_prefix]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')

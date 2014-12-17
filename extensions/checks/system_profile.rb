@@ -80,9 +80,7 @@ module Sensu
       def add_metric(*args)
         value = args.pop
         path = []
-        if options[:add_client_prefix]
-          path << settings[:client][:name]
-        end
+        path << settings[:client][:name] if options[:add_client_prefix]
         path << options[:path_prefix]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
@@ -93,7 +91,8 @@ module Sensu
         File.open(file_path, 'r') do |file|
           read_chunk = proc do
             content << file.read(chunk_size)
-            unless file.eof?
+            # #YELLOW
+            unless file.eof? # rubocop:disable Style/UnlessElse
               EM.next_tick(read_chunk)
             else
               yield content
@@ -158,7 +157,22 @@ module Sensu
       end
 
       def proc_net_dev_metrics
-        dev_metrics = %w(rxBytes rxPackets rxErrors rxDrops rxFifo rxFrame rxCompressed rxMulticast txBytes txPackets txErrors txDrops txFifo txColls txCarrier txCompressed)
+        dev_metrics = %w(rxBytes \
+                         rxPackets \
+                         rxErrors \
+                         rxDrops \
+                         rxFifo \
+                         rxFrame \
+                         rxCompressed \
+                         rxMulticast \
+                         txBytes \
+                         txPackets \
+                         txErrors \
+                         txDrops \
+                         txFifo \
+                         txColls \
+                         txCarrier \
+                         txCompressed)
         read_file('/proc/net/dev') do |proc_net_dev|
           proc_net_dev.each_line do |line|
             interface, data = line.scan(/^\s*([^:]+):\s*(.*)$/).first
