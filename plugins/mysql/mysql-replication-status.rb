@@ -110,11 +110,13 @@ class CheckMysqlReplicationStatus < Sensu::Plugin::Check::CLI
       unless results.nil?
         results.each_hash do |row|
           # #YELLOW
-          warn "couldn't detect replication status" unless # rubocop:diable all
+          # rubocop:disable all
+          warn "couldn't detect replication status" unless
             %w(Slave_IO_State Slave_IO_Running Slave_SQL_Running Last_IO_Error Last_SQL_Error Seconds_Behind_Master).all? do |key|
               row.key? key
             end
 
+          # rubocop: enable all
           slave_running = %w(Slave_IO_Running Slave_SQL_Running).all? do |key|
             row[key] =~ /Yes/
           end
