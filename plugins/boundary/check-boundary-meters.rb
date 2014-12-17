@@ -36,22 +36,22 @@ require 'json'
 
 class BoundaryMetersChecker < Sensu::Plugin::Check::CLI
   option :endpoint,
-    :description => 'Boundary API endpoint',
-    :short => '-e API-ENDPOINT',
-    :long => '--endpoint API-ENDPOINT',
-    :default => 'api.boundary.com'
+         description: 'Boundary API endpoint',
+         short: '-e API-ENDPOINT',
+         long: '--endpoint API-ENDPOINT',
+         default: 'api.boundary.com'
 
   option :org,
-    :description => 'Organisation ID',
-    :short => '-o ORG-ID',
-    :long => '--org-id ORG-ID',
-    :required => true
+         description: 'Organisation ID',
+         short: '-o ORG-ID',
+         long: '--org-id ORG-ID',
+         required: true
 
   option :key,
-    :description => 'API key',
-    :short => '-k API-KEY',
-    :long => '--key API-KEY',
-    :required => true
+         description: 'API key',
+         short: '-k API-KEY',
+         long: '--key API-KEY',
+         required: true
 
   def meter_connected_status
     meters.map do |meter|
