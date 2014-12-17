@@ -15,7 +15,7 @@ require 'sensu-plugin/check/cli'
 class CheckRaid < Sensu::Plugin::Check::CLI
   def check_software
     # #YELLOW
-    if File.exist?('/proc/mdstat') # rubocop:disable Style/GuardClause
+    if File.exist?('/proc/mdstat') # rubocop:disable GuardClause
       contents = File.read('/proc/mdstat')
       mg = contents.lines.grep(/active/)
       unless mg.empty?
@@ -32,7 +32,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
   def check_hp
     # #YELLOW
-    if File.exist?('/usr/bin/cciss_vol_status')  # rubocop:disable Style/GuardClause
+    if File.exist?('/usr/bin/cciss_vol_status')  # rubocop:disable GuardClause
       contents = `/usr/bin/cciss_vol_status /dev/sg0`
       c = contents.lines.grep(/status\: OK\./)
       # #YELLOW
@@ -46,7 +46,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
   def check_adaptec
     # #YELLOW
-    if File.exist?('/usr/StorMan/arcconf')  # rubocop:disable Style/GuardClause
+    if File.exist?('/usr/StorMan/arcconf')  # rubocop:disable GuardClause
       contents = `/usr/StorMan/arcconf GETCONFIG 1 AL`
 
       mg = contents.lines.grep(/Controller Status/)
@@ -82,7 +82,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
   def check_mega_raid
     # #YELLOW
-    if File.exist?('/usr/sbin/megacli')  # rubocop:disable Style/GuardClause
+    if File.exist?('/usr/sbin/megacli')  # rubocop:disable GuardClause
       contents = `/usr/sbin/megacli -AdpAllInfo -aALL`
       c = contents.lines.grep(/(Critical|Failed) Disks\s+\: 0/)
       # #YELLOW

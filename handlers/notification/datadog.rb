@@ -31,7 +31,7 @@ class DatadogNotif < Sensu::Handler
 
   def filter
     # #YELLOW
-    if @event['check']['alert'] == false # rubocop:disable Style/GuardClause
+    if @event['check']['alert'] == false # rubocop:disable GuardClause
       puts 'alert disabled -- filtered event ' + [@event['client']['name'], @event['check']['name']].join(' : ')
       exit 0
     end

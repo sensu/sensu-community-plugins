@@ -246,7 +246,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   end
 
     # #YELLOW
-    if config[:response_code] # rubocop:disable Style/GuardClause
+    if config[:response_code] # rubocop:disable GuardClause
       if config[:response_code] == res.code
         ok "#{res.code}, #{size} bytes" + body
       else

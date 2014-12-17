@@ -41,7 +41,7 @@ module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
       @replace = '_'
 
       # #YELLOW
-      if settings['graphite'] # rubocop:disable Style/GuardClause
+      if settings['graphite'] # rubocop:disable GuardClause
         # #YELLOW
         @reverse = true if settings['graphite']['reverse'] == true
         if settings['graphite']['replace']

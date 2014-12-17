@@ -72,7 +72,7 @@ class CheckSESLimit < Sensu::Plugin::Check::CLI
     end
 
     # #YELLOW
-    unless response.empty? # rubocop:disable Style/GuardClause
+    unless response.empty? # rubocop:disable GuardClause
       percent = (response.sent_last_24_hours.to_i / response.max_24_hour_send.to_i) * 100
       message = "SES sending limit is at #{percent}%"
 

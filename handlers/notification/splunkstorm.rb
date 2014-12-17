@@ -32,7 +32,7 @@ module Sensu
 
     def filter
       # #YELLOW
-      if @event['check']['alert'] == false # rubocop:disable Style/GuardClause
+      if @event['check']['alert'] == false # rubocop:disable GuardClause
         puts 'alert disabled -- filtered event ' + [@event['client']['name'], @event['check']['name']].join(' : ')
         exit 0
       end
@@ -41,7 +41,7 @@ module Sensu
     def alert
       refresh = (60.fdiv(@event['check']['interval']) * 30).to_i
       # #YELLOW
-      if @event['occurrences'] == 1 || @event['occurrences'] % refresh == 0  # rubocop:disable Style/GuardClause
+      if @event['occurrences'] == 1 || @event['occurrences'] % refresh == 0  # rubocop:disable GuardClause
         splunkstorm
       end
     end

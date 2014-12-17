@@ -79,7 +79,7 @@ Node Subscriptions: #{@event['client']['subscriptions'].join(', ')}
     Pony.options = mail_options
 
     # #YELLOW
-    unless settings['ponymailer']['recipients'].empty? # rubocop:disable Style/GuardClause
+    unless settings['ponymailer']['recipients'].empty? # rubocop:disable GuardClause
       settings['ponymailer']['recipients'].each do |to|
         begin
           Timeout.timeout 10 do

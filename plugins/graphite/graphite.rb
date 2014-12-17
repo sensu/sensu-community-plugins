@@ -132,7 +132,7 @@ class Graphite < Sensu::Plugin::Check::CLI
 
   def graphite_cache(target = nil)
     # #YELLOW
-    if @graphite_cache.key?(target) # rubocop:disable Style/GuardClause
+    if @graphite_cache.key?(target) # rubocop:disable GuardClause
       graphite_value = @graphite_cache[target].select { |value| value[:period] == @period }
       graphite_value if graphite_value.size > 0
     end

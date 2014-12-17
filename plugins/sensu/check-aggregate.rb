@@ -141,7 +141,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
 
   def compare_pattern(aggregate)
     # #YELLOW
-    if config[:summarize] && config[:pattern] # rubocop:disable Style/GuardClause
+    if config[:summarize] && config[:pattern] # rubocop:disable GuardClause
       regex = Regexp.new(config[:pattern])
       mappings = {}
       message = config[:message] || 'One of these is not like the others!'

@@ -27,7 +27,7 @@ class ClockWorkSmsNotif < Sensu::Handler
     response = message.deliver
 
     # #YELLOW
-    unless response.success # rubocop:disable Style/GuardClause
+    unless response.success # rubocop:disable GuardClause
       puts "#{response.error_code} - #{response.error_description}"
     end
   end
