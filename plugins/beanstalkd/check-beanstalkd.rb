@@ -1,29 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check beanstalkd queues
-# Requires the beaneater and json Gems
-# ===
-#
+# check-beanstalkd
 #
 # DESCRIPTION:
-#   This plugin checks the beanstalkd queue, using the beaneater gem
-#
-#
+#  Check beanstalkd queues
+
 # OUTPUT:
-#   OK
-#   WARN - queues that have surpassed the warning threshold
-#   CRITICAL - queues that have surpassed the critical threshold
+#   plain-text
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   json Ruby gem
-#   beaneater Ruby gem
+#   gem: beaneater
+#   gem: json
+#   gem: sensu-plugin
 #
-# Copyright 2014 99designs, Inc <devops@99designs.com>
+# #YELLOW
+# EXAMPLES:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-# rubocop:disable HandleExceptions
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 99designs, Inc <devops@99designs.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

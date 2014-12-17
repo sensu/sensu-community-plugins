@@ -1,20 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull beanstalkd metrics
-# ===
+# beanstalkd-metrics
 #
 # DESCRIPTION:
-#   This plugin checks the beanstalkd stats, using the beaneater gem
+#  This plugin checks the beanstalkd stats, using the beaneater gem
+#
+# OUTPUT:
+#   metric-data
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   json Ruby gem
-#   beaneater Ruby gem
+#   gem: beaneater
+#   gem: json
+#   gem: sensu-plugin
 #
-# Copyright 2014 99designs, Inc <devops@99designs.com>
+# #YELLOW
+# EXAMPLES:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 99designs, Inc <devops@99designs.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
