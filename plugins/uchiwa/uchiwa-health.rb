@@ -71,7 +71,8 @@ class UchiwaHealthCheck < Sensu::Plugin::Check::CLI
           critical 'Uchiwa status != ok' if json['uchiwa'].to_s != 'ok'
         elsif k.to_s == 'sensu'
           json['sensu'].each do |key, val|
-            if val['output'].to_s != 'ok'
+            # #YELLOW
+            if val['output'].to_s != 'ok' # rubocop:disable IfUnlessModifier
               critical "Sensu status != ok for Sensu API \"#{key}\". Error is \"#{val['output']}\""
             end
           end
