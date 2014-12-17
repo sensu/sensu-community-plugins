@@ -71,9 +71,9 @@ class RedisListLengthCheck < Sensu::Plugin::Check::CLI
 
     length = redis.llen(config[:key])
 
-    if (length >= config[:crit])
+    if length >= config[:crit]
       critical "Redis list #{config[:key]} length is above the CRITICAL limit: #{length} length / #{config[:crit]} limit"
-    elsif (length >= config[:warn])
+    elsif length >= config[:warn]
       warning "Redis list #{config[:key]} length is above the WARNING limit: #{length} length / #{config[:warn]} limit"
     else
       ok "Redis list #{config[:key]} length is below thresholds"

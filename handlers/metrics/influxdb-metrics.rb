@@ -27,7 +27,7 @@ class SensuToInfluxDB < Sensu::Handler
       key.gsub!('.', '_')
       value = m[1].to_f
       mydata = { host: @event['client']['name'], value: value,
-                ip: @event['client']['address']
+                 ip: @event['client']['address']
                }
       influxdb_data.write_point(key, mydata)
     end

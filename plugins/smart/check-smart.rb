@@ -131,8 +131,10 @@ class SmartCheck < Sensu::Plugin::Check::CLI
 
       (0..(thresholds.size / 5 - 1)).each do |i|
         att_id = @smart_attributes.index { |att| att[:id] == thresholds[i + 0].to_i }
-        thash = { crit_min: thresholds[i + 1].to_i, warn_min: thresholds[i + 2].to_i,
-          warn_max: thresholds[i + 3].to_i, crit_max: thresholds[i + 4].to_i }
+        thash = { crit_min: thresholds[i + 1].to_i,
+                  warn_min: thresholds[i + 2].to_i,
+                  warn_max: thresholds[i + 3].to_i,
+                  crit_max: thresholds[i + 4].to_i }
         @smart_attributes[att_id].merge! thash
       end
     end

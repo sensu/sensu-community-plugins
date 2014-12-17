@@ -96,7 +96,7 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
       elb.load_balancers.each do |lb|
         # #YELLOW
         lb.listeners.each do |listener| # rubocop:disable Style/Next
-          if (listener.protocol.to_s == 'https')
+          if listener.protocol.to_s == 'https'
             url = URI.parse("https://#{lb.dns_name}:#{listener.port}")
             http = Net::HTTP.new(url.host, url.port)
             http.use_ssl = true
