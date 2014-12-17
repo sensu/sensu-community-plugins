@@ -1,16 +1,15 @@
 #! /usr/bin/env ruby
 #
-# Check DynamoDB
-#
+# check-dynamodb-capacity
 #
 # DESCRIPTION:
-# Check DynamoDB statuses by CloudWatch and DynamoDB API.
+#   Check DynamoDB statuses by CloudWatch and DynamoDB API.
 #
 # OUTPUT:
 #   plain-text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: aws-sdk
@@ -27,7 +26,7 @@
 # NOTES:
 #
 # LICENSE:
-# Copyright 2014 github.com/y13i
+#   Copyright 2014 github.com/y13i
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #

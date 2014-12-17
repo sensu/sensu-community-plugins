@@ -1,7 +1,6 @@
 #! /usr/bin/env ruby
 #
-# Checks an ELB's health
-#
+# check-elb-health
 #
 # DESCRIPTION:
 #   This plugin checks the health of an Amazon Elastic Load Balancer.
@@ -14,6 +13,7 @@
 #
 # DEPENDENCIES:
 #   gem: right-aws
+#   gem: uri
 #   gem: sensu-plugin
 #
 # EXAMPLES:

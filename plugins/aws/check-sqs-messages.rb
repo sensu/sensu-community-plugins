@@ -1,10 +1,9 @@
 #! /usr/bin/env ruby
 #
-# check-instance-events
+# check-sqs-messages
 #
 # DESCRIPTION:
-#   This plugin looks up all instances in an account and alerts if one or more have a scheduled
-#   event (reboot, retirement, etc)
+#   This plugin checks the number of messages in an Amazon Web Services SQS queue.
 #
 # OUTPUT:
 #   plain-text
@@ -24,30 +23,10 @@
 # NOTES:
 #
 # LICENSE:
-#   Copyright (c) 2014, Tim Smith, tim@cozy.co
+#   Copyright (c) 2013, Justin Lambert <jlambert@letsevenup.com>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
-
-# !/usr/bin/env ruby
-#
-# Checks SQS messages
-# ===
-#
-# DESCRIPTION:
-#   This plugin checks the number of messages in an Amazon Web Services SQS queue.
-#
-# PLATFORMS:
-#   all
-#
-# DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   aws-sdk Ruby gem
-#
-# Copyright (c) 2013, Justin Lambert <jlambert@letsevenup.com>
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

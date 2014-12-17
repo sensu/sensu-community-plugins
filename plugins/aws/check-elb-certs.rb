@@ -1,7 +1,6 @@
 #! /usr/bin/env ruby
 #
-# Check ELB Certs
-#
+# check-elb-certs
 #
 # DESCRIPTION:
 #   This plugin looks up all ELBs in the organization and checks https
@@ -25,7 +24,7 @@
 # NOTES:
 #
 # LICENSE:
-# Copyright (c) 2013, Peter Burkholder, pburkholder@pobox.com
+#   Copyright (c) 2013, Peter Burkholder, pburkholder@pobox.com
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #

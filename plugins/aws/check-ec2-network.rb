@@ -3,7 +3,7 @@
 # check-ec2-network
 #
 # DESCRIPTION:
-# Check EC2 Network Metrics by CloudWatch API.
+#   Check EC2 Network Metrics by CloudWatch API.
 #
 # OUTPUT:
 #   plain-text
@@ -13,13 +13,12 @@
 #
 # DEPENDENCIES:
 #   gem: aws-sdk
-#   gem: time
 #   gem: sensu-plugin
 #
 # EXAMPLES:
-#  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} --warning-over 1000000 --critical-over 1500000
-#  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkIn --warning-over 1000000 --critical-over 1500000
-#  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkOut --warning-over 1000000 --critical-over 1500000
+#   ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} --warning-over 1000000 --critical-over 1500000
+#   ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkIn --warning-over 1000000 --critical-over 1500000
+#   ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} -d NetworkOut --warning-over 1000000 --critical-over 1500000
 #
 # NOTES:
 #

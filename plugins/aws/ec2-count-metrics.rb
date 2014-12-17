@@ -1,10 +1,9 @@
 #! /usr/bin/env ruby
 #
-# check-instance-events
+# ec2-count-metrics
 #
 # DESCRIPTION:
-#   This plugin looks up all instances in an account and alerts if one or more have a scheduled
-#   event (reboot, retirement, etc)
+#   This plugin retrives number of EC2 status
 #
 # OUTPUT:
 #   plain-text
@@ -28,23 +27,6 @@
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
-
-# !/usr/bin/env ruby
-#
-# Count EC2 instances
-# ===
-#
-# DESCRIPTION:
-# This plugin retrives number of EC2 status
-#
-# PLATFORMS:
-# all
-#
-# DEPENDENCIES:
-# sensu-plugin, aws-sdk Ruby gem
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 #
-# Check ELB Latency
+# check-elb-latency
 #
 #
 # DESCRIPTION:
@@ -13,15 +13,15 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: right-aws
+#   gem: aws-sdk
 #   gem: sensu-plugin
 #
 # EXAMPLES:
-#     # Warning if any load balancer's latency is over 1 second, critical if over 3 seconds.
-#     check-elb-latency --warning-over 1 --critical-over 3
+#   # Warning if any load balancer's latency is over 1 second, critical if over 3 seconds.
+#   check-elb-latency --warning-over 1 --critical-over 3
 #
-#     # Critical if "app" load balancer's latency is over 5 seconds, maximum of last one hour
-#     check-elb-latency --elb-names app --critical-over 5 --statistics maximum --period 3600
+#   # Critical if "app" load balancer's latency is over 5 seconds, maximum of last one hour
+#   check-elb-latency --elb-names app --critical-over 5 --statistics maximum --period 3600
 #
 # NOTES:
 #

@@ -19,7 +19,6 @@
 # needs example command
 # EXAMPLES:
 #
-#
 # NOTES:
 #
 # LICENSE:

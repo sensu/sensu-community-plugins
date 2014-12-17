@@ -12,7 +12,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: fog
+#   gem: aws-sdk
 #   gem: sensu-plugin
 #
 # EXAMPLES:

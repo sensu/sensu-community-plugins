@@ -1,13 +1,12 @@
 #! /usr/bin/env ruby
 #
-# check-instance-events
+# elasticache-metrics
 #
 # DESCRIPTION:
-#   This plugin looks up all instances in an account and alerts if one or more have a scheduled
-#   event (reboot, retirement, etc)
+#   Fetch Elasticache metrics from CloudWatch
 #
 # OUTPUT:
-#   plain-text
+#   metric-data
 #
 # PLATFORMS:
 #   Linux
@@ -22,31 +21,16 @@
 #
 #
 # NOTES:
+#   Redis: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Redis.html
+#   Memcached: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Memcached.html
+#
+#   By default fetches all available statistics from one minute ago.  You may need to fetch further back than this;
 #
 # LICENSE:
-#   Copyright (c) 2014, Tim Smith, tim@cozy.co
+#   Copyright 2014 Yann Verry
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
-
-# !/usr/bin/env ruby
-#
-# Fetch Elasticache metrics from CloudWatch
-# ===
-#
-# Copyright 2014 Yann Verry
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-#
-# Gets metrics from CloudWatch and puts them in Graphite
-#
-# Needs aws-sdk gem
-#
-# Redis: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Redis.html
-# Memcached: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Memcached.html
-#
-# By default fetches all available statistics from one minute ago.  You may need to fetch further back than this;
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

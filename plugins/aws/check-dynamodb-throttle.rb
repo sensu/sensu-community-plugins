@@ -1,10 +1,9 @@
 #! /usr/bin/env ruby
 #
-# Check DynamoDB
-#
+# check-dynamodb-throttle
 #
 # DESCRIPTION:
-# Check DynamoDB throttle by CloudWatch and DynamoDB API.
+#   Check DynamoDB throttle by CloudWatch and DynamoDB API.
 #
 # OUTPUT:
 #   plain-text
@@ -18,8 +17,8 @@
 #   gem: sensu-plugin
 #
 # EXAMPLES:
-#     # Critical if session table's read throttle is over 50 for the last 5 minutes
-#     check-dynamodb-throttle --table_names session --throttle-for read --critical-over 50 --statistics sum --period 300
+#   # Critical if session table's read throttle is over 50 for the last 5 minutes
+#   check-dynamodb-throttle --table_names session --throttle-for read --critical-over 50 --statistics sum --period 300
 #
 # NOTES:
 #
