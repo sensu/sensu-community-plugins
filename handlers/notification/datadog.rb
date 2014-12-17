@@ -10,7 +10,7 @@ class DatadogNotif < Sensu::Handler
     datadog
   end
 
-  def get_action
+  def acquire_action
     case @event['action']
     when 'create'
       'error'
@@ -20,7 +20,7 @@ class DatadogNotif < Sensu::Handler
   end
 
   # Return a low priotiry for resolve and warn events, normal for critical and unkown
-  def get_priority
+  def acquire_priority
     case @event['status']
     when '0', '1'
       'low'
@@ -30,7 +30,8 @@ class DatadogNotif < Sensu::Handler
   end
 
   def filter
-    if @event['check']['alert'] == false
+    # #YELLOW
+    if @event['check']['alert'] == false # rubocop:disable Style/GuardClause
       puts 'alert disabled -- filtered event ' + [@event['client']['name'], @event['check']['name']].join(' : ')
       exit 0
     end
@@ -38,8 +39,8 @@ class DatadogNotif < Sensu::Handler
 
   def datadog
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' ')
-    action = get_action
-    priority = get_priority
+    action = acquire_action
+    priority = acquire_priority
     tags = []
     tags.push('sensu')
     # allow for tags to be set in the configuration, this could be used to indicate environment

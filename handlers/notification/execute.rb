@@ -33,7 +33,8 @@ class Resolve < Sensu::Handler
   end
 
   def handle
-    unless @event['status'] == 0
+    # #YELLOW
+    unless @event['status'] == 0 # rubocop:disable Style/GuardClause
       executes = @event['check']['execute']
       executes.each do |execute|
         scope_param = get_scope_parameter execute
@@ -44,7 +45,8 @@ class Resolve < Sensu::Handler
 
   def run_cmd(cmd)
     result, stdout, stderr = systemu cmd
-    if result != 0
+    # #YELLOW
+    if result != 0 # rubocop:disable Style/GuardClause
       return "Failed to run #{cmd} (exit code #{result}) error is #{stderr.strip}, output is #{stdout.strip}"
     end
   end

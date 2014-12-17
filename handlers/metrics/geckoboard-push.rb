@@ -33,7 +33,8 @@ class GeckoboardPush < Sensu::Handler
       all << { value: v[1], label: v[0] }
     end
 
-    metrics.split(/\n/).each do |m|
+    # #YELLOW
+    metrics.split(/\n/).each do |m| # rubocop:disable Style/Next
       v = m.split(/\t/)
       if checks.key?(v[0])
         c = settings['geckoboard']['checks'][v[0]]

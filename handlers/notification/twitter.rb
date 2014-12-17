@@ -25,7 +25,8 @@ class TwitterHandler < Sensu::Handler
 
   def handle
     puts settings['twitter']
-    settings['twitter'].each do |account|
+    # #YELLOW
+    settings['twitter'].each do |account| # rubocop:disable Style/Next
       if @event['client']['subscriptions'].include?(account[1]['sensusub'])
         Twitter.configure do |t|
           t.consumer_key = account[1]['consumer_key']

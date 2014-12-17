@@ -34,7 +34,8 @@ class TwilioSMS < Sensu::Handler
     fail 'Please define a valid set of SMS recipients to use this handler' if candidates.nil? || candidates.empty?
 
     recipients = []
-    candidates.each do |mobile, candidate|
+    # #YELLOW
+    candidates.each do |mobile, candidate|  # rubocop:disable Style/Next
       if ((candidate['sensu_roles'].include?('all')) ||
           ((candidate['sensu_roles'] & @event['check']['subscribers']).size > 0) ||
           (candidate['sensu_checks'].include?(@event['check']['name']))) &&

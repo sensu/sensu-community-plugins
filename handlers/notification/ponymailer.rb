@@ -31,7 +31,7 @@ class PonyMailer < Sensu::Handler
   end
 
   def handle
-    mailOptions = {
+    mail_options = {
       subject: "Sensu Monitoring Alert: #{action_to_string} :: #{short_name}",
       from: "#{settings['ponymailer']['fromname']} <#{settings['ponymailer']['from']}>",
       via: :smtp,
@@ -44,16 +44,16 @@ class PonyMailer < Sensu::Handler
       charset: 'utf-8',
       sender: settings['ponymailer']['from']
     }
-    mailOptions.merg e!(via_options: {
-                          address: settings['ponymailer']['hostname'],
-                          port: settings['ponymailer']['port'],
-                          enable_starttls_auto: settings['ponymailer']['tls'],
-                          user_name: settings['ponymailer']['username'],
-                          password: settings['ponymailer']['password'],
-                          authentication: :plain
-                        }) if settings['ponymailer']['authenticate']
+    mail_options.merg e!(via_options: {
+                           address: settings['ponymailer']['hostname'],
+                           port: settings['ponymailer']['port'],
+                           enable_starttls_auto: settings['ponymailer']['tls'],
+                           user_name: settings['ponymailer']['username'],
+                           password: settings['ponymailer']['password'],
+                           authentication: :plain
+                         }) if settings['ponymailer']['authenticate']
 
-    mailOptions[:body] = %(Sensu has detected a failed check. Event analysis follows:
+    mail_options[:body] = %(Sensu has detected a failed check. Event analysis follows:
 
 Event Timestamp:    #{Time.at(@event['check']['issued'].to_i)}
 
@@ -76,9 +76,10 @@ Node Subscriptions: #{@event['client']['subscriptions'].join(', ')}
 
 
 )
-    Pony.options = mailOptions
+    Pony.options = mail_options
 
-    unless settings['ponymailer']['recipients'].empty?
+    # #YELLOW
+    unless settings['ponymailer']['recipients'].empty? # rubocop:disable Style/GuardClause
       settings['ponymailer']['recipients'].each do |to|
         begin
           Timeout.timeout 10 do

@@ -113,15 +113,14 @@ class Remediator < Sensu::Handler
       trigger = false
       (conditions['occurrences'] || []).each do |value|
         trigger = case
-          when value.is_a?(Integer) && occurrences == value then true
-          when value.to_s =~ /^\d+$/ && occurrences == $LAST_MATCH_INFO.to_a.first.to_i then true
-          when value.to_s =~ /^(\d+)-(\d+)$/ && Range.new($LAST_MATCH_INFO.to_a[1].to_i, $LAST_MATCH_INFO.to_a[2].to_i).to_a.include?(occurrences) then true
-          when value.to_s.match(/^(\d+)\+$/) && Range.new($LAST_MATCH_INFO.to_a[1].to_i, 9999).include?(occurrences) then true
+                  when value.is_a?(Integer) && occurrences == value then true
+                  when value.to_s =~ /^\d+$/ && occurrences == $LAST_MATCH_INFO.to_a.first.to_i then true
+                  # #YELLOW
+                  when value.to_s =~ /^(\d+)-(\d+)$/ && Range.new($LAST_MATCH_INFO.to_a[1].to_i, $LAST_MATCH_INFO.to_a[2].to_i).to_a.include?(occurrences) then true # rubocop:disable Metrics/LineLength
+                  when value.to_s.match(/^(\d+)\+$/) && Range.new($LAST_MATCH_INFO.to_a[1].to_i, 9999).include?(occurrences) then true
           else false
         end
-        if trigger
-          break
-        end
+        break if trigger
       end
 
       remediations_to_trigger << check if trigger

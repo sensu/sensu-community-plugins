@@ -16,7 +16,8 @@ require 'mail'
 require 'timeout'
 
 # patch to fix Exim delivery_method: https://github.com/mikel/mail/pull/546
-module ::Mail
+# #YELLOW
+module ::Mail # rubocop:disable Style/ClassAndModuleChildren
   class Exim < Sendmail
     def self.call(path, arguments, _destinations, encoded_message)
       popen "#{path} #{arguments}" do |io|

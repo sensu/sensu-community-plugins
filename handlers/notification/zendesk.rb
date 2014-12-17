@@ -36,7 +36,8 @@ class Zendesk < Sensu::Handler
       config.username = settings['zendesk']['username']
 
       # Choose one of the following depending on your authentication choice
-      unless settings['zendesk']['token'].nil?
+      # #YELOW
+      unless settings['zendesk']['token'].nil? # rubocop:disable Style/UnlessElse
         config.token = settings['zendesk']['token']
       else
         config.password = settings['zendesk']['password']

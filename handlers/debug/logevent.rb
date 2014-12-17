@@ -22,7 +22,8 @@ class LogEvent < Sensu::Handler
     end
 
     events = Dir.glob("#{eventdir}/*.#{@event['action']}")
-    if settings['logevent']['keep'] < events.length
+    # #YELLOW
+    if settings['logevent']['keep'] < events.length # rubocop:disable Style/GuardClause
       FileUtils.rm_f(events.sort.reverse.shift(settings['logevent']['keep']))
     end
   end

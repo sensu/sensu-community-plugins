@@ -99,7 +99,8 @@ class Ec2Node < Sensu::Handler
   def filter; end
 
   def handle
-    unless ec2_node_exists?
+    # #YELLOW
+    unless ec2_node_exists? # rubocop:disable Style/UnlessElse
       delete_sensu_client!
     else
       puts "[EC2 Node] #{@event['client']['name']} appears to exist in EC2"
@@ -112,7 +113,7 @@ class Ec2Node < Sensu::Handler
   end
 
   def ec2_node_exists?
-    states = get_valid_states
+    states = acquire_valid_states
     filtered_instances = ec2.servers.select { |s| states.include?(s.state) }
     instance_ids = filtered_instances.map(&:id)
     instance_ids.each do |id|
@@ -146,7 +147,7 @@ class Ec2Node < Sensu::Handler
     end
   end
 
-  def get_valid_states
+  def acquire_valid_states
     if @event['client'].key?('ec2_states')
       return @event['client']['ec2_states']
     else
