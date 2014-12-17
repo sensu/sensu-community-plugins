@@ -49,11 +49,16 @@ class CheckCassandraSchema < Sensu::Plugin::Check::CLI
 
   # execute cassandra's nodetool and return output as string
   def nodetool_cmd(cmd)
-    `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd}`
+    out = `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd} 2>&1`
+    return out, $?
   end
 
   def run
-    out = nodetool_cmd('describecluster')
+    out, rc = nodetool_cmd('describecluster')
+    if rc != 0
+      critical(out)
+    end
+
     bad_nodes = []
     # #YELLOW
     out.each_line do |line|  # rubocop:disable Style/Next
