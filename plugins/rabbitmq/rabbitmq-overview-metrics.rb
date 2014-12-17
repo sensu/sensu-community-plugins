@@ -71,7 +71,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
          boolean: true,
          default: false
 
-  def get_rabbitmq_info
+  def acquire_rabbitmq_info
     begin
       rabbitmq_info = CarrotTop.new(
         host: config[:host],
@@ -89,7 +89,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     timestamp = Time.now.to_i
 
-    rabbitmq = get_rabbitmq_info
+    rabbitmq = acquire_rabbitmq_info
     overview = rabbitmq.overview
 
     # overview['queue_totals']['messages']

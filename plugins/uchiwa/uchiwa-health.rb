@@ -68,9 +68,7 @@ class UchiwaHealthCheck < Sensu::Plugin::Check::CLI
       json = JSON.parse(res.body)
       json.keys.each do |k|
         if k.to_s == 'uchiwa'
-          if json['uchiwa'].to_s != 'ok'
-            critical 'Uchiwa status != ok'
-          end
+          critical 'Uchiwa status != ok' if json['uchiwa'].to_s != 'ok'
         elsif k.to_s == 'sensu'
           json['sensu'].each do |key, val|
             if val['output'].to_s != 'ok'

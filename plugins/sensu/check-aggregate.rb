@@ -108,17 +108,17 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     warning 'Sensu API returned invalid JSON'
   end
 
-  def get_aggregate
+  def acquire_aggregate
     uri = "/aggregates/#{config[:check]}"
     issued = api_request(uri + "?age=#{config[:age]}" + (config[:limit] ? "&limit=#{config[:limit]}" : ''))
-    unless issued.empty?
+    # #YELLOW
+    unless issued.empty?  # rubocop:disable Style/UnlessElse
       issued_sorted = issued.sort
       time = issued_sorted.pop
-      unless time.nil?
+      # #YELLOW
+      unless time.nil? # rubocop:disable Style/UnlessElse
         uri += "/#{time}"
-        if config[:summarize]
-          uri += '?summarize=output'
-        end
+        uri += '?summarize=output' if config[:summarize]
         api_request(uri)
       else
         warning "No aggregates older than #{config[:age]} seconds"
@@ -140,17 +140,20 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
   end
 
   def compare_pattern(aggregate)
-    if config[:summarize] && config[:pattern]
+    # #YELLOW
+    if config[:summarize] && config[:pattern] # rubocop:disable Style/GuardClause
       regex = Regexp.new(config[:pattern])
       mappings = {}
       message = config[:message] || 'One of these is not like the others!'
-      aggregate[:outputs].each do |output, _count|
+      # #YELLOW
+      aggregate[:outputs].each do |output, _count| # rubocop:disable Style/Next
         matched = regex.match(output.to_s)
         unless matched.nil?
           key = matched[1]
           value = matched[2..-1]
           if mappings.key?(key)
-            unless mappings[key] == value
+            # #YELLOW
+            unless mappings[key] == value  # rubocop:disable Style/IfUnlessModifier, Metrics/BlockNesting
               critical message + " (#{key})"
             end
           end
@@ -161,7 +164,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
   end
 
   def run
-    aggregate = get_aggregate
+    aggregate = acquire_aggregate
     compare_thresholds(aggregate)
     compare_pattern(aggregate)
     ok 'Aggregate looks GOOD'

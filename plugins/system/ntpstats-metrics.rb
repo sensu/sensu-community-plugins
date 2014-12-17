@@ -26,7 +26,8 @@ class NtpStatsMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: Socket.gethostname
 
   def run
-    unless config[:host] == 'localhost'
+    # #YELLOW
+    unless config[:host] == 'localhost'  # rubocop:disable Style/IfUnlessModifier
       config[:scheme] = config[:host]
     end
 
@@ -57,7 +58,8 @@ class NtpStatsMetrics < Sensu::Plugin::Metric::CLI::Graphite
     num_val_pattern = /-?[\d]+(\.[\d]+)?/
     pattern = /(#{key_pattern})=(#{num_val_pattern}),?\s?/
 
-    `ntpq -c rv #{host}`.scan(pattern).reduce({}) do |hash, parsed|
+    # #YELLOW
+    `ntpq -c rv #{host}`.scan(pattern).reduce({}) do |hash, parsed| # rubocop:disable Style/EachWithObject
       key, val, fraction = parsed
       hash[key] = fraction ? val.to_f : val.to_i
       hash

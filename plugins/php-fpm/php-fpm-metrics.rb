@@ -31,7 +31,8 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def run
     found = false
     attempts = 0
-    until found || attempts >= 10
+    # #YELLOW
+    until found || attempts >= 10 # rubocop:disable Style/Next
       attempts += 1
       if config[:url]
         uri = URI.parse(config[:url])
@@ -51,7 +52,15 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end # until
 
     stats = Crack::XML.parse(response.body)
-    stat = %w(start_since accepted_conn listen_queue max_listen_queue listen_queue_len idle_processes active_processes total_processes max_active_processes max_children_reached slow_requests)
+    stat = %w(start_since accepted_conn listen_queue \
+              max_listen_queue \
+              listen_queue_len \
+              idle_processes \
+              active_processes \
+              total_processes \
+              max_active_processes \
+              max_children_reached \
+              slow_requests)
     stat.each do |name|
       output "#{config[:scheme]}.#{name}", stats['status'][name]
     end

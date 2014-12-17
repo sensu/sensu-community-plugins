@@ -30,7 +30,7 @@ class CheckCPU < Sensu::Plugin::Check::CLI
            default: false
   end
 
-  def get_cpu_stats
+  def acquire_cpu_stats
     File.open('/proc/stat', 'r').each_line do |line|
       info = line.split(/\s+/)
       name = info.shift
@@ -41,9 +41,9 @@ class CheckCPU < Sensu::Plugin::Check::CLI
   def run
     metrics = [:user, :nice, :system, :idle, :iowait, :irq, :softirq, :steal, :guest]
 
-    cpu_stats_before = get_cpu_stats
+    cpu_stats_before = acquire_cpu_stats
     sleep config[:sleep]
-    cpu_stats_after = get_cpu_stats
+    cpu_stats_after = acquire_cpu_stats
 
     # Some kernels don't have a 'guest' value (RHEL5).
     metrics = metrics.slice(0, cpu_stats_after.length)

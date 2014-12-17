@@ -11,7 +11,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
          long: '--scheme SCHEME',
          default: "#{Socket.gethostname}.cpu"
 
-  def get_proc_stats
+  def acquire_proc_stats
     cpu_metrics = %w(user nice system idle iowait irq softirq steal guest)
     File.open('/proc/stat', 'r').each_line do |line|
       info = line.split(/\s+/)
@@ -28,16 +28,17 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def sum_cpu_metrics(metrics)
-    metrics.values.reduce { |sum, metric| sum + metric }
+    # #YELLOW
+    metrics.values.reduce { |sum, metric| sum + metric } # rubocop:disable Style/SingleLineBlockParams
   end
 
   def run
-    cpu_sample1 = get_proc_stats
+    cpu_sample1 = acquire_proc_stats
     sleep(1)
-    cpu_sample2 = get_proc_stats
+    cpu_sample2 = acquire_proc_stats
     cpu_metrics = cpu_sample2.keys
 
-    # we will sum all jiffy counts read in get_proc_stats
+    # we will sum all jiffy counts read in acquire_proc_stats
     cpu_total1 = sum_cpu_metrics(cpu_sample1)
     cpu_total2 = sum_cpu_metrics(cpu_sample2)
     # total cpu usage in last second in CPU jiffs (1/100 s)

@@ -29,9 +29,10 @@ class CheckCMDStatus < Sensu::Plugin::Check::CLI
          short: '-o',
          long: '--check_output REGEX'
 
-  def get_cmd_status
+  def acquire_cmd_status
     stdout = `#{config[:command]}`
-    unless $CHILD_STATUS.exitstatus.to_s == config[:status]
+    # #YELLOW
+    unless $CHILD_STATUS.exitstatus.to_s == config[:status] # rubocop:disable Style/UnlessElse
       critical "#{config[:command]} exited with #{$CHILD_STATUS.exitstatus}"
     else
       if config[:check_output]
@@ -47,6 +48,6 @@ class CheckCMDStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    get_cmd_status
+    acquire_cmd_status
   end
 end

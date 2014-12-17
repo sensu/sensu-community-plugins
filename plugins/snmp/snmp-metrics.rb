@@ -66,9 +66,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     rescue => e
       unknown "An unknown error occured: #{e.inspect}"
     end
-    if config[:graphite]
-      config[:host] = config[:host].gsub('.', '_')
-    end
+    config[:host] = config[:host].gsub('.', '_') if config[:graphite]
     response.each_varbind do |vb|
       if config[:prefix]
         output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f

@@ -58,7 +58,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
          description: 'CRITICAL message count threshold',
          default: 500
 
-  def get_rabbitmq_info
+  def acquire_rabbitmq_info
     begin
       rabbitmq_info = CarrotTop.new(
         host: config[:host],
@@ -74,9 +74,10 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   end
 
   def run
-    rabbitmq = get_rabbitmq_info
+    rabbitmq = acquire_rabbitmq_info
     queues = rabbitmq.queues
-    queues.each do |queue|
+    # #YELLOW
+    queues.each do |queue| # rubocop:disable Style/Next
       if queue['name'] == config[:queue]
         total = queue['messages']
         message "#{total}"

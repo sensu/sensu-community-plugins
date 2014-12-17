@@ -62,7 +62,8 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
     out[:name] << name
     puts "***** DEBUG: bluepill #{name} status *****\n#{app_status}" if config[:debug]
     processes_found = 0
-    app_status.each_line do |line|
+    # #YELLOW
+    app_status.each_line do |line| # rubocop:disable Style/Next
       if line =~ /(pid:)/
         processes_found += 1
         case line
@@ -102,7 +103,8 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
   def run
     # Check if Bluepill is installed
     `which bluepill`
-    unless $CHILD_STATUS.success?
+    # #YELLOW
+    unless $CHILD_STATUS.success? # rubocop:disable Style/IfUnlessModifier
       ok 'bluepill not installed'
     end
 
@@ -131,10 +133,12 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
         # loaded seems bizarre, but hey, that's just me.)
         # We assume that no found applications is OK, since we only
         # get here if -a option is unset.
-        bluepill_status.each_line do |line|
+        # #YELLOW
+        bluepill_status.each_line do |line| # rubocop:disable Style/Next
           if line =~ /^\s \d\.\s/
             app_name = line.split(/^\s \d\.\s/)[1].strip
-            puts "***** DEBUG: found an application: #{app_name} *****" if config[:debug]
+            # #YELLOW
+            puts "***** DEBUG: found an application: #{app_name} *****" if config[:debug] # rubocop:disable Metrics/BlockNesting
             out = merge_output(out, bluepill_application_status(app_name))
           end
         end

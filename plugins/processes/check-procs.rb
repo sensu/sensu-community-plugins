@@ -164,10 +164,11 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   end
 
   def on_cygwin?
-    `ps -W 2>&1`; $CHILD_STATUS.exitstatus == 0
+    # #YELLOW
+    `ps -W 2>&1`; $CHILD_STATUS.exitstatus == 0 # rubocop:disable Style/Semicolon
   end
 
-  def get_procs
+  def acquire_procs
     if on_cygwin?
       read_lines('ps -aWl').drop(1).map do |line|
         # Horrible hack because cygwin's ps has no o option, every
@@ -197,7 +198,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   end
 
   def run
-    procs = get_procs
+    procs = acquire_procs
 
     if config[:file_pid] && (file_pid = read_pid(config[:file_pid]))
       procs.reject! { |p| p[:pid].to_i != file_pid }
@@ -231,19 +232,24 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     msg += "; pid #{config[:file_pid]}" if config[:file_pid]
 
     if config[:metric]
-      count = procs.map { |p| p[config[:metric]].to_i }.reduce { |a, b| a + b }
+      # #YELLOW
+      count = procs.map { |p| p[config[:metric]].to_i }.reduce { |a, b| a + b } # rubocop:disable Style/SingleLineBlockParams
       msg += "; #{config[:metric]} == #{count}"
     else
       count = procs.size
     end
 
-    if !!config[:crit_under] && count < config[:crit_under]
+    # #YELLOW
+    if !!config[:crit_under] && count < config[:crit_under] # rubocop:disable Style/DoubleNegation
       critical msg
-    elsif !!config[:crit_over] && count > config[:crit_over]
+    # #YELLOW
+    elsif !!config[:crit_over] && count > config[:crit_over] # rubocop:disable Style/DoubleNegation
       critical msg
-    elsif !!config[:warn_under] && count < config[:warn_under]
+    # #YELLOW
+    elsif !!config[:warn_under] && count < config[:warn_under] # rubocop:disable Style/DoubleNegation
       warning msg
-    elsif !!config[:warn_over] && count > config[:warn_over]
+    # #YELLOW
+    elsif !!config[:warn_over] && count > config[:warn_over] # rubocop:disable Style/DoubleNegation
       warning msg
     else
       ok msg

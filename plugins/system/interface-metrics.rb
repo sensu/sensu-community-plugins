@@ -20,7 +20,22 @@ class InterfaceGraphite < Sensu::Plugin::Metric::CLI::Graphite
   def run
     # Metrics borrowed from hoardd: https://github.com/coredump/hoardd
 
-    metrics = %w(rxBytes rxPackets rxErrors rxDrops rxFifo rxFrame rxCompressed rxMulticast txBytes txPackets txErrors txDrops txFifo txColls txCarrier txCompressed)
+    metrics = %w(rxBytes \
+                 rxPackets \
+                 rxErrors \
+                 rxDrops \
+                 rxFifo \
+                 rxFrame \
+                 rxCompressed \
+                 rxMulticast \
+                 txBytes \
+                 txPackets \
+                 txErrors \
+                 txDrops \
+                 txFifo \
+                 txColls \
+                 txCarrier \
+                 txCompressed)
 
     File.open('/proc/net/dev', 'r').each_line do |line|
       interface, stats_string = line.scan(/^\s*([^:]+):\s*(.*)$/).first

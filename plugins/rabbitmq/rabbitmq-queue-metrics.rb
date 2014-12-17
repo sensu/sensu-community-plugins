@@ -50,7 +50,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
          boolean: true,
          default: false
 
-  def get_rabbitmq_queues
+  def acquire_rabbitmq_queues
     begin
       rabbitmq_info = CarrotTop.new(
         host: config[:host],
@@ -67,9 +67,10 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     timestamp = Time.now.to_i
-    get_rabbitmq_queues.each do |queue|
+    acquire_rabbitmq_queues.each do |queue|
       if config[:filter]
-        unless queue['name'].match(config[:filter])
+        # #YELLOW
+        unless queue['name'].match(config[:filter]) # rubocop:disable Style/IfUnlessModifier
           next
         end
       end

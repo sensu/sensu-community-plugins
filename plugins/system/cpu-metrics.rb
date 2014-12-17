@@ -22,7 +22,8 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
       name = info.shift
 
       if name.match(/cpu([0-9]+|)/)
-        cpu_count = cpu_count + 1
+        # #YELLOW
+        cpu_count = cpu_count + 1 # rubocop:disable Style/SelfAssignment
         name = 'total' if name == 'cpu'
         cpu_metrics.size.times { |i| output "#{config[:scheme]}.#{name}.#{cpu_metrics[i]}", info[i] }
       end

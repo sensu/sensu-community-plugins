@@ -87,7 +87,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
     warning 'Sensu API returned invalid JSON'
   end
 
-  def get_checks
+  def acquire_checks
     uri = '/aggregates'
     checks = api_request(uri)
     puts "Checks: #{checks.inspect}" if config[:debug]
@@ -97,10 +97,12 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def get_aggregate(check)
     uri = "/aggregates/#{check}"
     issued = api_request(uri + "?age=#{config[:age]}")
-    unless issued.empty?
+    # #YELLOW
+    unless issued.empty? # rubocop:disable Style/Style/UnlessElse
       issued_sorted = issued.sort
       time = issued_sorted.pop
-      unless time.nil?
+      # #YELLOW
+      unless time.nil? # rubocop:disable Style/Style/UnlessElse
         uri += "/#{time}"
         [time, api_request(uri)]
       else
@@ -112,7 +114,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    get_checks.each do |check|
+    acquire_checks.each do |check|
       timestamp, aggregate = get_aggregate(check[:check])
       puts "#{check[:check]} aggregates: #{aggregate}" if config[:debug]
       aggregate.each do |result, count|

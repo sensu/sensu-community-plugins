@@ -32,6 +32,8 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
+# #YELLOW
+# rubocop:disable VariableName
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'snmp'
@@ -114,29 +116,29 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Use low capacity counters'
 
   def run
-    ifTable_HC_columns = %w(
+    if_table_HC_columns = %w(
       ifHCInOctets ifHCOutOctets
       ifHCInUcastPkts ifHCOutUcastPkts
       ifHCInMulticastPkts ifHCOutMulticastPkts
       ifHCInBroadcastPkts ifHCOutBroadcastPkts
     )
-    ifTable_LC_columns = %w(
+    if_table_LC_columns = %w(
       ifInOctets ifOutOctets
       ifInUcastPkts ifOutUcastPkts
       ifInMulticastPkts ifOutMulticastPkts
       ifInBroadcastPkts ifOutBroadcastPkts
     )
-    ifTable_common_columns = %w(
+    if_table_common_columns = %w(
       ifIndex ifOperStatus ifName ifDescr
       ifInErrors ifOutErrors ifInDiscards ifOutDiscards ifSpeed
     )
-    ifTable_columns = ifTable_common_columns +
-      (config[:low_capacity] ? ifTable_LC_columns : ifTable_HC_columns)
+    if_table_columns = if_table_common_columns +
+      (config[:low_capacity] ? if_table_LC_columns : if_table_HC_columns)
 
     SNMP::Manager.open(host: "#{config[:host]}", community: "#{config[:community]}", version: config[:version]) do |manager|
-      manager.walk(ifTable_columns) do |row_array|
+      manager.walk(if_table_columns) do |row_array|
         # turn row (an array) into a hash for eaiser access to the columns
-        row = Hash[*ifTable_columns.zip(row_array).flatten]
+        row = Hash[*if_table_columns.zip(row_array).flatten]
         puts row.inspect if config[:verbose]
         if_name = config[:include_name] ? "#{row['ifIndex'].value}__#{graphite_safe_name(row['ifName'].value.to_s)}" : row['ifIndex'].value.to_s
 

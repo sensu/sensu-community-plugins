@@ -74,7 +74,7 @@ class CheckPHPFpm < Sensu::Plugin::Check::CLI
       else
         critical "#{response.body} instead of #{config[:response]}"
       end
-    elsif
+    else
       critical "Error, http response code: #{response.code}"
     end
 

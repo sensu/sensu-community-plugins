@@ -105,12 +105,12 @@ class CheckRspec < Sensu::Plugin::Check::CLI
 
   def exit_with(sym, message)
     case sym
-      when :ok
-        ok message
-      when :critical
-        critical message
-      else
-        unknown message
+    when :ok
+      ok message
+    when :critical
+      critical message
+    else
+      unknown message
     end
   end
 end

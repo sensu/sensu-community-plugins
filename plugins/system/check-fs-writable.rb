@@ -62,17 +62,17 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
     end
   end
 
-  def get_mnt_pts
+  def acquire_mnt_pts
     `grep VolGroup /proc/self/mounts | awk '{print $2, $4}' | awk -F, '{print $1}' | awk '{print $1, $2}'`
   end
 
-  def is_rw_in_proc(mount_info)
+  def rw_in_proc?(mount_info)
     mount_info.each  do |pt|
       @crit_pt_proc <<  "#{ pt.split[0] }" if pt.split[1] != 'rw'
     end
   end
 
-  def is_rw_test(mount_info)
+  def rw_test?(mount_info)
     mount_info.each do |pt|
       (Dir.exist? pt.split[0]) || (@crit_pt_test << "#{ pt.split[0] }")
       file = Tempfile.new('.sensu', pt.split[0])
@@ -89,13 +89,13 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
   def auto_discover
     # #YELLOW
     # this will only work for a single namespace as of now
-    mount_info = get_mnt_pts.split("\n")
+    mount_info = acquire_mnt_pts.split("\n")
     warning 'No mount points found' if mount_info.length == 0
     # #YELLOW
     #  I want to map this at some point to make it pretty and eaiser to read for large filesystems
     puts 'This is a list of mount_pts and their current status: ', mount_info if config[:debug]
-    is_rw_in_proc(mount_info)
-    is_rw_test(mount_info)
+    rw_in_proc?(mount_info)
+    rw_test?(mount_info)
     puts "The critical mount points according to proc are: #{ @crit_pt_proc }" if config[:debug]
     puts "The critical mount points according to actual testing are: #{ @crit_pt_test }" if config[:debug]
   end

@@ -30,7 +30,7 @@ class CheckMegraRAID < Sensu::Plugin::Check::CLI
          default: 0
 
   def run
-    haveError = false
+    have_error = false
     error = ''
     # get number of virtual drives
     `#{config[:megaraidcmd]} -LDGetNum -a#{config[:controller]} `
@@ -39,11 +39,11 @@ class CheckMegraRAID < Sensu::Plugin::Check::CLI
       stdout = `#{config[:megaraidcmd]} -LDInfo -L#{i} -a#{config[:controller]} `
       unless Regexp.new('State\s*:\s*Optimal').match(stdout)
         error = sprintf '%svirtual drive %d: %s ', error, i, stdout[/State\s*:\s*.*/].split(':')[1]
-        haveError = true
+        have_error = true
       end
     end
 
-    if haveError
+    if have_error
       critical error
     else
       ok

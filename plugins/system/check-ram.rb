@@ -28,7 +28,8 @@ class CheckRAM < Sensu::Plugin::Check::CLI
     total_ram, free_ram = 0, 0
 
     `free -m`.split("\n").drop(1).each do |line|
-      free_ram = line.split[3].to_i if line =~ /^-\/\+ buffers\/cache:/
+      # #YELLOW
+      free_ram = line.split[3].to_i if line =~ /^-\/\+ buffers\/cache:/ # rubocop:disable Style/RegexpLiteral
       total_ram = line.split[1].to_i if line =~ /^Mem:/
     end
 

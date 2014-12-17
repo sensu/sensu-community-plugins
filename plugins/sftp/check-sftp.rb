@@ -108,7 +108,8 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   private
 
   def check_file_write
-    if config[:check_prefix]
+    # #YELLOW
+    if config[:check_prefix] # rubocop:disable Style/GuardClause
       io = StringIO.new('Generated from Sensu at ' + Time.now.to_s)
       remote_path = File.join('', config[:directory], config[:check_prefix] + "_#{Time.now.to_i}.txt")
       sftp.upload!(io, remote_path)
@@ -117,7 +118,8 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   end
 
   def check_file_count
-    if config[:check_count]
+    # #YELLOW
+    if config[:check_count] # rubocop:disable Style/GuardClause
       if matching_files.count > config[:check_count]
         critical "Too many files - #{config[:directory]} has #{matching_files.count} matching files"
       end
@@ -125,7 +127,8 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   end
 
   def check_file_age
-    if config[:check_older]
+    # #YELLOW
+    if config[:check_older]  # rubocop:disable Style/GuardClause
       run_at    = Time.now
       old_files = matching_files.select { |f| (run_at.to_i - f.attributes.mtime) > config[:check_older] }
       unless old_files.empty?

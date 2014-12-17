@@ -62,7 +62,7 @@ class CheckSilenced < Sensu::Plugin::Metric::CLI::Graphite
     @api ||= RestClient::Resource.new(endpoint, timeout: 45)
   end
 
-  def get_stashes
+  def acquire_stashes
     all_stashes = JSON.parse(api['/stashes'].get)
     filtered_stashes = []
     all_stashes.each do |stash|
@@ -83,7 +83,7 @@ class CheckSilenced < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     @config = config
-    stashes = get_stashes
+    stashes = acquire_stashes
     now = Time.now.to_i
     @count = 0
     if stashes.count > 0

@@ -71,9 +71,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
       fields = line.split(/\s+/)
 
-      if stage == :device
-        key = fields.shift
-      end
+      key = fields.shift if stage == :device
       stats[key] = Hash[headers.zip(fields.map(&:to_f))]
     end
     stats
@@ -81,17 +79,14 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     cmd = "iostat -x #{config[:interval]} 2"
-    if config[:disk]
-      cmd += " #{File.basename(config[:disk])}"
-    end
+
+    cmd += " #{File.basename(config[:disk])}" if config[:disk]
     if config[:excludedisk]
       config[:excludedisk].each do |disk|
         cmd += " | grep -v #{disk}"
       end
     end
-    if config[:mappernames]
-      cmd += ' -N'
-    end
+    cmd += ' -N' if config[:mappernames]
     stats = parse_results(`#{cmd}`)
 
     timestamp = Time.now.to_i
