@@ -11,7 +11,7 @@ MethodLength:
   Max: 200
 
 LineLength:
-  Max: 160
+  Enabled: false
 
 # added MJ
 AlignParameters:

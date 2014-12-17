@@ -1,0 +1,21 @@
+
+FileName:
+  Enabled: false
+
+MethodLength:
+  Max: 200
+
+LineLength:
+  Max: 160
+
+PerceivedComplexity:
+  Enabled: false
+
+CyclomaticComplexity:
+  Enabled: false
+
+ClassLength:
+  Enabled: false
+
+Documentation:
+  Enabled: false
