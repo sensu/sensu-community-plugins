@@ -149,9 +149,7 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
         output "#{config[:scheme]}.#{if_name}.#{in_octets}", row[in_octets].value
         output "#{config[:scheme]}.#{if_name}.#{out_octets}", row[out_octets].value
 
-        if config[:include_speed]
-          output "#{config[:scheme]}.#{if_name}.ifSpeed", row['ifSpeed'].value
-        end
+        output "#{config[:scheme]}.#{if_name}.ifSpeed", row['ifSpeed'].value if config[:include_speed]
 
         if config[:include_error_metrics]
           output "#{config[:scheme]}.#{if_name}.ifInErrors", row['ifInErrors'].value

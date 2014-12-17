@@ -85,14 +85,9 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
           critical "Value: #{vb.value} failed to match Pattern: #{config[:match]}"
         end
       else
-        if "#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)
-          critical 'Critical state detected'
-        end
-
-        if ("#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)) && !("#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i))
-          warning 'Warning state detected'
-        end
-
+        critical 'Critical state detected' if "#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)
+        # #YELLOW
+        warning 'Warning state detected' if ("#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)) && !("#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)) # rubocop:disable LineLength
         unless "#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)
           ok 'All is well!'
         end

@@ -120,9 +120,7 @@ class CheckSftp < Sensu::Plugin::Check::CLI
   def check_file_count
     # #YELLOW
     if config[:check_count] # rubocop:disable GuardClause
-      if matching_files.count > config[:check_count]
-        critical "Too many files - #{config[:directory]} has #{matching_files.count} matching files"
-      end
+      critical "Too many files - #{config[:directory]} has #{matching_files.count} matching files" if matching_files.count > config[:check_count]
     end
   end
 

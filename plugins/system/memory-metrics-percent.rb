@@ -56,15 +56,12 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
       # no need to have both
       # the one to drop here is "used" because "free" will
       # stack up neatly to 100% with all the others (except swapUsed)
-      if k != 'total' && k !~ /swap/ && k != 'used'
-        memp[k] = 100.0 * mem[k] / mem['total']
-      end
+      # #YELLOW
+      memp[k] = 100.0 * mem[k] / mem['total'] if k != 'total' && k !~ /swap/ && k != 'used'
 
       # with percentages, swapUsed and swapFree are exactly complementary
       # no need to have both
-      if k != 'swapTotal' && k =~ /swap/ && k != 'swapFree'
-        memp[k] = 100.0 * mem[k] / swptot
-      end
+      memp[k] = 100.0 * mem[k] / swptot if k != 'swapTotal' && k =~ /swap/ && k != 'swapFree'
     end
 
     memp

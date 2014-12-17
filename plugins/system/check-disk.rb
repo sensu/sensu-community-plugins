@@ -123,9 +123,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
   end
 
   def run
-    if config[:includeline] && config[:ignoreline]
-      unknown 'Do not use -l and -L options concurrently'
-    end
+    unknown 'Do not use -l and -L options concurrently' if config[:includeline] && config[:ignoreline]
     read_df
     unknown 'No filesystems found' unless @line_count > 0
     critical usage_summary unless @crit_fs.empty?
