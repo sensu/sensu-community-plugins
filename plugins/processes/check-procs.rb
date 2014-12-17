@@ -165,7 +165,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
   def on_cygwin?
     # #YELLOW
-    `ps -W 2>&1`; $CHILD_STATUS.exitstatus == 0 # rubocop:disable Semicolon
+    `ps -W 2>&1`; $?.exitstatus == 0 # rubocop:disable Semicolon
   end
 
   def acquire_procs
