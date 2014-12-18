@@ -1,10 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Author: AJ Bourg <aj@ajbourg.com>
+#   check-checksums
 #
-# Checks the checksums of files.
+# DESCRIPTION:
+#   Check the file against its checksum
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux, BSD
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   AJ Bourg <aj@ajbourg.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

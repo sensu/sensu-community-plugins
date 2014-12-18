@@ -1,23 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# ===
+#   etcd-metrics
 #
 # DESCRIPTION:
 #   This plugin pulls stats out of an etcd node
 #
-# PLATFORMS:
-#   all
-#
 # OUTPUT:
-#   plain-text
+#    metric data
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   etcd Ruby gem
+#   gem: sensu-plugin
+#   gem: etcd
+#   gem: socket
 #
-# Copyright (c) 2014, Sean Clerkin
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Sean Clerkin
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'etcd'
