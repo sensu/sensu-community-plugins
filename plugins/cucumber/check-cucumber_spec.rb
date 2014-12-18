@@ -1,3 +1,28 @@
+#! /usr/bin/env ruby
+#
+#   check-cucumber_spec
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: check-cucumber
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require_relative 'check-cucumber'
 require_relative '../../spec_helper'
 

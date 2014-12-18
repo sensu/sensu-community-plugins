@@ -1,23 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# ===
+#   check-cucumber
 #
 # DESCRIPTION:
 #   A check that executes Cucumber tests
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: sensu-plugin
+#   gem: <?>
 #
-# Copyright 2014 Simon Dean <simon@simondean.org>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Simon Dean <simon@simondean.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'sensu-plugin/check/cli'
 require 'optparse'
