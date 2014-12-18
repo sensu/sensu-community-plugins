@@ -1,31 +1,39 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks that a given Docker container is running
-# ===
+#   check-container
 #
-# This is a simple check script for Sensu to check that a Docker container is
-# running. You can pass in either a container id or a container name.
-#
-# USAGE:
-#
-#   check-docker-container.rb c92d402a5d14
-#     CheckDockerContainer OK
-#
-#   check-docker-container.rb circle_burglar
-#     CheckDockerContainer CRITICAL: circle_burglar is not running on the host
+# DESCRIPTION:
+#   This is a simple check script for Sensu to check that a Docker container is
+#   running. You can pass in either a container id or a container name.
 #
 # OUTPUT:
-#    plain-text
+#   plain text
 #
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: docker
+#
+# USAGE:
+#   check-docker-container.rb c92d402a5d14
+#   CheckDockerContainer OK
+#
+#   check-docker-container.rb circle_burglar
+#   CheckDockerContainer CRITICAL: circle_burglar is not running on the host
+#
+# NOTES:
 #     => State.running == true   -> OK
 #     => State.running == false  -> CRITICAL
 #     => Not Found               -> CRITICAL
 #     => Can't connect to Docker -> WARNING
 #     => Other exception         -> WARNING
 #
-# DEPENDENCIES:
-#    sensu-plugin Ruby gem
-#    docker-api Ruby gem
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
