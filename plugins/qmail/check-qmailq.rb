@@ -5,7 +5,7 @@
 # This is a simple check script which checks the number of mails in qmail queue for Sensu,
 # Uses `qmail-qread` binary to find out the mals in queue
 #
-# Examples:
+# USAGE:
 #
 #   check-qmailq.rb -h host -w warn -c critcal -t type
 #

@@ -15,11 +15,10 @@
 #   gem: aws-sdk
 #   gem: sensu-plugin
 #
-# #YELLOW
 # needs example command
-# EXAMPLES:
-#
-#
+# USAGE:
+#   #YELLOW
+
 # NOTES:
 #   Redis: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Redis.html
 #   Memcached: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Memcached.html

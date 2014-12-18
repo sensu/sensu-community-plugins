@@ -7,7 +7,7 @@
 # Raises a warning event for each individual failed test.
 # Also raises a single critical event if tests are failing.
 #
-# Examples:
+# USAGE:
 #
 #   # Run entire suite of tests
 #   check-rspec -d /tmp/my_tests

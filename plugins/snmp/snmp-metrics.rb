@@ -7,7 +7,7 @@
 #
 # Requires SNMP gem
 #
-# Examples:
+# USAGE:
 #
 #   check-snmp -h host -C community -O oid -p prefix -s suffix
 #

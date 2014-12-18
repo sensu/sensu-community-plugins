@@ -16,7 +16,7 @@
 #   gem: time
 #   gem: sensu-plugin
 #
-# EXAMPLES:
+# USAGE:
 #   Warning if any table's consumed read/write capacity is over 80%, critical if over 90%
 #   check-dynamodb-capacity --warning-over 80 --critical-over 90
 #

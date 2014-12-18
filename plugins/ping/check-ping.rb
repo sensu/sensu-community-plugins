@@ -4,7 +4,7 @@
 #
 # Requires "net-ping" gem
 #
-# Examples:
+# USAGE:
 #
 #   check-ping -h host -T timeout [--report]
 #

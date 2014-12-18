@@ -6,7 +6,7 @@
 # Runs http://serverspec.org/ spec tests against your servers.
 # Fails with a critical if tests are failing.
 #
-# Examples:
+# USAGE:
 #
 #   # Run entire suite of testd
 #   check-serverspec -d /etc/my_tests_dir

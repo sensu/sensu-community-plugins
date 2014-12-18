@@ -16,7 +16,7 @@
 #  gem: docker
 #  gem: docker-api
 #
-# EXAMPLES:
+# USAGE:
 #   check-docker-container.rb -w 3 -c 3
 #     => 1 container running = OK.
 #     => 4 container running = CRITICAL

@@ -16,10 +16,8 @@
 #   gem: sensu-plugin
 #   Apache module: mod_status
 #
-# #YELLOW
-# needs usage
-#
 # USAGE:
+#  #YELLOW
 #
 # NOTES:
 #   enable extended mod_status

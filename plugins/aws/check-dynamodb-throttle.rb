@@ -16,13 +16,14 @@
 #   gem: time
 #   gem: sensu-plugin
 #
-# EXAMPLES:
-#   # Critical if session table's read throttle is over 50 for the last 5 minutes
+# USAGE:
+#   Critical if session table's read throttle is over 50 for the last 5 minutes
 #   check-dynamodb-throttle --table_names session --throttle-for read --critical-over 50 --statistics sum --period 300
 #
 # NOTES:
 #
 # LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #

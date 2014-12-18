@@ -17,7 +17,7 @@
 #   gem: sensu-plugin
 #
 # #YELLOW
-# EXAMPLES:
+# USAGE:
 #
 # NOTES:
 #

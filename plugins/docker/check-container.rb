@@ -6,7 +6,7 @@
 # This is a simple check script for Sensu to check that a Docker container is
 # running. You can pass in either a container id or a container name.
 #
-# EXAMPLES:
+# USAGE:
 #
 #   check-docker-container.rb c92d402a5d14
 #     CheckDockerContainer OK

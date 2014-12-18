@@ -17,9 +17,8 @@
 #   gem: aws-sdk
 #   gem: sensu-plugin
 #
-# #YELLOW
-# needs example command
-# EXAMPLES:
+# USAGE:
+#   #YELLOW
 #
 # NOTES:
 #

@@ -18,7 +18,7 @@
 #   gem: sensu-plugin
 #
 # #YELLOW
-# EXAMPLES:
+# USAGE:
 #
 # NOTES:
 #  Based on code from check-chef-nodes.rb
