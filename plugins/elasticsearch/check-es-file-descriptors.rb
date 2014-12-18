@@ -1,25 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks ElasticSearch file descriptor status
-# ===
+#   check-es-file-descriptors
 #
 # DESCRIPTION:
 #   This plugin checks the ElasticSearch file descriptor usage, using its API.
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   rest-client Ruby gem
+#   gem: sensu-plugin
+#   gem: json
+#   gem: rest-client
 #
-# Author: S. Zachariah Sprackett <zac@sprackett.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Author: S. Zachariah Sprackett <zac@sprackett.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

@@ -16,7 +16,7 @@
 # DEPENDENCIES:
 #   gem: github-api
 #
-# EXAMPLES:
+# USAGE:
 #   ./tech_debt.rb
 #   rake calculate_debt
 #

@@ -1,26 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks ElasticSearch cluster status
-# ===
+#  check-es-cluster-status
 #
 # DESCRIPTION:
 #   This plugin checks the ElasticSearch cluster status, using its API.
 #   Works with ES 0.9x and ES 1.x
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   rest-client Ruby gem
+#   gem: sensu-plugin
+#   gem: rest-client
 #
-# Copyright 2012 Sonian, Inc <chefs@sonian.net>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

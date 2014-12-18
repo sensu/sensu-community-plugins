@@ -13,7 +13,7 @@
 # value (string) of the blnames. Also you can set certain important
 # blacklists as critical by -C option in a similar way.
 #
-# EXAMPLE USAGE:
+# USAGE:
 #   check-rbl.rb -i 8.8.8.8 -C SORBS -I UCEPROTECT3
 #
 # Copyright 2012 Sarguru Nathan  <sarguru90@gmail.com>
