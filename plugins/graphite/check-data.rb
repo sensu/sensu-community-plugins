@@ -158,19 +158,24 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
         handle = open(url, url_opts)
 
-        @raw_data = JSON.parse(handle.gets)
-        output = {}
-        @raw_data.each do |raw|
-          raw['datapoints'].delete_if { |v| v.first.nil? }
-          next if raw['datapoints'].empty?
-          target = raw['target']
-          data = raw['datapoints'].map(&:first)
-          start = raw['datapoints'].first.last
-          dend = raw['datapoints'].last.last
-          step = ((dend - start) / raw['datapoints'].size.to_f).ceil
-          output[target] = { 'target' => target, 'data' => data, 'start' => start, 'end' => dend, 'step' => step }
+        @raw_data = handle.gets
+        if @raw_data == '[]'
+          unknown 'Empty data received from Graphite - metric probably doesn\'t exists'
+        else
+          @json_data = JSON.parse(@raw_data)
+          output = {}
+          @json_data.each do |raw|
+            raw['datapoints'].delete_if { |v| v.first.nil? }
+            next if raw['datapoints'].empty?
+            target = raw['target']
+            data = raw['datapoints'].map(&:first)
+            start = raw['datapoints'].first.last
+            dend = raw['datapoints'].last.last
+            step = ((dend - start) / raw['datapoints'].size.to_f).ceil
+            output[target] = { 'target' => target, 'data' => data, 'start' => start, 'end' => dend, 'step' => step }
+          end
+          output
         end
-        output
       rescue OpenURI::HTTPError
         unknown 'Failed to connect to graphite server'
       rescue NoMethodError

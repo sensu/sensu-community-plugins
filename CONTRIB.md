@@ -34,7 +34,7 @@ Each plugin, handler, mutator, extension should use the following standard heade
 #   alarms work?
 #
 # OUTPUT:
-#   <output> plain text, metric data, etc
+#   plain text, metric data, etc
 #
 # PLATFORMS:
 #   Linux, Windows, BSD, Solaris, etc
