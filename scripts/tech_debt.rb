@@ -31,7 +31,7 @@
 
 require 'github_api'
 
-sensu_path = '/Users/mjones/projects/personal/sensu-community-plugins/'
+sensu_path = ''
 Dir.chdir sensu_path
 
 tech_debt_yellow = '#YELLOW'
@@ -39,7 +39,7 @@ tech_debt_orange = '#ORANGE'
 tech_debt_red = '#RED'
 
 github = Github.new do |c|
-  c.oauth_token = '72b9952ed1f44655a83def437e0fa8efdc8a7c58'
+  c.oauth_token = ''
 end
 
 yellow_debt = ''
