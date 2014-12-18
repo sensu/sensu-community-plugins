@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check for chef-server health using chef-server-ctl
-# ===
+#   check-chef-server
 #
 # DESCRIPTION:
 #   This plugin uses Chef Servers's `chef-server-ctl` to check to see if
@@ -9,19 +8,26 @@
 #   to be run with elevated privileges (sudo) or it will fail with unknown
 #   state.
 #
-# DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   Chef server
-#
 # OUTPUT:
-#   Plain-text.
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   Chef Server
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
 #   Returns CRITICAL if any of the chef-server processes are in a 'fail' or 'down' state
 #
-# AUTHORS:
-#   Tim Smith tim@cozy.co
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Tim Smith  tim@cozy.co
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
