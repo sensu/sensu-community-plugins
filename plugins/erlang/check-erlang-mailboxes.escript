@@ -13,6 +13,7 @@
 %% Released under the same terms as Sensu (the MIT license); see LICENSE
 %% for details.
 
+%% #RED
 main(Options) ->
     ParsedOptions = parse_options(Options),
     ok = set_local_node_name(ParsedOptions),

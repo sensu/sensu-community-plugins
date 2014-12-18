@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+# #RED
 from argparse import ArgumentParser
 import socket
 import time
@@ -23,7 +25,7 @@ def main():
     client = Client(args.user, args.password, args.tenant, args.auth_url, service_type=args.service_type)
 
     servers = client.servers.list()
-    
+
     # http://docs.openstack.org/api/openstack-compute/2/content/List_Servers-d1e2078.html
     states = {
         'ACTIVE': 0,
@@ -42,7 +44,7 @@ def main():
         'UNKNOWN': 0,
         'VERIFY_RESIZE': 0,
     }
-    
+
     for server in servers:
         if server.status not in states:
             states[server.status] = 0
