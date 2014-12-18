@@ -29,10 +29,9 @@ Each plugin, handler, mutator, extension should use the following standard heade
 #
 #   <script name>
 #
-#
 # DESCRIPTION:
-#   <description> what is this thing supposed to do, monitor.  How do alerts or
-#   alarms work.
+#   what is this thing supposed to do, monitor?  How do alerts or
+#   alarms work?
 #
 # OUTPUT:
 #   <output> plain text, metric data, etc
