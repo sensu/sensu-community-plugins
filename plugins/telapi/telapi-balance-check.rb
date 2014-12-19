@@ -1,16 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks TelAPI Account Balance
-# ===
+#   telapi-balance-check
 #
 # DESCRIPTION:
 #   This plugin checks the account balance for TelAPI (http://www.telapi.com/).
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

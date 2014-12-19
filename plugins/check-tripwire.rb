@@ -1,36 +1,41 @@
-#!/usr/bin/env ruby
-
+#! /usr/bin/env ruby
 #
-# Checks a system for tripwire violations.
-# ===
+#   check-tripwire
 #
 # DESCRIPTION:
-# This plugin periodically runs a check of the tripwire intrusion detection tool and
-# posts events for each violation found.
+#   This plugin periodically runs a check of the tripwire intrusion detection tool and
+#   posts events for each violation found.
 #
-# The plugin assumes that tripwire has been configured and that a tripwire database
-# is available that contains the desired state of the system.
+#   The plugin assumes that tripwire has been configured and that a tripwire database
+#   is available that contains the desired state of the system.
 #
-# The plugin does note require that the database be on the target machine. If an http
-# url is supplied via the -d option then the database will be retrieved via http before
-# the check is run and deleted afterward.
+#   The plugin does note require that the database be on the target machine. If an http
+#   url is supplied via the -d option then the database will be retrieved via http before
+#   the check is run and deleted afterward.
+#
+# OUTPUT:
+#   plain text
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
 # DEPENDENCIES:
-#   tripwire tool installed on the target machine
+#   gem: sensu-plugin
+#   tripwire
 #
 # USAGE:
-# there are sensible defaults for each of the options so the check can reasonably
-# be run with no options. It is configurably for most modes of use though and the
-# option descriptions below are fairly self explanatory.
+#   there are sensible defaults for each of the options so the check can reasonably
+#   be run with no options. It is configurably for most modes of use though and the
+#   option descriptions below are fairly self explanatory.
 #
-# Copyright 2013 Steve Gargan
+# NOTES:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Copyright 2013 Steve Gargan
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'

@@ -1,12 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Java PermGen Check
-# ===
+#  java-permgen
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# DESCRIPTION:
+#   Java PermGen Check
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

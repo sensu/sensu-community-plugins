@@ -1,14 +1,29 @@
-#!/usr/bin/env ruby
-# Check SIP
-# ===
+#! /usr/bin/env ruby
 #
-# Connect to a SIP server and check we get a valid response to a request
-# for a SIP URI
+#   check-sip
 #
-# Copyright 2013 Bashton Ltd <sam@bashton.com>
+# DESCRIPTION:
+#   Connect to a SIP server and check we get a valid response to a request
+#   for a SIP URI
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 Bashton Ltd <sam@bashton.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

@@ -1,12 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check health of Uchiwa and configured Sensu endpoints
-# ===
+#   uchiwa-health
 #
-# Copyright 2014 Grant Heffernan <grant@mapzen.com>
+# DESCRIPTION:
+#   Check health of Uchiwa and configured Sensu endpoints
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: uri
+#
+# USAGE:
+#  #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Grant Heffernan <grant@mapzen.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

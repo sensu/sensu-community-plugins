@@ -1,23 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks the status of OpenLDAP syncrepl
-# ===
+#   check-syncrepl
 #
 # DESCRIPTION:
 #   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working
 #   This currently only works with TLS and binding as a user
 #
+# OUTPUT:
+#   plain text
+#
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   net-ldap >= 0.3.1 Ruby gem
+#   gem: sensu-plugin
+#   gem: net-ldap
 #
-# Copyright (c) 2014, Justin Lambert <jlambert@letsevenup.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Justin Lambert <jlambert@letsevenup.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
