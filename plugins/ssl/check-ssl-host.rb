@@ -19,6 +19,7 @@
 # DEPENDENCIES:
 #   sensu-plugin
 
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'date'
 require 'openssl'
@@ -27,41 +28,41 @@ class CheckSSLHost < Sensu::Plugin::Check::CLI
   check_name 'check_ssl_host'
 
   option :critical,
-         :description => 'Return critical this many days before cert expiry',
-         :short => '-c',
-         :long => '--critical DAYS',
-         :proc => proc(&:to_i),
-         :default => 7
+         description: 'Return critical this many days before cert expiry',
+         short: '-c',
+         long: '--critical DAYS',
+         proc: proc(&:to_i),
+         default: 7
 
   option :warning,
-         :description => 'Return warning this many days before cert expiry',
-         :short => '-w',
-         :long => '--warning DAYS',
-         :required => true,
-         :proc => proc(&:to_i),
-         :default => 14
+         description: 'Return warning this many days before cert expiry',
+         short: '-w',
+         long: '--warning DAYS',
+         required: true,
+         proc: proc(&:to_i),
+         default: 14
 
   option :host,
-         :description => 'Hostname of server to check',
-         :short => '-h',
-         :long => '--host HOST',
-         :required => true
+         description: 'Hostname of server to check',
+         short: '-h',
+         long: '--host HOST',
+         required: true
 
   option :port,
-         :description => 'Port on server to check',
-         :short => '-p',
-         :long => '--port PORT',
-         :default => 443
+         description: 'Port on server to check',
+         short: '-p',
+         long: '--port PORT',
+         default: 443
 
   option :skip_hostname_verification,
-         :description => 'Disables hostname verification',
-         :long => '--skip-hostname-verification',
-         :boolean => true
+         description: 'Disables hostname verification',
+         long: '--skip-hostname-verification',
+         boolean: true
 
   option :skip_chain_verification,
-         :description => 'Disables certificate chain verification',
-         :long => '--skip-chain-verification',
-         :boolean => true
+         description: 'Disables certificate chain verification',
+         long: '--skip-chain-verification',
+         boolean: true
 
   def get_cert_chain(host, port)
     tcp_client = TCPSocket.new(host, port)
