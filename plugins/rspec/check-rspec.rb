@@ -40,27 +40,6 @@
 #   for details.
 #
 
-
-#!/usr/bin/env ruby
-#
-# Check RSpec tests plugin
-# ===
-#
-#
-# USAGE:
-#
-#   # Run entire suite of tests
-#   check-rspec -d /tmp/my_tests
-#
-#   # Run only one set of tests
-#   check-rspec -d /tmp/my_tests -s spec/test_one.rb
-#
-#   # Run tests with all options (except environment variables)
-#   check-rspec -b /usr/bin/ruby -i bin/rspec -d /tmp/my_tests -s spec
-#
-#   # Run tests with required options and multiple environment variables
-#   check-rspec -d /tmp/my_tests -e "aws_access_key_id=XXX aws_secret_access_key=XXX"
-
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'json'
 require 'socket'
