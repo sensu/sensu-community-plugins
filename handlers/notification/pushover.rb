@@ -33,7 +33,7 @@ class Pushover < Sensu::Handler
   end
 
   def pushover
-      incident_key = @event['client']['name'] + '/' + @event['check']['name']
+    incident_key = @event['client']['name'] + '/' + @event['check']['name']
       params = {
         title: event_name,
         user: settings['pushover']['userkey'],
