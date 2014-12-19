@@ -1,19 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Chef nodes
-# ===
+#   check-chef-nodes
 #
-# Example
-# ------
+# DESCRIPTION:
+#   It will report you nodes from you cluster last seen more then some amount of seconds
+#   Set CRITICAL-TIMESPAN to something interval + splay + <average chef kitchen run time>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.#
 #
-# Look for nodes that haven't check in for 1 or more hours
+# OUTPUT:
+#   <output> plain text, metric data, etc
 #
-# ./check-chef-nodes.rb -t 3600 -U https://api.opscode.com/organizations/<org> -K /path/to/org.pem
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
 #
-# It will report you nodes from you cluster last seen more then some amount of seconds
-# Set CRITICAL-TIMESPAN to something interval + splay + <average chef kitchen run time>
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   Look for nodes that haven't check in for 1 or more hours
+#   ./check-chef-nodes.rb -t 3600 -U https://api.opscode.com/organizations/<org> -K /path/to/org.pem
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

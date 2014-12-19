@@ -1,16 +1,35 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Opsgenie Heartbeat Plugin
-# ===
+#   opsgenie-heatbeat
 #
-# Sends heartbeat signal to Opsgenie. If Opsgenie does not receive one atleast every 10 minutes
-# it will alert. Fails with a warning if heartbeat is not configured in the Opsgenie admin
-# interface.
+# DESCRIPTION:
+#   Sends heartbeat signal to Opsgenie. If Opsgenie does not receive one atleast every 10 minutes
+#   it will alert. Fails with a warning if heartbeat is not configured in the Opsgenie admin
+#   interface.
 #
-# Recommended plugin interval: 200 and occurences: 3
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: uri
+#   gem: json
+#   gem: net-https
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Recommended plugin interval: 200 and occurences: 3
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

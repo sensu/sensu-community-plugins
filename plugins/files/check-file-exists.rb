@@ -1,8 +1,8 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Simple Sensu File Exists Plugin
-# ===
+#   check-file-exists
 #
+# DESCRIPTION:
 # Sometimes you just need a simple way to test if your alerting is functioning
 # as you've designed it. This test plugin accomplishes just that. But it can
 # also be set to check for the existance of any file (provided you have
@@ -18,10 +18,25 @@
 # And then set it ok again with:
 # rm /tmp/CRITICAL
 #
-# Copyright 2013 Mike Skovgaard <mikesk@gmail.com>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux, BSD
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 Mike Skovgaard <mikesk@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

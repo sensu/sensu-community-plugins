@@ -16,7 +16,7 @@
 #   gem: sensu-plugin
 #   gem: tempfile
 #
-# EXAMPLES:
+# USAGE:
 #   ./check-fs-writable.rb --auto  (check all volgroups in fstab)
 #   ./check-fs-writable.rb --dir /,/var,/usr,/home  (check a defined list of directories)
 #

@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks DHCP servers
-# ===
+#   check-dhcp
 #
 # DESCRIPTION:
 #   This plugin checks DHCP server responses.
@@ -15,19 +14,29 @@
 #   The 'offer' or 'ipaddr' options can be used to test that the response
 #   is an offer (of any address), or of a specific address.
 #
+#
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
 # DEPENDENCIES:
-#   net-dhcp ipaddr socket sensu-plugin Ruby gem
+#   gem: sensu-plugin
+#   gem: net-dhcp
+#   gem: socket
+#   gem: ipaddr
 #
-# Author: Matthew Richardson <m.richardson@ed.ac.uk>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Matthew Richardson <m.richardson@ed.ac.uk>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

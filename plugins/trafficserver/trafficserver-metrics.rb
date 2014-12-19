@@ -1,18 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull TrafficServer metrics through /_stats
-# ===
+#   trafficserver-metrics
 #
-# Dependencies
-# ------------
-# - Ruby gem 'json'
+# DESCRIPTION:
+#   Pull TrafficServer metrics through /_stats
 #
-# Copyright 2013 Chris Read <chris.read@gmail.com>
+# OUTPUT:
+#   metric data
 #
-# Based on the riak metrics collector by Pete Shima <me@peteshima.com>
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Based on the riak metrics collector by Pete Shima <me@peteshima.com>
+#
+# LICENSE:
+#   Copyright 2013 Chris Read <chris.read@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

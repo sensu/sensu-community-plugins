@@ -1,11 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull puma metrics
+#   puma-metrics
 #
-# Requires app to be running with --control auto --state "/tmp/puma.state"
+# DESCRIPTION:
+#   Pull puma metrics
 #
-# ===
+# OUTPUT:
+#   metric data
 #
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Requires app to be running with --control auto --state "/tmp/puma.state"
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 

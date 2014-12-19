@@ -1,18 +1,38 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Serverspec tests plugin
-# ===
+#   check-serverspec
 #
-# Runs http://serverspec.org/ spec tests against your servers.
-# Fails with a critical if tests are failing.
+# DESCRIPTION:
+#   Runs http://serverspec.org/ spec tests against your servers.
+#   Fails with a critical if tests are failing.
 #
-# Examples:
+# OUTPUT:
+#   plain text
 #
-#   # Run entire suite of testd
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: socket
+#   gem: serverspec
+#
+# USAGE:
+#   Run entire suite of testd
 #   check-serverspec -d /etc/my_tests_dir
 #
-#   # Run only one set of tests
+#   Run only one set of tests
 #   check-serverspec -d /etc/my_tests_dir -t spec/test_one
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'json'

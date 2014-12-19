@@ -1,20 +1,35 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Push Varnish stats into graphite
-# ===
+#   varnish-metrics
 #
-# This was tested with varnishstat from Varnish 3.x, but should work fine
-# with 2.x as well, and probably any version that supports '-x' for xml output.
+# DESCRIPTION:
+#   This was tested with varnishstat from Varnish 3.x, but should work fine
+#   with 2.x as well, and probably any version that supports '-x' for xml output.
 #
-# Requires `crack` gem to parse xml.
+# OUTPUT:
+#   metric data
 #
-# TODO: Narrow down the list of metrics output default but still output all
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: crack
+#   gem: uri
+#   gem: json
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   #YELOW Narrow down the list of metrics output default but still output all
 #       metrics with a flag.
 #
-# Copyright 2012 Joe Miller https://github.com/joemiller
+# LICENSE:
+#   Copyright 2012 Joe Miller https://github.com/joemiller
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

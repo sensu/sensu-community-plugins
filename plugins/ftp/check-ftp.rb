@@ -1,13 +1,31 @@
-#!/usr/bin/env ruby
-# check-ftp.rb
-# ===
-# Uses either net/ftp or optionally double-bag-ftps ruby gem to check for
-# connectivity to an FTP or FTPS server
+#! /usr/bin/env ruby
 #
-# Author: S. Zachariah Sprackett <zac@sprackett.com>
+#   check-ftp
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DESCRIPTION:
+#   #YELLOW
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Uses either net/ftp or optionally double-bag-ftps ruby gem to check for
+#   connectivity to an FTP or FTPS server
+#
+# LICENSE:
+#   S. Zachariah Sprackett <zac@sprackett.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

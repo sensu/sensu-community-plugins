@@ -7,7 +7,7 @@
 #
 # Requires SNMP gem
 #
-# Examples:
+# USAGE:
 #
 #   snmp-bulk-metrics -h host -C community -O oid1,oid2... -s suffix
 #

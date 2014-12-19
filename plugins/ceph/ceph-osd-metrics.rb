@@ -3,14 +3,13 @@
 # ceph-osd-metrics
 #
 # DESCRIPTION:
-#   <description> what is this thing supposed to do, monitor.  How do alerts or
-#   alarms work.
+#   #YELLOW
 #
 # OUTPUT:
-#   <output> plain text, metric data, etc
+#   plain text
 #
 # PLATFORMS:
-#   Linux, Windows, BSD, Solaris, etc
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
@@ -18,7 +17,7 @@
 #   ceph client
 #
 # USAGE:
-#   example commands
+#   #YELLOW
 #
 # NOTES:
 #   Dumps performance metrics from Ceph OSD admin socket into graphite-

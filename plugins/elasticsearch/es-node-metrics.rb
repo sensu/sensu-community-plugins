@@ -1,16 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# ElasticSearch Metrics Plugin
-# ===
+#   es-node-metrics
 #
-# This plugin uses the ES API to collect metrics, producing a JSON
-# document which is outputted to STDOUT. An exit status of 0 indicates
-# the plugin has successfully collected and produced.
+# DESCRIPTION:
+#   This plugin uses the ES API to collect metrics, producing a JSON
+#   document which is outputted to STDOUT. An exit status of 0 indicates
+#   the plugin has successfully collected and produced.
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# OUTPUT:
+#   metric data
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

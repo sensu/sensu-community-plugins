@@ -1,15 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull MongoDB Stats to Graphite
-# ===
-# Copyright 2013 github.com/foomatty
-# Basics from github.com/mantree/mongodb-graphite-metrics
+#   mongodb-metrics
 #
-# Depends on ruby mongo driver
-# gem install mongo
+# DESCRIPTION:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: mongo
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Basics from github.com/mantree/mongodb-graphite-metrics
+#
+# LICENSE:
+#   Copyright 2013 github.com/foomatty
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

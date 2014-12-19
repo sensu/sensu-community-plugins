@@ -1,23 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Push twemproxy stats into graphite
-# ===
+#   twemproxy-metrics
 #
 # DESCRIPTION:
 #   This plugin gets the stats data provided by twemproxy
 #   and sends it to graphite.
 #
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   socket       Ruby stdlib
-#   timeout      Ruby stdlib
-#   json         Ruby stdlib
+#   gem: sensu-plugin
+#   gem: json
+#   gem: socket
 #
-# Copyright 2014 Toni Reina <areina0@gmail.com>
+# USAGE:
+#  #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Toni Reina <areina0@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

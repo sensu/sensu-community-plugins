@@ -1,9 +1,8 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# check-sftp.rb
-# ===
+#   check-sftp
 #
-# Description
+# DESCRIPTION:
 #   Provides checks against an sFTP site.
 #
 #   1)  SFTP Connection Testing
@@ -11,12 +10,26 @@
 #   3)  File Count Exceeding
 #   4)  Files Older Than
 #
-# Dependencies
-# - net-sftp
+# OUTPUT:
+#   plain text, metric data, etc
 #
-#  Author Charles Cooke   <charles@coupa.com>
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: net-sftp
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Charles Cooke   <charles@coupa.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

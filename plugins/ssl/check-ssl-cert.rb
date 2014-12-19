@@ -1,22 +1,36 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check when a SSL certificate will expire.
-# ===
+#   check-ssl-cert
 #
-# Requirements
-# ===
+# DESCRIPTION:
+#   Check when a SSL certificate will expire.
 #
-# Needs the openssl binary on the system.
+# OUTPUT:
+#   plain text
 #
-# Jean-Francois Theroux <me@failshell.io>
-# Nathan Williams <nath.e.will@gmail.com>
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: openssl
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   Jean-Francois Theroux <me@failshell.io>
+#   Nathan Williams <nath.e.will@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'date'
 require 'openssl'
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckSSLCert < Sensu::Plugin::Check::CLI

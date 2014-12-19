@@ -1,22 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks etcd node self stats
-# ===
+#   check-etcd
 #
 # DESCRIPTION:
 #   This plugin checks that the stats/self url returns 200OK
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   rest-client Ruby gem
+#   gem: sensu-plugin
+#   gem: rest-client
+#   gem: json
 #
-# this is a first pass need to figure out all bad responses
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

@@ -1,25 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks ElasticSearch heap usage
-# ===
+#   check-es-heap
 #
 # DESCRIPTION:
 #   This plugin checks ElasticSearch's Java heap usage using its API.
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   rest-client Ruby gem
+#   gem: sensu-plugin
+#   gem: rest-client
 #
-# Copyright 2012 Sonian, Inc <chefs@sonian.net>
+# USAGE:
+#   example commands
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#  Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

@@ -1,21 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Directory size metrics
-# ===
+#   metric-dirsize
 #
-# Simple wrapper around `du` for getting directory size stats,
-# in real size, apparent size and inodes (when supported).
+# DESCRIPTION:
+#   Simple wrapper around `du` for getting directory size stats,
+#   in real size, apparent size and inodes (when supported).
 #
-# Check `du --help` to guess the meaning of real and apparent size.
+#   Check `du --help` to guess the meaning of real and apparent size.
 #
-# Invocation example:
+# OUTPUT:
+#   metric data
 #
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
 #   metric-dirsize.rb --dir /var/backups/postgres/ --real
 #
-# Copyright 2014 Pablo Figue
+# NOTES:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Copyright 2014 Pablo Figue
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'socket'

@@ -1,12 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Verifies Gluster's geo-replication status
-# ===
+#   check-guster-georepl-status
 #
-# Jean-Francois Theroux <me@failshell.io>
+# DESCRIPTION:
+#   Verifies Gluster's geo-replication status#
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Jean-Francois Theroux <me@failshell.io>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

@@ -1,15 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull new relic metrics
-# ===
+#   newrelic-metrics
 #
-# NOTE: this is setup to only work if you have a single account under
-# your api key.
+# DESCRIPTION:
+#   Pull new relic metrics
 #
-# Copyright 2012 Pete Shima <me@peteshima.com>
+# OUTPUT:
+#   metric data
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   this is setup to only work if you have a single account under
+#   your api key.
+#
+# LICENSE:
+#   Copyright 2012 Pete Shima <me@peteshima.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

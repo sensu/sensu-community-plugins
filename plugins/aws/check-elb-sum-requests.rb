@@ -15,11 +15,11 @@
 #   gem: aws-sdk
 #   gem: sensu-plugin
 #
-# EXAMPLES:
-#   # Warning if any load balancer's sum request count is over 1000, critical if over 2000.
+# USAGE:
+#   Warning if any load balancer's sum request count is over 1000, critical if over 2000.
 #   check-elb-sum-requests --warning-over 1000 --critical-over 2000
 #
-#   # Critical if "app" load balancer's sum request count is over 10000, within last one hour
+#   Critical if "app" load balancer's sum request count is over 10000, within last one hour
 #   check-elb-sum-requests --elb-names app --critical-over 10000 --period 3600
 #
 # NOTES:

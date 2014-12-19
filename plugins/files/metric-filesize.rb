@@ -1,17 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Filesize metrics
-# ===
+#   metric-filesize
 #
-# Simple wrapper around `stat` for getting file size stats,
-# in both, bytes and blocks.
+# DESCRIPTION:
+#   Simple wrapper around `stat` for getting file size stats,
+#   in both, bytes and blocks.
 #
-# Based on: Curl HTTP Timings metric (Sensu Community Plugins) by Joe Miller
+# OUTPUT:
+#   metric data
 #
-# Copyright 2014 Pablo Figue
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Based on: Curl HTTP Timings metric (Sensu Community Plugins) by Joe Miller
+#
+# LICENSE:
+#   Copyright 2014 Pablo Figue
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'socket'

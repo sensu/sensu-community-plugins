@@ -16,8 +16,8 @@
 #   gem: json
 #   gem: sensu-plugin
 #
-# #YELLOW
-# EXAMPLES:
+# USAGE:
+#   #YELLOW
 #
 # NOTES:
 #

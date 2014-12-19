@@ -1,24 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Github Pull Request Metrics
+#   github-repo-metrics
 #
-# Interacts with Github API to generate metrics about repo.
+# DESCRIPTION:
+#   Interacts with Github API to generate metrics about repo.
 #
-# github.sensu.sensu.stats.pulls  6 1380260194
-# github.sensu.sensu.stats.branches 1 1380260194
-# github.sensu.sensu.stats.tags 116 1380260194
-# github.sensu.sensu.stats.contributors 26  1380260194
-# github.sensu.sensu.stats.languages  1 1380260194
-# ===
+# OUTPUT:
+#   metric data
 #
-# Authors
-# ===
-# Nick Stielau, @nstielau
+# PLATFORMS:
+#   Linux
 #
-# Copyright 2013 Nick Stielau
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
 #
-# Released under the same terms as Sensu (the MIT license); see
-# LICENSE for details.
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   Copyright 2013 Nick Stielau, @nstielau
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems'
 require 'sensu-plugin/metric/cli'

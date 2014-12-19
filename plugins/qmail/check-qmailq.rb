@@ -1,20 +1,33 @@
-#!/usr/bin/env ruby
-# Check-qmailq
-# ===
+#! /usr/bin/env ruby
 #
-# This is a simple check script which checks the number of mails in qmail queue for Sensu,
-# Uses `qmail-qread` binary to find out the mals in queue
+#   check-qmailq
 #
-# Examples:
+# DESCRIPTION:
+#   This is a simple check script which checks the number of mails in qmail queue for Sensu,
+#   Uses `qmail-qread` binary to find out the mals in queue
 #
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
 #   check-qmailq.rb -h host -w warn -c critcal -t type
-#
 #   Type can be "local" and "remote"
 #
-#  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

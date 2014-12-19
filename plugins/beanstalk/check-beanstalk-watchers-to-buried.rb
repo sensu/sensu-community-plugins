@@ -4,6 +4,7 @@
 #
 #
 # DESCRIPTION:
+#   #YELLOW
 #
 # OUTPUT:
 #   plain-text
@@ -15,8 +16,8 @@
 #   gem: beanstalk
 #   gem: sensu-plugin
 #
-# #YELLOW
-# EXAMPLES:
+# USAGE:
+#   #YELLOW
 #
 # NOTES:
 #

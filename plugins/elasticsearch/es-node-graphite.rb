@@ -1,36 +1,40 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Metrics from ElasticSearch Node
-# ===
+#   es-node-graphite
 #
 # DESCRIPTION:
 #   This check creates node metrics from the elasticsearch API
 #
 # OUTPUT:
-#   plain-text / graphite
+#   metric data
 #
 # PLATFORMS:
-#   all
+#   Linux, Windows, BSD, Solaris, etc
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   rest-client Ruby gem
-#   json Ruby gem
+#   gem: sensu-plugin
+#   gem: rest-client
+#   gem: json
 #
-# 2014/04
-# Modifid by Vincent Janelle @randomfrequency http://github.com/vjanelle
-# Add more metrics, fix es 1.x URLs, translate graphite stats from
-# names directly
+# USAGE:
+#   #YELLOW
 #
-# 2012/12 - Modified by Zach Dunn @SillySophist http://github.com/zadunn
-# To add more metrics, and correct for new versins of ES. Tested on
-# ES Version 0.19.8
+# NOTES:
+#   2014/04
+#   Modifid by Vincent Janelle @randomfrequency http://github.com/vjanelle
+#   Add more metrics, fix es 1.x URLs, translate graphite stats from
+#   names directly
 #
-# Copyright 2013 Vincent Janelle <randomfrequency@gmail.com>
-# Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   2012/12 - Modified by Zach Dunn @SillySophist http://github.com/zadunn
+#   To add more metrics, and correct for new versins of ES. Tested on
+#   ES Version 0.19.8
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Copyright 2013 Vincent Janelle <randomfrequency@gmail.com>
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

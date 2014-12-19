@@ -1,20 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# This is a simple Ping check script for Sensu.
+#  check-ping
 #
-# Requires "net-ping" gem
+# DESCRIPTION:
+#   This is a simple Ping check script for Sensu.
 #
-# Examples:
+# OUTPUT:
+#   plain text
 #
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: net-ping
+#
+# USAGE:
 #   check-ping -h host -T timeout [--report]
 #
-#  Default host is "localhost"
+# NOTES:
 #
-#  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+# LICENSE:
+#   Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

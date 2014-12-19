@@ -1,3 +1,27 @@
+#! /usr/bin/env ruby
+#
+#   check-dns_spec
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: check-dns
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require_relative 'check-dns'
 require_relative '../../spec_helper'
 

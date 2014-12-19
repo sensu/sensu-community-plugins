@@ -1,22 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks the number of recordings in Twilio
-# ===
+#   check-num-recordings
 #
 # DESCRIPTION:
-#   This plugin checks the number of recordings in a twilio account.
+#   Checks the number of recordings in Twilio
+#
+# OUTPUT:
+#   plain text, metric data, etc
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   nori Ruby gem
+#   gem: sensu-plugin
+#   gem: uri
+#   gem: nori
 #
-# Copyright (c) 2013, Justin Lambert <jlambert@letsevenup.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2013, Justin Lambert <jlambert@letsevenup.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

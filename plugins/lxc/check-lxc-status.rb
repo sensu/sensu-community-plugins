@@ -6,7 +6,7 @@
 #
 # Requires "lxc" gem
 #
-# Examples:
+# USAGE:
 #
 #   check-lxc-status.rb -n name    => name of the container
 #

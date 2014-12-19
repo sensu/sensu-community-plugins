@@ -8,7 +8,7 @@
 #
 # Requires SNMP gem
 #
-# Examples:
+# USAGE:
 #
 #   check-snmp -h host -C community -O oid -w warning -c critical
 #   check-snmp -h host -C community -O oid -m "(P|p)attern to match\.?"

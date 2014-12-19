@@ -15,10 +15,8 @@
 #   gem: fog
 #   gem: sensu-plugin
 #
-# #YELLOW
-# needs example command
-# EXAMPLES:
-#
+# USAGE:
+#   #YELLOW
 #
 # NOTES:
 #   Returns latency statistics by default.  You can specify any valid ELB metric type, see

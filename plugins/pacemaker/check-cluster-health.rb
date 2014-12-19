@@ -1,24 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Cluster Health
-# =========
+#   cjeck-cluster-health
 #
 # DESCRIPTION:
-#  Check pacemaker cluster for offline nodes or failed resources
+#   Check pacemaker cluster for offline nodes or failed resources
 #
 # OUTPUT:
-#  plain-text
+#   plain text
 #
 # PLATFORMS:
-#  linux
+#   Linux
 #
 # DEPENDENCIES:
-#  sensu-plugin ruby gem
+#   gem: sensu-plugin
+#   gem: rexml
 #
-# Copyright (c) 2014, Nathan Williams <nath.e.will@gmail.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Nathan Williams <nath.e.will@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

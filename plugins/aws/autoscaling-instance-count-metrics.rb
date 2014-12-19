@@ -15,10 +15,8 @@
 #   gem: fog
 #   gem: sensu-plugin
 #
-# #YELLOW
-# needs example command
-# EXAMPLES:
-#
+# USAGE:
+#   #YELLOW
 #
 # NOTES:
 #

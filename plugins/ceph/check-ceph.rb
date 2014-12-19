@@ -3,6 +3,7 @@
 # check-ceph
 #
 # DESCRIPTION:
+#   #YELLOW
 #
 # OUTPUT:
 #   plain text
@@ -29,7 +30,7 @@
 #   Using -d (--detailed) and/or -o (--osd-tree) will dramatically increase
 #   verboseness during warning/error reports, however they may add
 #   additional insights to cluster-related problems during notification.
-##
+#
 # LICENSE:
 #   Copyright 2013 Brian Clark <brian.clark@cloudapt.com>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE

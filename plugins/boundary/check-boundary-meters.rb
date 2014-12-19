@@ -17,14 +17,14 @@
 #   gem: json
 #   gem: sensu-plugin
 #
-# #YELLOW
-# EXAMPLES:
+# USAGE:
+#   #YELLOW
 #
 # NOTES:
 #  Based on code from check-chef-nodes.rb
 #
 # LICENSE:
-#   Copyright 2014 Heavy Water Operations, LLC <support@sensuapp.com>
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #

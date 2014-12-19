@@ -7,24 +7,24 @@
 #   if any node in the cluster has run into a schema disagreement problem
 #
 # OUTPUT:
-#   <output> plain text, metric data, etc
+#   plain text
 #
 # PLATFORMS:
-#   Linux, Windows, BSD, Solaris, etc
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
 #   Cassandra's nodetool
 #
 # USAGE:
-#   example commands
+#   #YELLOW
 #
 # NOTES:
 #   See http://www.datastax.com/documentation/cassandra/2.0/cassandra/dml/dml_handle_schema_disagree_t.html
 #   for more details
 #
 # LICENSE:
-#   Copyright 2014 Heavy Water Operations, LLC <support@sensuapp.com>
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #

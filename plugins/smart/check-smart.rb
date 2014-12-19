@@ -1,55 +1,61 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks devices SMART attributes with smartmontool
-# ===
+#   check-smart
 #
 # DESCRIPTION:
-# S.M.A.R.T. - Self-Monitoring, Analysis and Reporting Technology
+#   S.M.A.R.T. - Self-Monitoring, Analysis and Reporting Technology
 #
-# Check hdd and ssd SMART attributes defined in smart.json file. Default is
-# to check all attributes defined in this file if attribute is presented by hdd.
-# If attribute not presented script will skip it.
+#   Check hdd and ssd SMART attributes defined in smart.json file. Default is
+#   to check all attributes defined in this file if attribute is presented by hdd.
+#   If attribute not presented script will skip it.
 #
-# I defined smart.json file based on this two specification
-# http://en.wikipedia.org/wiki/S.M.A.R.T.#cite_note-kingston1-32
-# http://media.kingston.com/support/downloads/MKP_306_SMART_attribute.pdf
+#   I defined smart.json file based on this two specification
+#   http://en.wikipedia.org/wiki/S.M.A.R.T.#cite_note-kingston1-32
+#   http://media.kingston.com/support/downloads/MKP_306_SMART_attribute.pdf
 #
-# I tested on several Seagate, WesternDigital hdd and Cosair force Gt SSD
+#   I tested on several Seagate, WesternDigital hdd and Cosair force Gt SSD
 #
-# It is possible some hdd give strange attribute values and warnings based on it
-# but in this case simply define attribute list with '-a' parameter
-# and ignore wrong parameters. Maybe attribute 1 and 201 will be wrong because
-# format of this attributes specified by hdd vendors.
+#   It is possible some hdd give strange attribute values and warnings based on it
+#   but in this case simply define attribute list with '-a' parameter
+#   and ignore wrong parameters. Maybe attribute 1 and 201 will be wrong because
+#   format of this attributes specified by hdd vendors.
 #
-# You can test the script just make a copy of your smartctl output and change some
-# value. I put a hdd attribute file into 'test_hdd.txt' and a failed hdd file into
-# 'test_hdd_failed.txt'.
+#   You can test the script just make a copy of your smartctl output and change some
+#   value. I put a hdd attribute file into 'test_hdd.txt' and a failed hdd file into
+#   'test_hdd_failed.txt'.
 #
-# PLEASE TEST IT BEFORE YOU TRUST BLINDLY IN THIS SCRIPT!
+# OUTPUT:
+#   plain text
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
-# DEPENDENCIES: json, smartmontools, smart.json file, suduers
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   smartmontools
+#   smart.json
 #
 # USAGE:
-# You need to add 'sensu' user to suduers or you can't use 'smartctl'
-# sensu   ALL=(ALL) NOPASSWD:ALL
+#   You need to add 'sensu' user to suduers or you can't use 'smartctl'
+#   sensu   ALL=(ALL) NOPASSWD:ALL
 #
-# PARAMETERS:
-# -b: smartctl binary to use, in case you hide yours (default: /usr/sbin/smartctl)
-# -d: default threshold for crit_min,warn_min,warn_max,crit_max (default: 0,0,0,0)
-# -a: SMART attributes to check (default: all)
-# -t: Custom threshold for SMART attributes. (id,crit_min,warn_min,warn_max,crit_max)
-# -o: Overall SMART health check (default: on)
-# -d: Devices to check (default: all)
-# --debug: turn debug output on (default: off)
-# --debug_file: process this file instead of smartctl output for testing
+#   PARAMETERS:
+#   -b: smartctl binary to use, in case you hide yours (default: /usr/sbin/smartctl)
+#   -d: default threshold for crit_min,warn_min,warn_max,crit_max (default: 0,0,0,0)
+#   -a: SMART attributes to check (default: all)
+#   -t: Custom threshold for SMART attributes. (id,crit_min,warn_min,warn_max,crit_max)
+#   -o: Overall SMART health check (default: on)
+#   -d: Devices to check (default: all)
+#   --debug: turn debug output on (default: off)
+#   --debug_file: process this file instead of smartctl output for testing
 #
-# Copyright 2013 Peter Kepes <https://github.com/kepes>
+# NOTES:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Copyright 2013 Peter Kepes <https://github.com/kepes>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

@@ -7,7 +7,7 @@
 #
 # Requires "lxc" gem
 #
-# Examples:
+# USAGE:
 #
 #   check-lxc-memstat.rb -n name -w warn  -c critical
 #

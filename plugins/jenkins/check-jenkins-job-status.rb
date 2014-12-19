@@ -1,26 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Jenkins Job status
-#
-# ===
+#   check-jenkins-job-status
 #
 # DESCRIPTION:
 #   Query jenkins API asking for job status
 #
 # OUTPUT:
-#   OK        - job/jobs status is green(success)
-#   CRITICAL  - job/jobs status is red(failure)
+#   plain text
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: sensu-plugin
 #   jenkins_api_client
 #
-# TODO: add authorization options
-# TODO: add url to job's log for CRITICAL state
+# USAGE:
+#   #YELLOW
 #
-# Copyright 2014 SUSE, GmbH <happy-customer@suse.de>
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#   #YELLOW
+#   add authorization options
+#   add url to job's log for CRITICAL state
+#
+# LICENSE:
+#   Copyright 2014 SUSE, GmbH <happy-customer@suse.de>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
