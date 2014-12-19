@@ -59,7 +59,7 @@ class CheckProcessRestart < Sensu::Plugin::Check::CLI
   # Check if we can run checkrestart script
   # Return: Boolean
   def checkrestart?
-    File.exists?('/etc/debian_version') && File.exists?(CHECK_RESTART)
+    File.exist?('/etc/debian_version') && File.exist?(CHECK_RESTART)
   end
 
   # Run checkrestart and parse process(es) and pid(s)
