@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Sensu Handler: pushover
-## Updates 12/19/2014 - Added rudimentary 'occurrences' and 'refresh' key support. 
+## Updates 12/19/2014 - Added rudimentary 'occurrences' and 'refresh' key support.
 ## by Jordan Anderson (https://github.com/aqtrans)
 #
 # This handler formats alerts and sends them off to a the pushover.net service.
@@ -17,16 +17,14 @@ require 'sensu-handler'
 require 'timeout'
 
 class Pushover < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def handle
-    apiurl = 'https://api.pushover.net/1/messages.json'
     po_occurrences = @event['occurrences'].to_i
     po_refresh = @event['check']['refresh'].to_i
-    #if @event['occurrences'] == 1 || @event['occurrences'] % @event['check']['refresh'] == 0
+    # if @event['occurrences'] == 1 || @event['occurrences'] % @event['check']['refresh'] == 0
     if po_occurrences == 1 || po_occurrences % po_refresh == 0
       pushover
     else
@@ -37,15 +35,14 @@ class Pushover < Sensu::Handler
   def pushover
       incident_key = @event['client']['name'] + '/' + @event['check']['name']
       params = {
-        :title => event_name,
-        :user => settings['pushover']['userkey'],
-        :token => settings['pushover']['token'],
-        :message => @event['check']['output']
+        title: event_name,
+        user: settings['pushover']['userkey'],
+        token: settings['pushover']['token'],
+        message: @event['check']['output']
       }
-      
       begin
         timeout(3) do
-          apiurl = "https://api.pushover.net/1/messages.json"
+          apiurl = 'https://api.pushover.net/1/messages.json'
           url = URI.parse(apiurl)
           req = Net::HTTP::Post.new(url.path)
           req.set_form_data(params)
@@ -59,5 +56,4 @@ class Pushover < Sensu::Handler
         puts 'pushover -- timed out while attempting to ' + @event['action'] + ' incident -- ' + incident_key
       end
   end
-
 end
