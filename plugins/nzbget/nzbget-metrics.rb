@@ -1,10 +1,15 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Metrics from NZBGet
-# ===
+#   Metrics from NZBGet
 #
 # DESCRIPTION:
 #   Connects to the NZBGet API to return metrics of NZBGet's current status.
+#
+# OUTPUT:
+#   Metric data
+#
+# PLATFORMS:
+#   Linux, Mac, Windows
 #
 # USAGE:
 #   Default usage:
@@ -21,6 +26,7 @@
 #
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
