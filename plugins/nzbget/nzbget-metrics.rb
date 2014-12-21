@@ -34,30 +34,29 @@ require 'rest-client'
 require 'json'
 
 class NzbgetMetric < Sensu::Plugin::Metric::CLI::Graphite
-
   option :username,
-    short: '-u USERNAME',
-    long: '--username USERNAME',
-    description: 'NZBGet username',
-    required: true
+         short: '-u USERNAME',
+         long: '--username USERNAME',
+         description: 'NZBGet username',
+         required: true
 
   option :password,
-    short: '-p PASSWORD',
-    long: '--password PASSWORD',
-    description: 'NZBGet password',
-    required: true
+         short: '-p PASSWORD',
+         long: '--password PASSWORD',
+         description: 'NZBGet password',
+         required: true
 
   option :api,
-    short: '-a API',
-    long: '--api API',
-    description: 'NZBGet API location, defaults to http://localhost:6789',
-    default: 'http://localhost:6789'
+         short: '-a API',
+         long: '--api API',
+         description: 'NZBGet API location, defaults to http://localhost:6789',
+         default: 'http://localhost:6789'
 
   option :scheme,
-    short: '-s SCHEME',
-    long: '--scheme SCHEME',
-    description: 'Metric naming scheme',
-    default: "#{Socket.gethostname}.nzbget"
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         description: 'Metric naming scheme',
+         default: "#{Socket.gethostname}.nzbget"
 
   def api_request(resource)
     api_uri = "#{config[:api]}/#{config[:username]}:#{config[:password]}"
