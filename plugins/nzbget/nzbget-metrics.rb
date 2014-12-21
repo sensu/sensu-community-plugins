@@ -1,12 +1,12 @@
 #! /usr/bin/env ruby
 #
-#   Metrics from NZBGet
+#   nzbget-metrics
 #
 # DESCRIPTION:
 #   Connects to the NZBGet API to return metrics of NZBGet's current status.
 #
 # OUTPUT:
-#   Metric data
+#   metric-data
 #
 # PLATFORMS:
 #   Linux, Mac, Windows
