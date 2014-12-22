@@ -8,7 +8,7 @@ describe MemoryGraphite do
 
   before(:each) do
     def checker.meminfo_output
-      File.open('spec/fixtures/meminfo_output.txt', 'r')
+      File.open('spec/fixtures/plugins/system/meminfo_output.txt', 'r')
     end
   end
 

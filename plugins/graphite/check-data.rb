@@ -1,9 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check graphite values
-# ===
+#   check-data
 #
-# This plugin checks values within graphite
+# DESCRIPTION:
+#   This plugin checks values within graphite
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: open-uri
+#   gem: openssl
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

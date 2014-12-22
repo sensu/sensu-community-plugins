@@ -1,17 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# HAProxy Check
-# ===
+#   check-haproxy
 #
-# Defaults to checking if ALL services in the given group are up; with
-# -1, checks if ANY service is up. with -A, checks all groups.
+# DESCRIPTION:
+#   Defaults to checking if ALL services in the given group are up; with
+#   -1, checks if ANY service is up. with -A, checks all groups.
 #
-# Updated: To add -S to allow for different named sockets
+# OUTPUT:
+#   plain text
 #
-# Copyright 2011 Sonian, Inc.
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#   gem: csv
+#   gem: uri
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

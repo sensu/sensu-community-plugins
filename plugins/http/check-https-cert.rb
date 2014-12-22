@@ -1,17 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+#   check-https-cert
 #
 # DESCRIPTION:
 #    Checks the expiration date of a URL SSL Certificate
 #    and notifies if it is before the expiry parameter.
 #
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   net-https    Ruby stdlib
+#   gem: sensu-plugin
+#   gem: nrt-https
 #
-# Copyright 2014 Rhommel Lamas <roml@rhommell.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license) ; see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Rhommel Lamas <roml@rhommell.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

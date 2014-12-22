@@ -1,27 +1,52 @@
-#!/usr/bin/env ruby
-
-# Author: AJ Bourg <aj@ajbourg.com>
-
-# Check to ensure data gets posted and is retrievable by graphite.
-# We post to each server in config[:relays] then sleep config[:sleep]
-# seconds then check each of config[:graphites] to see if the data made it
-# to each one. OK if all servers have the data we expected, WARN if
-# config[:warning] or fewer have it. CRITICAL if config[:critical]
-# or fewer have it. config[:check_id] allows you to have many of these
-# checks running in different places without any conflicts. Customize it
-# if you are going to run this check from multiple servers. Otherwise
-# it defaults to default. (can be a descriptive string, used as a graphite key)
+#! /usr/bin/env ruby
 #
-# This check is most useful when you have a cluster of carbon-relays configured
-# with REPLICATION_FACTOR > 1 and more than one graphite server those
-# carbon-relays are configured to post to. This check ensures that replication
-# is actually happening in a timely manner.
+#   check-replication
+#
+# DESCRIPTION:
+#   Check to ensure data gets posted and is retrievable by graphite.
+#   We post to each server in config[:relays] then sleep config[:sleep]
+#   seconds then check each of config[:graphites] to see if the data made it
+#   to each one. OK if all servers have the data we expected, WARN if
+#   config[:warning] or fewer have it. CRITICAL if config[:critical]
+#   or fewer have it. config[:check_id] allows you to have many of these
+#   checks running in different places without any conflicts. Customize it
+#   if you are going to run this check from multiple servers. Otherwise
+#   it defaults to default. (can be a descriptive string, used as a graphite key)
+#
+#   This check is most useful when you have a cluster of carbon-relays configured
+#   with REPLICATION_FACTOR > 1 and more than one graphite server those
+#   carbon-relays are configured to post to. This check ensures that replication
+#   is actually happening in a timely manner.
 
-# How it works: We generate a large random number for each of these servers
-# Then we post that number to each server via a key in the form of:
-# checks.graphite.check_id.replication.your_graphite_server.ip It's safe
-# to throw this data away quickly. A day retention ought to be more
-# than enough for anybody.
+#   How it works: We generate a large random number for each of these servers
+#   Then we post that number to each server via a key in the form of:
+#   checks.graphite.check_id.replication.your_graphite_server.ip It's safe
+#   to throw this data away quickly. A day retention ought to be more
+#   than enough for anybody.
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: rest-client
+#   gem: json
+#   gem: ipaddress
+#   gem: resolv
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   AJ Bourg <aj@ajbourg.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
