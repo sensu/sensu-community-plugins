@@ -13,8 +13,6 @@ Gem::Specification.new do |gem|
 
   gem.files                 = Dir['Rakefile', '{plugins,extensions,handlers,mutators,lib,spec,scripts}/**/*', 'README*', 'LICENSE*', 'CONTRIB*', 'CHANGELOG*']
 
-  gem.add_dependency 'rubocop', '~> 0.17.0'
-  gem.add_dependency 'rake'
   gem.add_dependency 'sensu-plugin', '1.1.0'
   # gem.add_dependency
   # gem.add_dependency
@@ -43,6 +41,8 @@ Gem::Specification.new do |gem|
   # gem.add_dependency
 
   gem.add_development_dependency 'bundler',         '~> 1.3'
+  gem.add_dependency 'rubocop', '~> 0.17.0'
+  gem.add_dependency 'rake'
   # gem.add_development_dependency 'coveralls',       '~> 0.6.7'
   # gem.add_development_dependency 'guard',           '~> 2.2.3'
   # gem.add_development_dependency 'guard-bundler',   '~> 2.0.0'
