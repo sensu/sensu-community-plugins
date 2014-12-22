@@ -1,6 +1,28 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check CPU Plugin
+#   check-cpu
+#
+# DESCRIPTION:
+#   Check cpu usage
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
