@@ -23,7 +23,7 @@
 #
 
 require_relative '../../../plugins/dns/check-dns'
-require_relative '../../spec_helper'
+require_relative '../../../spec_helper'
 
 describe DNS, 'run' do
 
