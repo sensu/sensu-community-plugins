@@ -1,18 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Curl HTTP timing metrics
-# ===
+#   metrics-curl
 #
-# Simple wrapper around curl for getting timing stats from the various phases
-# of connecting to an HTTP/HTTPS server.
+# DESCRIPTION:
+#   Simple wrapper around curl for getting timing stats from the various phases
+#   of connecting to an HTTP/HTTPS server.
 #
-# Based on: http://dev.nuclearrooster.com/2009/12/07/quick-download-benchmarks-with-curl/
-# by Nick Stielau.
+# OUTPUT:
+#   metric data
 #
-# Copyright 2012 Joe Miller
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Based on: http://dev.nuclearrooster.com/2009/12/07/quick-download-benchmarks-with-curl/
+#   by Nick Stielau.
+#
+# LICENSE:
+#   Copyright 2012 Joe Miller
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'socket'

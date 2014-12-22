@@ -1,18 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check HTTP
-# ===
+#   check-http
 #
-# Takes either a URL or a combination of host/path/port/ssl, and checks for
-# a 200 response (that matches a pattern, if given). Can use client certs.
+# DESCRIPTION:
+#   Takes either a URL or a combination of host/path/port/ssl, and checks for
+#   a 200 response (that matches a pattern, if given). Can use client certs.
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
-# Updated by Lewis Preson 2012 to accept basic auth credentials
-# Updated by SweetSpot 2012 to require specified redirect
-# Updated by Chris Armstrong 2013 to accept multiple headers
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: net
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc <chefs@sonian.net>
+#   Updated by Lewis Preson 2012 to accept basic auth credentials
+#   Updated by SweetSpot 2012 to require specified redirect
+#   Updated by Chris Armstrong 2013 to accept multiple headers
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

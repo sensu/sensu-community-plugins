@@ -1,17 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull haproxy metrics for backends
-# ===
+#   <script name>
 #
-# If you are occassionally seeing "nil output" from this check, make sure you have
-# sensu-plugin >= 0.1.7. This will provide a better error message.
+# DESCRIPTION:
+#   If you are occassionally seeing "nil output" from this check, make sure you have
+#   sensu-plugin >= 0.1.7. This will provide a better error message.
 #
-# TODO: backend pool single node stats.
+# OUTPUT:
+#   metric data, etc
 #
-# Copyright 2012 Pete Shima <me@peteshima.com>, Joe Miller <https://github.com/joemiller>
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   #YELLOW
+#   backend pool single node stats
+#
+# LICENSE:
+#   Pete Shima <me@peteshima.com>, Joe Miller <https://github.com/joemiller>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
