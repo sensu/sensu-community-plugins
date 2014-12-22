@@ -23,8 +23,8 @@
 #   for details.
 #
 
-require_relative 'check-cucumber'
-require_relative '../../spec_helper'
+require_relative '../../../plugins/cucumber/check-cucumber'
+require_relative '../../../spec_helper'
 
 describe CheckCucumber do
   check_cucumber = nil
