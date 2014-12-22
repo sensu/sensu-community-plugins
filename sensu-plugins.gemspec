@@ -1,4 +1,4 @@
-
+require 'date'
 Gem::Specification.new do |gem|
   gem.name                  = 'sensu-community-plugins'
   gem.authors               = ['Sonian, Inc. and contributors']
@@ -42,7 +42,6 @@ Gem::Specification.new do |gem|
   # gem.add_dependency
   # gem.add_dependency
 
-
   gem.add_development_dependency 'bundler',         '~> 1.3'
   # gem.add_development_dependency 'coveralls',       '~> 0.6.7'
   # gem.add_development_dependency 'guard',           '~> 2.2.3'
@@ -56,7 +55,6 @@ Gem::Specification.new do |gem|
   # gem.add_development_dependency 'simplecov',       '~> 0.7.1'
   # gem.add_development_dependency 'yard',            '~> 0.8'
 end
-
 
 # ast (2.0.0)
 # diff-lcs (1.2.5)
