@@ -1,17 +1,36 @@
-#!/usr/bin/env ruby
-
+#! /usr/bin/env ruby
 #
-# Checks metrics in graphite, averaged over a period of time.
+#   check-stats
 #
-# The fired sensu event will only be critical if a stat is
-# above the critical threshold. Otherwise, the event will be warning,
-# if a stat is above the warning threshold.
+# DESCRIPTION:
+#   Checks metrics in graphite, averaged over a period of time.
 #
-# Multiple stats will be checked if * are used
-# in the "target" query.
+#   The fired sensu event will only be critical if a stat is
+#   above the critical threshold. Otherwise, the event will be warning,
+#   if a stat is above the warning threshold.
 #
-# Author: Alan Smith (alan@asmith.me)
-# Date: 08/28/2014
+#   Multiple stats will be checked if * are used
+#   in the "target" query.
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#
+# LICENSE:
+#   Alan Smith (alan@asmith.me)
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

@@ -1,14 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Get time series values from Graphite and create events based on values
-# ===
+#   <script name>
 #
+# DESCRIPTION:
+#   Get time series values from Graphite and create events based on values
 #
-# Copyright 2012 Ulf Mansson @ Recorded Future
-# Modifications by Chris Jansen to support wildcard targets
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: socket
+#   gem: array_stats
+#   gem: net/http
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Ulf Mansson @ Recorded Future
+#   Modifications by Chris Jansen to support wildcard targets
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

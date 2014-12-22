@@ -1,14 +1,32 @@
-#!/usr/bin/hbase org.jruby.Main
+#! /usr/bin/env ruby
 #
-# HBase regions plugin
-# ===
+#   check-hbase-regions
 #
-# This plugin checks the number of regions on a regionserver
+# DESCRIPTION:
+#   This plugin checks the number of regions on a regionserver
 #
-# Copyright 2011 Runa Inc
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: pp
+#   gem: java
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   #YELLOW
+#   rewite to use sensu-plugin
+#
+# LICENSE:
+#   Copyright 2011 Runa Inc
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'java'
 require 'pp'
