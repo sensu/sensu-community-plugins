@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'sensu-plugin'
+gem 'sensu-plugin', '1.1.0'
 
 group :test do
   gem 'rubocop', '~> 0.17.0'
