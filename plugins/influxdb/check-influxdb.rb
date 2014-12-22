@@ -1,12 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check if /ping endopoint is responding
-# ===
+#   check-influx
 #
-# Copyright (C) 2014, Mitsutoshi Aoe <maoe@foldr.in>
+# DESCRIPTION:
+#   Check if /ping endopoint is responding
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: uri
+#   gem: json
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright (C) 2014, Mitsutoshi Aoe <maoe@foldr.in>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

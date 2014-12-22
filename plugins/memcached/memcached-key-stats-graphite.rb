@@ -1,11 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Get memcached per key detailed get, set, and del operation metrics
+#   memcached-key-stats-graphite
 #
-# Copyright 2013 Piavlo <lolitushka@gmail.com>
+# DESCRIPTION:
+#   Get memcached per key detailed get, set, and del operation metrics
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 Piavlo <lolitushka@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

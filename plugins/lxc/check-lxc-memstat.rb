@@ -1,24 +1,35 @@
-#!/usr/bin/env ruby
-# check-lxc-memstat
-# ===
+#! /usr/bin/env ruby
 #
-# This is a simple check script for Sensu to check out the LXC's memory usage
+#   check-lxc-memstat
 #
+# DESCRIPTION:
+#   This is a simple check script for Sensu to check out the LXC's memory usage
 #
-# Requires "lxc" gem
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: lxc
 #
 # USAGE:
-#
 #   check-lxc-memstat.rb -n name -w warn  -c critical
 #
 #   check-lxc-memstat.rb -n testdebian -w 80 -c 90
 #
-#  Default lxc is "testdebian", change to if you dont want to pass host
-# option
-#  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Default lxc is "testdebian", change to if you dont want to pass host
+#   option
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
