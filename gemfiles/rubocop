@@ -8,4 +8,4 @@ gem 'rspec'
 gem 'rspec-mocks'
 gem 'rubocop', '~> 0.17.0'
 
-gemspec
+../gemspec
