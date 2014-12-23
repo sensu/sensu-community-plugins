@@ -24,13 +24,13 @@ matrix:
     - rvm: 1.8.7
     - rvm: 1.9.3
   exclude:
-    - rvm 1.8.7
+    - rvm: 1.8.7
       gemfile: gemfiles/rubocop
-    - rvm 1.9.2
+    - rvm: 1.9.2
       gemfile: gemfiles/rubocop
-    - rvm 1.9.3
+    - rvm: 1.9.3
       gemfile: gemfiles/no_rubocop
-    - rvm 2.0
+    - rvm: 2.0
       gemfile: gemfiles/no_rubocop
-    - rvm 2.1
+    - rvm: 2.1
       gemfile: gemfiles/no_rubocop
