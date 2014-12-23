@@ -1,19 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Push Memcached stats into graphite
+#   memcached-graphite
 #
-# Dependencies
-# -----------
-# - Ruby gem `memcached`
+# DESCRIPTION:
+#   Push Memcached stats into graphite
 #
-# ===
+# OUTPUT:
+#   metric data
 #
-# TODO: HitRatio percent and per second calculations
+# PLATFORMS:
+#   Linux
 #
-# Copyright 2012 Pete Shima <me@peteshima.com>
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: memcached
+#   gem: socket
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   #YELLOW
+#   HitRatio percent and per second calculations
+#
+# LICENSE:
+#   Copyright 2012 Pete Shima <me@peteshima.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

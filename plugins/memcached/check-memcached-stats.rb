@@ -1,12 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Memcached stats
-# ===
+#   check-memcached-stats
 #
-# Copyright 2012 AJ Christensen <aj@junglist.gen.nz>
+# DESCRIPTION:
+#   Check Memcached stats
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 AJ Christensen <aj@junglist.gen.nz>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

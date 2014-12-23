@@ -1,5 +1,7 @@
 language: ruby
 rvm:
+  - 1.9.2
+  - 1.9.3
   - 2.0
   - 2.1
 notifications:
@@ -10,5 +12,8 @@ notifications:
     on_failure: always
 
 script:
-  - 'bundle exec rake rubocop'
-  - 'bundle exec rake spec'
+  - 'bundle exec rake default'
+
+matrix:
+  allow_failures:
+    - rvm: 1.9.3

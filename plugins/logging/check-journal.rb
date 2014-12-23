@@ -1,40 +1,54 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Journal plugin
-# ===
+#  check-journal
 #
-# This plugin checks the systemd journal (aka journald) for a pattern.
-# It is loosely based on the check-log.rb plugin and accepts similar arguments
-# where relevant.
+# DESCRIPTION:
+#   This plugin checks the systemd journal (aka journald) for a pattern.
+#   It is loosely based on the check-log.rb plugin and accepts similar arguments
+#   where relevant.
 #
-# Unlike check-log.rb or other file-based log checks, we do not need to keep state
-# since we can query the journal using hints such as `--since=-5minutes`. The check
-# interval and the `--since` argument should match in order to ensure adequate
-# and efficient coverage of the journal. See `journalctl(1)` man page for additional
-# details on valid values for the `--since` parameters.
+#   Unlike check-log.rb or other file-based log checks, we do not need to keep state
+#   since we can query the journal using hints such as `--since=-5minutes`. The check
+#   interval and the `--since` argument should match in order to ensure adequate
+#   and efficient coverage of the journal. See `journalctl(1)` man page for additional
+#   details on valid values for the `--since` parameters.
 #
-# Journalctl params
-# -----------------
+#   Journalctl params
+#   -----------------
 #
-# By default, all available journal entries are queried. Any valid journalctl(1)
-# argument can be passed using `--journalctl_args="ARGS ..."`. For example, to
-# query only journal entries from the `elasticsearch.service` unit using the
-# `-u` option:
+#   By default, all available journal entries are queried. Any valid journalctl(1)
+#   argument can be passed using `--journalctl_args="ARGS ..."`. For example, to
+#   query only journal entries from the `elasticsearch.service` unit using the
+#   `-u` option:
 #
-#    $ check-journal.rb --journalctl_args='-u elasticsearch.service' -q Error
-#    CheckJournal CRITICAL: 20 matches found for Error in `journalctl --no-pager -a -u elasticsearch.service --since=-10minutes` (threshold 1)
+#      $ check-journal.rb --journalctl_args='-u elasticsearch.service' -q Error
+#      CheckJournal CRITICAL: 20 matches found for Error in `journalctl --no-pager -a -u elasticsearch.service --since=-10minutes` (threshold 1)
 #
-# Permissions
-# -----------
+#   Permissions
+#   -----------
 #
-# The user executing this script (probably the sensu user) must be a member of the
-# `systemd-journal` group to read all journal entries.
+#   The user executing this script (probably the sensu user) must be a member of the
+#   `systemd-journal` group to read all journal entries.
 #
+# OUTPUT:
+#   plain text
 #
-# Copyright 2013 Joe Miller
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 Joe Miller
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

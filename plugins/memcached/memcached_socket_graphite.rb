@@ -1,10 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# This plugin uses socket rather than memcached gem or ruby package.
-# Copyright 2013 github.com/foomatty
+#   memcached-socket-graphite
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DESCRIPTION:
+#   This plugin uses socket rather than memcached gem or ruby package.
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#  #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 github.com/foomatty
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
