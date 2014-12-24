@@ -30,8 +30,6 @@ Each plugin, handler, mutator, extension should use the following standard heade
 #   <script name>
 #
 # DESCRIPTION:
-#   what is this thing supposed to do, monitor?  How do alerts or
-#   alarms work?
 #
 # OUTPUT:
 #   plain text, metric data, etc
@@ -44,10 +42,8 @@ Each plugin, handler, mutator, extension should use the following standard heade
 #   gem: <?>
 #
 # USAGE:
-#   example commands
 #
 # NOTES:
-#   Does it behave differently on specific platforms, specific use cases, etc
 #
 # LICENSE:
 #   <your name>  <your email>
@@ -84,7 +80,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 
 There is a Vagrantfile with shell provisioning that will setup the major versions of Ruby and a sensu gemset for each if you wish to use it.  To get started install [Vagrant](https://www.vagrantup.com/) then type *vagrant up* in the root directory of the repo.  Once it is up type *vagrant ssh* to remote into the box and then *cd /vagrant && bundle install* to set all necessary dependencies.
 
-The box currently defaults to Ruby 2.1.4 but has 1.8.7, 1.9.3 and 2.0.0 installed and 1.8.7 and 1.9.3 available as well.  See the file comments for further details.
+The box currently defaults to Ruby 2.1.4 but has 1.9.2, 1.9.3 and 2.0.0 installed as well.  See the file comments for further details.
 
 ## Testing
 
@@ -93,7 +89,7 @@ Only pull requests passing lint/tests will be merged.
 
 Rubocop is used to lint the style of the ruby plugins. This is done
 to standardize the style used within these plugins, and ensure high
-quality code.  All current rules with the exception of <b>Style/FileName</b> are currently in effect.
+quality code.  Most current rules are currently in effect.  No linting is done on Ruby code prior to version 1.9.3 as Rubocop requires 1.9.2 and linting for it is identical to 1.9.3.  See the [travis.yml](.travis.yml) and [Rakefile](Rakefile) for details on what tests and versions are currently supported.  There are currently no plans to support Ruby 1.8.x
 
 You can test rubocop compliance for yourself by installing the gem and running <i>rubocop</i> from the command line.
 Running <i>rubocop -a</i> will attempt to autocorrect any issues, saving yourself considerable time in large files.
@@ -113,13 +109,13 @@ If you use either of these methods please mention in the PR as this should be ke
 
 ### Rspec
 
-Currently we have RSpec as a [test framework](https://github.com/sensu/sensu-plugin-spec). Please add coverage for your check.  Checks will not be considered production grade and stable until they have complete coverage.
+Currently we have RSpec3 as a [test framework](https://github.com/sensu/sensu-plugin-spec). Please add coverage for your check.  Checks will not be considered production grade and stable until they have complete coverage.
 
-You can use the included Vagrantfile for easy testing.  All necessary version of Ruby can be installed with their own dedicated gem sets using RVM.  Just boot up the machine and drop into /vagrant and execute
+You can use the included Vagrantfile for easy testing.  All necessary versions of Ruby can be installed with their own dedicated gem sets using RVM.  Just boot up the machine and drop into /vagrant and execute
 
     rake default
  
-to run all specs and rubocop tests.
+to run all specs and rubocop tests.  RSpec tests are currently run against 1.9.2, 1.9.3, 2.0, and 2.1.  There are currently no plans to support 1.8.x.
    
 This is ~~little bit hard~~ almost impossible for non-ruby checks. Let someone from [team](https://github.com/sensu?tab=members) know and maybe can can help.
 
