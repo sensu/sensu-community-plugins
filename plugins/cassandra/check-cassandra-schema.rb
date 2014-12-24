@@ -33,6 +33,7 @@
 # rubocop:disable AssignmentInCondition
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
+require 'English'
 
 class CheckCassandraSchema < Sensu::Plugin::Check::CLI
   option :hostname,
@@ -50,7 +51,7 @@ class CheckCassandraSchema < Sensu::Plugin::Check::CLI
   # execute cassandra's nodetool and return output as string
   def nodetool_cmd(cmd)
     out = `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd} 2>&1`
-    return out, $?
+    [out, $CHILD_STATUS]
   end
 
   def run
