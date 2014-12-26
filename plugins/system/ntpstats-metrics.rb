@@ -13,28 +13,28 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class NtpStatsMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :description => "Target host",
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :default => "localhost"
+         description: 'Target host',
+         short: '-h HOST',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => Socket.gethostname
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: Socket.gethostname
 
   def run
-    unless config[:host] == "localhost"
+    # #YELLOW
+    unless config[:host] == 'localhost'  # rubocop:disable IfUnlessModifier
       config[:scheme] = config[:host]
     end
 
     ntpstats = get_ntpstats(config[:host])
     critical "Failed to get ntpstats from #{config[:host]}" if ntpstats.empty?
     metrics = {
-      :ntpstats => ntpstats
+      ntpstats: ntpstats
     }
     metrics.each do |name, stats|
       stats.each do |key, value|
@@ -58,7 +58,8 @@ class NtpStatsMetrics < Sensu::Plugin::Metric::CLI::Graphite
     num_val_pattern = /-?[\d]+(\.[\d]+)?/
     pattern = /(#{key_pattern})=(#{num_val_pattern}),?\s?/
 
-    `ntpq -c rv #{host}`.scan(pattern).inject({}) do |hash, parsed|
+    # #YELLOW
+    `ntpq -c rv #{host}`.scan(pattern).reduce({}) do |hash, parsed| # rubocop:disable Style/EachWithObject
       key, val, fraction = parsed
       hash[key] = fraction ? val.to_f : val.to_i
       hash

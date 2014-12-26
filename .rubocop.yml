@@ -1,11 +1,3 @@
-###########################
-# Configuration for rubocop
-#
-# Most of these are disabling existing cops, primarily
-# due to a smattering of different styles and loose
-# guidlines for contributions.
-#
-# Any of these may be changed.
 
 MethodLength:
   Max: 200
@@ -13,167 +5,20 @@ MethodLength:
 LineLength:
   Max: 160
 
-AlignParameters:
+FileName:
   Enabled: false
 
-SpaceAroundOperators:
+PerceivedComplexity:
   Enabled: false
 
-Encoding:
+CyclomaticComplexity:
   Enabled: false
-
-AndOr:
-  Enabled: true
-
-FinalNewline:
-  Enabled: true
-
-AssignmentInCondition:
-  Enabled: true
-
-AllCops:
-  Excludes:
-    - vendor/**
 
 ClassLength:
-  Enabled: false
-
-##
-# TODO: enable and check everything below
-
-RegexpLiteral:
-  Enabled: false
-
-AccessorMethodName:
-  Enabled: false
-
-NilComparison:
-  Enabled: false
-
-WhileUntilDo:
-  Enabled: false
-
-TrailingComma:
-  Enabled: false
-
-SpecialGlobalVars:
-  Enabled: false
-
-RedundantBegin:
-  Enabled: false
-
-VariableName:
-  Enabled: false
-
-MethodName:
-  Enabled: false
-
-SignalException:
-  Enabled: false
-
-HashMethods:
-  Enabled: false
-
-NumericLiterals:
-  Enabled: false
-
-SpaceAfterMethodName:
-  Enabled: false
-
-DotPosition:
-  Enabled: false
-
-AlignArray:
-  Enabled: false
-
-ConditionPosition:
-  Enabled: false
-
-EmptyLiteral:
-  Enabled: false
-
-TrivialAccessors:
-  Enabled: false
-
-MultilineBlockChain:
-  Enabled: false
-
-PredicateName:
-  Enabled: false
-
-HashSyntax:
-  Enabled: false
-
-# Single Quotes
-StringLiterals:
-  Enabled: false
-
-UnlessElse:
-  Enabled: false
-
-RedundantSelf:
-  Enabled: false
-
-WordArray:
-  Enabled: false
-
-IfUnlessModifier:
-  Enabled: false
-
-ParenthesesAroundCondition:
-  Enabled: false
-
-WhileUntilModifier:
-  Enabled: false
-
-Semicolon:
-  Enabled: false
-
-BlockNesting:
-  Enabled: false
-
-Proc:
-  Enabled: false
-
-Lambda:
-  Enabled: false
-
-CollectionMethods:
-  Enabled: false
-
-EmptyLineBetweenDefs:
-  Enabled: false
-
-SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-RescueException:
-  Enabled: false
-
-CaseIndentation:
-  Enabled: false
-
-EmptyLinesAroundBody:
-  Enabled: false
-
-IndentationWidth:
-  Enabled: false
-
-# That would be nice to have - check for long methods
-CyclomaticComplexity:
   Enabled: false
 
 Documentation:
   Enabled: false
 
-AlignHash:
-  Enabled: false
-
-SpaceAroundBlockBraces:
-  Enabled: false
-
-SingleLineBlockParams:
-  Enabled: false
-
-BracesAroundHashParameters:
+IfUnlessModifier:
   Enabled: false

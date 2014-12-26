@@ -1,52 +1,103 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# This is a simple Ping check script for Sensu.
+#  check-ping
 #
-# Requires "net-ping" gem
+# DESCRIPTION:
+#   This is a simple Ping check script for Sensu.
 #
-# Examples:
+# OUTPUT:
+#   plain text
 #
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: net-ping
+#
+# USAGE:
 #   check-ping -h host -T timeout [--report]
 #
-#  Default host is "localhost"
+# NOTES:
 #
-#  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+# LICENSE:
+#   Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'net/ping'
 
 class CheckPING < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h host',
-    :default => 'localhost'
+         short: '-h host',
+         default: 'localhost'
 
   option :timeout,
-    :short => '-T timeout',
-    :default => '5'
+         short: '-T timeout',
+         proc: proc(&:to_i),
+         default: 5
+
+  option :count,
+         short: '-c count',
+         description: 'The number of ping requests',
+         proc: proc(&:to_i),
+         default: 1
+
+  option :interval,
+         short: '-i interval',
+         description: 'The number of seconds to wait between ping requests',
+         proc: proc(&:to_f),
+         default: 1
+
+  option :warn_ratio,
+         short: '-W ratio',
+         description: 'Warn if successful ratio is under this value',
+         proc: proc(&:to_f),
+         default: 0.5
+
+  option :critical_ratio,
+         short: '-C ratio',
+         description: 'Critical if successful ratio is under this value',
+         proc: proc(&:to_f),
+         default: 0.2
 
   option :report,
-    :short => '-r',
-    :long => '--report',
-    :description => "Attach MTR report if ping is failed",
-    :default => false
+         short: '-r',
+         long: '--report',
+         description: 'Attach MTR report if ping is failed',
+         default: false
 
   def run
+    result = []
     pt = Net::Ping::External.new(config[:host], nil, config[:timeout])
-    if pt.ping?
-      ok "ICMP ping successful for host: #{config[:host]}"
+    config[:count].times do |i|
+      sleep(config[:interval]) unless i == 0
+      result[i] = pt.ping?
+    end
+
+    successful_count = result.count(true)
+    total_count = config[:count]
+    success_ratio = successful_count / total_count.to_f
+
+    if success_ratio > config[:warn_ratio]
+      success_message = "ICMP ping successful for host: #{config[:host]}"
+      ok success_message
     else
-      message = "ICMP ping unsuccessful for host: #{config[:host]}"
+      failure_message = "ICMP ping unsuccessful for host: #{config[:host]} (successful: #{successful_count}/#{total_count})"
+
       if config[:report]
         report = `mtr --curses --report-cycles=1 --report --no-dns #{config[:host]}`
-        message = message + "\n" + report
+        failure_message = failure_message + "\n" + report
       end
-      critical message
+
+      if success_ratio <= config[:critical_ratio]
+        critical failure_message
+      else
+        warning failure_message
+      end
     end
   end
 end

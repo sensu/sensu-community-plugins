@@ -11,6 +11,7 @@
 
 # get arguments
 
+# #RED
 while getopts 'w:c:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;

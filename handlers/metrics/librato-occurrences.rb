@@ -10,13 +10,13 @@ require 'sensu-handler'
 require 'librato/metrics'
 
 class LibratoMetrics < Sensu::Handler
-
   # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
 
   def handle
     hostname = @event['client']['name'].split('.').first
-    check_name = @event['check']['name'].gsub(%r|[ \.]|, '_')
+    # #YELLOW
+    check_name = @event['check']['name'].gsub(%r{[ \.]}, '_') # rubocop:disable RegexpLiteral
     metric = "sensu.events.#{hostname}.#{check_name}.occurrences"
     value = @event['action'] == 'create' ? @event['occurrences'] : 0
 
@@ -24,7 +24,7 @@ class LibratoMetrics < Sensu::Handler
 
     begin
       timeout(3) do
-        Librato::Metrics.submit metric.to_sym => {:type => :counter, :value => value, :source => 'sensu'}
+        Librato::Metrics.submit metric.to_sym => { type: :counter, value: value, source: 'sensu' }
       end
     rescue Timeout::Error
       puts "librato -- timed out while sending metric #{metric}"
@@ -32,5 +32,4 @@ class LibratoMetrics < Sensu::Handler
       puts "librato -- failed to send metric #{metric} : #{error}"
     end
   end
-
 end

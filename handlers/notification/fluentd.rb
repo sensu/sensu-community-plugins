@@ -49,23 +49,23 @@ class Fluentd < Sensu::Handler
 
   def handle
     event = {
-      :action => action_to_string,
-      :name => event_name,
-      :client => @event['client']['name'],
-      :check_name => @event['check']['name'],
-      :status => @event['check']['status'],
-      :output => @event['check']['output'],
-      :address => @event['client']['address'],
-      :command => @event['check']['command'],
-      :occurrences => @event['occurrences'],
-      :flapping => @event['check']['flapping']
+      action: action_to_string,
+      name: event_name,
+      client: @event['client']['name'],
+      check_name: @event['check']['name'],
+      status: @event['check']['status'],
+      output: @event['check']['output'],
+      address: @event['client']['address'],
+      command: @event['check']['command'],
+      occurrences: @event['occurrences'],
+      flapping: @event['check']['flapping']
     }
 
     begin
       timeout(5) do
         uri = URI("http://#{host}:#{port}/#{event_tag}?time=#{@event['check']['issued']}")
         http = Net::HTTP.new(uri.host, uri.port)
-        request = Net::HTTP::Post.new(uri.path, "content-type" => "application/json; charset=utf-8")
+        request = Net::HTTP::Post.new(uri.path, 'content-type' => 'application/json; charset=utf-8')
         request.body = JSON.dump(event)
 
         response = http.request(request)

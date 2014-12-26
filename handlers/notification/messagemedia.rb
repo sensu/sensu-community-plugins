@@ -22,13 +22,13 @@ class MessageMedia < Sensu::Handler
   def action_to_string
     case @event['check']['status']
     when 0
-      "RESOLVED"
+      'RESOLVED'
     when 1
-      "WARNING"
+      'WARNING'
     when 2
-      "CRITICAL"
+      'CRITICAL'
     else
-      "UNKNOWN"
+      'UNKNOWN'
     end
   end
 
@@ -48,7 +48,7 @@ class MessageMedia < Sensu::Handler
         settings['messagemedia']['mobile_numbers'].each do |mobile_number|
           puts 'sms -- preparing alert(s) for ' + mobile_number
           begin
-            si.add_message :phone_number => mobile_number, :message => message
+            si.add_message phone_number: mobile_number, message: message
           rescue ArgumentError
             puts 'sms -- failed sending alert(s) for ' + mobile_number
           end

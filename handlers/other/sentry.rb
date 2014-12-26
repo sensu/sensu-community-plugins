@@ -36,7 +36,7 @@ require 'uri'
 event = JSON.parse(STDIN.read, symbolize_names: true)
 
 # set up the URL and URI
-dsn = %r((.+\/\/)(.+):(.+)@(.+)\/(\d+)).match("#{ARGV[0]}")
+dsn = %r{(.+\/\/)(.+):(.+)@(.+)\/(\d+)}.match("#{ARGV[0]}")
 @proto = dsn[1]
 @key = dsn[2]
 @secret = dsn[3]
@@ -63,10 +63,10 @@ end
 tstamp = Time.now.utc.iso8601
 
 # create the header
-auth_header = 'Sentry sentry_version=5,' +
-'sentry_client=raven-ruby/1.0,' +
-"sentry_timestamp=#{event[:client][:timestamp]}," +
-"sentry_key=#{@key}, sentry_client=raven-ruby/1.0," +
+auth_header = 'Sentry sentry_version=5,' \
+'sentry_client=raven-ruby/1.0,' \
+"sentry_timestamp=#{event[:client][:timestamp]}," \
+"sentry_key=#{@key}, sentry_client=raven-ruby/1.0," \
 "sentry_secret=#{@secret}"
 
 # create the event_id
