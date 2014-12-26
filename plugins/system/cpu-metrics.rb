@@ -49,7 +49,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
         # #YELLOW
         cpu_count = cpu_count + 1 # rubocop:disable Style/SelfAssignment
         name = 'total' if name == 'cpu'
-        cpu_metrics.size.times { |i| output "#{config[:scheme]}.#{name}.#{cpu_metrics[i]}", info[i] }
+        info.size.times { |i| output "#{config[:scheme]}.#{name}.#{cpu_metrics[i]}", info[i] }
       end
 
       output "#{config[:scheme]}.#{name}", info.last if other_metrics.include? name
