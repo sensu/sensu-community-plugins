@@ -16,11 +16,13 @@ require 'sensu-plugin/check/cli'
 class CheckWindowsCpuLoad < Sensu::Plugin::Check::CLI
   option :warning,
          short: '-w WARNING',
-         default: 85
+         default: 85,
+         proc: proc(&:to_i)
 
   option :critical,
          short: '-c CRITICAL',
-         default: 95
+         default: 95,
+         proc: proc(&:to_i)
 
   def run
     io = IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\"")
