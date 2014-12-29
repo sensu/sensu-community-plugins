@@ -1,6 +1,7 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# ===
+# check-rds-events
+#
 #
 # DESCRIPTION:
 #   This plugin checks rds clusters for critical events.
@@ -8,17 +9,26 @@
 #   events containing the text string 'has started' or 'is being'.  These events all have
 #   accompanying completiion events and are impacting events
 #
+# OUTPUT:
+#   plain-text
+#
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   aws-sdk Ruby gem
+#   gem: aws-sdk
+#   gem: sensu-plugin
 #
-# Copyright (c) 2014, Tim Smith, tim@cozy.co
+# USAGE:
+#  ./check-rds-events.rb -r ${you_region} -s ${your_aws_secret_access_key} -a ${your_aws_access_key}
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Tim Smith <tim@cozy.co>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
