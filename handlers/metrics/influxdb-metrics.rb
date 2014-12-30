@@ -20,7 +20,7 @@ class SensuToInfluxDB < Sensu::Handler
                                                       port: influxdb_port,
                                                       server: influxdb_server
     mydata = []
-    Array(@event['check']['output']).each do |metric|
+    @event['check']['output'].each_line do |metric|
       m = metric.split
       next unless m.count == 3
       key = m[0].split('.', 2)[1]
