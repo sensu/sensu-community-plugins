@@ -5,7 +5,7 @@
 #
 # Dependencies
 # -----------
-# - python-quantumclient and related libraries
+# - python-neutronclient and related libraries
 #
 # Performs API query to determine 'alive' status of all
 # (or filtered list of) Neutron network agents. Also has
@@ -18,10 +18,11 @@
 # see LICENSE for details.
 #
 
+# #RED
 import sys
 import argparse
 import logging
-from quantumclient.quantum import client
+from neutronclient.neutron import client
 
 STATE_OK = 0
 STATE_WARNING = 1
@@ -82,23 +83,23 @@ for a in agents['agents']:
 
 if agents_down:
     for a in agents_down:
-        messages.append("{} on {} is down".format(a['agent_type'], a['host']))
+        messages.append("{agent_type} on {host} is down".format(agent_type=a['agent_type'], host=a['host']))
         exit_state = STATE_CRITICAL
 
 if args.warn_disabled and agents_disabled:
     for a in agents_disabled:
-        messages.append("{} on {} is {} and disabled"
-                        .format(a['agent_type'],
-                                a['host'],
-                                'alive' if a['alive'] else 'down'))
+        messages.append("{agent_type} on {host} is {alive} and disabled"
+                        .format(agent_type=a['agent_type'],
+                                host=a['host'],
+                                alive='alive' if a['alive'] else 'down'))
     if exit_state != STATE_CRITICAL: exit_state = STATE_WARNING
 
 if len(messages) == 1:
-     print "Neutron agent status: {}".format(messages[0])
+     print "Neutron agent status: {status}".format(status=messages[0])
 else:
-    print "Neutron agent status {} total / {} down / {} disabled".format(len(agents['agents']),
-                                                                        len(agents_down),
-                                                                        len(agents_disabled))
+    print "Neutron agent status {agents} total / {agents_down} down / {agents_disabled} disabled".format(agents=len(agents['agents']),
+                                                                        agents_down=len(agents_down),
+                                                                        agents_disabled=len(agents_disabled))
 
 if len(messages) > 1: print "\n".join(messages)
 exit(exit_state)

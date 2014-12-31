@@ -11,6 +11,7 @@
 
 # Also make sure the user "sensu" can sudo without password
 
+# #RED
 while getopts 'w:c:n:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
@@ -42,7 +43,7 @@ WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 NAME=${NAME:=0}
 
-#Get PID of JVM. 
+#Get PID of JVM.
 #At this point grep for the name of the java process running your jvm.
 PID=$(sudo jps | grep $NAME | awk '{ print $1}')
 
@@ -52,7 +53,7 @@ TotalHeap=$(sudo jstat -gccapacity $PID  | tail -n 1 | awk '{ print ($4 + $5 + $
 #Determine amount of used heap JVM is using
 UsedHeap=$(sudo jstat -gc $PID  | tail -n 1 | awk '{ print ($3 + $4 + $6 + $8 + $10) / 1024 }')
 
-#Get heap usage percentage 
+#Get heap usage percentage
 HeapPer=$(echo "scale=3; $UsedHeap / $TotalHeap * 100" | bc -l| cut -d "." -f1)
 
 

@@ -1,4 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+#   <script name>
+#
+# DESCRIPTION:
+#   what is this thing supposed to do, monitor?  How do alerts or
+#   alarms work?
+#
+# OUTPUT:
+#   plain text, metric data, etc
+#
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   <your name>  <your email>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+# !/usr/bin/env ruby
 #
 # Push mysql stats into graphite
 # ===
@@ -11,59 +41,77 @@
 #
 # Copyright 2012 Pete Shima <me@peteshima.com>
 # Additional hacks by Joe Miller - https://github.com/joemiller
+# Updated by Oluwaseun Obajobi 2014 to accept ini argument
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# USING INI ARGUMENT
+# This was implemented to load mysql credentials without parsing the username/password.
+# The ini file should be readable by the sensu user/group.
+# Ref: http://eric.lubow.org/2009/ruby/parsing-ini-files-with-ruby/
+#
+#   EXAMPLE
+#     mysql-alive.rb -h db01 --ini '/etc/sensu/my.cnf'
+#
+#   MY.CNF INI FORMAT
+#   [client]
+#   user=sensu
+#   password="abcd1234"
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'mysql2'
 require 'socket'
+require 'inifile'
 
 class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "Mysql Host to connect to",
-    :required => true
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Mysql Host to connect to',
+         required: true
 
   option :port,
-    :short => "-P PORT",
-    :long => "--port PORT",
-    :description => "Mysql Port to connect to",
-    :proc => proc {|p| p.to_i },
-    :default => 3306
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'Mysql Port to connect to',
+         proc: proc(&:to_i),
+         default: 3306
 
   option :username,
-    :short => "-u USERNAME",
-    :long => "--user USERNAME",
-    :description => "Mysql Username",
-    :required => true
+         short: '-u USERNAME',
+         long: '--user USERNAME',
+         description: 'Mysql Username'
 
   option :password,
-    :short => "-p PASSWORD",
-    :long => "--pass PASSWORD",
-    :description => "Mysql password",
-    :default => ""
+         short: '-p PASSWORD',
+         long: '--pass PASSWORD',
+         description: 'Mysql password',
+         default: ''
+
+  option :ini,
+         short: '-i',
+         long: '--ini VALUE',
+         description: 'My.cnf ini file'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.mysql"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.mysql"
 
   option :socket,
-    :short => "-S SOCKET",
-    :long => "--socket SOCKET"
+         short: '-S SOCKET',
+         long: '--socket SOCKET'
 
   option :verbose,
-    :short => "-v",
-    :long => "--verbose",
-    :boolean => true
+         short: '-v',
+         long: '--verbose',
+         boolean: true
 
   def run
-
     # props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
 
     metrics = {
@@ -89,7 +137,8 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Select_full_range_join' => 'fullRangeJoins',
         'Select_range' =>           'selectRange',
         'Select_range_check' =>     'selectRange_check',
-        'Select_scan' =>            'selectScan'
+        'Select_scan' =>            'selectScan',
+        'Slow_queries' =>           'slowQueries'
       },
       'querycache' => {
         'Qcache_queries_in_cache' =>  'queriesInCache',
@@ -174,61 +223,71 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       }
     }
 
-    begin
-      mysql = Mysql2::Client.new(
-        :host => config[:host],
-        :port =>config[:port],
-        :username => config[:username],
-        :password => config[:password],
-        :socket => config[:socket]
+    config[:host].split(' ').each do |mysql_host|
+      mysql_shorthostname = mysql_host.split('.')[0]
+      if config[:ini]
+        ini = IniFile.load(config[:ini])
+        section = ini['client']
+        db_user = section['user']
+        db_pass = section['password']
+      else
+        db_user = config[:username]
+        db_pass = config[:password]
+      end
+      begin
+        mysql = Mysql2::Client.new(
+          host: mysql_host,
+          port: config[:port],
+          username: db_user,
+          password: db_pass,
+          socket: config[:socket]
         )
 
-      results = mysql.query("SHOW GLOBAL STATUS")
-    rescue => e
-      puts e.message
-    end
-
-    results.each do |row|
-      metrics.each do |category, var_mapping|
-        if var_mapping.has_key?(row["Variable_name"])
-          output "#{config[:scheme]}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
-        end
+        results = mysql.query('SHOW GLOBAL STATUS')
+      rescue => e
+        puts e.message
       end
-    end
 
-    begin
-      slave_results = mysql.query("SHOW SLAVE STATUS")
-      # should return a single element array containing one hash
-      slave_results.first.each do |key, value|
-        if metrics['general'].include?(key)
-          # Replication lag being null is bad, very bad, so negativate it here
-          if key == 'Seconds_Behind_Master' and value.nil?
-            value = -1
-          end
-          output "#{config[:scheme]}.general.#{metrics['general'][key]}", value
-        end
-      end
-    rescue Exception => e
-      puts "Error querying slave status: #{e}" if config[:verbose]
-    end
-
-    begin
-      variables_results = mysql.query("SHOW GLOBAL VARIABLES")
-
-      category = 'configuration'
-      variables_results.each do |row|
-        metrics[category].each do |metric, desc|
-          if metric.casecmp(row["Variable_name"]) == 0
-            output "#{config[:scheme]}.#{category}.#{desc}", row["Value"]
+      results.each do |row|
+        metrics.each do |category, var_mapping|
+          if var_mapping.key?(row['Variable_name'])
+            output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{var_mapping[row['Variable_name']]}", row['Value']
           end
         end
       end
-    rescue => e
-      puts e.message
+
+      begin
+        slave_results = mysql.query('SHOW SLAVE STATUS')
+        # should return a single element array containing one hash
+        # #YELLOW
+        slave_results.first.each do |key, value| # rubocop:disable Style/Next
+          if metrics['general'].include?(key)
+            # Replication lag being null is bad, very bad, so negativate it here
+            value = -1 if key == 'Seconds_Behind_Master' && value.nil?
+            output "#{config[:scheme]}.#{mysql_shorthostname}.general.#{metrics['general'][key]}", value
+          end
+        end
+      rescue => e
+        puts "Error querying slave status: #{e}" if config[:verbose]
+      end
+
+      begin
+        variables_results = mysql.query('SHOW GLOBAL VARIABLES')
+
+        category = 'configuration'
+        variables_results.each do |row|
+          metrics[category].each do |metric, desc|
+            if metric.casecmp(row['Variable_name']) == 0
+              output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{desc}", row['Value']
+            end
+          end
+        end
+      rescue => e
+        puts e.message
+      end
+
     end
 
     ok
-
   end
-
 end

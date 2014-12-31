@@ -1,98 +1,126 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check graphite values
-# ===
+#   check-data
 #
-# This plugin checks values within graphite
+# DESCRIPTION:
+#   This plugin checks values within graphite
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: open-uri
+#   gem: openssl
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
 require 'open-uri'
+require 'openssl'
 
 class CheckGraphiteData < Sensu::Plugin::Check::CLI
-
   option :target,
-    :description => 'Graphite data target',
-    :short => '-t TARGET',
-    :long => '--target TARGET',
-    :required => true
+         description: 'Graphite data target',
+         short: '-t TARGET',
+         long: '--target TARGET',
+         required: true
 
   option :server,
-    :description => 'Server host and port',
-    :short => '-s SERVER:PORT',
-    :long => '--server SERVER:PORT',
-    :required => true
+         description: 'Server host and port',
+         short: '-s SERVER:PORT',
+         long: '--server SERVER:PORT',
+         required: true
 
   option :username,
-    :description => 'username for basic http authentication',
-    :short => '-u USERNAME',
-    :long => '--user USERNAME',
-    :required => false
+         description: 'username for basic http authentication',
+         short: '-u USERNAME',
+         long: '--user USERNAME',
+         required: false
 
   option :password,
-    :description => 'user password for basic http authentication',
-    :short => '-p PASSWORD',
-    :long => '--pass PASSWORD',
-    :required => false
+         description: 'user password for basic http authentication',
+         short: '-p PASSWORD',
+         long: '--pass PASSWORD',
+         required: false
 
   option :passfile,
-    :description => 'password file path for basic http authentication',
-    :short => '-P PASSWORDFILE',
-    :long => '--passfile PASSWORDFILE',
-    :required => false
+         description: 'password file path for basic http authentication',
+         short: '-P PASSWORDFILE',
+         long: '--passfile PASSWORDFILE',
+         required: false
 
   option :warning,
-    :description => 'Generate warning if given value is above received value',
-    :short => '-w VALUE',
-    :long => '--warn VALUE',
-    :proc => proc{|arg| arg.to_f }
+         description: 'Generate warning if given value is above received value',
+         short: '-w VALUE',
+         long: '--warn VALUE',
+         proc: proc(&:to_f)
 
   option :critical,
-    :description => 'Generate critical if given value is above received value',
-    :short => '-c VALUE',
-    :long => '--critical VALUE',
-    :proc => proc{|arg| arg.to_f }
+         description: 'Generate critical if given value is above received value',
+         short: '-c VALUE',
+         long: '--critical VALUE',
+         proc: proc(&:to_f)
 
   option :reset_on_decrease,
-    :description => 'Send OK if value has decreased on any values within END-INTERVAL to END',
-    :short => '-r INTERVAL',
-    :long => '--reset INTERVAL',
-    :proc => proc{|arg| arg.to_i }
+         description: 'Send OK if value has decreased on any values within END-INTERVAL to END',
+         short: '-r INTERVAL',
+         long: '--reset INTERVAL',
+         proc: proc(&:to_i)
 
   option :name,
-    :description => 'Name used in responses',
-    :short => '-n NAME',
-    :long => '--name NAME',
-    :default => "graphite check"
+         description: 'Name used in responses',
+         short: '-n NAME',
+         long: '--name NAME',
+         default: 'graphite check'
 
   option :allowed_graphite_age,
-    :description => 'Allowed number of seconds since last data update (default: 60 seconds)',
-    :short => '-a SECONDS',
-    :long => '--age SECONDS',
-    :default => 60,
-    :proc => proc{|arg| arg.to_i }
+         description: 'Allowed number of seconds since last data update (default: 60 seconds)',
+         short: '-a SECONDS',
+         long: '--age SECONDS',
+         default: 60,
+         proc: proc(&:to_i)
 
   option :hostname_sub,
-    :description => 'Character used to replace periods (.) in hostname (default: _)',
-    :short => '-s CHARACTER',
-    :long => '--host-sub CHARACTER'
+         description: 'Character used to replace periods (.) in hostname (default: _)',
+         short: '-s CHARACTER',
+         long: '--host-sub CHARACTER'
 
   option :from,
-    :description => 'Get samples starting from FROM (default: -10mins)',
-    :short => '-f FROM',
-    :long => '--from FROM',
-    :default => "-10mins"
+         description: 'Get samples starting from FROM (default: -10mins)',
+         short: '-f FROM',
+         long: '--from FROM',
+         default: '-10mins'
 
   option :below,
-    :description => 'warnings/critical if values below specified thresholds',
-    :short => '-b',
-    :long => '--below'
+         description: 'warnings/critical if values below specified thresholds',
+         short: '-b',
+         long: '--below'
+
+  option :no_ssl_verify,
+         description: 'Do not verify SSL certs',
+         short: '-v',
+         long: '--nosslverify'
 
   option :help,
-    :description => 'Show this message',
-    :short => '-h',
-    :long => '--help'
+         description: 'Show this message',
+         short: '-h',
+         long: '--help'
 
   # Run checks
   def run
@@ -101,7 +129,13 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       exit
     end
 
-    retrieve_data || check_age || check(:critical) || check(:warning) || ok("#{name} value okay")
+    data = retrieve_data
+    data.each_pair do |_key, value|
+      @value = value
+      @data = value['data']
+      check_age || check(:critical) || check(:warning)
+    end
+    ok("#{name} value okay")
   end
 
   # name used in responses
@@ -112,47 +146,70 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check the age of the data being processed
   def check_age
-    if (Time.now.to_i - @end) > config[:allowed_graphite_age]
+    # #YELLOW
+    if (Time.now.to_i - @value['end']) > config[:allowed_graphite_age] # rubocop:disable GuardClause
       unknown "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
     end
   end
 
   # grab data from graphite
   def retrieve_data
-    unless @raw_data
+    # #YELLOW
+    unless @raw_data # rubocop:disable GuardClause
       begin
+        unless config[:server].start_with?('https://', 'http://')
+          config[:server].prepend('http://')
+        end
 
-        url = "http://#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
-        if (config[:username] && (config[:password] || config[:passfile]))
+        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
+
+        url_opts = {}
+
+        if config[:no_ssl_verify]
+          url_opts[:ssl_verify_mode] = OpenSSL::SSL::VERIFY_NONE
+        end
+
+        if config[:username] && (config[:password] || config[:passfile])
           if config[:passfile]
             pass = File.open(config[:passfile]).readline
           elsif config[:password]
             pass = config[:password]
           end
-          handle = open(url, :http_basic_authentication =>["#{config[:username]}", pass.chomp])
-        else # we don't have both username and password trying without
-          handle = open(url)
-        end
 
-        @raw_data = JSON.parse(handle.gets).first
-        @raw_data['datapoints'].delete_if{|v| v.first == nil}
-        @data = @raw_data['datapoints'].map(&:first)
-        @target = @raw_data['target']
-        @start = @raw_data['datapoints'].first.last
-        @end = @raw_data['datapoints'].last.last
-        @step = ((@end - @start) / @raw_data['datapoints'].size.to_f).ceil
-        nil
+          url_opts[:http_basic_authentication] = [config[:username], pass.chomp]
+        end # we don't have both username and password trying without
+
+        handle = open(url, url_opts)
+
+        @raw_data = handle.gets
+        if @raw_data == '[]'
+          unknown 'Empty data received from Graphite - metric probably doesn\'t exists'
+        else
+          @json_data = JSON.parse(@raw_data)
+          output = {}
+          @json_data.each do |raw|
+            raw['datapoints'].delete_if { |v| v.first.nil? }
+            next if raw['datapoints'].empty?
+            target = raw['target']
+            data = raw['datapoints'].map(&:first)
+            start = raw['datapoints'].first.last
+            dend = raw['datapoints'].last.last
+            step = ((dend - start) / raw['datapoints'].size.to_f).ceil
+            output[target] = { 'target' => target, 'data' => data, 'start' => start, 'end' => dend, 'step' => step }
+          end
+          output
+        end
       rescue OpenURI::HTTPError
-        unknown "Failed to connect to graphite server"
+        unknown 'Failed to connect to graphite server'
       rescue NoMethodError
-        unknown "No data for time period and/or target"
+        unknown 'No data for time period and/or target'
       rescue Errno::ECONNREFUSED
-        unknown "Connection refused when connecting to graphite server"
+        unknown 'Connection refused when connecting to graphite server'
       rescue Errno::ECONNRESET
-        unknown "Connection reset by peer when connecting to graphite server"
+        unknown 'Connection reset by peer when connecting to graphite server'
       rescue EOFError
-        unknown "End of file error when reading from graphite server"
-      rescue Exception => e
+        unknown 'End of file error when reading from graphite server'
+      rescue => e
         unknown "An unknown error occured: #{e.inspect}"
       end
     end
@@ -161,8 +218,9 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # type:: :warning or :critical
   # Return alert if required
   def check(type)
-    if config[type]
-      send(type, "#{name} has passed #{type} threshold (#{@data.last})") if (below?(type) || above?(type))
+    # #YELLOW
+    if config[type] # rubocop:disable GuardClause
+      send(type, "#{@value['target']} has passed #{type} threshold (#{@data.last})") if below?(type) || above?(type)
     end
   end
 
@@ -173,7 +231,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check is value is above defined threshold
   def above?(type)
-    (!config[:below]) and (@data.last > config[type]) and (!decreased?)
+    (!config[:below]) && (@data.last > config[type]) && (!decreased?)
   end
 
   # Check if values have decreased within interval if given
@@ -194,8 +252,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
       @formatted = Socket.gethostbyname(Socket.gethostname).first.gsub('.', config[:hostname_sub] || '_')
       config[:target].gsub('$', @formatted)
     else
-      config[:target]
+      URI.escape config[:target]
     end
   end
-
 end

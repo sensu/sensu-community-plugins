@@ -9,13 +9,13 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 
 class GraphiteOccurrences < Sensu::Handler
-
   # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
 
   def handle
     hostname = @event['client']['name'].split('.').first
-    check_name = @event['check']['name'].gsub(%r|[ \.]|, '_')
+    # #YELLOW
+    check_name = @event['check']['name'].gsub(%r{[ \.]}, '_')  # rubocop:disable RegexpLiteral
     value = @event['action'] == 'create' ? @event['occurrences'] : 0
     now = Time.now.to_i
 
@@ -32,10 +32,9 @@ class GraphiteOccurrences < Sensu::Handler
         sock.close
       end
     rescue Timeout::Error
-      puts "graphite -- timed out while sending check occurrence"
+      puts 'graphite -- timed out while sending check occurrence'
     rescue => error
       puts "graphite -- failed to send check occurrence: #{error}"
     end
   end
-
 end

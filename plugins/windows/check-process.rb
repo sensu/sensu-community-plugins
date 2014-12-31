@@ -13,19 +13,17 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckDatabase < Sensu::Plugin::Check::CLI
-
-  option :process , :short => '-p process'
+  option :process, short: '-p process'
 
   def run
-    temp = system("tasklist|findstr /i "+config[:process])
+    temp = system('tasklist|findstr /i ' + config[:process])
     puts temp
     if temp == false
-      message config[:process]+ " is not running"
+      message config[:process] + ' is not running'
       critical
     else
-      message config[:process]+ " is running"
+      message config[:process] + ' is running'
       ok
     end
   end
 end
-

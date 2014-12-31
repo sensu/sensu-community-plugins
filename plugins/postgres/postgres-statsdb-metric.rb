@@ -21,49 +21,48 @@ require 'pg'
 require 'socket'
 
 class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :user,
-         :description => "Postgres User",
-         :short       => '-u USER',
-         :long        => '--user USER'
+         description: 'Postgres User',
+         short: '-u USER',
+         long: '--user USER'
 
   option :password,
-         :description => "Postgres Password",
-         :short       => '-p PASS',
-         :long        => '--password PASS'
+         description: 'Postgres Password',
+         short: '-p PASS',
+         long: '--password PASS'
 
   option :hostname,
-         :description => "Hostname to login to",
-         :short       => '-h HOST',
-         :long        => '--hostname HOST',
-         :default     => 'localhost'
+         description: 'Hostname to login to',
+         short: '-h HOST',
+         long: '--hostname HOST',
+         default: 'localhost'
 
   option :port,
-         :description => "Database port",
-         :short       => '-P PORT',
-         :long        => '--port PORT',
-         :default     => 5432
+         description: 'Database port',
+         short: '-P PORT',
+         long: '--port PORT',
+         default: 5432
 
   option :db,
-         :description => "Database name",
-         :short       => '-d DB',
-         :long        => '--db DB',
-         :default     => 'postgres'
+         description: 'Database name',
+         short: '-d DB',
+         long: '--db DB',
+         default: 'postgres'
 
   option :scheme,
-         :description => "Metric naming scheme, text to prepend to $queue_name.$metric",
-         :long        => "--scheme SCHEME",
-         :default     => "#{Socket.gethostname}.postgresql"
+         description: 'Metric naming scheme, text to prepend to $queue_name.$metric',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.postgresql"
 
   def run
     timestamp = Time.now.to_i
 
     con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, 'postgres', config[:user], config[:password])
     request = [
-        "select xact_commit, xact_rollback,",
-        "blks_read, blks_hit,",
-        "tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted",
-        "from pg_stat_database where datname='#{config[:db]}'"
+      'select xact_commit, xact_rollback,',
+      'blks_read, blks_hit,',
+      'tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted',
+      "from pg_stat_database where datname='#{config[:db]}'"
     ]
     con.exec(request.join(' ')) do |result|
       result.each do |row|
@@ -80,7 +79,5 @@ class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     ok
-
   end
-
 end

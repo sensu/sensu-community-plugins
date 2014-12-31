@@ -1,11 +1,3 @@
-###########################
-# Configuration for rubocop
-#
-# Most of these are disabling existing cops, primarily
-# due to a smattering of different styles and loose
-# guidlines for contributions.
-#
-# Any of these may be changed.
 
 MethodLength:
   Max: 200
@@ -13,100 +5,20 @@ MethodLength:
 LineLength:
   Max: 160
 
-HashSyntax:
+FileName:
   Enabled: false
 
-# Prefer single-quotes
-StringLiterals:
+PerceivedComplexity:
   Enabled: false
 
-AlignParameters:
+CyclomaticComplexity:
   Enabled: false
 
-SpaceAroundOperators:
+ClassLength:
   Enabled: false
 
-Encoding:
-  Enabled: false
-
-PercentR:
-  Enabled: false
-
-SpaceAroundBraces:
-  Enabled: false
-
-FavorPercentR:
-  Enabled: false
-
-AndOr:
-  Enabled: false
-
-EmptyLineBetweenDefs:
-  Enabled: false
-
-SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-SymbolName:
-  Enabled: false
-
-ReduceArguments:
-  Enabled: false
-
-RescueException:
-  Enabled: false
-
-Syntax:
-  Enabled: false
-
-WordArray:
+Documentation:
   Enabled: false
 
 IfUnlessModifier:
   Enabled: false
-
-ParenthesesAroundCondition:
-  Enabled: false
-
-MethodAndVariableSnakeCase:
-  Enabled: false
-
-AvoidClassVars:
-  Enabled: false
-
-WhileUntilModifier:
-  Enabled: false
-
-Semicolon:
-  Enabled: false
-
-UnlessElse:
-  Enabled: false
-
-BlockNesting:
-  Enabled: false
-
-Proc:
-  Enabled: false
-
-# Global vars should be removed
-AvoidGlobalVars:
-  Enabled: false
-
-# Probably some good ones in here.
-# Disabled for $? => $CHILD_STATUS
-AvoidPerlisms:
-  Enabled: false
-
-Lambda:
-  Enabled: false
-
-CollectionMethods:
-  Enabled: false
-
-CaseIndentation:
-  Enabled: false
-
-AllCops:
-  Excludes:
-    - vendor/**

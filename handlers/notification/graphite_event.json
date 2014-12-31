@@ -1,0 +1,9 @@
+{
+  "graphite_event": {
+    "server_uri": "https://graphite.example.com:443/events/",
+    "tags": [
+      "custom_tag_a",
+      "custom_tag_b"
+    ]
+  }
+}

@@ -19,7 +19,6 @@ require 'sensu-handler'
 require 'tempodb'
 
 class TempoDBSensu < Sensu::Handler
-
   def handle
     client = TempoDB::Client.new(
       settings['tempodb']['api_key'],
@@ -32,14 +31,14 @@ class TempoDBSensu < Sensu::Handler
 
     # loop through metrics, separated by \n, pull out each metric and add to data array
     metrics.split("\n").each do |metric|
-      m = metric.split()
+      m = metric.split
 
       # Should match format metric.path.two value timestamp
       next unless m.count == 3
 
       key = m[0]
       v = m[1].to_f
-      data.push({ 'key' => key, 'v' => v })
+      data.push('key' => key, 'v' => v)
     end
 
     begin
@@ -47,7 +46,7 @@ class TempoDBSensu < Sensu::Handler
         client.write_bulk(time, data)
       end
     rescue Timeout::Error
-      puts "tempodb -- timed out while sending bulk write"
+      puts 'tempodb -- timed out while sending bulk write'
     rescue => error
       puts "tempodb -- failed to send bulk write : #{error}"
     end

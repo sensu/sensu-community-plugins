@@ -1,84 +1,91 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks the status of OpenLDAP syncrepl
-# ===
+#   check-syncrepl
 #
 # DESCRIPTION:
 #   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working
 #   This currently only works with TLS and binding as a user
 #
+# OUTPUT:
+#   plain text
+#
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin >= 1.5 Ruby gem
-#   net-ldap >= 0.3.1 Ruby gem
+#   gem: sensu-plugin
+#   gem: net-ldap
 #
-# Copyright (c) 2014, Justin Lambert <jlambert@letsevenup.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Justin Lambert <jlambert@letsevenup.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'net/ldap'
 
 class CheckSyncrepl < Sensu::Plugin::Check::CLI
-
   option :hosts,
-    :short        => '-h HOSTS',
-    :long         => '--hosts HOSTS',
-    :description  => 'Comma seperated list of hosts to compare',
-    :required     => true,
-    :proc         => proc { |hosts| hosts.split(',') }
+         short: '-h HOSTS',
+         long: '--hosts HOSTS',
+         description: 'Comma seperated list of hosts to compare',
+         required: true,
+         proc: proc { |hosts| hosts.split(',') }
 
   option :port,
-    :short        => '-t PORT',
-    :long         => '--port PORT',
-    :description  => 'Port to connect to OpenLDAP on',
-    :default      => 636,
-    :proc         => proc { |i| i.to_i }
+         short: '-t PORT',
+         long: '--port PORT',
+         description: 'Port to connect to OpenLDAP on',
+         default: 636,
+         proc: proc(&:to_i)
 
   option :base,
-    :short        => '-b BASE',
-    :long         => '--base BASE',
-    :description  => 'Base to fetch the ContextCSN for',
-    :required     => true
+         short: '-b BASE',
+         long: '--base BASE',
+         description: 'Base to fetch the ContextCSN for',
+         required: true
 
   option :user,
-    :short        => '-u USER',
-    :long         => '--user USER',
-    :description  => 'User to bind as',
-    :required     => true
+         short: '-u USER',
+         long: '--user USER',
+         description: 'User to bind as',
+         required: true
 
   option :password,
-    :short        => '-p PASSWORD',
-    :long         => '--password PASSWORD',
-    :description  => 'Password used to bind',
-    :required     => true
+         short: '-p PASSWORD',
+         long: '--password PASSWORD',
+         description: 'Password used to bind',
+         required: true
 
   option :retries,
-    :short        => '-r RETRIES',
-    :long         => '--retries RETRIES',
-    :description  => 'Number of times to retry (useful for environments with larger number of writes)',
-    :default      => 0,
-    :proc         => proc { |i| i.to_i }
+         short: '-r RETRIES',
+         long: '--retries RETRIES',
+         description: 'Number of times to retry (useful for environments with larger number of writes)',
+         default: 0,
+         proc: proc(&:to_i)
 
   def get_csns(host)
-    ldap = Net::LDAP.new :host => host,
-      :port => config[:port],
-      :encryption => {
-        :method => :simple_tls
-      },
-      :auth => {
-        :method => :simple,
-        :username => config[:user],
-        :password => config[:password]
-      }
+    ldap = Net::LDAP.new host: host,
+                         port: config[:port],
+                         encryption: {
+                           method: :simple_tls
+                         },
+                         auth: {
+                           method: :simple,
+                           username: config[:user],
+                           password: config[:password]
+                         }
 
     begin
       if ldap.bind
-        ldap.search(:base => config[:base], :attributes => ['contextCSN'], :return_result => true, :scope => Net::LDAP::SearchScope_BaseObject) do |entry|
+        ldap.search(base: config[:base], attributes: ['contextCSN'], return_result: true, scope: Net::LDAP::SearchScope_BaseObject) do |entry|
           return entry['contextcsn']
         end
       else
@@ -90,7 +97,7 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
   end
 
   def run
-    unknown "Cannot compare 1 node (to anything else)." if config[:hosts].length == 1
+    unknown 'Cannot compare 1 node (to anything else).' if config[:hosts].length == 1
 
     (config[:retries] + 1).times do
       # Build a list of contextCSNs from each host
@@ -107,11 +114,11 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
       end
 
       # If everything is OK, no need to retry
-      ok "All nodes are in sync" if @differences.length == 0
+      ok 'All nodes are in sync' if @differences.length == 0
     end
 
     # Hit max retries, report latest differences
-    message = "ContextCSNs differe between: "
+    message = 'ContextCSNs differe between: '
 
     joined = []
     @differences.each do |different|
@@ -121,4 +128,3 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
     critical message
   end
 end
-

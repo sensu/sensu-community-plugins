@@ -41,8 +41,8 @@
 # LICENSE for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
-require "sensu-handler"
-require "ridley"
+require 'sensu-handler'
+require 'ridley'
 
 class ChefNode < Sensu::Handler
   def chef_node_exists?
@@ -53,7 +53,7 @@ class ChefNode < Sensu::Handler
         client_name: settings['chef']['client_name'],
         client_key: settings['chef']['client_key'],
         ssl: {
-          verify: settings['chef']['client_key'].nil? ? true : settings["chef"]["verify_ssl"]
+          verify: settings['chef']['client_key'].nil? ? true : settings['chef']['verify_ssl']
         }
       ) do |r|
         r.node.find(@event['client']['name']) ? true : false
@@ -75,18 +75,17 @@ class ChefNode < Sensu::Handler
   end
 
   def delete_sensu_client!
-    begin
-      api_request(:DELETE, '/clients/' + @event['client']['name'])
-      puts "CHEF-NODE: Successfully deleted Sensu client #{@event['client']['name']}"
-    rescue => error
-      puts "CHEF-NODE: Unexpected error: #{error.inspect}"
-    end
+    api_request(:DELETE, '/clients/' + @event['client']['name'])
+    puts "CHEF-NODE: Successfully deleted Sensu client #{@event['client']['name']}"
+  rescue => error
+    puts "CHEF-NODE: Unexpected error: #{error.inspect}"
   end
 
   def filter; end
 
   def handle
-    unless chef_node_exists?
+    # #YELLOW
+    unless chef_node_exists?  # rubocop:disable GuardClause, IfUnlessModifier
       delete_sensu_client!
     end
   end
