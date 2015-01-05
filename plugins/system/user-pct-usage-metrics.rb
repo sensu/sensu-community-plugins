@@ -1,19 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# System User Percentage Metric Plugin
+#  System User Percentage Metric Plugin
 #
-# Produces Graphite output of sum of %CPU over all processes by user.
+# DESCRIPTION:
+#   Produces Graphite output of sum of %CPU over all processes by user.
+#   E.g., if user joe is running two processes, each using 10% CPU, and
+#   jane is running one process using 50% CPU, output will be:
 #
-# E.g., if user joe is running two processes, each using 10% CPU, and
-# jane is running one process using 50% CPU, output will be:
+#   joe 20.0 (timestamp)
+#   jane 50.0 (timestamp)
 #
-# joe 20.0 (timestamp)
-# jane 50.0 (timestamp)
+# OUTPUT:
+#   Graphite metric data.
 #
-# John VanDyk <sensu@sysarchitects.com>
+# PLATFORMS:
+#   Linux, BSD, OS X
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#   ./user-pct-usage-metrics.rb --ignore_inactive true
+# NOTES:
+#
+# LICENSE:
+#   John VanDyk <sensu@sysarchitects.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
