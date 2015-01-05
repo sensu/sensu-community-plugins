@@ -27,8 +27,8 @@ class Pushover < Sensu::Handler
     else
       keys = [
         {
-          'userkey'=> settings['pushover']['userkey'],
-          'token'=> settings['pushover']['token']
+          'userkey' => settings['pushover']['userkey'],
+          'token' => settings['pushover']['token']
         }
       ]
     end
@@ -47,7 +47,7 @@ class Pushover < Sensu::Handler
 
     keys.each do |key|
       begin
-        timeout(5) do  
+        timeout(5) do
           params['user'] = key['userkey']
           params['token'] = key['token']
           req.set_form_data(params)
