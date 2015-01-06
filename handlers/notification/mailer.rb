@@ -9,6 +9,11 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
+# Note: The default mailer config is fetched from the predefined json config file which is "mailer.json" or any other
+#       file defiend using the "json_config" command line option. The mailing list could also be configured on a per client basis
+#       by defining the "mail_to" attribute in the client config file. This will override the default mailing list where the
+#       alerts are being routed to for that particular client.
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 gem 'mail', '~> 2.5.4'
@@ -58,7 +63,7 @@ class Mailer < Sensu::Handler
 
   def build_mail_to_list
     json_config = config[:json_config] || 'mailer'
-    mail_to = settings[json_config]['mail_to']
+    mail_to = @event['client']['mail_to'] || settings[json_config]['mail_to']
     if settings[json_config].key?('subscriptions')
       @event['check']['subscribers'].each do |sub|
         if settings[json_config]['subscriptions'].key?(sub)
