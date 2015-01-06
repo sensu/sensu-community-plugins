@@ -126,7 +126,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
     end
     n_warns_overall = 0
     n_crits_overall = 0
-    error_overall = ""
+    error_overall = ''
     file_list.each do |log_file|
       begin
         open_log log_file
@@ -177,7 +177,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
     bytes_read = 0
     n_warns = 0
     n_crits = 0
-    accumulative_error = ""
+    accumulative_error = ''
 
     @log.seek(@bytes_to_skip, File::SEEK_SET) if @bytes_to_skip > 0
     # #YELLOW
