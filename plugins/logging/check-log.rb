@@ -101,6 +101,13 @@ class CheckLog < Sensu::Plugin::Check::CLI
          short: '-F FILE',
          long: '--filepattern FILE'
 
+  option :return_content,
+         description: 'Return matched line',
+         short: '-r',
+         long: '--return',
+         boolean: true,
+         default: false
+
   def run
     unknown 'No log file specified' unless config[:log_file] || config[:file_pattern]
     unknown 'No pattern specified' unless config[:pattern]
@@ -119,17 +126,22 @@ class CheckLog < Sensu::Plugin::Check::CLI
     end
     n_warns_overall = 0
     n_crits_overall = 0
+    error_overall = ""
     file_list.each do |log_file|
       begin
         open_log log_file
       rescue => e
         unknown "Could not open log file: #{e}"
       end
-      n_warns, n_crits = search_log
+      n_warns, n_crits, accumulative_error = search_log
       n_warns_overall += n_warns
       n_crits_overall += n_crits
+
+      if config[:return_content]
+        error_overall = accumulative_error
+      end
     end
-    message "#{n_warns_overall} warnings, #{n_crits_overall} criticals for pattern #{config[:pattern]}"
+    message "#{n_warns_overall} warnings, #{n_crits_overall} criticals for pattern #{config[:pattern]}. #{error_overall}"
     if n_crits_overall > 0
       critical
     elsif n_warns_overall > 0
@@ -165,6 +177,8 @@ class CheckLog < Sensu::Plugin::Check::CLI
     bytes_read = 0
     n_warns = 0
     n_crits = 0
+    accumulative_error = ""
+
     @log.seek(@bytes_to_skip, File::SEEK_SET) if @bytes_to_skip > 0
     # #YELLOW
     @log.each_line do |line| # rubocop:disable Style/Next
@@ -175,6 +189,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
         m = line.match(config[:pattern]) unless line.match(config[:exclude])
       end
       if m
+        accumulative_error += "\n" + line.slice(0, 250)
         if m[1]
           if config[:crit] && m[1].to_i > config[:crit]
             n_crits += 1
@@ -194,6 +209,6 @@ class CheckLog < Sensu::Plugin::Check::CLI
     File.open(@state_file, 'w') do |file|
       file.write(@bytes_to_skip + bytes_read)
     end
-    [n_warns, n_crits]
+    [n_warns, n_crits, accumulative_error]
   end
 end
