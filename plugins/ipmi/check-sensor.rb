@@ -8,10 +8,10 @@
 #   a more detailed explanation of how to find and use sensor names.
 #
 # OUTPUT:
-#   plain text, metric data, etc
+#   plain text
 #
 # PLATFORMS:
-#   Linux, Windows, BSD, Solaris, etc
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
