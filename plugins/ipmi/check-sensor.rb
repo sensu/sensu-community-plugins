@@ -8,7 +8,7 @@
 #   a more detailed explanation of how to find and use sensor names.
 #
 # OUTPUT:
-#   plain text
+#   metric data
 #
 # PLATFORMS:
 #   Linux
@@ -46,71 +46,70 @@ require 'timeout'
 
 class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.ipmisensor"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.ipmisensor"
 
   option :sensor,
-    :description => "IPMI sensor to gather stats for.  Default is ALL",
-    :short => "-s SENSOR_NAME",
-    :long => "--sensor SENSOR_NAME",
-    :default => "all"
+         description: 'IPMI sensor to gather stats for.  Default is ALL',
+         short: '-s SENSOR_NAME',
+         long: '--sensor SENSOR_NAME',
+         default: 'all'
 
   option :username,
-    :description => "IPMI Username",
-    :short => "-u IPMI_USERNAME",
-    :long => "--username IPMI_USERNAME",
-    :required => true
+         description: 'IPMI Username',
+         short: '-u IPMI_USERNAME',
+         long: '--username IPMI_USERNAME',
+         required: true
 
   option :password,
-    :description => "IPMI Password",
-    :short => "-p IPMI_PASSWORD",
-    :long => "--password IPMI_PASSWORD",
-    :required => true
+         description: 'IPMI Password',
+         short: '-p IPMI_PASSWORD',
+         long: '--password IPMI_PASSWORD',
+         required: true
 
   option :privilege,
-    :description => "IPMI privilege level: CALLBACK, USER, OPERATOR, ADMINISTRATOR (defaults to USER)",
-    :short => "-v PRIVILEGE",
-    :long => "--privilege PRIVILEGE",
-    :default => "USER",
-    :required => false
+         description: 'IPMI privilege level: CALLBACK, USER, OPERATOR, ADMINISTRATOR (defaults to USER)',
+         short: '-v PRIVILEGE',
+         long: '--privilege PRIVILEGE',
+         default: 'USER',
+         required: false
 
   option :host,
-    :description => "IPMI Hostname or IP",
-    :short => "-h IPMI_HOST",
-    :long => "--host IPMI_HOST",
-    :required => true
+         description: 'IPMI Hostname or IP',
+         short: '-h IPMI_HOST',
+         long: '--host IPMI_HOST',
+         required: true
 
   option :provider,
-    :description => "IPMI Tool Provider (ipmitool OR freeipmi).  Default is ipmitool.",
-    :short => "-i IPMI_PROVIDER",
-    :long => "--ipmitool IPMI_PROVIDER",
-    :default => "ipmitool"
+         description: 'IPMI Tool Provider (ipmitool OR freeipmi).  Default is ipmitool.',
+         short: '-i IPMI_PROVIDER',
+         long: '--ipmitool IPMI_PROVIDER',
+         default: 'ipmitool'
 
   option :timeout,
-    :description => "IPMI connection timeout in seconds (defaults to 30)",
-    :short => '-t TIMEOUT',
-    :long => '--timeout TIMEOUT',
-    :default => 30
+         description: 'IPMI connection timeout in seconds (defaults to 30)',
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         default: 30
 
   def conn
-    begin
-      timeout(config[:timeout].to_i) do
-        Rubyipmi.connect(config[:username],
-                         config[:password],
-                         config[:host],
-                         config[:provider],
-                         {:privilege => config[:privilege]})
-      end
-    rescue Timeout::Error
-      unknown "Timeout during IPMI operation."
-    rescue Exception => e
-      unknown "An unknown error occured: #{e.inspect}"
+    timeout(config[:timeout].to_i) do
+      Rubyipmi.connect(config[:username],
+                       config[:password],
+                       config[:host],
+                       config[:provider],
+                       privilege: config[:privilege])
     end
+  rescue Timeout::Error
+    unknown 'Timeout during IPMI operation.'
+  rescue => e
+    unknown "An unknown error occured: #{e.inspect}"
   end
 
   def run
-    conn.sensors.list.each do |sensor|
+    # #YELLOW
+    conn.sensors.list.each do |sensor| # rubocop:disable Style/Next
       if config[:sensor] != 'all'
         next if sensor[1][:name] != config[:sensor]
       end
