@@ -89,8 +89,6 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
       # Determine % memory consumed
       pmem = ( '%.2f' % ( nodeinfo["mem_used"].fdiv(nodeinfo["mem_limit"]) * 100)).to_f
 
-      if config[:watchalarms]?
-
       # build status and message
       status = 'ok'
       message = 'Server is healthy'
