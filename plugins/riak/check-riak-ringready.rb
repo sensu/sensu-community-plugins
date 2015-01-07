@@ -32,10 +32,9 @@ class CheckRiakRingStatus < Sensu::Plugin::Check::CLI
 
   def run
     exit_status, message = execute 'sudo -n -k riak-admin ringready'
-    # #YELLOW
-    if exit_status.success? # rubocop:disable IfUnlessModifier
-      ok message if /^TRUE/ =~ message
-    end
+
+    ok message if /^TRUE/ =~ message if exit_status.success?
+
     critical message
   end
 end

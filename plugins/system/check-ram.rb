@@ -1,6 +1,20 @@
 #!/usr/bin/env ruby
 #
 # Check free RAM Plugin
+# ===
+#
+# DESCRIPTION:
+# This plugin checks the free ram left in the server.
+#
+# OUTPUT:
+#   plain-text
+#
+# PLATFORMS:
+#   all
+#
+# USAGE:
+#   ./check-ram.rb -w 15 -c 5  (Warn if 85% of RAM is used and Crit if 95% is used)
+#   ./check-ram.rb -m -w 1024 -c 512  (Warn if only 1GB of RAM is left and Crit if 512M is left)
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -28,8 +42,7 @@ class CheckRAM < Sensu::Plugin::Check::CLI
     total_ram, free_ram = 0, 0
 
     `free -m`.split("\n").drop(1).each do |line|
-      # #YELLOW
-      free_ram = line.split[3].to_i if line =~ /^-\/\+ buffers\/cache:/ # rubocop:disable RegexpLiteral
+      free_ram = line.split[3].to_i if line =~ %r{^-/\+ buffers/cache:}
       total_ram = line.split[1].to_i if line =~ /^Mem:/
     end
 
