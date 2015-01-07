@@ -38,6 +38,7 @@
 require 'sensu-plugin/check/cli'
 require 'json'
 require 'rubygems' if RUBY_VERSION < '1.9.0'
+require 'English'
 
 # Use to see if any processes require a restart
 class CheckProcessRestart < Sensu::Plugin::Check::CLI
