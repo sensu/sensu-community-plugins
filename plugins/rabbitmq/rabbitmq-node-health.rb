@@ -49,13 +49,15 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
          description: 'Warning % of mem usage vs high watermark',
          short: '-m',
          long: '--mwarn PERCENT',
-         default: '80'
+         proc: proc(&:to_f),
+         default: 80
 
    option :memcrit,
          description: 'Critical % of mem usage vs high watermark',
          short: '-c',
          long: '--mcrit PERCENT',
-         default: '90'
+         proc: proc(&:to_f),
+         default: 90
 
     option :watchalarms,
         description: 'Sound critical if one or more alarms are triggered',
