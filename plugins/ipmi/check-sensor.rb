@@ -1,31 +1,42 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# IPMI Sensor Plugin
+#   check-sensor
 #
-# This plugin collects sensor data from an IPMI endpoint.
-# Output is in Graphite format. See the rubyipmi gem docs for
-# a more detailed explanation of how to find and use sensor names.
+# DESCRIPTION:
+#   This plugin collects sensor data from an IPMI endpoint.
+#   Output is in Graphite format. See the rubyipmi gem docs for
+#   a more detailed explanation of how to find and use sensor names.
 #
-# Matt Mencel <matt@techminer.net>
+# OUTPUT:
+#   plain text, metric data, etc
 #
-# REQUIREMENTS:
-#    - rubyipmi gem (https://github.com/logicminds/rubyipmi)
-#    - ipmitool or freeipmi package
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
 #
-# EXAMPLES:  By default the check returns all sensors.  If you want to check
-#            just the IPMI temperature sensor on a power supply named
-#            't_in_ps0', you do the following.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: ipmi
+#   ipmitool or freeipmi package
 #
-#    check-sensor.rb -u IPMI_USER -p IPMI_PASS -h 10.1.1.1 -s t_in_ps0
-#    FQDN.ipmisensor.t_in_ps1 32.000 1416346692
+# USAGE:
+#   By default the check returns all sensors.  If you want to check
+#   just the IPMI temperature sensor on a power supply named
+#   't_in_ps0', you do the following.
 #
-# CAVEATS:  Don't use passwords with characters that require escaping (e.g. !)
-#           Test your IPMI endpoints first to verify any specified sensor names
-#           and that your credentials are working before adding them to a Sensu
-#           check.
+#   check-sensor.rb -u IPMI_USER -p IPMI_PASS -h 10.1.1.1 -s t_in_ps0
+#   FQDN.ipmisensor.t_in_ps1 32.000 1416346692
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#   Don't use passwords with characters that require escaping (e.g. !)
+#   Test your IPMI endpoints first to verify any specified sensor names
+#   and that your credentials are working before adding them to a Sensu
+#   check.
+#
+# LICENSE:
+#   Matt Mencel <matt@techminer.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
