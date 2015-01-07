@@ -97,7 +97,7 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
       if pmem >= config[:memcrit]
         message = "Memory usage is critical: #{pmem}%"
         status = 'critical'
-      elsif pemem >= config[:memwarn]
+      elsif pmem >= config[:memwarn]
         message = "Memory usage is at warning: #{pmem}%"
         status = 'warning'
       end
