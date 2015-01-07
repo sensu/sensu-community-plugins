@@ -67,7 +67,7 @@ module Sensu
           handler: 'graphite',
           add_client_prefix: true,
           path_prefix: 'WMI',
-          prefix_at_start:0
+          prefix_at_start: 0
         }
         if settings[:wmi_metrics].is_a?(Hash)
           @options.merge!(settings[:wmi_metrics])
