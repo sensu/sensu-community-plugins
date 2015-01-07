@@ -59,9 +59,9 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
 
     option :watchalarms,
         description: 'Sound critical if one or more alarms are triggered',
-        short: '-a',
-        long: '--alarms BOOL',
-        default: true
+        short: '-a BOOLEAN',
+        long: '--alarms BOOLEAN',
+        default: 'true'
 
   def run
     res = node_healthy?
@@ -92,7 +92,7 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
       # build status and message
       status = 'ok'
       message = 'Server is healthy'
-      if  pmem >= config[:memcrit]
+      if pmem >= config[:memcrit]
         message = "Memory usage is critical: #{pmem}%"
         status = 'critical'
       elsif pemem >= config[:memwarn]
@@ -100,13 +100,14 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
         status = 'warning'
       end
       # If we are set to watch alarms then watch those and set status and messages accordingly
-      if config[:watchalarms]?
+      if config[:watchalarms] == 'true'
         if nodeinfo["mem_alarm"] == true
           status = 'critical'
           message += ' Memory Alarm ON'
         end
+
         if nodeinfo["disk_alarm"] == true
-          stats = 'critical'
+          status = 'critical'
           message += ' Disk Alarm ON'
         end
       end
