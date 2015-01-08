@@ -1,10 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# mpstat style output for each CPU on system
-# ===
+#   cpu-mpstat-metrics
 #
-# Uses the linux/kstat rubygem to do the hard work in /proc/stat
-# includes individual cpu and overall cpu usage
+# DESCRIPTION:
+#   Uses the linux/kstat rubygem to do the hard work in /proc/stat
+#   includes individual cpu and overall cpu usage
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#   gem: linux/kstat
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

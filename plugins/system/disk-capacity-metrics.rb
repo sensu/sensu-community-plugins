@@ -1,17 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Disk Capacity Metrics Plugin
-# ===
+#   disk-capacity-metrics
 #
-# This plugin uses df to collect disk capacity metrics
-# disk-metrics.rb looks at /proc/stat which doesnt hold capacity metricss.
-# could have intetrated this into disk-metrics.rb, but thought I'd leave it up to
-# whomever implements the checks.
+# DESCRIPTION:
+#   This plugin uses df to collect disk capacity metrics
+#   disk-metrics.rb looks at /proc/stat which doesnt hold capacity metricss.
+#   could have intetrated this into disk-metrics.rb, but thought I'd leave it up to
+#   whomever implements the checks.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric data
 #
-# rubocop:disable HandleExceptions
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -28,7 +44,8 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
       begin
         converted = Integer(value)
         values[index] = converted
-      rescue ArgumentError
+        # #YELLOW
+      rescue ArgumentError # rubocop:disable Lint/HandleExceptions
       end
     end
     values

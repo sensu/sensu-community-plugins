@@ -1,11 +1,28 @@
-#!/usr/bin/ruby
-
+#! /usr/bin/env ruby
 #
-# Check dmesg for failing hardware
+#   check-hardware-fail
 #
-# Detects things like overheating CPUs, dying hard drives, etc.
+# DESCRIPTION:
+#   Check dmesg for failing hardware
+#   Detects things like overheating CPUs, dying hard drives, etc.
 #
-# Originally by Shank Feek, greatly modified by Alan Smith.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Shank Feek, Alan Smith
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

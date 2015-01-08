@@ -1,17 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   <script name>
 #
-# System VMStat Plugin
-# ===
+# DESCRIPTION:
+#   This plugin uses vmstat to collect basic system metrics, produces
+#   Graphite formated output.
 #
-# This plugin uses vmstat to collect basic system metrics, produces
-# Graphite formated output.
+# OUTPUT:
+#   metric data
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
 #
-# rubocop:disable HandleExceptions
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -28,7 +41,8 @@ class VMStat < Sensu::Plugin::Metric::CLI::Graphite
       begin
         converted = Integer(value)
         values[index] = converted
-      rescue ArgumentError
+        # #YELLOW
+      rescue ArgumentError # rubocop:disable Lint/HandleExceptions
       end
     end
     values
