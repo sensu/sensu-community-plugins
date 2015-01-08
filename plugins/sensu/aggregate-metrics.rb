@@ -23,76 +23,72 @@
 # Released under the same terms as Sensu (the MIT license); see
 # LICENSE for details.
 
-require "rubygems"
-require "sensu-plugin/metric/cli"
-require "rest-client"
-require "json"
+require 'rubygems'
+require 'sensu-plugin/metric/cli'
+require 'rest-client'
+require 'json'
 
 class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :api,
-    :short => "-a URL",
-    :long => "--api URL",
-    :description => "Sensu API URL",
-    :default => "http://localhost:4567"
+         short: '-a URL',
+         long: '--api URL',
+         description: 'Sensu API URL',
+         default: 'http://localhost:4567'
 
   option :user,
-    :short => "-u USER",
-    :long => "--user USER",
-    :description => "Sensu API USER"
+         short: '-u USER',
+         long: '--user USER',
+         description: 'Sensu API USER'
 
   option :password,
-    :short => "-p PASSOWRD",
-    :long => "--password PASSWORD",
-    :description => "Sensu API PASSWORD"
+         short: '-p PASSOWRD',
+         long: '--password PASSWORD',
+         description: 'Sensu API PASSWORD'
 
   option :timeout,
-    :short => "-t SECONDS",
-    :long => "--timeout SECONDS",
-    :description => "Sensu API connection timeout in SECONDS",
-    :proc => proc {|a| a.to_i },
-    :default => 30
+         short: '-t SECONDS',
+         long: '--timeout SECONDS',
+         description: 'Sensu API connection timeout in SECONDS',
+         proc: proc(&:to_i),
+         default: 30
 
   option :age,
-    :short => "-A SECONDS",
-    :long => "--age SECONDS",
-    :description => "Minimum aggregate age in SECONDS, time since check request issued",
-    :default => 30,
-    :proc => proc {|a| a.to_i }
+         short: '-A SECONDS',
+         long: '--age SECONDS',
+         description: 'Minimum aggregate age in SECONDS, time since check request issued',
+         default: 30,
+         proc: proc(&:to_i)
 
   option :scheme,
-    :description => "Metric naming scheme",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.sensu.aggregates"
+         description: 'Metric naming scheme',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.sensu.aggregates"
 
   option :debug,
-    :long => "--debug",
-    :description => "Verbose output"
+         long: '--debug',
+         description: 'Verbose output'
 
   def api_request(resource)
-    begin
-      request = RestClient::Resource.new(config[:api] + resource, {
-        :timeout => config[:timeout],
-        :user => config[:user],
-        :password => config[:password]
-      })
-      JSON.parse(request.get, :symbolize_names => true)
-    rescue RestClient::ResourceNotFound
-      warning "Resource not found: #{resource}"
-    rescue Errno::ECONNREFUSED
-      warning "Connection refused"
-    rescue RestClient::RequestFailed
-      warning "Request failed"
-    rescue RestClient::RequestTimeout
-      warning "Connection timed out"
-    rescue RestClient::Unauthorized
-      warning "Missing or incorrect Sensu API credentials"
-    rescue JSON::ParserError
-      warning "Sensu API returned invalid JSON"
-    end
+    request = RestClient::Resource.new(config[:api] + resource, timeout: config[:timeout],
+                                                                user: config[:user],
+                                                                password: config[:password])
+    JSON.parse(request.get, symbolize_names: true)
+  rescue RestClient::ResourceNotFound
+    warning "Resource not found: #{resource}"
+  rescue Errno::ECONNREFUSED
+    warning 'Connection refused'
+  rescue RestClient::RequestFailed
+    warning 'Request failed'
+  rescue RestClient::RequestTimeout
+    warning 'Connection timed out'
+  rescue RestClient::Unauthorized
+    warning 'Missing or incorrect Sensu API credentials'
+  rescue JSON::ParserError
+    warning 'Sensu API returned invalid JSON'
   end
 
-  def get_checks
-    uri = "/aggregates"
+  def acquire_checks
+    uri = '/aggregates'
     checks = api_request(uri)
     puts "Checks: #{checks.inspect}" if config[:debug]
     checks
@@ -101,10 +97,12 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def get_aggregate(check)
     uri = "/aggregates/#{check}"
     issued = api_request(uri + "?age=#{config[:age]}")
-    unless issued.empty?
+    # #YELLOW
+    unless issued.empty? # rubocop:disable UnlessElse
       issued_sorted = issued.sort
       time = issued_sorted.pop
-      unless time.nil?
+      # #YELLOW
+      unless time.nil? # rubocop:disable UnlessElse
         uri += "/#{time}"
         [time, api_request(uri)]
       else
@@ -116,7 +114,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    get_checks.each do |check|
+    acquire_checks.each do |check|
       timestamp, aggregate = get_aggregate(check[:check])
       puts "#{check[:check]} aggregates: #{aggregate}" if config[:debug]
       aggregate.each do |result, count|

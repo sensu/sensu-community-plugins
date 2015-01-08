@@ -12,7 +12,7 @@
 # Attempts to work on Cygwin (where ps does not have the features we
 # need) by calling Windows' tasklist.exe, but this is not well tested.
 #
-# Examples:
+# USAGE:
 #
 #   # chef-client is running
 #   check-procs -p chef-client -W 1
@@ -27,127 +27,127 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
+require 'English'
 
 class CheckProcs < Sensu::Plugin::Check::CLI
-
   option :warn_over,
-    :short => '-w N',
-    :long => '--warn-over N',
-    :description => 'Trigger a warning if over a number',
-    :proc => proc {|a| a.to_i }
+         short: '-w N',
+         long: '--warn-over N',
+         description: 'Trigger a warning if over a number',
+         proc: proc(&:to_i)
 
   option :crit_over,
-    :short => '-c N',
-    :long => '--critical-over N',
-    :description => 'Trigger a critical if over a number',
-    :proc => proc {|a| a.to_i }
+         short: '-c N',
+         long: '--critical-over N',
+         description: 'Trigger a critical if over a number',
+         proc: proc(&:to_i)
 
   option :warn_under,
-    :short => '-W N',
-    :long => '--warn-under N',
-    :description => 'Trigger a warning if under a number',
-    :proc => proc {|a| a.to_i },
-    :default => 1
+         short: '-W N',
+         long: '--warn-under N',
+         description: 'Trigger a warning if under a number',
+         proc: proc(&:to_i),
+         default: 1
 
   option :crit_under,
-    :short => '-C N',
-    :long => '--critical-under N',
-    :description => 'Trigger a critial if under a number',
-    :proc => proc {|a| a.to_i },
-    :default => 1
+         short: '-C N',
+         long: '--critical-under N',
+         description: 'Trigger a critial if under a number',
+         proc: proc(&:to_i),
+         default: 1
 
   option :metric,
-    :short => '-t METRIC',
-    :long => '--metric METRIC',
-    :description => 'Trigger a critical if there are METRIC procs',
-    :proc => proc {|a| a.to_sym }
+         short: '-t METRIC',
+         long: '--metric METRIC',
+         description: 'Trigger a critical if there are METRIC procs',
+         proc: proc(&:to_sym)
 
   option :match_self,
-    :short => '-m',
-    :long => '--match-self',
-    :description => 'Match itself',
-    :boolean => true,
-    :default => false
+         short: '-m',
+         long: '--match-self',
+         description: 'Match itself',
+         boolean: true,
+         default: false
 
   option :match_parent,
-    :short => '-M',
-    :long => '--match-parent',
-    :description => 'Match parent process it uses ruby {process.ppid}',
-    :boolean => true,
-    :default => false
+         short: '-M',
+         long: '--match-parent',
+         description: 'Match parent process it uses ruby {process.ppid}',
+         boolean: true,
+         default: false
 
   option :cmd_pat,
-    :short => '-p PATTERN',
-    :long => '--pattern PATTERN',
-    :description => 'Match a command against this pattern'
+         short: '-p PATTERN',
+         long: '--pattern PATTERN',
+         description: 'Match a command against this pattern'
 
   option :file_pid,
-    :short => '-f PID',
-    :long => '--file-pid PID',
-    :description => 'Check against a specific PID'
+         short: '-f PID',
+         long: '--file-pid PID',
+         description: 'Check against a specific PID'
 
   option :vsz,
-    :short => '-z VSZ',
-    :long => '--virtual-memory-size VSZ',
-    :description => 'Trigger on a Virtual Memory size is bigger than this',
-    :proc => proc {|a| a.to_i }
+         short: '-z VSZ',
+         long: '--virtual-memory-size VSZ',
+         description: 'Trigger on a Virtual Memory size is bigger than this',
+         proc: proc(&:to_i)
 
   option :rss,
-    :short => '-r RSS',
-    :long => '--resident-set-size RSS',
-    :description => 'Trigger on a Resident Set size is bigger than this',
-    :proc => proc {|a| a.to_i }
+         short: '-r RSS',
+         long: '--resident-set-size RSS',
+         description: 'Trigger on a Resident Set size is bigger than this',
+         proc: proc(&:to_i)
 
   option :pcpu,
-    :short => '-P PCPU',
-    :long => '--proportional-set-size PCPU',
-    :description => 'Trigger on a Proportional Set Size is bigger than this',
-    :proc => proc {|a| a.to_f }
+         short: '-P PCPU',
+         long: '--proportional-set-size PCPU',
+         description: 'Trigger on a Proportional Set Size is bigger than this',
+         proc: proc(&:to_f)
 
   option :thcount,
-    :short => '-T THCOUNT',
-    :long => '--thread-count THCOUNT',
-    :description => 'Trigger on a Thread Count is bigger than this',
-    :proc => proc {|a| a.to_i }
+         short: '-T THCOUNT',
+         long: '--thread-count THCOUNT',
+         description: 'Trigger on a Thread Count is bigger than this',
+         proc: proc(&:to_i)
 
   option :state,
-    :short => '-s STATE',
-    :long => '--state STATE',
-    :description => 'Trigger on a specific state, example: Z for zombie',
-    :proc => proc {|a| a.split(',') }
+         short: '-s STATE',
+         long: '--state STATE',
+         description: 'Trigger on a specific state, example: Z for zombie',
+         proc: proc { |a| a.split(',') }
 
   option :user,
-    :short => '-u USER',
-    :long => '--user USER',
-    :description => 'Trigger on a specific user',
-    :proc => proc {|a| a.split(',') }
+         short: '-u USER',
+         long: '--user USER',
+         description: 'Trigger on a specific user',
+         proc: proc { |a| a.split(',') }
 
   option :esec_over,
-    :short => '-e SECONDS',
-    :long => '--esec-over SECONDS',
-    :proc => proc {|a| a.to_i },
-    :description => 'Match processes that older that this, in SECONDS'
+         short: '-e SECONDS',
+         long: '--esec-over SECONDS',
+         proc: proc(&:to_i),
+         description: 'Match processes that older that this, in SECONDS'
 
   option :esec_under,
-    :short => '-E SECONDS',
-    :long => '--esec-under SECONDS',
-    :proc => proc {|a| a.to_i },
-    :description => 'Match process that are younger than this, in SECONDS'
+         short: '-E SECONDS',
+         long: '--esec-under SECONDS',
+         proc: proc(&:to_i),
+         description: 'Match process that are younger than this, in SECONDS'
 
   option :cpu_over,
-    :short => '-i SECONDS',
-    :long => '--cpu-over SECONDS',
-    :proc => proc {|a| a.to_i },
-    :description => 'Match processes cpu time that is older than this, in SECONDS'
+         short: '-i SECONDS',
+         long: '--cpu-over SECONDS',
+         proc: proc(&:to_i),
+         description: 'Match processes cpu time that is older than this, in SECONDS'
 
   option :cpu_under,
-    :short => '-I SECONDS',
-    :long => '--cpu-under SECONDS',
-    :proc => proc {|a| a.to_i },
-    :description => 'Match processes cpu time that is younger than this, in SECONDS'
+         short: '-I SECONDS',
+         long: '--cpu-under SECONDS',
+         proc: proc(&:to_i),
+         description: 'Match processes cpu time that is younger than this, in SECONDS'
 
   def read_pid(path)
-    if File.exists?(path)
+    if File.exist?(path)
       File.read(path).strip.to_i
     else
       unknown "Could not read pid file #{path}"
@@ -165,10 +165,11 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   end
 
   def on_cygwin?
-    `ps -W 2>&1`; $?.exitstatus == 0
+    # #YELLOW
+    `ps -W 2>&1`; $CHILD_STATUS.exitstatus == 0 # rubocop:disable Semicolon
   end
 
-  def get_procs
+  def acquire_procs
     if on_cygwin?
       read_lines('ps -aWl').drop(1).map do |line|
         # Horrible hack because cygwin's ps has no o option, every
@@ -178,7 +179,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
         # const char *lfmt = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
         state = line.slice!(0..0)
         _stime = line.slice!(45..53)
-        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :etime, :command, :time).merge(:state => state)
+        line_to_hash(line, :pid, :ppid, :pgid, :winpid, :tty, :uid, :etime, :command, :time).merge(state: state)
       end
     else
       read_lines('ps axwwo user,pid,vsz,rss,pcpu,nlwp,state,etime,time,command').drop(1).map do |line|
@@ -189,33 +190,33 @@ class CheckProcs < Sensu::Plugin::Check::CLI
 
   def etime_to_esec(etime)
     m = /(\d+-)?(\d\d:)?(\d\d):(\d\d)/.match(etime)
-    (m[1]||0).to_i*86400 + (m[2]||0).to_i*3600 + (m[3]||0).to_i*60 + (m[4]||0).to_i
+    (m[1] || 0).to_i * 86_400 + (m[2] || 0).to_i * 3600 + (m[3] || 0).to_i * 60 + (m[4] || 0).to_i
   end
 
   def cputime_to_csec(time)
     m = /(\d+-)?(\d\d:)?(\d\d):(\d\d)/.match(time)
-    (m[1]||0).to_i*86400 + (m[2]||0).to_i*3600 + (m[3]||0).to_i*60 + (m[4]||0).to_i
+    (m[1] || 0).to_i * 86_400 + (m[2] || 0).to_i * 3600 + (m[3] || 0).to_i * 60 + (m[4] || 0).to_i
   end
 
   def run
-    procs = get_procs
+    procs = acquire_procs
 
     if config[:file_pid] && (file_pid = read_pid(config[:file_pid]))
       procs.reject! { |p| p[:pid].to_i != file_pid }
     end
-    procs.reject! {|p| p[:pid].to_i == $$ } unless config[:match_self]
-    procs.reject! {|p| p[:pid].to_i == Process.ppid } unless config[:match_parent]
-    procs.reject! {|p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
-    procs.reject! {|p| p[:vsz].to_f > config[:vsz] } if config[:vsz]
-    procs.reject! {|p| p[:rss].to_f > config[:rss] } if config[:rss]
-    procs.reject! {|p| p[:pcpu].to_f > config[:pcpu] } if config[:pcpu]
-    procs.reject! {|p| p[:thcount].to_i > config[:thcount] } if config[:thcount]
-    procs.reject! {|p| etime_to_esec(p[:etime]) >= config[:esec_under] } if config[:esec_under]
-    procs.reject! {|p| etime_to_esec(p[:etime]) <= config[:esec_over] } if config[:esec_over]
-    procs.reject! {|p| cputime_to_csec(p[:time]) >= config[:cpu_under] } if config[:cpu_under]
-    procs.reject! {|p| cputime_to_csec(p[:time]) <= config[:cpu_over] } if config[:cpu_over]
-    procs.reject! {|p| !config[:state].include?(p[:state]) } if config[:state]
-    procs.reject! {|p| !config[:user].include?(p[:user]) } if config[:user]
+    procs.reject! { |p| p[:pid].to_i == $PROCESS_ID } unless config[:match_self]
+    procs.reject! { |p| p[:pid].to_i == Process.ppid } unless config[:match_parent]
+    procs.reject! { |p| p[:command] !~ /#{config[:cmd_pat]}/ } if config[:cmd_pat]
+    procs.reject! { |p| p[:vsz].to_f > config[:vsz] } if config[:vsz]
+    procs.reject! { |p| p[:rss].to_f > config[:rss] } if config[:rss]
+    procs.reject! { |p| p[:pcpu].to_f > config[:pcpu] } if config[:pcpu]
+    procs.reject! { |p| p[:thcount].to_i > config[:thcount] } if config[:thcount]
+    procs.reject! { |p| etime_to_esec(p[:etime]) >= config[:esec_under] } if config[:esec_under]
+    procs.reject! { |p| etime_to_esec(p[:etime]) <= config[:esec_over] } if config[:esec_over]
+    procs.reject! { |p| cputime_to_csec(p[:time]) >= config[:cpu_under] } if config[:cpu_under]
+    procs.reject! { |p| cputime_to_csec(p[:time]) <= config[:cpu_over] } if config[:cpu_over]
+    procs.reject! { |p| !config[:state].include?(p[:state]) } if config[:state]
+    procs.reject! { |p| !config[:user].include?(p[:user]) } if config[:user]
 
     msg = "Found #{procs.size} matching processes"
     msg += "; cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
@@ -232,23 +233,27 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     msg += "; pid #{config[:file_pid]}" if config[:file_pid]
 
     if config[:metric]
-      count = procs.map {|p| p[config[:metric]].to_i }.reduce {|a, b| a + b }
+      # #YELLOW
+      count = procs.map { |p| p[config[:metric]].to_i }.reduce { |a, b| a + b } # rubocop:disable SingleLineBlockParams
       msg += "; #{config[:metric]} == #{count}"
     else
       count = procs.size
     end
 
-    if !!config[:crit_under] && count < config[:crit_under]
+    # #YELLOW
+    if !!config[:crit_under] && count < config[:crit_under] # rubocop:disable Style/DoubleNegation
       critical msg
-    elsif !!config[:crit_over] && count > config[:crit_over]
+    # #YELLOW
+    elsif !!config[:crit_over] && count > config[:crit_over] # rubocop:disable Style/DoubleNegation
       critical msg
-    elsif !!config[:warn_under] && count < config[:warn_under]
+    # #YELLOW
+    elsif !!config[:warn_under] && count < config[:warn_under] # rubocop:disable Style/DoubleNegation
       warning msg
-    elsif !!config[:warn_over] && count > config[:warn_over]
+    # #YELLOW
+    elsif !!config[:warn_over] && count > config[:warn_over] # rubocop:disable Style/DoubleNegation
       warning msg
     else
       ok msg
     end
   end
-
 end

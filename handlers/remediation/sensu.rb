@@ -73,9 +73,9 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
+require 'English'
 
 class Remediator < Sensu::Handler
-
   # Override filter_repeated from Sensu::Handler.
   # Remediations are not alerts.
   def filter_repeated; end
@@ -108,21 +108,20 @@ class Remediator < Sensu::Handler
 
     remediations.each do |check, conditions|
       # Check remediations matching the current severity
-      next unless (conditions["severities"] || []).include?(severity)
+      next unless (conditions['severities'] || []).include?(severity)
 
       # Check for remediations matching the current occurrence count
       trigger = false
-      (conditions["occurrences"] || []).each do |value|
+      (conditions['occurrences'] || []).each do |value|
         trigger = case
-          when value.is_a?(Integer) && occurrences == value then true
-          when value.to_s =~ /^\d+$/ && occurrences == $~.to_a.first.to_i then true
-          when value.to_s =~ /^(\d+)-(\d+)$/ && Range.new($~.to_a[1].to_i, $~.to_a[2].to_i).to_a.include?(occurrences) then true
-          when value.to_s.match(/^(\d+)\+$/) && Range.new($~.to_a[1].to_i, 9999).include?(occurrences) then true
+                  when value.is_a?(Integer) && occurrences == value then true
+                  when value.to_s =~ /^\d+$/ && occurrences == $LAST_MATCH_INFO.to_a.first.to_i then true
+                  # #YELLOW
+                  when value.to_s =~ /^(\d+)-(\d+)$/ && Range.new($LAST_MATCH_INFO.to_a[1].to_i, $LAST_MATCH_INFO.to_a[2].to_i).to_a.include?(occurrences) then true # rubocop:disable LineLength
+                  when value.to_s.match(/^(\d+)\+$/) && Range.new($LAST_MATCH_INFO.to_a[1].to_i, 9999).include?(occurrences) then true
           else false
         end
-        if trigger
-          break
-        end
+        break if trigger
       end
 
       remediations_to_trigger << check if trigger
@@ -133,8 +132,7 @@ class Remediator < Sensu::Handler
   # Issue a check via the API
   def trigger_remediation(check, subscribers)
     api_request(:POST, '/request') do |req|
-      req.body = JSON.dump({"check" => check, "subscribers" => subscribers})
+      req.body = JSON.dump('check' => check, 'subscribers' => subscribers)
     end
   end
-
 end

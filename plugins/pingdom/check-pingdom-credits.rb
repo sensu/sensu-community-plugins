@@ -39,37 +39,37 @@ require 'json'
 
 class CheckPingdomCredits < Sensu::Plugin::Check::CLI
   option :user,
-    :short => '-u EMAIL',
-    :required => true
+         short: '-u EMAIL',
+         required: true
   option :password,
-    :short => '-p PASSWORD',
-    :required => true
+         short: '-p PASSWORD',
+         required: true
   option :application_key,
-    :short => '-k APP_KEY',
-    :long => '--application-key APP_KEY',
-    :required => true
+         short: '-k APP_KEY',
+         long: '--application-key APP_KEY',
+         required: true
 
   option :warn_sms,
-    :long => '--warn-available-sms COUNT',
-    :default => 10,
-    :proc => proc {|a| a.to_i }
+         long: '--warn-available-sms COUNT',
+         default: 10,
+         proc: proc(&:to_i)
   option :crit_sms,
-    :long => '--crit-available-sms COUNT',
-    :default => 5,
-    :proc => proc {|a| a.to_i }
+         long: '--crit-available-sms COUNT',
+         default: 5,
+         proc: proc(&:to_i)
 
   option :warn_checks,
-    :long => '--warn-available-checks COUNT',
-    :default => 3,
-    :proc => proc {|a| a.to_i }
+         long: '--warn-available-checks COUNT',
+         default: 3,
+         proc: proc(&:to_i)
   option :crit_checks,
-    :long => '--crit-available-checks COUNT',
-    :default => 1,
-    :proc => proc {|a| a.to_i }
+         long: '--crit-available-checks COUNT',
+         default: 1,
+         proc: proc(&:to_i)
 
   option :timeout,
-    :short => '-t SECS',
-    :default => 10
+         short: '-t SECS',
+         default: 10
 
   def run
     check_sms!
@@ -83,9 +83,9 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
   def check_sms!
     message = "Only #{available_sms} Pingdom SMS left (threshold %{threshold})"
     if config[:crit_sms] >= available_sms
-      critical(message % { :threshold => config[:crit_sms] })
+      critical(message % { threshold: config[:crit_sms] })
     elsif config[:warn_sms] >= available_sms
-      warning(message % { :threshold => config[:warn_sms] })
+      warning(message % { threshold: config[:warn_sms] })
     else
       @sms_ok = true
     end
@@ -94,9 +94,9 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
   def check_checks!
     message = "Only #{available_checks} Pingdom checks left (threshold %{threshold})"
     if config[:crit_checks] >= available_checks
-      critical(message % { :threshold => config[:crit_checks] })
+      critical(message % { threshold: config[:crit_checks] })
     elsif config[:warn_checks] >= available_checks
-      warning(message % { :threshold => config[:warn_checks] })
+      warning(message % { threshold: config[:warn_checks] })
     else
       @checks_ok = true
     end
@@ -118,27 +118,26 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
   def api_call
     resource = RestClient::Resource.new(
       'https://api.pingdom.com/api/2.0/credits',
-      :user     => config[:user],
-      :password => config[:password],
-      :headers  => { 'App-Key' => config[:application_key] },
-      :timeout  => config[:timeout]
+      user: config[:user],
+      password: config[:password],
+      headers: { 'App-Key' => config[:application_key] },
+      timeout: config[:timeout]
     )
-    JSON.parse(resource.get, :symbolize_names => true)
+    JSON.parse(resource.get, symbolize_names: true)
 
   rescue RestClient::RequestTimeout
-    warning "Connection timeout"
+    warning 'Connection timeout'
   rescue SocketError
-    warning "Network unavailable"
+    warning 'Network unavailable'
   rescue Errno::ECONNREFUSED
-    warning "Connection refused"
+    warning 'Connection refused'
   rescue RestClient::RequestFailed
-    warning "Request failed"
+    warning 'Request failed'
   rescue RestClient::RequestTimeout
-    warning "Connection timed out"
+    warning 'Connection timed out'
   rescue RestClient::Unauthorized
-    warning "Missing or incorrect API credentials"
+    warning 'Missing or incorrect API credentials'
   rescue JSON::ParserError
-    warning "API returned invalid JSON"
+    warning 'API returned invalid JSON'
   end
-
 end

@@ -1,22 +1,40 @@
-#!/usr/bin/hbase org.jruby.Main
+#! /usr/bin/env ruby
 #
-# HBase regions plugin
-# ===
+#   check-hbase-regions
 #
-# This plugin checks the number of regions on a regionserver
+# DESCRIPTION:
+#   This plugin checks the number of regions on a regionserver
 #
-# Copyright 2011 Runa Inc
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: pp
+#   gem: java
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   #YELLOW
+#   rewite to use sensu-plugin
+#
+# LICENSE:
+#   Copyright 2011 Runa Inc
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'java'
 require 'pp'
 
 include Java
-include_class('java.lang.Integer') { |package, name| "J#{name}" }
-include_class('java.lang.Long')    { |package, name| "J#{name}" }
-include_class('java.lang.Boolean') { |package, name| "J#{name}" }
+include_class('java.lang.Integer') { |_package, name| "J#{name}" }
+include_class('java.lang.Long')    { |_package, name| "J#{name}" }
+include_class('java.lang.Boolean') { |_package, name| "J#{name}" }
 
 import org.apache.hadoop.hbase.client.HBaseAdmin
 import org.apache.hadoop.hbase.client.HTable
@@ -24,11 +42,11 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.log4j.Logger
 
-packages = ["org.apache.zookeeper", "org.apache.hadoop", "org.apache.hadoop.hbase"]
+packages = ['org.apache.zookeeper', 'org.apache.hadoop', 'org.apache.hadoop.hbase']
 
 packages.each do |package|
   logger = org.apache.log4j.Logger.getLogger(package)
-  logger.setLevel(org.apache.log4j.Level::ERROR);
+  logger.setLevel(org.apache.log4j.Level::ERROR)
 end
 
 module SensuUtils
@@ -38,7 +56,7 @@ module SensuUtils
     'OK' => 0,
     'WARNING' => 1,
     'CRITICAL' => 2,
-    'UNKNOWN' => 3,
+    'UNKNOWN' => 3
   }
 
   def output(fn, *args)
@@ -51,7 +69,6 @@ module SensuUtils
       exit(code)
     end
   end
-
 end
 
 include SensuUtils
@@ -62,8 +79,8 @@ def regionserver_info
 
   status = admin.getClusterStatus
   status.getServerInfo.map do |server|
-    { :hostname => server.getServerAddress.getHostname,
-      :regions => server.getLoad.getNumberOfRegions
+    { hostname: server.getServerAddress.getHostname,
+      regions: server.getLoad.getNumberOfRegions
     }
   end
 end
@@ -71,15 +88,15 @@ end
 def check_threshold(info)
   case info[:regions]
   when config[:ok]..config[:warning]
-    { :status => :ok, :msg => "Regions: #{info.inspect}" }
+    { status: :ok, msg: "Regions: #{info.inspect}" }
   when config[:warning]..config[:critical]
-    { :status => :warning, :msg => "Regions: #{info.inspect}" }
+    { status: :warning, msg: "Regions: #{info.inspect}" }
   else
-    { :status => :critical, :msg => "Regions: #{info.inspect}" }
+    { status: :critical, msg: "Regions: #{info.inspect}" }
   end
 end
 
-@config = { :ok => 0, :warning => 900, :critical => 1000 }
+@config = { ok: 0, warning: 900, critical: 1000 }
 
 class Array
   def second
@@ -87,9 +104,7 @@ class Array
   end
 end
 
-def config
-  @config
-end
+attr_reader :config
 
 def run
   status = regionserver_info.map { |x| check_threshold(x) }
@@ -103,7 +118,6 @@ def run
   else
     ok msg
   end
-
 end
 
 @config[:warning]  = ARGV.first.to_i if ARGV.first

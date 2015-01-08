@@ -22,57 +22,56 @@ require 'mysql2'
 require 'socket'
 
 class KeystoneTokenCounts < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-         :short => '-h HOST',
-         :long => '--host HOST',
-         :description => 'Mysql Host to connect to',
-         :default => 'localhost'
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Mysql Host to connect to',
+         default: 'localhost'
 
   option :port,
-         :short => '-P PORT',
-         :long => '--port PORT',
-         :description => 'Mysql Port to connect to',
-         :proc => proc { |p| p.to_i },
-         :default => 3306
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'Mysql Port to connect to',
+         proc: proc(&:to_i),
+         default: 3306
 
   option :username,
-         :short => '-u USERNAME',
-         :long => '--user USERNAME',
-         :description => 'Mysql Username',
-         :required => true
+         short: '-u USERNAME',
+         long: '--user USERNAME',
+         description: 'Mysql Username',
+         required: true
 
   option :password,
-         :short => '-p PASSWORD',
-         :long => '--pass PASSWORD',
-         :description => 'Mysql password',
-         :default => ''
+         short: '-p PASSWORD',
+         long: '--pass PASSWORD',
+         description: 'Mysql password',
+         default: ''
 
   option :scheme,
-         :description => 'Metric naming scheme, text to prepend to metric',
-         :short => '-s SCHEME',
-         :long => '--scheme SCHEME',
-         :default => "#{Socket.gethostname}.keystone.tokens"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.keystone.tokens"
 
   option :socket,
-         :short => '-S SOCKET',
-         :long => '--socket SOCKET'
+         short: '-S SOCKET',
+         long: '--socket SOCKET'
 
   option :by_user,
-         :description => 'Show token counts by user',
-         :long => '--by-user',
-         :boolean => true,
-         :default => false
+         description: 'Show token counts by user',
+         long: '--by-user',
+         boolean: true,
+         default: false
 
   option :ks_users,
-         :description => 'Delimited list of users to include',
-         :long => '--ks-users USER[,USER]'
+         description: 'Delimited list of users to include',
+         long: '--ks-users USER[,USER]'
 
   option :database,
-         :short => '-d DATABASE',
-         :long => '--database DATABASE',
-         :description => 'Database name',
-         :default => 'keystone'
+         short: '-d DATABASE',
+         long: '--database DATABASE',
+         description: 'Database name',
+         default: 'keystone'
 
   def run
     if config[:ks_users]
@@ -92,9 +91,9 @@ GROUP BY user.name
     eosql
     begin
       mysql = Mysql2::Client.new(
-        :host => config[:host], :port => config[:port],
-        :username => config[:username], :password => config[:password],
-        :socket => config[:socket], :database => config[:database]
+        host: config[:host], port: config[:port],
+        username: config[:username], password: config[:password],
+        socket: config[:socket], database: config[:database]
       )
       mysql.query(sql).each do |row|
         metrics.size.times do |i|
@@ -113,5 +112,4 @@ GROUP BY user.name
     end
     ok
   end
-
 end

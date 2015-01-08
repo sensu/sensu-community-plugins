@@ -1,78 +1,90 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Fetch Elasticache metrics from CloudWatch
-# ===
+# elasticache-metrics
 #
-# Copyright 2014 Yann Verry
+# DESCRIPTION:
+#   Fetch Elasticache metrics from CloudWatch
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric-data
 #
-# Gets metrics from CloudWatch and puts them in Graphite
+# PLATFORMS:
+#   Linux
 #
-# Needs aws-sdk gem
+# DEPENDENCIES:
+#   gem: aws-sdk
+#   gem: sensu-plugin
 #
-# Redis: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Redis.html
-# Memcached: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Memcached.html
+# needs example command
+# USAGE:
+#   #YELLOW
+
+# NOTES:
+#   Redis: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Redis.html
+#   Memcached: http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CacheMetrics.Memcached.html
 #
-# By default fetches all available statistics from one minute ago.  You may need to fetch further back than this;
+#   By default fetches all available statistics from one minute ago.  You may need to fetch further back than this;
+#
+# LICENSE:
+#   Copyright 2014 Yann Verry
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'aws-sdk'
 
 class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :cacheclusterid,
-    :description => "Name of the Cache Cluster",
-    :short => "-n ELASTICACHE_NAME",
-    :long => "--name ELASTICACHE_NAME",
-    :required => true
+         description: 'Name of the Cache Cluster',
+         short: '-n ELASTICACHE_NAME',
+         long: '--name ELASTICACHE_NAME',
+         required: true
 
   option :cachenodeid,
-    :description => 'Cache Node ID',
-    :short => '-i CACHE_NODE_ID',
-    :long => '--cache-node-id CACHE_NODE_ID',
-    :default => '0001'
+         description: 'Cache Node ID',
+         short: '-i CACHE_NODE_ID',
+         long: '--cache-node-id CACHE_NODE_ID',
+         default: '0001'
 
   option :elasticachetype,
-    :description => "Elasticache type redis or memcached",
-    :short => "-c TYPE",
-    :long => "--cachetype TYPE",
-    :required => true
+         description: 'Elasticache type redis or memcached',
+         short: '-c TYPE',
+         long: '--cachetype TYPE',
+         required: true
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => ""
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: ''
 
   option :fetch_age,
-    :description => "How long ago to fetch metrics for",
-    :short => "-f AGE",
-    :long => "--fetch_age",
-    :default => 60,
-    :proc => proc { |a| a.to_i }
+         description: 'How long ago to fetch metrics for',
+         short: '-f AGE',
+         long: '--fetch_age',
+         default: 60,
+         proc: proc(&:to_i)
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
 
   option :aws_secret_access_key,
-    :short => '-k AWS_SECRET_ACCESS_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
+         short: '-k AWS_SECRET_ACCESS_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as us-east-1).",
-    :default => 'us-east-1'
+         short: '-r AWS_REGION',
+         long: '--aws-region REGION',
+         description: 'AWS Region (such as us-east-1).',
+         default: 'us-east-1'
 
   def run
-
-    if config[:scheme] == ""
+    if config[:scheme] == ''
       graphitepath = "#{config[:elasticachename]}.#{config[:metric].downcase}"
     else
       graphitepath = config[:scheme]
@@ -93,7 +105,7 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
         'ListBasedCmds' => 'Count',
         'SetBasedCmds' => 'Count',
         'SortedSetBasedCmds' => 'Count',
-        'CurrItems' => 'Count',
+        'CurrItems' => 'Count'
       },
       'memcached' => {
         'CPUUtilization' => 'Percent',
@@ -134,16 +146,16 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
         'TouchMisses' => 'Count',
         'NewConnections' => 'Count',
         'NewItems' => 'Count',
-        'UnusedMemory' => 'Bytes',
+        'UnusedMemory' => 'Bytes'
       }
     }
 
     begin
 
       AWS.config(
-        :access_key_id      => config[:aws_access_key],
-        :secret_access_key  => config[:aws_secret_access_key],
-        :region             => config[:aws_region]
+        access_key_id: config[:aws_access_key],
+        secret_access_key: config[:aws_secret_access_key],
+        region: config[:aws_region]
       )
 
       et = Time.now - config[:fetch_age]
@@ -156,7 +168,7 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
         'namespace' => 'AWS/ElastiCache',
         'metric_name' => config[:metric],
         'dimensions' => [
-          { 'name' => 'CacheClusterId', 'value' => config[:cacheclusterid]}
+          { 'name' => 'CacheClusterId', 'value' => config[:cacheclusterid] }
         ],
         'start_time' => st.iso8601,
         'end_time' => et.iso8601,
@@ -176,10 +188,10 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       unless result.nil?
         result.each do |name, d|
           # We only return data when we have some to return
-          output graphitepath + '.' + name.downcase , d[:average], d[:timestamp].to_i
+          output graphitepath + '.' + name.downcase, d[:average], d[:timestamp].to_i
         end
       end
-    rescue Exception => e
+    rescue => e
       puts "Error: exception: #{e}"
       critical
     end

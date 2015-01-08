@@ -21,12 +21,10 @@ require 'sensu-handler'
 require 'flowdock'
 
 class FlowdockNotifier < Sensu::Handler
-
   def handle
     token = settings['flowdock']['auth_token']
     data = @event['check']['output']
-    flow = Flowdock::Flow.new(:api_token => token, :external_user_name => "Sensu")
-    flow.push_to_chat(:content => data, :tags => ["sensu", "test"])
+    flow = Flowdock::Flow.new(api_token: token, external_user_name: 'Sensu')
+    flow.push_to_chat(content: data, tags: %w(sensu test))
   end
-
 end

@@ -1,31 +1,42 @@
-#!/usr/bin/env ruby
-# check-lxc-status
-# ===
+#! /usr/bin/env ruby
 #
-# This is a simple check script for Sensu to check the status of a Linux Container
+#   check-lxc-status
 #
-# Requires "lxc" gem
+# DESCRIPTION:
+#   This is a simple check script for Sensu to check the status of a Linux Container
 #
-# Examples:
+# OUTPUT:
+#   plain text, metric data, etc
 #
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: lxc
+#
+# USAGE:
 #   check-lxc-status.rb -n name    => name of the container
 #
-#  Default lxc is "testdebian", change to if you dont want to pass host
-# option
-#  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Default lxc is "testdebian", change to if you dont want to pass host
+#   option
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'lxc'
 
 class CheckLXCSTATUS < Sensu::Plugin::Check::CLI
-
   option :name,
-    :short => '-n name',
-    :default => "testdebian"
+         short: '-n name',
+         default: 'testdebian'
 
   def run
     conn = LXC.container("#{config[:name]}")
@@ -38,7 +49,7 @@ class CheckLXCSTATUS < Sensu::Plugin::Check::CLI
         ok "container  #{config[:name]} is Running"
       end
       else
-      critical "container #{config[:name]} does not Exists"
+        critical "container #{config[:name]} does not Exists"
     end
   end
 end

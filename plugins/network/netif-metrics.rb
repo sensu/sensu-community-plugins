@@ -1,28 +1,44 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Network interface throughput
-# ===
+#   netif-metrics
+#
+# DESCRIPTION:
+#   Network interface throughput
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   sysstat to get 'sar'
+#   gem: sensu-plugin
+#   gem: socket
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class NetIFMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}"
 
   def run
-    `sar -n DEV 1 1 | grep Average | grep -v IFACE`.each_line do |line|
+    # #YELLOW
+    `sar -n DEV 1 1 | grep Average | grep -v IFACE`.each_line do |line|  # rubocop:disable Style/Next
       stats = line.split(/\s+/)
       unless stats.empty?
         stats.shift
@@ -33,7 +49,5 @@ class NetIFMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     ok
-
   end
-
 end

@@ -1,22 +1,39 @@
-#!/usr/bin/hbase org.jruby.Main
+#! /usr/bin/env ruby
 #
-# HBase status plugin
-# ===
+#   check-hbase-status
 #
-# This plugin checks if any of the regionservers are down
+# DESCRIPTION:
+#   This plugin checks the status
 #
-# Copyright 2011 Runa Inc
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: pp
+#   gem: java
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   #YELLOW
+#   rewite to use sensu-plugin
+#
+# LICENSE:
+#   Copyright 2011 Runa Inc
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 require 'java'
 require 'pp'
 
 include Java
-include_class('java.lang.Integer') { |package, name| "J#{name}" }
-include_class('java.lang.Long')    { |package, name| "J#{name}" }
-include_class('java.lang.Boolean') { |package, name| "J#{name}" }
+include_class('java.lang.Integer') { |_package, name| "J#{name}" }
+include_class('java.lang.Long')    { |_package, name| "J#{name}" }
+include_class('java.lang.Boolean') { |_package, name| "J#{name}" }
 
 import org.apache.hadoop.hbase.client.HBaseAdmin
 import org.apache.hadoop.hbase.client.HTable
@@ -24,11 +41,11 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.log4j.Logger
 
-packages = ["org.apache.zookeeper", "org.apache.hadoop", "org.apache.hadoop.hbase"]
+packages = ['org.apache.zookeeper', 'org.apache.hadoop', 'org.apache.hadoop.hbase']
 
 packages.each do |package|
   logger = org.apache.log4j.Logger.getLogger(package)
-  logger.setLevel(org.apache.log4j.Level::ERROR);
+  logger.setLevel(org.apache.log4j.Level::ERROR)
 end
 
 module SensuUtils
@@ -38,7 +55,7 @@ module SensuUtils
     'OK' => 0,
     'WARNING' => 1,
     'CRITICAL' => 2,
-    'UNKNOWN' => 3,
+    'UNKNOWN' => 3
   }
 
   def output(fn, *args)
@@ -51,7 +68,6 @@ module SensuUtils
       exit(code)
     end
   end
-
 end
 
 include SensuUtils
@@ -66,12 +82,12 @@ def check_hbase_status
   count = dead_servers.length
 
   if count == 0
-    ok "Alive"
+    ok 'Alive'
   else
-    critical "Dead: #{dead_servers.join(" ")}"
+    critical "Dead: #{dead_servers.join(' ')}"
   end
 
-  unknown "No output from plugin"
+  unknown 'No output from plugin'
 end
 
 check_hbase_status

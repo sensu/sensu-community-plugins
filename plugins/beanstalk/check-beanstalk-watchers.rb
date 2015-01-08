@@ -1,10 +1,31 @@
-#!/usr/bin/env ruby
-# check-beanstalk-watchers.rb
-# ===
-# Author: S. Zachariah Sprackett <zac@sprackett.com>
+#! /usr/bin/env ruby
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# check-beanstalk-watchers
+#
+#
+# DESCRIPTION:
+#   #YELLOW
+#
+# OUTPUT:
+#   plain-text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: beanstalk
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright S. Zachariah Sprackett <zac@sprackett.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -12,29 +33,29 @@ require 'beanstalk-client'
 
 class CheckBeanstalkWatchers < Sensu::Plugin::Check::CLI
   option :host,
-    :short   => '-H HOST',
-    :default => 'localhost'
+         short: '-H HOST',
+         default: 'localhost'
   option :port,
-    :short   => '-p PORT',
-    :default => '11300'
+         short: '-p PORT',
+         default: '11300'
   option :tube,
-    :short   => '-t TUBE'
+         short: '-t TUBE'
   option :crit,
-    :short   => '-c CRIT_THRESHOLD',
-    :proc    => proc { |a| a.to_i },
-    :default => false
+         short: '-c CRIT_THRESHOLD',
+         proc: proc(&:to_i),
+         default: false
   option :warn,
-    :short   => '-w WARN_THRESHOLD',
-    :proc    => proc { |a| a.to_i },
-    :default => false
+         short: '-w WARN_THRESHOLD',
+         proc: proc(&:to_i),
+         default: false
 
   def run
-    unknown "Tube was not set" unless config[:tube]
+    unknown 'Tube was not set' unless config[:tube]
     begin
       beanstalk = Beanstalk::Connection.new(
         "#{config[:host]}:#{config[:port]}"
       )
-    rescue Exception => e
+    rescue => e
       critical "Failed to connect: (#{e})"
     end
 
@@ -44,7 +65,8 @@ class CheckBeanstalkWatchers < Sensu::Plugin::Check::CLI
     rescue Beanstalk::NotFoundError
       warning "Tube #{config[:tube]} not found"
     end
-    unless watchers
+    # #YELLOW
+    unless watchers # rubocop:disable IfUnlessModifier
       watchers = 0
     end
     if config[:crit] && watchers < config[:crit]

@@ -1,4 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+#   <script name>
+#
+# DESCRIPTION:
+#   what is this thing supposed to do, monitor?  How do alerts or
+#   alarms work?
+#
+# OUTPUT:
+#   plain text, metric data, etc
+#
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   <your name>  <your email>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+# !/usr/bin/env ruby
 #
 # TCP socket state metrics
 # ===
@@ -57,24 +87,24 @@ TCP_STATES = {
 }
 
 class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.tcp"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.tcp"
 
   option :port,
-    :description => "Port you wish to get metrics for",
-    :short => "-p PORT",
-    :long => "--port PORT",
-    :proc => proc {|a| a.to_i }
+         description: 'Port you wish to get metrics for',
+         short: '-p PORT',
+         long: '--port PORT',
+         proc: proc(&:to_i)
 
   def netstat(protocol = 'tcp')
     state_counts = Hash.new(0)
-    TCP_STATES.each_pair { |hex, name| state_counts[name] = 0 }
+    TCP_STATES.each_pair { |_hex, name| state_counts[name] = 0 }
 
-    File.open('/proc/net/' + protocol).each do |line|
+    # #YELLOW
+    File.open('/proc/net/' + protocol).each do |line| # rubocop:disable Style/Next
       line.strip!
       if m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
         connection_state = m[5]
@@ -99,5 +129,4 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
     ok
   end
-
 end
