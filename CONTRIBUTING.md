@@ -26,7 +26,7 @@ Each plugin, handler, mutator, extension should use the following standard heade
 
 ````
 #! /usr/bin/env ruby
-#
+#  encoding: UTF-8
 #   <script name>
 #
 # DESCRIPTION:
