@@ -1,17 +1,28 @@
 #!/usr/bin/env ruby
 #
-# Check Supervisor
-# ===
+# check-supervisor-socket
 #
-# Check all supervisor processes are running
 #
-# Requires ruby-supervisor gem
+# DESCRIPTION:
+#   Check all supervisor processes are running#
 #
-#   Author: Johan van den Dorpe
-#   Copyright (c) 2013 Double Negative Limited
+# OUTPUT:
+#   Plain text, 'All processes running' or eg. 'redis-server not running: FATAL'
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: uby-supervisor
+#
+# USAGE:
+#   check-supervisor-socket.rb
+#
+# LICENSE:
+#    Copyright (c) 2013 Double Negative Limited and Johan van den Dorpe
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9'
 require 'sensu-plugin/check/cli'
