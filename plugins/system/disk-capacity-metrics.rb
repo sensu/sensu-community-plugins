@@ -45,7 +45,7 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
         converted = Integer(value)
         values[index] = converted
         # #YELLOW
-      rescue ArgumentError # rubocop:disable Lint/HandleExceptions
+      rescue ArgumentError # rubocop:disable HandleExceptions
       end
     end
     values
