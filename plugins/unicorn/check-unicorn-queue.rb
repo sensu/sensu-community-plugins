@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Checks Unicorn Queue
-# ===
+# check-unicorn-queue
 #
 # DESCRIPTION:
 #   This plugin checks the queue of Unicorn (a Rack HTTP server)

@@ -1,14 +1,27 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Linux system load
-# ===
+#   check-load
 #
-# Copyright 2012 Sonian, Inc <chefs@sonian.net>
+# DESCRIPTION:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-
-# rubocop:disable HandleExceptions
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 if RUBY_VERSION < '1.9.0'
   require 'rubygems'

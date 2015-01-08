@@ -1,12 +1,30 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Push ioping stats into graphite
-# ===
+#   ioping-metrics
 #
-# Copyright 2014 Mitsutoshi Aoe <maoe@foldr.in>
+# DESCRIPTION:
+#   Push ioping stats into graphite
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Mitsutoshi Aoe <maoe@foldr.in>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
