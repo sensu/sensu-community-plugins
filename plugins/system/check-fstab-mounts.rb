@@ -1,16 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check fstab Mounts Plugin
-# ===
+#   check-fstab-mounts
 #
-# Check /etc/mtab to ensure all filesystems of the requested type(s) from
-# fstab are currently mounted.  If no fstypes are specified, will check all
-# entries in fstab.
+# DESCRIPTION:
+#   Check /etc/mtab to ensure all filesystems of the requested type(s) from
+#   fstab are currently mounted.  If no fstypes are specified, will check all
+#   entries in fstab.
 #
-# Peter Fern <ruby@0xc0dedbad.com>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: pathname
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Peter Fern <ruby@0xc0dedbad.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

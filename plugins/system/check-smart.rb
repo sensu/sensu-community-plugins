@@ -1,25 +1,40 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Check the SMART health status of physical disks
-# ===
+#   check-smart
 #
-# This is a drop-in replacement for check-disk-health.sh.
+# DESCRIPTION:
 #
-# smartctl requires root permissions.  When running this script as a non-root
-# user such as sensu, ensure it is run with sudo.
+# OUTPUT:
+#   plain text
 #
-# Create a file named /etc/sudoers.d/smartctl with this line inside :
-# sensu ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+# PLATFORMS:
+#   Linux
 #
-# Fedora has some additional restrictions : if requiretty is set, sudo will only
-# run when the user is logged in to a real tty.
-# Then add this in the sudoers file (/etc/sudoers), below the line Defaults requiretty :
-# Defaults sensu !requiretty
+# DEPENDENCIES:
+#   gem: sensu-plugin
 #
-# Copyright 2013 Mitsutoshi Aoe <maoe@foldr.in>
+# USAGE:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#   This is a drop-in replacement for check-disk-health.sh.
+#
+#   smartctl requires root permissions.  When running this script as a non-root
+#   user such as sensu, ensure it is run with sudo.
+#
+#   Create a file named /etc/sudoers.d/smartctl with this line inside :
+#   sensu ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+#
+#   Fedora has some additional restrictions : if requiretty is set, sudo will only
+#   run when the user is logged in to a real tty.
+#   Then add this in the sudoers file (/etc/sudoers), below the line Defaults requiretty :
+#   Defaults sensu !requiretty
+#
+# LICENSE:
+#   Copyright 2013 Mitsutoshi Aoe <maoe@foldr.in>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

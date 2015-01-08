@@ -1,17 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   <script name>
 #
-# System Temperature Plugin
-# ===
+# DESCRIPTION:
+#   This plugin uses sensors to collect basic system metrics, produces
+#   Graphite formated output.
+
 #
-# This plugin uses sensors to collect basic system metrics, produces
-# Graphite formated output.
+# OUTPUT:
+#   metric data
 #
-# Copyright 2012 Wantudu SL <dsuarez@wantudu.com>
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#   lm-sensors
 #
-# Requires lm-sensors
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Wantudu SL <dsuarez@wantudu.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
