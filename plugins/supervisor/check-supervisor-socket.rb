@@ -11,7 +11,7 @@
 #   Plain text, 'All processes running' or eg. 'redis-server not running: FATAL'
 #
 # PLATFORMS:
-#   All
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
