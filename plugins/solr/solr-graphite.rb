@@ -1,14 +1,35 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Push Apache Solr stats into graphite
-# ===
+#   solr-graphite
 #
-# TODO: Narrow down needed stats, find a cleaner way to parse the xml
+# DESCRIPTION:
+#   Push Apache Solr stats into graphite
 #
-# Copyright 2012 Pete Shima <me@peteshima.com>
+# OUTPUT:
+#   metric data
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: net-http
+#   gem: uri
+#   gem: crack
+#
+# USAGE:
+#
+# NOTES:
+#   #YELLOW
+#   Narrow down needed stats, find a cleaner way to parse the xml
+#
+# LICENSE:
+#   Copyright 2012 Pete Shima <me@peteshima.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

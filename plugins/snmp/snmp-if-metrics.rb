@@ -1,39 +1,51 @@
-#!/usr/bin/env ruby
-# SNMP Interface Metrics
-# ===
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Collect device network interface metrics using the IF-MIB (RFC 2863) interface.
+#   snmp-if-metrics
 #
-# This script uses the 64-bit "HC" (high capacity) metrics which I am assuming most
-# modern devices probably support. If there is no HC support, use --low-capacity
-# flag.
+# DESCRIPTION:
+#   Collect device network interface metrics using the IF-MIB (RFC 2863) interface.
 #
-# Example
-# -------
+# OUTPUT:
+#   plain text, metric data, etc
 #
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: snmp
+#
+# USAGE:
 #   snmp-if-metrics.rb -C community -h host
 #
-# Only in/out octets are displayed by default to keep the number of metrics low. Additional
-# Metrics can be generated:
+#   Only in/out octets are displayed by default to keep the number of metrics low. Additional
+#   Metrics can be generated:
 #
-# - `--include-down`: Output metrics for interfaces not marked up (ifOperStatus != 1).
-#    By default only metrics for interfaces in the up state are printed.
-# - `--include-errors`: Output error metrics such as in/out errors, discards, etc.
-# - `--include-name`: Include the interface name with the interface index number when generating
-#    the metric name. This can help identify interfaces in graphite when browsing.
-# - `--include-packet-counts`: Output packet metrics.
-# - `--include-speed`: Output a metric for the interface's speed. Useful when constructing
-#   a view of an interfaces capacity in graphite.
-# - `--version`: Set SNMP protocol version (SNMPv2c or SNMPv1)
-# - `--low-capacity`: Use low capacity counters
+#   - `--include-down`: Output metrics for interfaces not marked up (ifOperStatus != 1).
+#      By default only metrics for interfaces in the up state are printed.
+#   - `--include-errors`: Output error metrics such as in/out errors, discards, etc.
+#   - `--include-name`: Include the interface name with the interface index number when generating
+#      the metric name. This can help identify interfaces in graphite when browsing.
+#   - `--include-packet-counts`: Output packet metrics.
+#   - `--include-speed`: Output a metric for the interface's speed. Useful when constructing
+#     a view of an interfaces capacity in graphite.
+#   - `--version`: Set SNMP protocol version (SNMPv2c or SNMPv1)
+#   - `--low-capacity`: Use low capacity counters
 #
-# Copyright (c) 2013 Joe Miller
+# NOTES:
+#   This script uses the 64-bit "HC" (high capacity) metrics which I am assuming most
+#   modern devices probably support. If there is no HC support, use --low-capacity
+#   flag.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-
+# LICENSE:
+#   Copyright (c) 2013 Joe Miller
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 # #YELLOW
 # rubocop:disable VariableName
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'snmp'

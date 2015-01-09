@@ -1,7 +1,33 @@
-#!/usr/bin/env ruby
-# Created by Mike Crocker
-# Grab various metrics from apache-solr stats page
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
+#   solr-v1.graphit.rb
+#
+# DESCRIPTION:
+#   Grab various metrics from apache-solr stats page
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#   gem: open-uri
+#   gem: nokogiri
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Mike Crocker
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
