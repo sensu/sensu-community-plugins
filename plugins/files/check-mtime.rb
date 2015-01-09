@@ -54,11 +54,11 @@ class Mtime < Sensu::Plugin::Check::CLI
          default: false
 
   option :ok_zero_size,
-         :description => 'OK if file has zero size',
-         :short => '-z',
-         :long => '--ok-zero-size',
-         :boolean => true,
-         :default => false
+         description: 'OK if file has zero size',
+         short: '-z',
+         long: '--ok-zero-size',
+         boolean: true,
+         default: false
 
   def run_check(type, age)
     to_check = config["#{type}_age".to_sym].to_i
