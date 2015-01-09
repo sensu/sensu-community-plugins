@@ -52,16 +52,16 @@ class Mailer < Sensu::Handler
     begin
       timeout 10 do
         message_params = {
-          :from     => params[:mail_from],
-          :to       => params[:mail_to],
-          :subject  => subject,
-          :text     => body
+          from:     params[:mail_from],
+          to:       params[:mail_to],
+          subject:  subject,
+          text:     body
         }
 
         mg_client.send_message params[:mg_domain], message_params
 
         puts 'mail -- sent alert for ' + short_name + ' to ' + params[:mail_to]
-    end
+      end
     rescue Timeout::Error
       puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
     end
