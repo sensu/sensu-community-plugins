@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks DHCP servers
-# ===
+#   check-dhcp
 #
 # DESCRIPTION:
 #   This plugin checks DHCP server responses.
@@ -15,19 +14,29 @@
 #   The 'offer' or 'ipaddr' options can be used to test that the response
 #   is an offer (of any address), or of a specific address.
 #
+#
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
 # DEPENDENCIES:
-#   net-dhcp ipaddr socket sensu-plugin Ruby gem
+#   gem: sensu-plugin
+#   gem: net-dhcp
+#   gem: socket
+#   gem: ipaddr
 #
-# Author: Matthew Richardson <m.richardson@ed.ac.uk>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Matthew Richardson <m.richardson@ed.ac.uk>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -36,37 +45,35 @@ require 'ipaddr'
 require 'socket'
 
 class CheckDHCP < Sensu::Plugin::Check::CLI
-
   option :server,
-    :description => "IP address of DHCP Server - will use unicast",
-    :short => '-s SERVER',
-    :long => '--server SERVER'
+         description: 'IP address of DHCP Server - will use unicast',
+         short: '-s SERVER',
+         long: '--server SERVER'
 
   option :timeout,
-    :description => "Time to wait for DHCP responses (in seconds)",
-    :short => '-t TIMEOUT',
-    :long => '--timeout TIMEOUT',
-    :default => '10'
+         description: 'Time to wait for DHCP responses (in seconds)',
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         default: '10'
 
   option :offer,
-    :description => "Must the DHCP response be an offer?",
-    :short => '-o',
-    :long => '--offer',
-    :boolean => true
+         description: 'Must the DHCP response be an offer?',
+         short: '-o',
+         long: '--offer',
+         boolean: true
 
   option :ipaddr,
-    :description => "IP address the DHCP server should offer",
-    :short => '-i IPADDR',
-    :long => '--ipaddr IPADDR'
+         description: 'IP address the DHCP server should offer',
+         short: '-i IPADDR',
+         long: '--ipaddr IPADDR'
 
   option :debug,
-    :description => "Enable verbose debugging output",
-    :short => '-d',
-    :long => '--debug',
-    :boolean => true
+         description: 'Enable verbose debugging output',
+         short: '-d',
+         long: '--debug',
+         boolean: true
 
   def dhcp_discover
-
     request = DHCP::Discover.new
 
     listensock = UDPSocket.new
@@ -83,7 +90,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
     else
       # Use broadcast, and listen on dhcp client port
       sendsock.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
-      sendaddr = "<broadcast>"
+      sendaddr = '<broadcast>'
       listenport = 68
     end
 
@@ -96,7 +103,8 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       request.giaddr = IPAddr.new(sendsock.addr.last).to_i
     end
 
-    if config[:debug]
+    # #YELLOW
+    if config[:debug] # rubocop:disable IfUnlessModifier
       puts request
     end
 
@@ -107,7 +115,8 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       data = listensock.recvfrom_nonblock(1500)
     rescue IO::WaitReadable
       # Socket not yet readable - wait until it is, or timeout reached
-      unless IO.select([listensock], nil, nil, config[:timeout].to_i)
+      # #YELLOW
+      unless IO.select([listensock], nil, nil, config[:timeout].to_i) # rubocop:disable UnlessElse
         # timeout reached
         critical "Timeout reached awaiting response from DHCP server #{config[:server]}"
       else
@@ -120,7 +129,6 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
 
     # Returns a DHCP::Message object, or nil if not parseable
     DHCP::Message.from_udp_payload(data[0])
-
   end
 
   def run
@@ -131,15 +139,17 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       if config[:offer] || config[:ipaddr]
         # Is the response an DHCP Offer?
         if response.is_a?(DHCP::Offer)
-          if config[:ipaddr]
+          # #YELLOW
+          if config[:ipaddr] # rubocop:disable BlockNesting
             offer = IPAddr.new(response.yiaddr, Socket::AF_INET).to_s
-            if offer == config[:ipaddr]
+            # #YELLOW
+            if offer == config[:ipaddr] # rubocop:disable BlockNesting
               ok "Received DHCP offer of IP address #{offer}"
             else
               critical "Received DHCP offer of IP address #{offer}, expected #{config[:ipaddr]}"
             end
           else
-            ok "Received DHCP offer"
+            ok 'Received DHCP offer'
           end
         else
           critical "Message received from #{config[:server]} not a DHCP offer"
@@ -147,7 +157,7 @@ class CheckDHCP < Sensu::Plugin::Check::CLI
       else
         # Is response a DHCP message?
         if response.is_a?(DHCP::Message)
-          ok "Received DHCP response"
+          ok 'Received DHCP response'
         else
           critical "Message received from #{config[:server]} not a valid DHCP response"
         end

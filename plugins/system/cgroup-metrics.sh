@@ -1,10 +1,10 @@
 #!/bin/bash
 #
 # Retrive cgroup metrics on Linux systems
-# 
+#
 # Author: Julian Prokay -- jprokay@gmail.com
 
-
+# #RED
 usage()
 {
 	cat <<EOF
@@ -18,7 +18,7 @@ The output is formatted for Sensu as: {path} {metric value} {timestamp}
 
 OPTIONS:
 	-h Show this message
-	-s Scheme. Used as the prefix for the output path. 
+	-s Scheme. Used as the prefix for the output path.
            Default: stats.{hostname -s}.cgroup
 	-c Required. CGroup component(s). Ex: cpu, memory
 	-m Required. Metric(s) to get. Ex: nr_throttled
@@ -99,7 +99,7 @@ get_cgroup_stat()
             fi
             counter=$counter+1
         done
-    done	
+    done
 }
 
 if [ "${#COMPONENTS[@]}" -eq 0 ]; then
@@ -115,4 +115,4 @@ if [ -z "$SCHEME" ]; then
     SCHEME="stats.`hostname -s`.cgroups"
 fi
 
-get_cgroup_stats 
+get_cgroup_stats

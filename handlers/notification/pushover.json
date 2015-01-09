@@ -1,6 +1,20 @@
 {
   "pushover": {
+
+    "_comment": "Single userkey / token pair",
     "userkey": "12345",
-    "token": "54321"
+    "token": "54321",
+
+    "_comment": "Multiple userkey / token pairs",
+    "keys": [
+      {
+        "userkey": "abcdef",
+        "token": "fedcab"
+      },
+      {
+        "userkey": "ghijkl",
+        "token": "lkjihg"
+      }
+    ]
   }
 }

@@ -41,13 +41,12 @@ require 'sensu-handler'
 require 'timeout'
 
 class Hubot < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def action_to_string
-    @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
+    @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
   def format_message
@@ -62,7 +61,7 @@ class Hubot < Sensu::Handler
 
     http = Net::HTTP.new(hubot_server, hubot_port)
     request = Net::HTTP::Post.new('/hubot/say')
-    request.set_form_data({ 'message' => format_message, 'room' => hubot_channel })
+    request.set_form_data('message' => format_message, 'room' => hubot_channel)
 
     begin
       timeout(10) do

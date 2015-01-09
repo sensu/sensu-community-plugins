@@ -2,3 +2,6 @@ Gemfile.lock
 .bundle
 vendor
 node_modules
+scripts/tech_debt.rb
+.vagrant/*
+*.gem

@@ -1,27 +1,52 @@
-#!/usr/bin/env ruby
-
-# Author: AJ Bourg <aj@ajbourg.com>
-
-# Check to ensure data gets posted and is retrievable by graphite.
-# We post to each server in config[:relays] then sleep config[:sleep]
-# seconds then check each of config[:graphites] to see if the data made it
-# to each one. OK if all servers have the data we expected, WARN if
-# config[:warning] or fewer have it. CRITICAL if config[:critical]
-# or fewer have it. config[:check_id] allows you to have many of these
-# checks running in different places without any conflicts. Customize it
-# if you are going to run this check from multiple servers. Otherwise
-# it defaults to default. (can be a descriptive string, used as a graphite key)
+#! /usr/bin/env ruby
 #
-# This check is most useful when you have a cluster of carbon-relays configured
-# with REPLICATION_FACTOR > 1 and more than one graphite server those
-# carbon-relays are configured to post to. This check ensures that replication
-# is actually happening in a timely manner.
+#   check-replication
+#
+# DESCRIPTION:
+#   Check to ensure data gets posted and is retrievable by graphite.
+#   We post to each server in config[:relays] then sleep config[:sleep]
+#   seconds then check each of config[:graphites] to see if the data made it
+#   to each one. OK if all servers have the data we expected, WARN if
+#   config[:warning] or fewer have it. CRITICAL if config[:critical]
+#   or fewer have it. config[:check_id] allows you to have many of these
+#   checks running in different places without any conflicts. Customize it
+#   if you are going to run this check from multiple servers. Otherwise
+#   it defaults to default. (can be a descriptive string, used as a graphite key)
+#
+#   This check is most useful when you have a cluster of carbon-relays configured
+#   with REPLICATION_FACTOR > 1 and more than one graphite server those
+#   carbon-relays are configured to post to. This check ensures that replication
+#   is actually happening in a timely manner.
 
-# How it works: We generate a large random number for each of these servers
-# Then we post that number to each server via a key in the form of:
-# checks.graphite.check_id.replication.your_graphite_server.ip It's safe
-# to throw this data away quickly. A day retention ought to be more
-# than enough for anybody.
+#   How it works: We generate a large random number for each of these servers
+#   Then we post that number to each server via a key in the form of:
+#   checks.graphite.check_id.replication.your_graphite_server.ip It's safe
+#   to throw this data away quickly. A day retention ought to be more
+#   than enough for anybody.
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: rest-client
+#   gem: json
+#   gem: ipaddress
+#   gem: resolv
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   AJ Bourg <aj@ajbourg.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -34,56 +59,56 @@ require 'ipaddress'
 
 class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
   option :relays,
-    :short => '-r RELAYS',
-    :long => '--relays RELAYS',
-    :description => 'Comma separated list of carbon relay servers to post to.',
-    :required => true
+         short: '-r RELAYS',
+         long: '--relays RELAYS',
+         description: 'Comma separated list of carbon relay servers to post to.',
+         required: true
   option :servers,
-    :short => '-g SERVERS',
-    :long => '--graphite SERVERS',
-    :description => 'Comma separated list of all graphite servers to check.',
-    :required => true
+         short: '-g SERVERS',
+         long: '--graphite SERVERS',
+         description: 'Comma separated list of all graphite servers to check.',
+         required: true
   option :sleep,
-    :short => '-s SECONDS',
-    :long => '--sleep SECONDS',
-    :description => 'Time to sleep between submitting and checking for value.',
-    :default => 30,
-    :proc => proc { |a| a.to_i }
+         short: '-s SECONDS',
+         long: '--sleep SECONDS',
+         description: 'Time to sleep between submitting and checking for value.',
+         default: 30,
+         proc: proc(&:to_i)
   option :timeout,
-    :short => '-t TIMEOUT',
-    :long => '--timeout TIMEOUT',
-    :description => 'Timeout limit for posting to the relay.',
-    :default => 5,
-    :proc => proc { |a| a.to_i }
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         description: 'Timeout limit for posting to the relay.',
+         default: 5,
+         proc: proc(&:to_i)
   option :port,
-    :short => '-p PORT',
-    :long => '--port PORT',
-    :description => 'Port to post to carbon-relay on.',
-    :default => 2003,
-    :proc => proc { |a| a.to_i }
+         short: '-p PORT',
+         long: '--port PORT',
+         description: 'Port to post to carbon-relay on.',
+         default: 2003,
+         proc: proc(&:to_i)
   option :critical,
-    :short => '-c COUNT',
-    :long => '--critical COUNT',
-    :description => 'Number of servers missing our test data to be critical.',
-    :default => 2,
-    :proc => proc { |a| a.to_i }
+         short: '-c COUNT',
+         long: '--critical COUNT',
+         description: 'Number of servers missing our test data to be critical.',
+         default: 2,
+         proc: proc(&:to_i)
   option :warning,
-    :short => '-w COUNT',
-    :long => '--warning COUNT',
-    :description => 'Number of servers missing our test data to be warning.',
-    :default => 1,
-    :proc => proc { |a| a.to_i }
+         short: '-w COUNT',
+         long: '--warning COUNT',
+         description: 'Number of servers missing our test data to be warning.',
+         default: 1,
+         proc: proc(&:to_i)
   option :check_id,
-    :short => '-i ID',
-    :long => '--check-id ID',
-    :description => 'Check ID to identify this check.',
-    :default => "default"
+         short: '-i ID',
+         long: '--check-id ID',
+         description: 'Check ID to identify this check.',
+         default: 'default'
   option :verbose,
-    :short => '-v',
-    :long => '--verbose',
-    :description => 'Verbose.',
-    :default => false,
-    :boolean => true
+         short: '-v',
+         long: '--verbose',
+         description: 'Verbose.',
+         default: false,
+         boolean: true
 
   def run
     messages = []
@@ -127,7 +152,7 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
 
     relay_ips = {}
 
-    time_out("resolving dns") do
+    time_out('resolving dns') do
       relays.each do |r|
         if IPAddress.valid? r
           relay_ips[r] = [r]
@@ -143,7 +168,7 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
   def post_message(server_name, ip, check_id)
     server_key = graphite_key(server_name)
 
-    number = rand(10000)
+    number = rand(10_000)
     time = Time.now.to_i
 
     ip_key = graphite_key(ip)
@@ -159,7 +184,7 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
       puts "Posted #{key} to #{server_name} with #{number} on IP #{ip}."
     end
 
-    { "relay" => server_name, "ip" => ip, "key" => key, "value" => number }
+    { 'relay' => server_name, 'ip' => ip, 'key' => key, 'value' => number }
   end
 
   # checks to see if a value landed on a graphite server
@@ -175,7 +200,7 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
         graphite_data = JSON.parse(graphite_data)
       end
     rescue RestClient::Exception, JSON::ParserError => e
-      critical "Unexpected error getting data from #{server}: #{e.to_s}"
+      critical "Unexpected error getting data from #{server}: #{e}"
     end
 
     success = false
@@ -194,13 +219,10 @@ class CheckGraphiteReplication < Sensu::Plugin::Check::CLI
   end
 
   def time_out(activity, &block)
-    begin
-      Timeout.timeout(config[:timeout]) do
-        yield block
-      end
-    rescue Timeout::Error
-      critical "Timed out while #{activity}"
+    Timeout.timeout(config[:timeout]) do
+      yield block
     end
+  rescue Timeout::Error
+    critical "Timed out while #{activity}"
   end
-
 end

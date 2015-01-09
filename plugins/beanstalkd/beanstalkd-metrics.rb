@@ -1,20 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Pull beanstalkd metrics
-# ===
+# beanstalkd-metrics
 #
 # DESCRIPTION:
-#   This plugin checks the beanstalkd stats, using the beaneater gem
+#  This plugin checks the beanstalkd stats, using the beaneater gem
+#
+# OUTPUT:
+#   metric-data
+#
+# PLATFORMS:
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   json Ruby gem
-#   beaneater Ruby gem
+#   gem: beaneater
+#   gem: json
+#   gem: sensu-plugin
 #
-# Copyright 2014 99designs, Inc <devops@99designs.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 99designs, Inc <devops@99designs.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -23,26 +34,25 @@ require 'beaneater'
 
 # Checks the queue levels
 class BeanstalkdMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :server,
-    description: 'beanstalkd server',
-    short:       '-s SERVER',
-    long:        '--server SERVER',
-    default:     'localhost'
+         description: 'beanstalkd server',
+         short:       '-s SERVER',
+         long:        '--server SERVER',
+         default:     'localhost'
 
   option :port,
-    description: 'beanstalkd server port',
-    short:       '-p PORT',
-    long:        '--port PORT',
-    default:     '11300'
+         description: 'beanstalkd server port',
+         short:       '-p PORT',
+         long:        '--port PORT',
+         default:     '11300'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.beanstalkd"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.beanstalkd"
 
-  def get_beanstalkd_connection
+  def acquire_beanstalkd_connection
     begin
       conn = Beaneater::Pool.new(["#{config[:server]}:#{config[:port]}"])
     rescue
@@ -52,7 +62,7 @@ class BeanstalkdMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    stats = get_beanstalkd_connection.stats
+    stats = acquire_beanstalkd_connection.stats
 
     stats.keys.sort.each do |key|
       next if key == 'version' # The version X.Y.Z is not a number

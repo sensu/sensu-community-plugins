@@ -32,6 +32,8 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
+# #YELLOW
+# rubocop:disable VariableName
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'snmp'
@@ -41,116 +43,113 @@ def graphite_safe_name(name)
 end
 
 class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :short => '-h host',
-    :boolean => true,
-    :default => "127.0.0.1",
-    :required => true
+         short: '-h host',
+         boolean: true,
+         default: '127.0.0.1',
+         required: true
 
   option :community,
-    :short => '-C snmp community',
-    :boolean =>true,
-    :default => "public"
+         short: '-C snmp community',
+         boolean: true,
+         default: 'public'
 
   option :scheme,
-    :short => '-s SCHEME',
-    :long => '--scheme SCHEME',
-    :default => "snmp.interfaces",
-    :description => 'prefix to attach to graphite path'
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: 'snmp.interfaces',
+         description: 'prefix to attach to graphite path'
 
   option :include_pkt_metrics,
-    :short => '-k',
-    :long => '--include-packet-counts',
-    :boolean => true,
-    :default => false,
-    :description => 'Include packets metrics, eg: IfInUcastPkts, IfOutUcastPkts, IfInBroadcastPkts, etc'
+         short: '-k',
+         long: '--include-packet-counts',
+         boolean: true,
+         default: false,
+         description: 'Include packets metrics, eg: IfInUcastPkts, IfOutUcastPkts, IfInBroadcastPkts, etc'
 
   option :include_speed,
-    :short => '-s',
-    :long => '--include-speed',
-    :boolean => true,
-    :default => false,
-    :description => 'Output interface max speed (ifSpeed) metric'
+         short: '-s',
+         long: '--include-speed',
+         boolean: true,
+         default: false,
+         description: 'Output interface max speed (ifSpeed) metric'
 
   option :include_name,
-    :short => '-n',
-    :long => '--include-name',
-    :boolean => true,
-    :default => false,
-    :description => 'append ifName to ifIndex when generating metric name, eg: "1__OUTSIDE"'
+         short: '-n',
+         long: '--include-name',
+         boolean: true,
+         default: false,
+         description: 'append ifName to ifIndex when generating metric name, eg: "1__OUTSIDE"'
 
   option :include_error_metrics,
-    :short => '-e',
-    :long => '--include-errors',
-    :boolean => true,
-    :default => false,
-    :description => 'Include error metrics in output'
+         short: '-e',
+         long: '--include-errors',
+         boolean: true,
+         default: false,
+         description: 'Include error metrics in output'
 
   option :include_down_interfaces,
-    :short => '-d',
-    :long => '--include-down',
-    :boolean => true,
-    :default => false,
-    :description => 'output metrics for all interfaces including those marked down'
+         short: '-d',
+         long: '--include-down',
+         boolean: true,
+         default: false,
+         description: 'output metrics for all interfaces including those marked down'
 
   option :verbose,
-    :short => '-v',
-    :long => '--verbose',
-    :boolean => true,
-    :default => false,
-    :description => 'verbose output for debugging'
+         short: '-v',
+         long: '--verbose',
+         boolean: true,
+         default: false,
+         description: 'verbose output for debugging'
 
   option :version,
-    :short => '-V VERSION',
-    :long => '--version VERSION',
-    :default => :SNMPv2c,
-    :description => 'SNMP version (SNMPv1 or SNMPv2c)',
-    :proc => Proc.new {|ver| ver.intern }
+         short: '-V VERSION',
+         long: '--version VERSION',
+         default: :SNMPv2c,
+         description: 'SNMP version (SNMPv1 or SNMPv2c)',
+         proc: proc(&:intern)
 
   option :low_capacity,
-    :long => '--low-capacity',
-    :boolean => true,
-    :default => false,
-    :description => 'Use low capacity counters'
+         long: '--low-capacity',
+         boolean: true,
+         default: false,
+         description: 'Use low capacity counters'
 
   def run
-    ifTable_HC_columns = %w[
+    if_table_HC_columns = %w(
       ifHCInOctets ifHCOutOctets
       ifHCInUcastPkts ifHCOutUcastPkts
       ifHCInMulticastPkts ifHCOutMulticastPkts
       ifHCInBroadcastPkts ifHCOutBroadcastPkts
-    ]
-    ifTable_LC_columns = %w[
+    )
+    if_table_LC_columns = %w(
       ifInOctets ifOutOctets
       ifInUcastPkts ifOutUcastPkts
       ifInMulticastPkts ifOutMulticastPkts
       ifInBroadcastPkts ifOutBroadcastPkts
-    ]
-    ifTable_common_columns = %w[
+    )
+    if_table_common_columns = %w(
       ifIndex ifOperStatus ifName ifDescr
       ifInErrors ifOutErrors ifInDiscards ifOutDiscards ifSpeed
-    ]
-    ifTable_columns = ifTable_common_columns +
-      (config[:low_capacity] ? ifTable_LC_columns : ifTable_HC_columns)
+    )
+    if_table_columns = if_table_common_columns +
+      (config[:low_capacity] ? if_table_LC_columns : if_table_HC_columns)
 
-    SNMP::Manager.open(:host => "#{config[:host]}", :community => "#{config[:community]}", :version => config[:version]) do |manager|
-      manager.walk(ifTable_columns) do |row_array|
+    SNMP::Manager.open(host: "#{config[:host]}", community: "#{config[:community]}", version: config[:version]) do |manager|
+      manager.walk(if_table_columns) do |row_array|
         # turn row (an array) into a hash for eaiser access to the columns
-        row = Hash[*ifTable_columns.zip(row_array).flatten]
+        row = Hash[*if_table_columns.zip(row_array).flatten]
         puts row.inspect if config[:verbose]
-        if_name = config[:include_name] ? "#{row['ifIndex'].value.to_s}__#{graphite_safe_name(row['ifName'].value.to_s)}" : row['ifIndex'].value.to_s
+        if_name = config[:include_name] ? "#{row['ifIndex'].value}__#{graphite_safe_name(row['ifName'].value.to_s)}" : row['ifIndex'].value.to_s
 
         next if row['ifOperStatus'].value != 1 && !config[:include_down_interfaces]
 
-        in_octets = config[:low_capacity] ? "ifInOctets" : "ifHCInOctets"
-        out_octets = config[:low_capacity] ? "ifOutOctets" : "ifHCOutOctets"
+        in_octets = config[:low_capacity] ? 'ifInOctets' : 'ifHCInOctets'
+        out_octets = config[:low_capacity] ? 'ifOutOctets' : 'ifHCOutOctets'
         output "#{config[:scheme]}.#{if_name}.#{in_octets}", row[in_octets].value
         output "#{config[:scheme]}.#{if_name}.#{out_octets}", row[out_octets].value
 
-        if config[:include_speed]
-          output "#{config[:scheme]}.#{if_name}.ifSpeed", row['ifSpeed'].value
-        end
+        output "#{config[:scheme]}.#{if_name}.ifSpeed", row['ifSpeed'].value if config[:include_speed]
 
         if config[:include_error_metrics]
           output "#{config[:scheme]}.#{if_name}.ifInErrors", row['ifInErrors'].value
@@ -160,12 +159,12 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
         end
 
         if config[:include_pkt_metrics]
-          in_ucast_pkts = config[:low_capacity] ? "ifInUcastPkts" : "ifHCInUcastPkts"
-          out_ucast_pkts = config[:low_capacity] ? "ifOutUcastPkts" : "ifHCOutUcastPkts"
-          in_mcast_pkts = config[:low_capacity] ? "ifInMulticastPkts" : "ifHCInMulticastPkts"
-          out_mcast_pkts = config[:low_capacity] ? "ifOutMulticastPkts" : "ifHCOutMulticastPkts"
-          in_bcast_pkts = config[:low_capacity] ? "ifInBroadcastPkts" : "ifHCInBroadcastPkts"
-          out_bcast_pkts = config[:low_capacity] ? "ifOutBroadcastPkts" : "ifHCOutBroadcastPkts"
+          in_ucast_pkts = config[:low_capacity] ? 'ifInUcastPkts' : 'ifHCInUcastPkts'
+          out_ucast_pkts = config[:low_capacity] ? 'ifOutUcastPkts' : 'ifHCOutUcastPkts'
+          in_mcast_pkts = config[:low_capacity] ? 'ifInMulticastPkts' : 'ifHCInMulticastPkts'
+          out_mcast_pkts = config[:low_capacity] ? 'ifOutMulticastPkts' : 'ifHCOutMulticastPkts'
+          in_bcast_pkts = config[:low_capacity] ? 'ifInBroadcastPkts' : 'ifHCInBroadcastPkts'
+          out_bcast_pkts = config[:low_capacity] ? 'ifOutBroadcastPkts' : 'ifHCOutBroadcastPkts'
           output "#{config[:scheme]}.#{if_name}.#{in_ucast_pkts}", row[in_ucast_pkts].value
           output "#{config[:scheme]}.#{if_name}.#{out_ucast_pkts}", row[out_ucast_pkts].value
           output "#{config[:scheme]}.#{if_name}.#{in_mcast_pkts}", row[in_mcast_pkts].value
@@ -177,5 +176,4 @@ class SNMPIfStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
     end
     ok
   end
-
 end

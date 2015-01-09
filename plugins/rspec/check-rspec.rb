@@ -1,25 +1,44 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check RSpec tests plugin
-# ===
+#   check-rspec
 #
-# Runs RSpec tests.
-# Raises a warning event for each individual failed test.
-# Also raises a single critical event if tests are failing.
+# DESCRIPTION:
+#   Runs RSpec tests.
+#   Raises a warning event for each individual failed test.
+#   Also raises a single critical event if tests are failing.
 #
-# Examples:
+# OUTPUT:
+#   plain text
 #
-#   # Run entire suite of tests
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: rspec
+#   gem: socket
+#
+# USAGE:
+#   Run entire suite of tests
 #   check-rspec -d /tmp/my_tests
 #
-#   # Run only one set of tests
+#   Run only one set of tests
 #   check-rspec -d /tmp/my_tests -s spec/test_one.rb
 #
-#   # Run tests with all options (except environment variables)
+#   Run tests with all options (except environment variables)
 #   check-rspec -b /usr/bin/ruby -i bin/rspec -d /tmp/my_tests -s spec
 #
-#   # Run tests with required options and multiple environment variables
-#   check-rspec -d /tmp/my_tests -e "aws_access_key_id=XXX aws_secret_access_key=XXX"
+#   Run tests with required options and multiple environment variables
+#   check-rspec -d /tmp/my_tests -e "aws_access_key_id=XX aws_secret_access_key=XX"
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'json'
@@ -28,36 +47,35 @@ require 'rspec'
 require 'sensu-plugin/check/cli'
 
 class CheckRspec < Sensu::Plugin::Check::CLI
-
   option :ruby_bin,
-         :short   => '-b ruby',
-         :long    => '--ruby-bin ruby',
-         :default => 'ruby'
+         short: '-b ruby',
+         long: '--ruby-bin ruby',
+         default: 'ruby'
 
   option :rspec_bin,
-         :short   => '-i rspec',
-         :long    => '--rspec-bin rspec',
-         :default => 'rspec'
+         short: '-i rspec',
+         long: '--rspec-bin rspec',
+         default: 'rspec'
 
   option :tests_dir,
-         :short    => '-d /tmp/my_tests',
-         :long     => '--tests-dir /tmp/my_tests',
-         :required => true
+         short: '-d /tmp/my_tests',
+         long: '--tests-dir /tmp/my_tests',
+         required: true
 
   option :spec_dir,
-         :short   => '-s spec',
-         :long    => '--spec-dir spec',
-         :default => 'spec'
+         short: '-s spec',
+         long: '--spec-dir spec',
+         default: 'spec'
 
   option :environment_variables,
-         :short    => '-e aws_access_key_id=XXX',
-         :long     => '--env-var aws_access_key_id=XXX',
-         :required => false
+         short: '-e aws_access_key_id=XXX',
+         long: '--env-var aws_access_key_id=XXX',
+         required: false
 
   option :handler,
-         :short   => '-l HANDLER',
-         :long    => '--handler HANDLER',
-         :default => 'default'
+         short: '-l HANDLER',
+         long: '--handler HANDLER',
+         default: 'default'
 
   def sensu_client_socket(msg)
     u = UDPSocket.new
@@ -106,13 +124,12 @@ class CheckRspec < Sensu::Plugin::Check::CLI
 
   def exit_with(sym, message)
     case sym
-      when :ok
-        ok message
-      when :critical
-        critical message
-      else
-        unknown message
+    when :ok
+      ok message
+    when :critical
+      critical message
+    else
+      unknown message
     end
   end
-
 end

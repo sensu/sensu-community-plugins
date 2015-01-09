@@ -18,30 +18,27 @@ require 'sensu-handler'
 require 'httparty'
 
 class StatusPageIOMetrics < Sensu::Handler
-
   # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
 
   def send_metric(value, timestamp, metric_id)
     # puts "Sending #{value} #{timestamp} #{metric_id}"
-    begin
-      timeout(3) do
-        HTTParty.post(
-          "https://api.statuspage.io/v1/pages/#{@page_id}/metrics/#{metric_id}/data.json",
-          :headers => { 'Authorization' => "OAuth #{@api_key}"},
-          :body => {
-            :data => {
-              :timestamp => timestamp,
-              :value => value.to_f
-            }
+    timeout(3) do
+      HTTParty.post(
+        "https://api.statuspage.io/v1/pages/#{@page_id}/metrics/#{metric_id}/data.json",
+        headers: { 'Authorization' => "OAuth #{@api_key}" },
+        body: {
+          data: {
+            timestamp: timestamp,
+            value: value.to_f
           }
-        )
-      end
-    rescue Timeout::Error
-      puts "statuspageio -- timed out while sending metrics"
-    rescue => error
-      puts "statuspageio -- failed to send metric #{metric_id} : #{error}"
+        }
+      )
     end
+  rescue Timeout::Error
+    puts 'statuspageio -- timed out while sending metrics'
+  rescue => error
+    puts "statuspageio -- failed to send metric #{metric_id} : #{error}"
   end
 
   def handle
@@ -62,5 +59,4 @@ class StatusPageIOMetrics < Sensu::Handler
       send_metric(value, timestamp, metric_id) if metric_id
     end
   end
-
 end

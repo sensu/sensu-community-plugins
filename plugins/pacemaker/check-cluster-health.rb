@@ -1,54 +1,59 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Cluster Health
-# =========
+#   cjeck-cluster-health
 #
 # DESCRIPTION:
-#  Check pacemaker cluster for offline nodes or failed resources
+#   Check pacemaker cluster for offline nodes or failed resources
 #
 # OUTPUT:
-#  plain-text
+#   plain text
 #
 # PLATFORMS:
-#  linux
+#   Linux
 #
 # DEPENDENCIES:
-#  sensu-plugin ruby gem
+#   gem: sensu-plugin
+#   gem: rexml
 #
-# Copyright (c) 2014, Nathan Williams <nath.e.will@gmail.com>
+# USAGE:
+#   #YELLOW
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#
+# LICENSE:
+#   Copyright (c) 2014, Nathan Williams <nath.e.will@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'rexml/document'
 
 class CheckClusterHealth < Sensu::Plugin::Check::CLI
-
   option :warn_offline,
-    :short => '-o OFFLINE_NODES',
-    :long => '--warn-offline OFFLINE_NODES',
-    :description => 'Number of offline nodes to trigger warning',
-    :default => 1
+         short: '-o OFFLINE_NODES',
+         long: '--warn-offline OFFLINE_NODES',
+         description: 'Number of offline nodes to trigger warning',
+         default: 1
 
   option :critical_offline,
-    :short => '-O OFFLINE_NODES',
-    :long => '--critical-offline OFFLINE_NODES',
-    :description => 'Number of offline nodes to trigger critical',
-    :default => 1
+         short: '-O OFFLINE_NODES',
+         long: '--critical-offline OFFLINE_NODES',
+         description: 'Number of offline nodes to trigger critical',
+         default: 1
 
   option :warn_failed,
-    :short => '-f FAILED_RESOURCES',
-    :long => '--warn-failed FAILED_RESOURCES',
-    :description => 'Number of failed resources to trigger warning',
-    :default => 1
+         short: '-f FAILED_RESOURCES',
+         long: '--warn-failed FAILED_RESOURCES',
+         description: 'Number of failed resources to trigger warning',
+         default: 1
 
   option :critical_failed,
-    :short => '-F FAILED_RESOURCES',
-    :long => '--critical-failed FAILED_RESOURCES',
-    :description => 'Number of failed resources to trigger critical',
-    :default => 1
+         short: '-F FAILED_RESOURCES',
+         long: '--critical-failed FAILED_RESOURCES',
+         description: 'Number of failed resources to trigger critical',
+         default: 1
 
   def run
     cluster_state = REXML::Document.new(cluster_xml)
@@ -83,5 +88,4 @@ class CheckClusterHealth < Sensu::Plugin::Check::CLI
   def cluster_xml
     `crm_mon -Xn`
   end
-
 end
