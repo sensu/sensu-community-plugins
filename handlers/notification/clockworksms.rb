@@ -4,6 +4,8 @@
 #
 # This handler send SMS via clockworksms API based on the severity of the check result.
 #
+# Requires: clockworksms gem
+#
 # Copyright 2014 Dejan Golja <dejan@golja.org>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
