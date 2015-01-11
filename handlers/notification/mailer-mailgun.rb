@@ -1,17 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   mailer-mailgun.rb
 #
-# Sensu Handler: mailer-mailgun
+# DESCRIPTION:
+#   This handler formats alerts as mail and sends them off to a pre-defined recipient
+#   using the Rackspace Mailgun service (http://www.rackspace.com/mailgun).
 #
-# This handler formats alerts as mail and sends them off to a pre-defined recipient
-# using the Rackspace Mailgun service (http://www.rackspace.com/mailgun).
+# OUTPUT:
+#   Delivers email for events.
 #
-# Copyright 2015 github.com/powellchristoph
-# Copyright 2015 Chris Powell (https://github.com/powellchristoph)
+# PLATFORMS:
+#   All
 #
-# Requires mailgun-ruby gem 'gem install mailgun-ruby'
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: mailgun-ruby
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   In mailer-mailgun.json, set the following values:
+#   * mail_from: The from address that will appear in the email
+#   * mail_to: The address of the recipent
+#   * mg_apikey: The apikey of the Mailgun account
+#   * mg_domain: The domain name that you have configured Mailgun to use
+#
+# LICENSE:
+#   Chris Powell powellchristoph@gmail.com
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
