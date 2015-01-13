@@ -25,7 +25,7 @@ class ClockWorkSmsNotif < Sensu::Handler
     content[157..content.length] = '...' if content.length > 160
     message = @api.messages.build
     message.to = to
-		message.from = from
+    message.from = from
     message.content = content
     response = message.deliver
 
@@ -38,7 +38,7 @@ class ClockWorkSmsNotif < Sensu::Handler
   def handle
     key = settings['clockworksms']['key']
     to = settings['clockworksms']['to']
-		from = settings['clockworksms']['from'] || "SENSU"
+    from = settings['clockworksms']['from'] || "SENSU"
 
     fail 'Please define a valid SMS key' if key.nil?
     fail 'Please define a valid set of SMS recipients to use this handler' if to.nil? || !to.is_a?(Hash)
