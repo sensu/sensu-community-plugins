@@ -70,6 +70,8 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
 
     if res['status'] == 'ok'
       ok res['message']
+    elsif res['status'] == 'warning'
+      warning res['message']
     elsif res['status'] == 'critical'
       critical res['message']
     else
@@ -108,7 +110,7 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
           message += ' Memory Alarm ON'
         end
 
-        if nodeinfo["disk_alarm"] == true
+        if nodeinfo["disk_free_alarm"] == true
           status = 'critical'
           message += ' Disk Alarm ON'
         end
