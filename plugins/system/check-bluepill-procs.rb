@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check application processes running under bluepill control
-# ===
+#   check-bluepill-procs
 #
 # DESCRIPTION:
 #   This plugin monitors the status of applications and processes
@@ -12,22 +11,30 @@
 #   of all the applications that bluepill has loaded.
 #
 # OUTPUT:
-#   Plain-text.
+#   plain text
 #   Returns CRITICAL if any process is down or if a manually specified
 #   application has no processes loaded
 #   Returns WARNING if any process is starting or unmonitored
 #   Returns OK if all processes for all specified applications are 'up'
 #   or bluepill is not in $PATH
 #
-# DEPENDENCIES:
-#   sensu-plugin Ruby gem
+# PLATFORMS:
+#   Linux
 #
-# AUTHORS:
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: English
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
 #   James Legg mail@jameslegg.co.uk
 #   Matt Greensmith mgreensmith@cozy.co
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

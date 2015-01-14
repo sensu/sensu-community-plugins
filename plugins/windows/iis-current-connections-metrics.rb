@@ -1,14 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check IIS Current Connections Metric
-# ===
+#   iis-current-connections-metrics
 #
-# Tested on Windows 2012RC2.
+# DESCRIPTION:
 #
-# Yohei Kawahara <inokara@gmail.com>
+# OUTPUT:
+#   metric data
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Windows
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#  Tested on Windows 2012RC2.
+#
+# LICENSE:
+#   Yohei Kawahara <inokara@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

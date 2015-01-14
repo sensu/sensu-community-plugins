@@ -1,20 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Windows Disk Plugin
-# ===
+#   check-disk-windows
 #
-# This is mostly copied from the original check-disk.rb plugin and modified
-# to use WMIC.  This is our first attempt at writing a plugin for Windows.
+# DESCRIPTION:
+#   This is mostly copied from the original check-disk.rb plugin and modified
+#   to use WMIC.  This is our first attempt at writing a plugin for Windows.
 #
-# Uses Windows WMIC facility. Warning/critical levels are percentages only.
+#   Uses Windows WMIC facility. Warning/critical levels are percentages only.
+
 #
-# REQUIRES: ActiveSupport version 4.0 or above.
+# OUTPUT:
+#   plain text
 #
-# Copyright 2013 <bp-parks@wiu.edu> <mr-mencel@wiu.edu>
+# PLATFORMS:
+#   Windows
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-# rubocop:disable VariableName
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   REQUIRES: ActiveSupport version 4.0 or above.
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 <bp-parks@wiu.edu> <mr-mencel@wiu.edu>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

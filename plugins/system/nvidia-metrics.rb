@@ -1,20 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# NVidia Graphics Card Metric Plugin
-# ===
+#   nvidia-metrics
 #
-# This plugin uses nvidia-smi to collect basic metrics, produces
-# Graphite formated output.
+# DESCRIPTION:
+#   This plugin uses nvidia-smi to collect basic metrics, produces
+#   Graphite formated output.
 #
-# Copyright 2014 Cedric <cedric.grun@gmail.com>
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   metric data
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
-# DEPENDENCIES : nvidia-smi
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#   nvidia-smi
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Cedric <cedric.grun@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

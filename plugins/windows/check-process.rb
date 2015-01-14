@@ -1,13 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Named Process Plugin
-# This plugin checks whether a User-inputted process is running or not
-# This checks users tasklist tool to find any process is running or not.
+#   check-process
 #
-# Copyright 2013 <jashishtech@gmail.com>
+# DESCRIPTION:
+#   This plugin checks whether a User-inputted process is running or not
+#   This checks users tasklist tool to find any process is running or not.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Windows
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 <jashishtech@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

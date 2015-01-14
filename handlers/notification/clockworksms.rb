@@ -4,6 +4,8 @@
 #
 # This handler send SMS via clockworksms API based on the severity of the check result.
 #
+# Requires: clockworksms gem
+#
 # Copyright 2014 Dejan Golja <dejan@golja.org>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -19,10 +21,11 @@ class ClockWorkSmsNotif < Sensu::Handler
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
-  def send_sms(to, content)
+  def send_sms(to, from, content)
     content[157..content.length] = '...' if content.length > 160
     message = @api.messages.build
     message.to = to
+    message.from = from
     message.content = content
     response = message.deliver
 
@@ -35,6 +38,7 @@ class ClockWorkSmsNotif < Sensu::Handler
   def handle
     key = settings['clockworksms']['key']
     to = settings['clockworksms']['to']
+    from = settings['clockworksms']['from'] || 'SENSU'
 
     fail 'Please define a valid SMS key' if key.nil?
     fail 'Please define a valid set of SMS recipients to use this handler' if to.nil? || !to.is_a?(Hash)
@@ -49,15 +53,15 @@ class ClockWorkSmsNotif < Sensu::Handler
       case @event['check']['status']
       when 0
         if severities.include?('ok')
-          send_sms(phone, "OK-#{event_name} #{message}")
+          send_sms(phone, from, "OK-#{event_name} #{message}")
         end
       when 1
         if severities.include?('warning')
-          send_sms(phone, "WARN-#{event_name} #{message}")
+          send_sms(phone, from, "WARN-#{event_name} #{message}")
         end
       when 2
         if severities.include?('critical')
-          send_sms(phone, "CRIT-#{event_name} #{message}")
+          send_sms(phone, from, "CRIT-#{event_name} #{message}")
         end
       end
     end

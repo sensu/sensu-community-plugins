@@ -44,6 +44,12 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
          description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
          required: true
 
+  option :aws_region,
+         description: 'AWS Region (such as us-east-1)',
+         short: '-r AWS_REGION',
+         long: '--aws-region AWS_REGION',
+         default: 'us-east-1'
+
   option :queue,
          short: '-q SQS_QUEUE',
          long: '--queue SQS_QUEUE',
@@ -81,7 +87,9 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
   def run
     AWS.config(
       access_key_id: config[:aws_access_key],
-      secret_access_key: config[:aws_secret_access_key])
+      secret_access_key: config[:aws_secret_access_key],
+      region: config[:aws_region]
+    )
 
     sqs = AWS::SQS.new
     messages = sqs.queues.named(config[:queue]).approximate_number_of_messages

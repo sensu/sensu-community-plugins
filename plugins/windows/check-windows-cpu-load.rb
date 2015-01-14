@@ -1,14 +1,28 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Windows's CPU usage
-# ===
+#   check-windows-cpu-load
 #
-# Tested on Windows 2008RC2.
+# DESCRIPTION:
 #
-# Jean-Francois Theroux <me@failshell.io>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Windows
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#  Tested on Windows 2008RC2.
+#
+# LICENSE:
+#   Jean-Francois Theroux <me@failshell.io>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

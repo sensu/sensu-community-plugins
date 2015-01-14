@@ -53,6 +53,13 @@ class Mtime < Sensu::Plugin::Check::CLI
          boolean: true,
          default: false
 
+  option :ok_zero_size,
+         description: 'OK if file has zero size',
+         short: '-z',
+         long: '--ok-zero-size',
+         boolean: true,
+         default: false
+
   def run_check(type, age)
     to_check = config["#{type}_age".to_sym].to_i
     # #YELLOW
@@ -64,8 +71,16 @@ class Mtime < Sensu::Plugin::Check::CLI
   def run
     unknown 'No file specified' unless config[:file]
     unknown 'No warn or critical age specified' unless config[:warning_age] || config[:critical_age]
+    if File.exist?(config[:file])
+      if File.size?(config[:file]).nil? && !config[:ok_zero_size]
+        critical 'file has zero size'
+      end
+    end
     f = Dir.glob(config[:file]).first
     if f
+      if File.size?(f).nil? && !config[:ok_zero_size]
+        critical 'file has zero size'
+      end
       age = Time.now.to_i - File.mtime(f).to_i
       run_check(:critical, age) || run_check(:warning, age) || ok("file is #{age} seconds old")
     else

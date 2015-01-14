@@ -1,13 +1,12 @@
 #! /usr/bin/env ruby
 #
-# Check Filesystem Writability Plugin
-# ===
+# check-fs-writable
 #
 # DESCRIPTION:
 # This plugin checks that a filesystem is writable. Useful for checking for stale NFS mounts.
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
 #   all
