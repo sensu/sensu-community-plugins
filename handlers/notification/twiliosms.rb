@@ -16,13 +16,12 @@ require 'rest-client'
 require 'json'
 
 class TwilioSMS < Sensu::Handler
-
   def short_name
-      @event['client']['name'] + '/' + @event['check']['name']
+    @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def action_to_string
-    @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
+    @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
   def handle
@@ -31,15 +30,16 @@ class TwilioSMS < Sensu::Handler
     from_number = settings['twiliosms']['number']
     candidates = settings['twiliosms']['recipients']
 
-    raise 'Please define a valid Twilio authentication set to use this handler' unless (account_sid && auth_token && from_number)
-    raise 'Please define a valid set of SMS recipients to use this handler' if (candidates.nil? || candidates.empty?)
+    fail 'Please define a valid Twilio authentication set to use this handler' unless account_sid && auth_token && from_number
+    fail 'Please define a valid set of SMS recipients to use this handler' if candidates.nil? || candidates.empty?
 
     recipients = []
-    candidates.each do |mobile, candidate|
-      if (((candidate['sensu_roles'].include?('all')) ||
+    # #YELLOW
+    candidates.each do |mobile, candidate|  # rubocop:disable Style/Next
+      if ((candidate['sensu_roles'].include?('all')) ||
           ((candidate['sensu_roles'] & @event['check']['subscribers']).size > 0) ||
           (candidate['sensu_checks'].include?(@event['check']['name']))) &&
-          (candidate['sensu_level'] >= @event['check']['status']))
+          (candidate['sensu_level'] >= @event['check']['status'])
         recipients << mobile
       end
     end
@@ -50,13 +50,13 @@ class TwilioSMS < Sensu::Handler
     twilio = Twilio::REST::Client.new(account_sid, auth_token)
     recipients.each do |recipient|
       begin
-        twilio.account.sms.messages.create(
-          :from => from_number,
-          :to => recipient,
-          :body => message
+        twilio.account.messages.create(
+          from: from_number,
+          to: recipient,
+          body: message
         )
         puts "Notified #{recipient} for #{action_to_string}"
-      rescue Exception => e
+      rescue => e
         puts "Failure detected while using Twilio to notify on event: #{e.message}"
       end
     end

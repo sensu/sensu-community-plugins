@@ -20,6 +20,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# #RED
 set -e
 
 STATE_OK=0
@@ -36,9 +37,10 @@ usage ()
     echo " -U <username>    Username to use to get an auth token"
     echo " -T <tenant>      Tenant to use to get an auth token"
     echo " -P <password>    Password to use ro get an auth token"
+    echo " -E <Endpoint>    URL for Ceilometer endpoint. Optional. If blank, use service catalog"
 }
 
-while getopts 'h:H:U:T:P:' OPTION
+while getopts 'h:H:U:T:P:E:' OPTION
 do
     case $OPTION in
         h)
@@ -56,6 +58,9 @@ do
             ;;
         P)
             export OS_PASSWORD=$OPTARG
+            ;;
+        E)
+            export CEILOMETER_URL=$OPTARG
             ;;
         *)
             usage

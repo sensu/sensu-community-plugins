@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+# #RED
 import argparse
 import boto.ec2
 from boto.vpc import VPCConnection

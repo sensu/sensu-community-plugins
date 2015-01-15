@@ -1,0 +1,7 @@
+{
+  "hubot": {
+    "server": "hubot.domain.tld",
+    "port": 8080,
+    "channel": "#irc-room"
+  }
+}

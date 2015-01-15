@@ -1,0 +1,15 @@
+{ 
+    "zendesk": {
+        "url": "https://mydesk.zendesk.com/api/v2",
+        "username" : "login.email@zendesk.com",
+        "token": "your zendesk token",
+        "password": "your zendesk password",
+        "type": "incident",
+        "priority": "urgent",
+        "tags": [
+            "tag1"
+        ],
+        "subscriptions_to_tags": false,
+        "status_to_use": [2]
+  }
+}

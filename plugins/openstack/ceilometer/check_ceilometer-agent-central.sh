@@ -19,7 +19,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# If not running as root, requires this line in /etc/sudoers:
+# sensu  ALL=(ALL) NOPASSWD: /bin/netstat -epta
+#
 
+# #RED
 set -e
 
 STATE_OK=0
@@ -31,7 +35,7 @@ STATE_DEPENDENT=4
 
 PID=$(pidof -x ceilometer-agent-central)
 
-if ! KEY=$(netstat -epta 2>/dev/null | grep $PID | grep amqp)
+if ! KEY=$(sudo /bin/netstat -epta 2>/dev/null | grep $PID | grep amqp)
 then
     echo "Ceilometer Central Agent is not connected to AMQP."
     exit $STATE_CRITICAL

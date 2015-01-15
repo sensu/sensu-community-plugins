@@ -1,4 +1,7 @@
-module Sensu::Extension
+require 'sensu/redis'
+
+# #YELLOW
+module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
   class RedisOutput < Handler
     def name
       'redis_output'
@@ -8,27 +11,25 @@ module Sensu::Extension
       'outputs events output to a redis list or channel'
     end
 
+    def opts
+      @settings['redis_output']
+    end
+
     def post_init
-      @redis = Sensu::Redis.connect({
-        :host => @settings["redis_output"]["host"],
-        :port => @settings["redis_output"]["port"] || 6379,
-        :database => @settings["redis_output"]["db"] || 0,
-      })
+      @redis = Sensu::Redis.connect(host: opts['host'],
+                                    port: opts['port'] || 6379,
+                                    database: opts['db'] || 0)
     end
 
     def run(event)
-      opts = @settings["redis_output"]
+      output = Oj.load(event, symbol_keys: false)['check']['output']
+      output = opts['split'] ? output.split("\n") : Array(output)
 
-      output = Oj.load(event)[:check][:output]
-      output = output.split("\n") if opts["split"]
-
-      Array(output).each do |e|
-        case opts["data_type"]
-        when "list"
-          @redis.lpush(opts["key"], e)
-        when "channel"
-          @redis.publish(opts["key"], e)
-        end
+      case opts['data_type']
+      when 'list'
+        output.each { |e| @redis.lpush(opts['key'], e) }
+      when 'channel'
+        output.each { |e| @redis.publish(opts['key'], e) }
       end
 
       yield("sent #{output.count} events", 0)

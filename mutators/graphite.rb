@@ -25,14 +25,14 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
-
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'json'
 
 # parse event
-event = JSON.parse(STDIN.read, :symbolize_names => true)
+event = JSON.parse(STDIN.read, symbolize_names: true)
 
-if ARGV[0] == "-r" || ARGV[0] == "--reverse"
-  puts event[:check][:output].gsub(event[:client][:name], event[:client][:name].split('.').reverse.join("."))
+if ARGV[0] == '-r' || ARGV[0] == '--reverse'
+  puts event[:check][:output].gsub(event[:client][:name], event[:client][:name].split('.').reverse.join('.'))
 else
   puts event[:check][:output].gsub(event[:client][:name], event[:client][:name].gsub('.', '_'))
 end

@@ -17,22 +17,21 @@ require 'uri'
 #  host (default account.talkerapp.com)
 
 class TalkerNotif < Sensu::Handler
-
   def host
-    settings["talker"]["host"] || "#{settings["talker"]["account"]}.talkerapp.com"
+    settings['talker']['host'] || "#{settings['talker']['account']}.talkerapp.com"
   end
 
   def port
-    settings["talker"]["port"] || ssl ? 443 : 80
+    settings['talker']['port'] || ssl ? 443 : 80
   end
 
   def ssl
-    settings["talker"]["ssl"].nil? ? true : settings["talker"]["ssl"]
+    settings['talker']['ssl'].nil? ? true : settings['talker']['ssl']
   end
 
   def room_uri
-    protocol = ssl ? "https" : "http"
-    URI.parse("#{protocol}://#{host}:#{port}/rooms/#{settings["talker"]["room"]}/messages.json")
+    protocol = ssl ? 'https' : 'http'
+    URI.parse("#{protocol}://#{host}:#{port}/rooms/#{settings['talker']['room']}/messages.json")
   end
 
   def event_name
@@ -46,17 +45,16 @@ class TalkerNotif < Sensu::Handler
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
     request = Net::HTTP::Post.new(room_uri.request_uri)
-    request['X-Talker-Token'] = settings["talker"]["token"]
+    request['X-Talker-Token'] = settings['talker']['token']
 
-    if @event['action'].eql?("resolve")
+    if @event['action'].eql?('resolve')
       message = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
     else
       message = "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
     end
 
     request.content_type = 'application/json'
-    request.body = JSON.dump(:message => message)
+    request.body = JSON.dump(message: message)
     http.request(request)
   end
-
 end

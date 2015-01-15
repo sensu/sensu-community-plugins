@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks DNS resolution
-# ===
+#   check-dns
 #
 # DESCRIPTION:
 #   This plugin checks DNS resolution using `dig`.
@@ -9,90 +8,100 @@
 #   results will end with trailing '.' (dot)
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   linux
-#   bsd
+#   Linux, BSD
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: sensu-plugin
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class DNS < Sensu::Plugin::Check::CLI
-
   option :domain,
-    :description => "Domain to resolve (or ip if type PTR)",
-    :short => '-d DOMAIN',
-    :long => '--domain DOMAIN'
+         description: 'Domain to resolve (or ip if type PTR)',
+         short: '-d DOMAIN',
+         long: '--domain DOMAIN'
 
   option :type,
-    :description => "Record type to resolve (A, AAAA, TXT, etc) use PTR for reverse lookup",
-    :short => '-t RECORD',
-    :long => '--type RECORD',
-    :default => 'A'
+         description: 'Record type to resolve (A, AAAA, TXT, etc) use PTR for reverse lookup',
+         short: '-t RECORD',
+         long: '--type RECORD',
+         default: 'A'
 
   option :server,
-    :description => "Server to use for resolution",
-    :short => '-s SERVER',
-    :long => '--server SERVER'
+         description: 'Server to use for resolution',
+         short: '-s SERVER',
+         long: '--server SERVER'
 
   option :result,
-    :description => "A positive result entry",
-    :short => '-r RESULT',
-    :long => '--result RESULT'
+         description: 'A positive result entry',
+         short: '-r RESULT',
+         long: '--result RESULT'
 
   option :warn_only,
-    :description => "Warn instead of critical on failure",
-    :short => '-w',
-    :long => '--warn-only',
-    :boolean => true
+         description: 'Warn instead of critical on failure',
+         short: '-w',
+         long: '--warn-only',
+         boolean: true
 
   option :debug,
-    :description => "Print debug information",
-    :long => '--debug',
-    :boolean => true
+         description: 'Print debug information',
+         long: '--debug',
+         boolean: true
 
   def resolve_domain
     if config[:type] == 'PTR'
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} -x #{config[:domain]} +short +time=1"
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ''} -x #{config[:domain]} +short +time=1"
     else
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ""} #{config[:domain]} #{config[:type]} +short +time=1"
+      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ''} #{config[:domain]} #{config[:type]} +short +time=1"
     end
     puts cmd if config[:debug]
     output = `#{cmd}`
     puts output if config[:debug]
     # Trim, split, remove comments and empty lines
-    entries = output.strip.split("\n").reject{|l| l.match('^;') || l.match('^$')}
+    entries = output.strip.split("\n").reject { |l| l.match('^;') || l.match('^$') }
     puts "Entries: #{entries}" if config[:debug]
     entries
   end
 
   def run
-    unknown "No domain specified" unless config[:domain]
-    entries = resolve_domain
-    if entries.length.zero?
-      if config[:warn_only]
-        warning "Could not resolve #{config[:domain]}"
-      else
-        critical "Could not resolve #{config[:domain]}"
-      end
+    if config[:domain].nil?
+      unknown 'No domain specified'
     else
-      if config[:result]
-        if entries.include?(config[:result])
-          ok "Resolved #{config[:domain]} including #{config[:result]}"
+      entries = resolve_domain
+      if entries.length.zero?
+        if config[:warn_only]
+          warning "Could not resolve #{config[:domain]}"
         else
-          critical "Resolved #{config[:domain]} did not include #{config[:result]}"
+          critical "Could not resolve #{config[:domain]}"
         end
       else
-        ok "Resolved #{config[:domain]} #{config[:type]} records"
+        if config[:result]
+          # #YELLOW
+          if entries.include?(config[:result])  # rubocop:disable BlockNesting
+            ok "Resolved #{config[:domain]} including # {config[:result]}"
+          else
+            critical "Resolved #{config[:domain]} did not include #{config[:result]}"
+          end
+        else
+          ok "Resolved #{config[:domain]} #{config[:type]} records"
+        end
       end
     end
   end
-
 end
