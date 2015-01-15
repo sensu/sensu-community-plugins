@@ -12,26 +12,26 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
-
+#
+# rubocop:disable Metrics/AbcSize, Style/AlignParameters
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'socket'
 require 'sensu-plugin/metric/cli'
 
 class SyslogNgMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
     description: 'Metric naming scheme, text to prepend to metric',
     short: '-s SCHEME',
     long: '--scheme SCHEME',
     required: true,
-    default: "#{Socket.gethostname.gsub('.','_')}.syslog_ng"
+    default: "#{Socket.gethostname.gsub('.', '_')}.syslog_ng"
 
   option :ctl_path,
     description: 'Path to syslog-ng-ctl command',
     short: '-p PATH',
     long: '--path PATH',
     required: false,
-    default: "/usr/sbin"
+    default: '/usr/sbin'
 
   def run
     binary = "#{config[:ctl_path]}/syslog-ng-ctl"
