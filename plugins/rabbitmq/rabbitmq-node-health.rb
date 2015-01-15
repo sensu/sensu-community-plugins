@@ -5,7 +5,7 @@
 #
 # This plugin checks if RabbitMQ server node is in a running state.
 #
-# The plugin is based on the RabbitMQ cluster node healt plugin by Tim Smith
+# The plugin is based on the RabbitMQ cluster node health plugin by Tim Smith
 #
 #
 # Copyright 2012 Abhijith G <abhi@runa.com> and Runa Inc.
@@ -52,18 +52,18 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
          proc: proc(&:to_f),
          default: 80
 
-   option :memcrit,
+  option :memcrit,
          description: 'Critical % of mem usage vs high watermark',
          short: '-c',
          long: '--mcrit PERCENT',
          proc: proc(&:to_f),
          default: 90
 
-    option :watchalarms,
-        description: 'Sound critical if one or more alarms are triggered',
-        short: '-a BOOLEAN',
-        long: '--alarms BOOLEAN',
-        default: 'true'
+  option :watchalarms,
+         description: 'Sound critical if one or more alarms are triggered',
+         short: '-a BOOLEAN',
+         long: '--alarms BOOLEAN',
+         default: 'true'
 
   def run
     res = node_healthy?
@@ -91,26 +91,26 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
       nodeinfo = JSON.parse(resource.get)[0]
 
       # Determine % memory consumed
-      pmem = ( '%.2f' % ( nodeinfo["mem_used"].fdiv(nodeinfo["mem_limit"]) * 100)).to_f
+      pmem = sprintf( '%.2f', nodeinfo['mem_used'].fdiv(nodeinfo['mem_limit']) * 100)
 
       # build status and message
       status = 'ok'
       message = 'Server is healthy'
-      if pmem >= config[:memcrit]
+      if pmem.to_f >= config[:memcrit]
         message = "Memory usage is critical: #{pmem}%"
         status = 'critical'
-      elsif pmem >= config[:memwarn]
+      elsif pmem.to_f >= config[:memwarn]
         message = "Memory usage is at warning: #{pmem}%"
         status = 'warning'
       end
       # If we are set to watch alarms then watch those and set status and messages accordingly
       if config[:watchalarms] == 'true'
-        if nodeinfo["mem_alarm"] == true
+        if nodeinfo['mem_alarm'] == true
           status = 'critical'
           message += ' Memory Alarm ON'
         end
 
-        if nodeinfo["disk_free_alarm"] == true
+        if nodeinfo['disk_free_alarm'] == true
           status = 'critical'
           message += ' Disk Alarm ON'
         end

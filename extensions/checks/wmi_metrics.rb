@@ -86,7 +86,7 @@ module Sensu
         path = []
         path << options[:path_prefix] if options[:prefix_at_start]
         path << settings[:client][:name] if options[:add_client_prefix]
-        path << options[:path_prefix] if ! options[:prefix_at_start]
+        path << options[:path_prefix] unless options[:prefix_at_start]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
