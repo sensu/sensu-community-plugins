@@ -45,6 +45,12 @@
 # -d: Devices to check (default: all)
 # --debug: turn debug output on (default: off)
 # --debug_file: process this file instead of smartctl output for testing
+# HARDWARE RAID PARAMETERS (EXPERIMENTAL!)*:
+# -m: The MegaCLI tool location, if set force check hardware RAID devices
+# -M: Device Id's of the hardware RAID disks (default: all)
+# 
+# * Beacause of the strange and incosistent device naming/numbering of the
+# Smartmontools with megaraid it is strongly experimental feature!
 #
 # Copyright 2013 Peter Kepes <https://github.com/kepes>
 #
@@ -97,6 +103,20 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     :description => "Devices to check",
     :required => false,
     :default => 'all'
+  
+  option :megacli,
+    :short => "-m location",
+    :long => "--megacli location",
+    :description => "The MegaCLI tool location, if set force check hardware RAID devices(WARNING! EXPERIMENTAL!)",
+    :required => false,
+    :default => false
+  
+  option :megacli_devices,
+    :short => "-M 1,2,3,4|all",
+    :long => "--megacli_devs 1,2,3,4|all",
+    :description => "Device Id's of the hardware RAID disks",
+    :required => false,
+    :default => "all"
 
   option :debug,
     :long => "--debug on",
@@ -141,7 +161,12 @@ class SmartCheck < Sensu::Plugin::Check::CLI
     attCheckList = findAttributes
 
     # Devices to check
-    devices = config[:debug_file].nil? ? findDevices : ['sda']
+    if config[:megacli]
+      # Hardware Raid devices to check
+      devices = find_raid_devices
+    else
+      devices = config[:debug_file].nil? ? find_devices : ['sda']
+    end
 
     # Overall health and attributes parameter
     parameters = "-H -A"
@@ -211,7 +236,7 @@ class SmartCheck < Sensu::Plugin::Check::CLI
   end
 
   # find all devices from /proc/partitions or from parameter
-  def findDevices
+  def find_devices
     # Return parameter value if it's defined
     return config[:devices].split(',') unless config[:devices] == 'all'
 
@@ -228,6 +253,18 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       devices << partition unless partition.nil?
     end
 
+    return devices
+  end
+  
+  # Find hardware RAID devices from config or with the MegaCLI tool
+  def find_raid_devices
+    if config[:devices] == "all"
+      devices = `#{config[:megacli]} -pdlist -a0| grep 'Device Id' | cut -d ' ' -f 3 | sort`.split(/\n/).reject(&:empty?)
+    else
+      devices = config[:devices].split(',')
+    end
+    # Hack the device names to work with smartctl
+    devices.map! {|device| "sda -d sat+megaraid,#{device}"}
     return devices
   end
 
