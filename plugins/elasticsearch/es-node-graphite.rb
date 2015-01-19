@@ -123,10 +123,10 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
         'transport',
         'thread_pool'
       ]
-      stats_query_array.add('jvm') if jvm_stats == true
-      stats_query_array.add('os') if os_stat == true
-      stats_query_array.add('process') if process_stats == true
-      stats_query_array.add('tp_stats') if tp_stats == true
+      stats_query_array.push('jvm') if jvm_stats == true
+      stats_query_array.push('os') if os_stat == true
+      stats_query_array.push('process') if process_stats == true
+      stats_query_array.push('tp_stats') if tp_stats == true
       stats_query_string = stats_query_array.join(',');
     else
       stats_query_string = [
