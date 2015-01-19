@@ -32,7 +32,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
-class CheckDatabase < Sensu::Plugin::Check::CLI
+class CheckWinService < Sensu::Plugin::Check::CLI
   option :service,
          description: 'Check for a specific service',
          long: '--service SERVICE',
