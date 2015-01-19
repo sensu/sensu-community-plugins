@@ -91,7 +91,7 @@ class CheckRabbitMQNode < Sensu::Plugin::Check::CLI
       nodeinfo = JSON.parse(resource.get)[0]
 
       # Determine % memory consumed
-      pmem = sprintf( '%.2f', nodeinfo['mem_used'].fdiv(nodeinfo['mem_limit']) * 100)
+      pmem = sprintf('%.2f', nodeinfo['mem_used'].fdiv(nodeinfo['mem_limit']) * 100)
 
       # build status and message
       status = 'ok'
