@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
-# Copyright 2014 Chef Software, Inc.
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE for
-# details.
-#
-# SSL certificate checker
+# encoding: UTF-8
+#  check-ssl-host.rb
 #
 # DESCRIPTION:
+#   SSL certificate checker
 #   Connects to a HTTPS (or other SSL) server and performs several checks on
 #   the certificate:
 #     - Is the hostname valid for the host we're requesting
@@ -17,7 +14,24 @@
 #   by a trusted authority.
 #
 # DEPENDENCIES:
-#   sensu-plugin
+#   gem: sensu-plugin
+#
+# USAGE:
+#   # Basic usage
+#   check-ssl-host.rb -h <hostname>
+#   # Specify specific days before cert expiry to alert on
+#   check-ssl-host.rb -h <hostmame> -c <critical_days> -w <warning_days>
+#   # Use -p to specify an alternate port
+#   check-ssl-host.rb -h <hostname> -p 8443
+#   # Use --skip-hostname-verification and/or --skip-chain-verification to
+#   # disable some of the checks made.
+#   check-ssl-host.rb -h <hostname> --skip-chain-verification
+#
+# LICENSE:
+#   Copyright 2014 Chef Software, Inc.
+#   Released under the same terms as Sensu (the MIT license); see LICENSE for
+#   details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
