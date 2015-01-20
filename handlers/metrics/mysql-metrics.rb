@@ -4,8 +4,8 @@
 #
 # Depends on mysql gem
 # gem install mysql
-# 
-# This handler sends metrics to a MySQL database for later user such as 
+#
+# This handler sends metrics to a MySQL database for later user such as
 # historic comparisons, charts and so on
 #
 # =========== Initial DDL ===========
@@ -25,16 +25,16 @@ require 'json'
 require 'mysql'
 
 class MysqlMetric < Sensu::Handler
-  #override filters from Sensu::Handler. not appropriate for metric handlers
+  # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
 
   def handle
-    #mysql settings
+    # mysql settings
     mysql_hostname = settings['mysql']['hostname']
     mysql_username = settings['mysql']['username']
     mysql_password = settings['mysql']['password']
 
-    #event values
+    # event values
     client_id = @event['client']['name']
     check_name = @event['check']['name']
     check_issued = @event['check']['issued']
@@ -43,7 +43,12 @@ class MysqlMetric < Sensu::Handler
 
     begin
       con = Mysql.new mysql_hostname, mysql_username, mysql_password
-      con.query("INSERT INTO sensumetrics.sensu_historic_metrics(client_id, check_name, issue_time, output, status) VALUES ('#{client_id}', '#{check_name}', #{check_issued}, '#{check_output}', #{check_status})")
+      con.query("INSERT INTO "\
+                "sensumetrics.sensu_historic_metrics("\
+                "client_id, check_name, issue_time, "\
+                "output, status) "\
+                "VALUES ('#{client_id}', '#{check_name}', "\
+                "#{check_issued}, '#{check_output}', #{check_status})")
     rescue Mysql::Error => e
       puts e.errno
       puts e.error
