@@ -66,7 +66,8 @@ module Sensu
           interval: 10,
           handler: 'graphite',
           add_client_prefix: true,
-          path_prefix: 'WMI'
+          path_prefix: 'WMI',
+          prefix_at_start: 0
         }
         if settings[:wmi_metrics].is_a?(Hash)
           @options.merge!(settings[:wmi_metrics])
@@ -83,8 +84,9 @@ module Sensu
       def add_metric(*args)
         value = args.pop
         path = []
+        path << options[:path_prefix] if options[:prefix_at_start]
         path << settings[:client][:name] if options[:add_client_prefix]
-        path << options[:path_prefix]
+        path << options[:path_prefix] unless options[:prefix_at_start]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
