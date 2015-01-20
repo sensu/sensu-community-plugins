@@ -20,18 +20,18 @@ require 'sensu-plugin/metric/cli'
 
 class SyslogNgMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
-    description: 'Metric naming scheme, text to prepend to metric',
-    short: '-s SCHEME',
-    long: '--scheme SCHEME',
-    required: true,
-    default: "#{Socket.gethostname.gsub('.', '_')}.syslog_ng"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         required: true,
+         default: "#{Socket.gethostname.gsub('.', '_')}.syslog_ng"
 
   option :ctl_path,
-    description: 'Path to syslog-ng-ctl command',
-    short: '-p PATH',
-    long: '--path PATH',
-    required: false,
-    default: '/usr/sbin'
+         description: 'Path to syslog-ng-ctl command',
+         short: '-p PATH',
+         long: '--path PATH',
+         required: false,
+         default: '/usr/sbin'
 
   def run
     binary = "#{config[:ctl_path]}/syslog-ng-ctl"
