@@ -72,7 +72,6 @@ class ELBHealth < Sensu::Plugin::Check::CLI
     hash
   end
 
-  #from here to method run is a work in progress
   def elb
     @elb ||= AWS::ELB.new aws_config
   end
@@ -103,15 +102,12 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       unhealthy_instances
     end
   end
-  #end test shit
 
   def run
     results = {}
     @message = (elbs.size > 1 ? config[:aws_region] + ": " : '') 
     critical = false
     elbs.each do |elb|
-      #puts elb.name
-      #results[elb.name] = check_health elb
       result = check_health elb
       if result != "OK"
         @message += "#{elb.name} unhealthy => #{result.map{|id, state| '[' + id + '::' + state + ']' }.join(' ')}. "
