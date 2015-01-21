@@ -43,9 +43,9 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :scheme,
     :description => 'Metric naming scheme, text to prepend to metric',
-    :short       => '-s SCHEME',
-    :long        => '--scheme SCHEME',
-    :default     => ''
+    :short => '-s SCHEME',
+    :long => '--scheme SCHEME',
+    :default => ''
 
   option :aws_access_key,
     :short => '-a AWS_ACCESS_KEY',

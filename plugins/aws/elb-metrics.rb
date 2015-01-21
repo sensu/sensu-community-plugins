@@ -1,24 +1,36 @@
 #!/usr/bin/env ruby
 #
 # Fetch ELB metrics from CloudWatch
-# ===
 #
-# Copyright 2013 Bashton Ltd http://www.bashton.com/
+# DESCRIPTION:
+#   Gets latency metrics from CloudWatch and puts them in Graphite for longer term storage
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+#   Returns latency statistic by default.  You can specify any valid ELB metric type, see
+#   http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#elb-metricscollected
 #
-# Gets latency metrics from CloudWatch and puts them in Graphite for longer term storage
+#   By default fetches statistic from one minute ago.  You may need to fetch further back than this;
+#   high traffic ELBs can sometimes experience statistic delays of up to 10 minutes.  If you experience this,
+#   raising a ticket with AWS support should get the problem resolved.
+#   As a workaround you can use eg -f 300 to fetch data from 5 minutes ago.
 #
-# Needs aws-sdk gem
+# OUTPUT:
+#   plain-text
 #
-# Returns latency statistic by default.  You can specify any valid ELB metric type, see
-# http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#elb-metricscollected
+# PLATFORMS:
+#   all
 #
-# By default fetches statistic from one minute ago.  You may need to fetch further back than this;
-# high traffic ELBs can sometimes experience statistic delays of up to 10 minutes.  If you experience this,
-# raising a ticket with AWS support should get the problem resolved.
-# As a workaround you can use eg -f 300 to fetch data from 5 minutes ago.
+# DEPENDENCIES:
+#   aws-sdk
+#
+# EXAMPLES:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2013 Bashton Ltd http://www.bashton.com/
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

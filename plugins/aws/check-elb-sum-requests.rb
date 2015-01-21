@@ -20,7 +20,7 @@
 require "sensu-plugin/check/cli"
 require "aws-sdk"
 
-class CheckELBLatency < Sensu::Plugin::Check::CLI
+class CheckELBSumRequests < Sensu::Plugin::Check::CLI
   option :access_key_id,
     short:       "-k N",
     long:        "--access-key-id ID",
@@ -110,7 +110,8 @@ class CheckELBLatency < Sensu::Plugin::Check::CLI
   def check_sum_requests(elb)
     metric        = latency_metric elb.name
     metric_value  = begin
-                      latest_value metric
+                      value = latest_value metric
+                      puts value
                     rescue
                       0
                     end

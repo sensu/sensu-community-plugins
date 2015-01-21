@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# Checks an ELB's health
-# Last Update: 11/19/2014 by bkett
+# Checks health of ELB backed instances.
+# Last Update: 12/10/2014 by bkett
 # ===
 #
 # DESCRIPTION:
-#   This plugin checks the health of an Amazon Elastic Load Balancer.
+#   This plugin checks the health of an Amazon Elastic Load Balancer or all ELBs in a given region.
 #
 # OUTPUT:
 #   plain-text
@@ -51,8 +51,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   option :elb_name,
     :short => '-n ELB_NAME',
     :long => '--elb-name ELB_NAME',
-    :description => 'The Elastic Load Balancer name of which you want to check the health',
-    :required => true
+    :description => 'The Elastic Load Balancer name of which you want to check the health'
 
   option :instances,
     :short => '-i INSTANCES',
@@ -73,35 +72,58 @@ class ELBHealth < Sensu::Plugin::Check::CLI
     hash
   end
 
-  def run
-
-    unhealthy_instances = {}
-    begin
-      elb = AWS::ELB.new aws_config
-      if config[:instances]
-        instance_health_hash = elb.load_balancers[config[:elb_name]].instances.health(config[:instances])
-      else
-        instance_health_hash= elb.load_balancers[config[:elb_name]].instances.health
-      end
-      instance_health_hash.each do |instance_health|
-          if instance_health[:state] != "InService"
-            unhealthy_instances[instance_health[:instance].id] = instance_health[:state]
-          end
-      end
-      unless unhealthy_instances.empty?
-        if config[:verbose]
-          critical "Unhealthy instances detected: #{unhealthy_instances.map{|id, state| '[' + id + '::' + state + ']' }.join(' ')}"
-        else
-          critical "Detected [#{unhealthy_instances.size}] unhealthy instances"
-        end
-      else
-        ok "All instances on ELB #{config[:aws_region]}::#{config[:elb_name]} healthy!"
-      end
-    rescue AWS::Errors::ServerError => e
-      warning "A Server-Side issue occured while communicating with the AWS API: #{e.message}"
-    rescue AWS::Errors::ClientError => e
-      warning "A Client-Side issue occured while communicating with the AWS API: #{e.message}"
-    end
+  #from here to method run is a work in progress
+  def elb
+    @elb ||= AWS::ELB.new aws_config
   end
 
+  def elbs
+    return @elbs if @elbs
+    @elbs = elb.load_balancers.to_a
+    @elbs.select! { |elb| config[:elb_name].include? elb.name } if config[:elb_name]
+    @elbs
+  end
+
+  def check_health(elb)
+    unhealthy_instances = {}
+    if config[:instances]
+      instance_health_hash = elb.instances.health(config[:instances])
+      message = ", with #{elb.instances.count} instances "
+    else
+      instance_health_hash = elb.instances.health
+    end
+    instance_health_hash.each do |instance_health|
+      if instance_health[:state] != "InService"
+        unhealthy_instances[instance_health[:instance].id] = instance_health[:state]
+      end
+    end
+    if unhealthy_instances.empty?
+      "OK"
+    else
+      unhealthy_instances
+    end
+  end
+  #end test shit
+
+  def run
+    results = {}
+    @message = (elbs.size > 1 ? config[:aws_region] + ": " : '') 
+    critical = false
+    elbs.each do |elb|
+      #puts elb.name
+      #results[elb.name] = check_health elb
+      result = check_health elb
+      if result != "OK"
+        @message += "#{elb.name} unhealthy => #{result.map{|id, state| '[' + id + '::' + state + ']' }.join(' ')}. "
+        critical = true
+      else
+        @message += "#{elb.name} => healthy. "
+      end
+    end
+    if critical
+      critical @message
+    else
+      ok @message
+    end
+  end
 end

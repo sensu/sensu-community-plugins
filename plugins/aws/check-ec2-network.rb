@@ -47,12 +47,14 @@ class CheckEc2Network < Sensu::Plugin::Check::CLI
   option :region,
          short:       "-r R",
          long:        "--region REGION",
-         description: "AWS region"
+         description: "AWS region",
+         required: true
 
   option :instance_id,
          short:       "-i instance-id",
          long:        "--instance-id instance-ids",
-         description: "EC2 Instance ID to check."
+         description: "EC2 Instance ID to check.",
+         required: true
 
   option :end_time,
          short:       "-t T",
