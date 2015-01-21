@@ -114,5 +114,5 @@ task :default do
     author.download_gravatar(file) unless File.exists?(file)
   end
 
-  write_template('templates/index.erb', 'index.html', binding())
+  write_template('templates/author.erb', 'index.html', binding())
 end
