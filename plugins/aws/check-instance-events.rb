@@ -76,21 +76,9 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
     begin
       # #YELLOW
       ec2.describe_instance_status[:instance_status_set].each do |i| # rubocop:disable Next
-
         unless i[:events_set].empty?
-          # Exclude completed reboots since the events API appearently returns these even after they have been completed:
-          # Example:
-          #  "events_set": [
-          #     {
-          #         "code": "system-reboot",
-          #         "description": "[Completed] Scheduled reboot",
-          #         "not_before": "2015-01-05 12:00:00 UTC",
-          #         "not_after": "2015-01-05 18:00:00 UTC"
-          #     }
-          # ]
-          unless i[:events_set].select { |x| x[:code] == 'system-reboot' && x[:description] =~ /\[Completed\]/ }
-            event_instances << i[:instance_id]
-          end
+          # Loop through the array in the events_set - add to the array unless Completed exists - meaning the event has passed
+          i[:events_set].each {|k| event_instances << i[:instance_id] unless k[:description].include? "[Completed]"} 
         end
       end
     rescue => e
