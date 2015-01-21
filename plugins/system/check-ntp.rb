@@ -40,13 +40,18 @@ class CheckNTP < Sensu::Plugin::Check::CLI
 
   def run
     begin
-      offset = `ntpq -c "rv 0 offset"`.split('=')[1].strip.to_f
+      output = `ntpq -c "rv 0 stratum,offset"`
+      stratum = output.split(',')[0].split('=')[1].strip.to_i
+      offset = output.split(',')[1].split('=')[1].strip.to_f
     rescue
       unknown 'NTP command Failed'
     end
 
-    critical if offset >= config[:crit] || offset <= -config[:crit]
-    warning if offset >= config[:warn] || offset <= -config[:warn]
-    ok
+    critical 'NTP not synced' if stratum > 15
+
+    message = "NTP offset by #{offset.abs}ms"
+    critical message if offset >= config[:crit] || offset <= -config[:crit]
+    warning message if offset >= config[:warn] || offset <= -config[:warn]
+    ok message
   end
 end
