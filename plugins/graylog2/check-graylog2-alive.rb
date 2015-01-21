@@ -1,19 +1,41 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   check-graylog2-alive.rb
 #
-# Graylog2 Server Alive Check
-# ===
+# DESCRIPTION:
+#   This plugin checks the the status of the Graylog2 Server using the
+#   REST API normally available on port 12900
 #
-# This plugin checks if the Graylog2 Server is alive using the REST API
+# OUTPUT:
+#   plain text
 #
-# Copyright 2015 Swift Networks
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: rest-client
+#
+# USAGE:
+#   ./check-graylog2-alive.rb -u admin -p 12345
+#
+# NOTES:
+#   This plugin requires a username and password with permission to access
+#   the /system API call in the Graylog2 server. A basic non-admin, reader
+#   only account will do.
+#
+# LICENSE:
+#   Adam Ashley <aashley@adamashley.name>
+#   Swift Networks
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'json'
-require 'rest_client'
+require 'rest-client'
 
 class CheckGraylog2Alive < Sensu::Plugin::Check::CLI
   option :host,
