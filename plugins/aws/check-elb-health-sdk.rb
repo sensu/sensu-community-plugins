@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
-# Checks health of ELB backed instances.
-# Last Update: 12/10/2014 by bkett
+# check-elb-health-sdk
+# Last Update: 1/22/2015 by bkett
 # ===
 #
 # DESCRIPTION:
@@ -11,12 +11,15 @@
 #   plain-text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: aws-sdk
+#   gem: uri
+#   gem: net/http
+#   gem: sensu-plugin
 #
-# Copyright (c) 2014, Panagiotis Papadomitsos <pj@ezgr.net>
+# Copyright (c) 2015, Benjamin Kett <bkett@umn.edu>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -30,39 +33,39 @@ require 'aws-sdk'
 class ELBHealth < Sensu::Plugin::Check::CLI
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-    :default => ENV['AWS_ACCESS_KEY_ID']
+         :short => '-a AWS_ACCESS_KEY',
+         :long => '--aws-access-key AWS_ACCESS_KEY',
+         :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
+         :default => ENV['AWS_ACCESS_KEY_ID']
 
   option :aws_secret_access_key,
-    :short => '-s AWS_SECRET_ACCESS_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-    :default => ENV['AWS_SECRET_ACCESS_KEY']
+         :short => '-s AWS_SECRET_ACCESS_KEY',
+         :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
+         :default => ENV['AWS_SECRET_ACCESS_KEY']
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1).",
-    :default => 'us-east-1'
+         :short => '-r AWS_REGION',
+         :long => '--aws-region REGION',
+         :description => "AWS Region (such as eu-west-1).",
+         :default => 'us-east-1'
 
   option :elb_name,
-    :short => '-n ELB_NAME',
-    :long => '--elb-name ELB_NAME',
-    :description => 'The Elastic Load Balancer name of which you want to check the health'
+         :short => '-n ELB_NAME',
+         :long => '--elb-name ELB_NAME',
+         :description => 'The Elastic Load Balancer name of which you want to check the health'
 
   option :instances,
-    :short => '-i INSTANCES',
-    :long => '--instances INSTANCES',
-    :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health'
+         :short => '-i INSTANCES',
+         :long => '--instances INSTANCES',
+         :description => 'Comma separated list of specific instances IDs inside the ELB of which you want to check the health'
 
   option :verbose,
-    :short => '-v',
-    :long => '--verbose',
-    :description => 'Enable a little bit more verbose reports about instance health',
-    :boolean => true,
-    :default => false
+         :short => '-v',
+         :long => '--verbose',
+         :description => 'Enable a little bit more verbose reports about instance health',
+         :boolean => true,
+         :default => false
 
   def aws_config
     hash = {}
