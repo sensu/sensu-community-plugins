@@ -214,11 +214,11 @@ class CheckRDS < Sensu::Plugin::Check::CLI
 
   def run
     if config[:db_instance_id].nil? || config[:db_instance_id].empty?
-      critical('No DB instance provided.  See help for usage details')
+      unknown 'No DB instance provided.  See help for usage details'
     end
 
     @db_instance  = find_db_instance config[:db_instance_id]
-    @message      = @db_instance.inspect
+    @message      = "#{config[:db_instance_id]}: "
     @severities   = {
       critical: false,
       warning:  false
@@ -233,7 +233,7 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     end
 
     if %w(cpu memory disk).any? { |item| %w(warning critical).any? { |severity| config[:"#{item}_#{severity}_over"] } }
-      @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds "
+      @message += "(#{config[:statistics].to_s.capitalize} within #{config[:period]}s "
       @message += "between #{config[:end_time] - config[:period]} to #{config[:end_time]})"
     end
 
