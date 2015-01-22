@@ -92,8 +92,8 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   end
 
   def run
-    begin
       aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
+    begin
       elb = Fog::AWS::ELB.new aws_config
       if config[:instances]
         instances = config[:instances].split(',')

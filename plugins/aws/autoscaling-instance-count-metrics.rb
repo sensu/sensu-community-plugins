@@ -59,7 +59,7 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--aws-region REGION',
          description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
-  
+
   def aws_config
     hash = {}
     hash.update aws_access_key_id: config[:aws_access_key], aws_secret_access_key: config[:aws_secret_access_key]\
@@ -69,7 +69,7 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    if config[:scheme] == '' 
+    if config[:scheme] == ''
       graphitepath = "#{config[:groupname]}.autoscaling.instance_count"
     else
       graphitepath = config[:scheme]
