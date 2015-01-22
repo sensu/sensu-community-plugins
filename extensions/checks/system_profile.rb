@@ -31,11 +31,11 @@ module Sensu
 
       def definition
         {
-          :type => 'metric',
-          :name => name,
-          :interval => options[:interval],
-          :standalone => true,
-          :handler => options[:handler]
+          type: 'metric',
+          name: name,
+          interval: options[:interval],
+          standalone: true,
+          handler: options[:handler]
         }
       end
 
@@ -60,10 +60,11 @@ module Sensu
       def options
         return @options if @options
         @options = {
-          :interval => 10,
-          :handler => 'graphite',
-          :add_client_prefix => true,
-          :path_prefix => 'system'
+          interval: 10,
+          handler: 'graphite',
+          add_client_prefix: true,
+          path_prefix: 'system',
+          prefix_at_start: 0
         }
         if settings[:system_profile].is_a?(Hash)
           @options.merge!(settings[:system_profile])
@@ -80,10 +81,9 @@ module Sensu
       def add_metric(*args)
         value = args.pop
         path = []
-        if options[:add_client_prefix]
-          path << settings[:client][:name]
-        end
-        path << options[:path_prefix]
+        path << options[:path_prefix] if options[:prefix_at_start]
+        path << settings[:client][:name] if options[:add_client_prefix]
+        path << options[:path_prefix] unless options[:prefix_at_start]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
@@ -91,9 +91,10 @@ module Sensu
       def read_file(file_path, chunk_size = nil)
         content = ''
         File.open(file_path, 'r') do |file|
-          read_chunk = Proc.new do
+          read_chunk = proc do
             content << file.read(chunk_size)
-            unless file.eof?
+            # #YELLOW
+            unless file.eof? # rubocop:disable UnlessElse
               EM.next_tick(read_chunk)
             else
               yield content
@@ -105,8 +106,8 @@ module Sensu
 
       def parse_proc_stat
         sample = {}
-        cpu_metrics = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq', 'steal', 'guest']
-        misc_metrics = ['ctxt', 'processes', 'procs_running', 'procs_blocked', 'btime', 'intr']
+        cpu_metrics = %w(user nice system idle iowait irq softirq steal guest)
+        misc_metrics = %w(ctxt processes procs_running procs_blocked btime intr)
         read_file('/proc/stat') do |proc_stat|
           proc_stat.each_line do |line|
             next if line.empty?
@@ -158,12 +159,22 @@ module Sensu
       end
 
       def proc_net_dev_metrics
-        dev_metrics = [
-                       'rxBytes', 'rxPackets', 'rxErrors', 'rxDrops',
-                       'rxFifo', 'rxFrame', 'rxCompressed', 'rxMulticast',
-                       'txBytes', 'txPackets', 'txErrors', 'txDrops',
-                       'txFifo', 'txColls', 'txCarrier', 'txCompressed'
-                      ]
+        dev_metrics = %w(rxBytes \
+                         rxPackets \
+                         rxErrors \
+                         rxDrops \
+                         rxFifo \
+                         rxFrame \
+                         rxCompressed \
+                         rxMulticast \
+                         txBytes \
+                         txPackets \
+                         txErrors \
+                         txDrops \
+                         txFifo \
+                         txColls \
+                         txCarrier \
+                         txCompressed)
         read_file('/proc/net/dev') do |proc_net_dev|
           proc_net_dev.each_line do |line|
             interface, data = line.scan(/^\s*([^:]+):\s*(.*)$/).first

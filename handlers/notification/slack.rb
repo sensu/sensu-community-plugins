@@ -9,34 +9,19 @@
 # integration in slack. You can create the required webhook by visiting
 # https://{your team}.slack.com/services/new/incoming-webhook
 #
-# After you configure your webhook, you'll need the token from the integration.
-# The token is the last part of the webhook URL, the string after
-# the last "/" sign.
-# The default channel and bot name entered can be overridden by this handlers
-# configuration.
-#
-# Minimum configuration required is the 'token' and 'team_name'
+# After you configure your webhook, you'll need the webhook URL from the integration.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'json'
 
 class Slack < Sensu::Handler
-
-  def slack_token
-    get_setting('token')
-  end
-
-  def slack_channel
-    get_setting('channel')
+  def slack_webhook_url
+    get_setting('webhook_url')
   end
 
   def slack_message_prefix
     get_setting('message_prefix')
-  end
-
-  def slack_team_name
-    get_setting('team_name')
   end
 
   def slack_bot_name
@@ -52,7 +37,7 @@ class Slack < Sensu::Handler
   end
 
   def get_setting(name)
-    settings["slack"][name]
+    settings['slack'][name]
   end
 
   def handle
@@ -69,7 +54,7 @@ class Slack < Sensu::Handler
   end
 
   def post_data(notice)
-    uri = slack_uri(slack_token)
+    uri = URI(slack_webhook_url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
 
@@ -86,19 +71,18 @@ class Slack < Sensu::Handler
     when Net::HTTPSuccess
       true
     else
-      raise response.error!
+      fail response.error!
     end
   end
 
   def payload(notice)
     {
-      :icon_url => 'http://sensuapp.org/img/sensu_logo_large-c92d73db.png',
-      :attachments => [{
-        :text  => [slack_message_prefix, notice].compact.join(' '),
-        :color => color
+      icon_url: 'http://sensuapp.org/img/sensu_logo_large-c92d73db.png',
+      attachments: [{
+        text: [slack_message_prefix, notice].compact.join(' '),
+        color: color
       }]
     }.tap do |payload|
-      payload[:channel] = slack_channel if slack_channel
       payload[:username] = slack_bot_name if slack_bot_name
     end
   end
@@ -116,10 +100,4 @@ class Slack < Sensu::Handler
   def check_status
     @event['check']['status']
   end
-
-  def slack_uri(token)
-    url = "https://#{slack_team_name}.slack.com/services/hooks/incoming-webhook?token=#{token}"
-    URI(url)
-  end
-
 end

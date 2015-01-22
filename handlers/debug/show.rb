@@ -11,10 +11,8 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 
 class Show < Sensu::Handler
-
   def handle
     puts 'Settings: ' + settings.to_hash.inspect
     puts 'Event: ' + @event.inspect
   end
-
 end

@@ -26,16 +26,14 @@ class DatadogMetrics < Sensu::Handler
     end
   end
 
-  def emit_metric(name, value, timestamp)
-    begin
-      timeout(3) do
-        @dog.emit_point(name, value, :host => @event['client']['name'])
-      end
-    rescue Timeout::Error
-      puts "datadog -- timed out while sending metrics"
-    rescue => error
-      puts "datadog -- failed to send metrics: #{error.message}"
-      puts " #{error.backtrace.join("\n\t")}"
+  def emit_metric(name, value, _timestamp)
+    timeout(3) do
+      @dog.emit_point(name, value, host: @event['client']['name'])
     end
+  rescue Timeout::Error
+    puts 'datadog -- timed out while sending metrics'
+  rescue => error
+    puts "datadog -- failed to send metrics: #{error.message}"
+    puts " #{error.backtrace.join("\n\t")}"
   end
 end

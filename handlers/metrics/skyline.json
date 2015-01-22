@@ -1,0 +1,6 @@
+{  
+  "skyline" : {
+     "server" : "skyline.example.com",
+     "port" : 2025
+  }
+}

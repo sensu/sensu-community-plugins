@@ -7,37 +7,37 @@ require 'socket'
 
 class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
   option :master_host,
-    :short => '-m',
-    :long => '--master=HOST',
-    :description => 'PostgreSQL master HOST'
+         short: '-m',
+         long: '--master=HOST',
+         description: 'PostgreSQL master HOST'
 
   option :slave_host,
-    :short => '-s',
-    :long => '--slave=HOST',
-    :description => 'PostgreSQL slave HOST',
-    :default => 'localhost'
+         short: '-s',
+         long: '--slave=HOST',
+         description: 'PostgreSQL slave HOST',
+         default: 'localhost'
 
   option :database,
-     :short => '-d',
-     :long => '--database=NAME',
-     :description => 'Database NAME',
-     :default => 'postgres'
+         short: '-d',
+         long: '--database=NAME',
+         description: 'Database NAME',
+         default: 'postgres'
 
   option :user,
-    :short => '-u',
-    :long => '--username=VALUE',
-    :description => 'Database username'
+         short: '-u',
+         long: '--username=VALUE',
+         description: 'Database username'
 
   option :pass,
-    :short => '-p',
-    :long => '--password=VALUE',
-    :description => 'Database password'
+         short: '-p',
+         long: '--password=VALUE',
+         description: 'Database password'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-g SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.postgres.replication_lag"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-g SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.postgres.replication_lag"
 
   def run
     @dbmaster = config[:master_host]
@@ -60,7 +60,7 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     # Establishing connections to the slave
-    conn_slave = PGconn.connect(@dbslave, @dbport, '', '' , @dbname, @dbusername, @password)
+    conn_slave = PGconn.connect(@dbslave, @dbport, '', '', @dbname, @dbusername, @password)
     res = conn_slave.exec('SELECT pg_last_xlog_receive_location()').getvalue(0, 0)
     conn_slave.close
 

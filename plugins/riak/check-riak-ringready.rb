@@ -20,7 +20,6 @@ require 'sensu-plugin/check/cli'
 require 'open3'
 
 class CheckRiakRingStatus < Sensu::Plugin::Check::CLI
-
   def execute(cmd)
     captured_stdout = ''
     exit_status = Open3.popen2e(ENV, cmd) do |stdin, stdout, wait_thr|
@@ -32,11 +31,10 @@ class CheckRiakRingStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    exit_status, message = execute "sudo -n -k riak-admin ringready"
-    if exit_status.success?
-      if /^TRUE/ =~ message
-        ok message
-      end
+    exit_status, message = execute 'sudo -n -k riak-admin ringready'
+    # #YELLOW
+    if exit_status.success? # rubocop:disable IfUnlessModifier
+      ok message if /^TRUE/ =~ message
     end
     critical message
   end

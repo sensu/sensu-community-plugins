@@ -14,63 +14,62 @@ require 'socket'
 require 'carrot-top'
 
 class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
-
   option :host,
-    :description => "RabbitMQ management API host",
-    :long => "--host HOST",
-    :default => "localhost"
+         description: 'RabbitMQ management API host',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :port,
-    :description => "RabbitMQ management API port",
-    :long => "--port PORT",
-    :proc => proc { |p| p.to_i },
-    :default => 15672
+         description: 'RabbitMQ management API port',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         default: 15_672
 
   option :user,
-    :description => "RabbitMQ management API user",
-    :long => "--user USER",
-    :default => "guest"
+         description: 'RabbitMQ management API user',
+         long: '--user USER',
+         default: 'guest'
 
   option :password,
-    :description => "RabbitMQ management API password",
-    :long => "--password PASSWORD",
-    :default => "guest"
+         description: 'RabbitMQ management API password',
+         long: '--password PASSWORD',
+         default: 'guest'
 
   option :ssl,
-    :description => "Enable SSL for connection to the API",
-    :long => "--ssl",
-    :boolean => true,
-    :default => false
+         description: 'Enable SSL for connection to the API',
+         long: '--ssl',
+         boolean: true,
+         default: false
 
   option :warn,
-    :short => '-w NUM_MESSAGES',
-    :long => '--warn NUM_MESSAGES',
-    :description => 'WARNING message count threshold',
-    :default => 250
+         short: '-w NUM_MESSAGES',
+         long: '--warn NUM_MESSAGES',
+         description: 'WARNING message count threshold',
+         default: 250
 
   option :critical,
-    :short => '-c NUM_MESSAGES',
-    :long => '--critical NUM_MESSAGES',
-    :description => 'CRITICAL message count threshold',
-    :default => 500
+         short: '-c NUM_MESSAGES',
+         long: '--critical NUM_MESSAGES',
+         description: 'CRITICAL message count threshold',
+         default: 500
 
-  def get_rabbitmq_info
+  def acquire_rabbitmq_info
     begin
       rabbitmq_info = CarrotTop.new(
-        :host => config[:host],
-        :port => config[:port],
-        :user => config[:user],
-        :password => config[:password],
-        :ssl => config[:ssl]
+        host: config[:host],
+        port: config[:port],
+        user: config[:user],
+        password: config[:password],
+        ssl: config[:ssl]
       )
     rescue
-      warning "could not get rabbitmq info"
+      warning 'could not get rabbitmq info'
     end
     rabbitmq_info
   end
 
   def run
-    rabbitmq = get_rabbitmq_info
+    rabbitmq = acquire_rabbitmq_info
     overview = rabbitmq.overview
     total = overview['queue_totals']['messages']
     message "#{total}"
@@ -78,5 +77,4 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     warning if total > config[:warn].to_i
     ok
   end
-
 end

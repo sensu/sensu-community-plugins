@@ -5,9 +5,13 @@ shared_context :plugin_stub do
     Sensu::Plugin::CLI.class_eval do
       class PluginStub
         def run; end
+
         def ok(*); end
+
         def warning(*); end
+
         def critical(*); end
+
         def unknown(*); end
       end
       # rubocop:disable all

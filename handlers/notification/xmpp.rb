@@ -8,7 +8,6 @@ require 'xmpp4r/muc'
 include Jabber
 
 class XmppHandler < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
@@ -20,13 +19,13 @@ class XmppHandler < Sensu::Handler
     xmpp_target_type = settings['xmpp']['target_type']
     xmpp_server = settings['xmpp']['server']
 
-    if @event['action'].eql?("resolve")
-#      body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
+    if @event['action'].eql?('resolve')
+      #      body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
       body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['output']} - #{@event['check']['notification']}"
     else
-#      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
+      #      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
       body = "Sensu ALERT - [#{event_name}] - #{@event['check']['output']} - #{@event['check']['notification']}"
-#      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['output']}"
+      #      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['output']}"
     end
 
     jid = JID.new(xmpp_jid)
@@ -38,14 +37,13 @@ class XmppHandler < Sensu::Handler
       m = Message.new(xmpp_target, body)
       room = MUC::MUCClient.new(cl)
       room.my_jid = jid
-      room.join(Jabber::JID.new(xmpp_target+'/'+cl.jid.node))
+      room.join(Jabber::JID.new(xmpp_target + '/' + cl.jid.node))
       room.send m
       room.exit
     else
-      m = Message.new(xmpp_target, body).set_type(:normal).set_id('1').set_subject("SENSU ALERT!")
+      m = Message.new(xmpp_target, body).set_type(:normal).set_id('1').set_subject('SENSU ALERT!')
       cl.send m
     end
     cl.close
   end
-
 end

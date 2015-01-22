@@ -1,25 +1,40 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Check the SMART health status of physical disks
-# ===
+#   check-smart
 #
-# This is a drop-in replacement for check-disk-health.sh.
+# DESCRIPTION:
 #
-# smartctl requires root permissions.  When running this script as a non-root
-# user such as sensu, ensure it is run with sudo.
+# OUTPUT:
+#   plain text
 #
-# Create a file named /etc/sudoers.d/smartctl with this line inside :
-# sensu ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+# PLATFORMS:
+#   Linux
 #
-# Fedora has some additional restrictions : if requiretty is set, sudo will only
-# run when the user is logged in to a real tty.
-# Then add this in the sudoers file (/etc/sudoers), below the line Defaults requiretty :
-# Defaults sensu !requiretty
+# DEPENDENCIES:
+#   gem: sensu-plugin
 #
-# Copyright 2013 Mitsutoshi Aoe <maoe@foldr.in>
+# USAGE:
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# NOTES:
+#   This is a drop-in replacement for check-disk-health.sh.
+#
+#   smartctl requires root permissions.  When running this script as a non-root
+#   user such as sensu, ensure it is run with sudo.
+#
+#   Create a file named /etc/sudoers.d/smartctl with this line inside :
+#   sensu ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+#
+#   Fedora has some additional restrictions : if requiretty is set, sudo will only
+#   run when the user is logged in to a real tty.
+#   Then add this in the sudoers file (/etc/sudoers), below the line Defaults requiretty :
+#   Defaults sensu !requiretty
+#
+# LICENSE:
+#   Copyright 2013 Mitsutoshi Aoe <maoe@foldr.in>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -56,10 +71,10 @@ end
 
 class CheckSMART < Sensu::Plugin::Check::CLI
   option :smart_incapable_disks,
-    :long => '--smart-incapable-disks EXIT_CODE',
-    :description => 'Exit code when SMART is unavailable/disabled on a disk (ok, warn, critical, unknown)',
-    :proc => proc {|exit_code| exit_code.to_sym },
-    :default => :unknown
+         long: '--smart-incapable-disks EXIT_CODE',
+         description: 'Exit code when SMART is unavailable/disabled on a disk (ok, warn, critical, unknown)',
+         proc: proc(&:to_sym),
+         default: :unknown
 
   def initialize
     super
@@ -70,32 +85,33 @@ class CheckSMART < Sensu::Plugin::Check::CLI
   def scan_disks!
     `lsblk -nro NAME,TYPE`.each_line do |line|
       name, type = line.split
-      @devices << Disk.new(name) if type == "disk"
+      @devices << Disk.new(name) if type == 'disk'
     end
   end
 
   def run
-    unless @devices.length > 0
-      unknown "No SMART capable devices found"
+    # #YELLOW
+    unless @devices.length > 0  # rubocop:disable IfUnlessModifier
+      unknown 'No SMART capable devices found'
     end
 
-    unhealthy_disks = @devices.select {|disk| disk.smart_capable? && !disk.healthy? }
-    unknown_disks = @devices.reject {|disk| disk.smart_capable? }
+    unhealthy_disks = @devices.select { |disk| disk.smart_capable? && !disk.healthy? }
+    unknown_disks = @devices.reject(&:smart_capable?)
 
     if unhealthy_disks.length > 0
-      output = unhealthy_disks.map {|disk| disk.health_output }
-      output.concat(unknown_disks.map {|disk| disk.capability_output })
+      output = unhealthy_disks.map(&:health_output)
+      output.concat(unknown_disks.map(&:capability_output))
       critical output.join("\n")
     end
 
     if unknown_disks.length > 0
       exit_with(
         config[:smart_incapable_disks],
-        unknown_disks.map {|disk| disk.capability_output }.join("\n")
+        unknown_disks.map(&:capability_output).join("\n")
       )
     end
 
-    ok "PASSED"
+    ok 'PASSED'
   end
 
   def exit_with(sym, message)

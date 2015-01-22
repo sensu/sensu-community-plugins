@@ -1,24 +1,32 @@
-#!/usr/bin/env ruby
-
+#! /usr/bin/env ruby
+#
+#   <script name>
+#
 # DESCRIPTION:
 #   This plugin checks the status of processes
 #   managed with Eye via the HTTP API provided by the
 #   'eye-http' gem (github.com/kostya/eye-http)
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin ruby gem
+#   gem: sensu-plugin
+#   gem: json
 #
-# AUTHOR:
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
 #   Nate Meyer <nmeyer@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -26,21 +34,20 @@ require 'net/http'
 require 'json'
 
 class CheckEyeHttp < Sensu::Plugin::Check::CLI
-
   option :host,
-    short: '-h host',
-    default: '127.0.0.1'
+         short: '-h host',
+         default: '127.0.0.1'
 
   option :port,
-    short: '-p port',
-    default: 12345
+         short: '-p port',
+         default: 12_345
 
   option :uri,
-    short: '-u uri',
-    default: '/api/info?filter=all'
+         short: '-u uri',
+         default: '/api/info?filter=all'
 
   option :debug,
-    short: '-d'
+         short: '-d'
 
   def run
     out = { ok: [], warn: [], crit: [] }

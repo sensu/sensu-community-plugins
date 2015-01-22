@@ -8,6 +8,8 @@
 # http://openjdk.java.net/install/
 
 # Also make sure the user "sensu" can sudo without password
+
+# #RED
 while getopts 's:n:h' OPT; do
 case $OPT in
 s) SCHEME=$OPTARG;;

@@ -11,14 +11,13 @@ require 'sensu-handler'
 require 'simple-graphite'
 
 class Resolve < Sensu::Handler
-
   def handle
-    port = settings["graphite_notify"]["port"] ? settings["graphite_notify"]["port"].to_s : "2003"
-    graphite = Graphite.new({:host => settings["graphite_notify"]["host"], :port => port})
+    port = settings['graphite_notify']['port'] ? settings['graphite_notify']['port'].to_s : '2003'
+    graphite = Graphite.new(host: settings['graphite_notify']['host'], port: port)
     return unless graphite
-    prop = @event["action"] == "create" ? 1 : 0
-    message = "#{settings['graphite_notify']['prefix']}.#{@event['client']['name'].gsub(".", "_")}.#{@event['check']['name']}"
-    message += " #{prop} #{graphite.time_now+rand(100)}"
+    prop = @event['action'] == 'create' ? 1 : 0
+    message = "#{settings['graphite_notify']['prefix']}.#{@event['client']['name'].gsub('.', '_')}.#{@event['check']['name']}"
+    message += " #{prop} #{graphite.time_now + rand(100)}"
     begin
       graphite.push_to_graphite do |graphite_socket|
         graphite_socket.puts message
@@ -28,5 +27,4 @@ class Resolve < Sensu::Handler
       raise error_msg
     end
   end
-
 end

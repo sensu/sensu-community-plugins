@@ -1,18 +1,38 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Serverspec tests plugin
-# ===
+#   check-serverspec
 #
-# Runs http://serverspec.org/ spec tests against your servers.
-# Fails with a critical if tests are failing.
+# DESCRIPTION:
+#   Runs http://serverspec.org/ spec tests against your servers.
+#   Fails with a critical if tests are failing.
 #
-# Examples:
+# OUTPUT:
+#   plain text
 #
-#   # Run entire suite of testd
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: json
+#   gem: socket
+#   gem: serverspec
+#
+# USAGE:
+#   Run entire suite of testd
 #   check-serverspec -d /etc/my_tests_dir
 #
-#   # Run only one set of tests
+#   Run only one set of tests
 #   check-serverspec -d /etc/my_tests_dir -t spec/test_one
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'json'
@@ -21,21 +41,20 @@ require 'serverspec'
 require 'sensu-plugin/check/cli'
 
 class CheckServerspec < Sensu::Plugin::Check::CLI
-
   option :tests_dir,
-    :short => '-d /tmp/dir',
-    :long => '--tests-dir /tmp/dir',
-    :required => true
+         short: '-d /tmp/dir',
+         long: '--tests-dir /tmp/dir',
+         required: true
 
   option :spec_tests,
-    :short => '-t spec/test',
-    :long => '--spec-tests spec/test',
-    :default => nil
+         short: '-t spec/test',
+         long: '--spec-tests spec/test',
+         default: nil
 
   option :handler,
-    :short => '-l HANDLER',
-    :long => '--handler HANDLER',
-    :default => 'default'
+         short: '-l HANDLER',
+         long: '--handler HANDLER',
+         default: 'default'
 
   def sensu_client_socket(msg)
     u = UDPSocket.new
@@ -61,11 +80,11 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
     serverspec_results = `cd #{config[:tests_dir]} ; ruby -S rspec #{config[:spec_tests]} --format json`
     parsed = JSON.parse(serverspec_results)
 
-    parsed["examples"].each do |serverspec_test|
-      test_name = serverspec_test["file_path"].split('/')[-1] + "_" + serverspec_test["line_number"].to_s
-      output = serverspec_test["full_description"].gsub!(/\"/, '')
+    parsed['examples'].each do |serverspec_test|
+      test_name = serverspec_test['file_path'].split('/')[-1] + '_' + serverspec_test['line_number'].to_s
+      output = serverspec_test['full_description'].gsub!(/\"/, '')
 
-      if serverspec_test["status"] == "passed"
+      if serverspec_test['status'] == 'passed'
         send_ok(
           test_name,
           output
@@ -79,20 +98,19 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
 
     end
 
-    puts parsed["summary_line"]
-    failures = parsed["summary_line"].split[2]
+    puts parsed['summary_line']
+    failures = parsed['summary_line'].split[2]
     if failures != '0'
       exit_with(
         :critical,
-        parsed["summary_line"]
+        parsed['summary_line']
       )
     else
       exit_with(
         :ok,
-        parsed["summary_line"]
+        parsed['summary_line']
       )
     end
-
   end
 
   def exit_with(sym, message)
@@ -105,5 +123,4 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
       unknown message
     end
   end
-
 end

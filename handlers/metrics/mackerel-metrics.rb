@@ -38,10 +38,10 @@ class Mackerel < Sensu::Handler
       v = line.split("\t")
 
       metrics = [{
-        :hostId => hostid,
-        :name   => format('%{custom}.%{name}', custom: 'custom', name: v[0]),
-        :value  => v[1].to_i,
-        :time   => v[2].to_i,
+        hostId: hostid,
+        name: format('%{custom}.%{name}', custom: 'custom', name: v[0]),
+        value: v[1].to_i,
+        time: v[2].to_i
       }]
 
       begin
@@ -51,8 +51,8 @@ class Mackerel < Sensu::Handler
           https.use_ssl = true
           https.verify_mode = OpenSSL::SSL::VERIFY_NONE
           request = Net::HTTP::Post.new(uri.path)
-          request["Content-Type"] = "application/json; charset=utf-8"
-          request["X-Api-Key"] = api_key
+          request['Content-Type'] = 'application/json; charset=utf-8'
+          request['X-Api-Key'] = api_key
 
           request.body = JSON.dump(metrics)
           response = https.request(request)
