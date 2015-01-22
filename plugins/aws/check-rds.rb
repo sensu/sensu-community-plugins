@@ -123,7 +123,6 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def find_db_instance(id)
-    fail if !id || id.empty?
     db = rds.instances[id]
     fail unless db.exists?
     db
@@ -211,6 +210,10 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def run
+    if config[:db_instance_id].nil? || config[:db_instance_id].empty?
+      critical('No DB instance provided.  See help for usage details')
+    end
+
     @db_instance  = find_db_instance config[:db_instance_id]
     @message      = @db_instance.inspect
     @severities   = {
