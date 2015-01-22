@@ -81,18 +81,21 @@ class CheckSupervisorSocket < Sensu::Plugin::Check::CLI
       request.exec(@super, '1.1', '/RPC2')
 
       # wait for and parse the http response
+      response = nil
       loop do
         response = Net::HTTPResponse.read_new(@super)
         break unless response.is_a?(Net::HTTPContinue)
       end
 
       response.reading_body(@super, request.response_body_permitted?) {}
-    rescue
-      critical "Tried requesting XMLRPC 'supervisor.getAllProcessInfo' from UNIX domain socket #{config[:socket]} but failed"
+    rescue => e
+      critical "Tried requesting XMLRPC 'supervisor.getAllProcessInfo' from UNIX domain socket #{config[:socket]} but failed: #{e}"
     end
 
-    XML::XMLRPC::Parser.new(response.body).params do |process|
-      critical "#{process['name']} not running: #{process['statename'].upcase}" if config[:critical].include?(process['statename'])
+    XML::XMLRPC::Parser.new(response.body).params.each do |param|
+      param.each do |process|
+        critical "#{process[:name]} not running: #{process[:statename].upcase}" if config[:critical].include?(process[:statename])
+      end
     end
 
     ok 'All processes running'
