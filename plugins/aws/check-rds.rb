@@ -52,17 +52,21 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   option :access_key_id,
          short:       '-k N',
          long:        '--access-key-id ID',
-         description: 'AWS access key ID'
+         description: 'AWS access key ID',
+         default: ENV['AWS_ACCESS_KEY_ID']
 
   option :secret_access_key,
          short:       '-s N',
          long:        '--secret-access-key KEY',
-         description: 'AWS secret access key'
+         description: 'AWS secret access key',
+         default: ENV['AWS_SECRET_ACCESS_KEY']
 
   option :region,
          short:       '-r R',
          long:        '--region REGION',
-         description: 'AWS region'
+         description: 'AWS region',
+         description: 'AWS Region (such as eu-west-1).',
+         default: 'us-east-1'
 
   option :db_instance_id,
          short:       '-i N',
