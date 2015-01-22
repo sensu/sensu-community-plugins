@@ -31,9 +31,9 @@ require 'aws-sdk'
 
 class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :groupname,
-         description: "Name of the AutoScaling group",
-         short: "-g GROUP_NAME",
-         long: "--autoscaling-group GROUP_NAME",
+         description: 'Name of the AutoScaling group',
+         short: '-g GROUP_NAME',
+         long: '--autoscaling-group GROUP_NAME',
          required: true
 
   option :scheme,
@@ -57,27 +57,28 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :aws_region,
          short: '-r AWS_REGION',
          long: '--aws-region REGION',
-         description: "AWS Region (such as eu-west-1).",
+         description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
   
   def aws_config
     hash = {}
-    hash.update aws_access_key_id: config[:aws_access_key], aws_secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
-    hash.update region: config[:aws_region] 
+    hash.update aws_access_key_id: config[:aws_access_key], aws_secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
     hash
   end
 
   def run
-    if config[:scheme] == ""
+    if config[:scheme] == '' 
       graphitepath = "#{config[:groupname]}.autoscaling.instance_count"
     else
       graphitepath = config[:scheme]
     end
     begin
       as = AWS::AutoScaling.new aws_config
-      count = as.groups[config[:groupname]].auto_scaling_instances.map{|i| i.lifecycle_state}.count('InService')
+      count = as.groups[config[:groupname]].auto_scaling_instances.map { |i| i.lifecycle_state }.count('InService')
       output graphitepath, count
-    rescue e
+    rescue => e
       puts "Error: exception: #{e}"
       critical
     end

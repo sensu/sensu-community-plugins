@@ -136,7 +136,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
       end
-    rescue e
+    rescue => e
       critical "Error: exception: #{e}"
     end
     ok
