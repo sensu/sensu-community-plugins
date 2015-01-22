@@ -88,8 +88,9 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
 
   def aws_config
     hash = {}
-    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key] if config[:aws_access_key] && config[:aws_secret_access_key]
-    hash.update region: config[:aws_region] 
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
     hash
   end
 
@@ -121,7 +122,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
       message << " (#{state['OutOfService'].join(', ')})"
     end
     message << "; Unknown: #{state['Unknown'].count}"
-    if state['Unknown'].count > 0 
+    if state['Unknown'].count > 0
       message << " (#{state['Unknown'].join(', ')})"
     end
 

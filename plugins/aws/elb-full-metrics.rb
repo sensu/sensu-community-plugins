@@ -78,7 +78,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
-    hash.update region: config[:aws_region] 
+    hash.update region: config[:aws_region]
     hash
   end
 
@@ -117,9 +117,9 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
       result = {}
       graphitepath = config[:scheme]
 
-      config[:elbname].split(' ').each do |elbname| 
+      config[:elbname].split(' ').each do |elbname|
         statistic_type.each do |key, value|
-          if config[:scheme] == ""
+          if config[:scheme] == ''
             graphitepath = "#{config[:elbname]}.#{key.downcase}"
           end
           options['metric_name'] = key
@@ -136,7 +136,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
       end
-    rescue => e
+    rescue e
       critical "Error: exception: #{e}"
     end
     ok

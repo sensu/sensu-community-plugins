@@ -38,15 +38,14 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
          default: 'sensu.aws.ec2'
 
   option :aws_access_key,
-         :short => '-a AWS_ACCESS_KEY',
-         :long => '--aws-access-key AWS_ACCESS_KEY',
-         :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
 
   option :aws_secret_access_key,
-         :short => '-k AWS_SECRET_ACCESS_KEY',
-         :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-         :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
-
+         short: '-k AWS_SECRET_ACCESS_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
 
   option :aws_region,
          short: '-r AWS_REGION',
@@ -63,19 +62,17 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
-    hash.update region: config[:aws_region] 
+    hash.update region: config[:aws_region]
     hash
   end
 
   def run
     begin
 
-      aws_debug = false
-
       client = AWS::EC2::Client.new aws_config
 
       def by_instances_status(client)
-        if config[:scheme] == 'sensu.aws.ec2' 
+        if config[:scheme] == 'sensu.aws.ec2'
           config[:scheme] += '.count'
         end
 
@@ -96,7 +93,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
 
-        unless data.nil? 
+        unless data.nil?
           # We only return data when we have some to return
           output config[:scheme] + '.total', total
           status.each do |name, count|
@@ -106,7 +103,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
       end
 
       def by_instances_type(client)
-        if config[:scheme] == 'sensu.aws.ec2' 
+        if config[:scheme] == 'sensu.aws.ec2'
           config[:scheme] += '.types'
         end
 
@@ -124,7 +121,7 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
 
-        unless data.nil? 
+        unless data.nil?
           # We only return data when we have some to return
           data.each do |name, count|
             output config[:scheme] + ".#{name}", count

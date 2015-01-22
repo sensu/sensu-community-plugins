@@ -63,22 +63,22 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: 'Latency'
 
   option :statistic,
-         :description => "Statistics type",
-         :short => "-t STATISTIC",
-         :long => "--statistic",
-         :default => ""
+         description: "Statistics type",
+         short: '-t STATISTIC',
+         long: '--statistic',
+         default: ''
 
   option :aws_access_key,
-         :short => '-a AWS_ACCESS_KEY',
-         :long => '--aws-access-key AWS_ACCESS_KEY',
-         :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
-         :default => ENV['AWS_ACCESS_KEY']
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
+         default: ENV['AWS_ACCESS_KEY']
 
   option :aws_secret_access_key,
-         :short => '-k AWS_SECRET_KEY',
-         :long => '--aws-secret-access-key AWS_SECRET_KEY',
-         :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
-         :default => ENV['AWS_SECRET_KEY']
+         short: '-k AWS_SECRET_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
+         default: ENV['AWS_SECRET_KEY']
 
   option :aws_region,
          short: '-r AWS_REGION',
@@ -89,13 +89,13 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
-    hash.update region: config[:aws_region] 
+    hash.update region: config[:aws_region]
     hash
   end
 
   def run
-    statistic = ""
-    if config[:statistic] == ""
+    statistic = ''
+    if config[:statistic] == ''
       default_statistic_per_metric = {
         'Latency' => 'Average',
         'RequestCount' => 'Sum',
@@ -127,17 +127,17 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
             'value' => config[:elbname]
           }
         ],
-         'statistics' => [statistic],
-         'start_time' => st.iso8601,
-         'end_time' => et.iso8601,
-         'period' => 60
+        'statistics' => [statistic],
+        'start_time' => st.iso8601,
+        'end_time' => et.iso8601,
+        'period' => 60
       }
       result = cw.get_metric_statistics(options)
       data = result[:datapoints][0]
       unless data.nil?
         # We only return data when we have some to return
         graphitepath = config[:scheme]
-        if config[:scheme] == ""
+        if config[:scheme] == ''
           graphitepath = "#{config[:elbname]}.#{config[:metric].downcase}"
         end
         output graphitepath, data[statistic.downcase.to_sym], data[:timestamp].to_i

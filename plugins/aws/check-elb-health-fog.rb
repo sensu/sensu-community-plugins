@@ -87,7 +87,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
-    hash.update region: config[:region] 
+    hash.update region: config[:region]
     hash
   end
 
@@ -105,15 +105,15 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       health.body['DescribeInstanceHealthResult']['InstanceStates'].each do |instance|
         unhealthy_instances[instance['InstanceId']] = instance['State'] unless instance['State'].eql?('InService')
       end
-      unless unhealthy_instances.empty?
+      if unhealthy_instances.empty?
+        ok "All instances on ELB #{aws_region}::#{config[:elb_name]} healthy!"
+      else
         if config[:verbose]
           critical "Unhealthy instances detected: #{unhealthy_instances.map{ |id, state| '[' + id + '::' + state + ']' }.join(' ') }"
         else
           critical "Detected [#{unhealthy_instances.size}] unhealthy instances"
         end
-      else
-        ok "All instances on ELB #{aws_region}::#{config[:elb_name]} healthy!"
-    end
+      end
     rescue => e
       warning "An issue occured while communicating with the AWS EC2 API: #{e.message}"
     end

@@ -31,7 +31,6 @@ require 'uri'
 require 'aws-sdk'
 
 class ELBHealth < Sensu::Plugin::Check::CLI
-
   option :aws_access_key,
          short: '-a AWS_ACCESS_KEY',
          long: '--aws-access-key AWS_ACCESS_KEY',
@@ -47,7 +46,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   option :aws_region,
          short: '-r AWS_REGION',
          long: '--aws-region REGION',
-         description: "AWS Region (such as eu-west-1).",
+         description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
 
   option :elb_name,
@@ -70,7 +69,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
-    hash.update region: config[:aws_region] 
+    hash.update region: config[:aws_region]
     hash
   end
 
@@ -89,30 +88,28 @@ class ELBHealth < Sensu::Plugin::Check::CLI
     unhealthy_instances = {}
     if config[:instances]
       instance_health_hash = elb.instances.health(config[:instances])
-      message = ", with #{elb.instances.count} instances "
     else
       instance_health_hash = elb.instances.health
     end
     instance_health_hash.each do |instance_health|
-      if instance_health[:state] != "InService"
+      if instance_health[:state] != 'InService'
         unhealthy_instances[instance_health[:instance].id] = instance_health[:state]
       end
     end
     if unhealthy_instances.empty?
-      "OK"
+      'OK'
     else
       unhealthy_instances
     end
   end
 
   def run
-    results = {}
-    @message = (elbs.size > 1 ? config[:aws_region] + ": " : '') 
+    @message = (elbs.size > 1 ? config[:aws_region] + ': ' : '')
     critical = false
     elbs.each do |elb|
       result = check_health elb
-      if result != "OK"
-        @message += "#{elb.name} unhealthy => #{result.map{|id, state| '[' + id + '::' + state + ']' }.join(' ')}. "
+      if result != 'OK'
+        @message += "#{elb.name} unhealthy => #{result.map { |id, state| '[' + id + '::' + state + ']' }.join(' ')}. "
         critical = true
       else
         @message += "#{elb.name} => healthy. "

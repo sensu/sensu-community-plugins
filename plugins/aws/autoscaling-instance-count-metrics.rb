@@ -77,8 +77,7 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
       as = AWS::AutoScaling.new aws_config
       count = as.groups[config[:groupname]].auto_scaling_instances.map{|i| i.lifecycle_state}.count('InService')
       output graphitepath, count
-
-    rescue: e
+    rescue e
       puts "Error: exception: #{e}"
       critical
     end
