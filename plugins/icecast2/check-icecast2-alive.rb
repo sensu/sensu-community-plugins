@@ -82,8 +82,8 @@ class CheckIcecast2Alive < Sensu::Plugin::Check::CLI
     begin
       resource = RestClient::Resource.new "http://#{host}:#{port}/admin/stats", username, password
       status = Crack::XML.parse(resource.get)
-      { 'status' => 'ok', 'message' => 'Icecast2 server is alive' }
-    rescue Errno::ECONNREFUSED =>e
+      { 'status' => 'ok', 'message' => "#{status['server_id']} server is alive." }
+    rescue Errno::ECONNREFUSED => e
       { 'status' => 'critical', 'message' => e.message }
     rescue => e
       { 'status' => 'unknown', 'message' => e.message }

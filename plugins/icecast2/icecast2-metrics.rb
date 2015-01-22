@@ -84,7 +84,7 @@ class Icecast2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         sources
         stats
       }.each do |stat|
-        output "#{scheme}.active.#{stat}", status["icestats"][stat]
+        output "#{scheme}.active.#{stat}", status['icestats'][stat]
       end
 
       %w{
@@ -97,10 +97,10 @@ class Icecast2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         source_total_connections
         stats_connections
       }.each do |stat|
-        output "#{scheme}.connections.#{stat}", status["icestats"][stat]
+        output "#{scheme}.connections.#{stat}", status['icestats'][stat]
       end
-      status["icestats"]["source"].each do |source|
-        sourceName = source["mount"].gsub(/^\//, '')
+      status['icestats']['source'].each do |source|
+        source_name = source['mount'].gsub(/^\//, '')
         %w{
           bitrate
           listeners
@@ -109,11 +109,11 @@ class Icecast2Metrics < Sensu::Plugin::Metric::CLI::Graphite
           total_bytes_sent
         }.each do |stat|
           if source[stat]
-            output "#{scheme}.sources.#{sourceName}.#{stat}", source[stat]
+            output "#{scheme}.sources.#{source_name}.#{stat}", source[stat]
           else
             # Some of the stats are not available until someone connects for
             # the first time. Return 0.
-            output "#{scheme}.sources.#{sourceName}.#{stat}", 0
+            output "#{scheme}.sources.#{source_name}.#{stat}", 0
           end
         end
       end
