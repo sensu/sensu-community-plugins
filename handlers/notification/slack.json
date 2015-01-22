@@ -1,8 +1,6 @@
 {
   "slack": {
-    "token": "webhook token",
-    "team_name": "your team name",
-    "channel": "#notifications-room, optional defaults to slack defined",
+    "webhook_url": "webhook url",
     "message_prefix": "optional prefix - can be used for mentions",
     "surround": "optional - can be used for bold(*), italics(_), code(`) and preformatted(```)",
     "bot_name": "optional bot name, defaults to slack defined"

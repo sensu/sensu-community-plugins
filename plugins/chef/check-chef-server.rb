@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check for chef-server health using chef-server-ctl
-# ===
+#   check-chef-server
 #
 # DESCRIPTION:
 #   This plugin uses Chef Servers's `chef-server-ctl` to check to see if
@@ -9,19 +8,26 @@
 #   to be run with elevated privileges (sudo) or it will fail with unknown
 #   state.
 #
-# DEPENDENCIES:
-#   sensu-plugin Ruby gem
-#   Chef server
-#
 # OUTPUT:
-#   Plain-text.
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   Chef Server
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
 #   Returns CRITICAL if any of the chef-server processes are in a 'fail' or 'down' state
 #
-# AUTHORS:
-#   Tim Smith tim@cozy.co
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# LICENSE:
+#   Tim Smith  tim@cozy.co
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -31,7 +37,7 @@ class CheckChefServer < Sensu::Plugin::Check::CLI
   def run
     # chef-server-ctl must be run with elevated privs. fail if we're not uid 0
     if Process.uid != 0
-      unknown('chef-chef-server must be run with elevated privileges so that chef-server-ctl can be executed')
+      unknown('check-chef-server must be run with elevated privileges so that chef-server-ctl can be executed')
     else
       status = `/usr/bin/chef-server-ctl status`
       failed_processes = []
@@ -41,7 +47,7 @@ class CheckChefServer < Sensu::Plugin::Check::CLI
         end
       end
       if failed_processes.count > 0
-        critical("chef-server service(s): #{failed_processes.join(', ')} #{failed_processes.count == 1 ? "is" : "are"} failed, down, or in warning state")
+        critical("chef-server service(s): #{failed_processes.join(', ')} #{failed_processes.count == 1 ? 'is' : 'are'} failed, down, or in warning state")
       else
         ok
       end

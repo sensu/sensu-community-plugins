@@ -7,7 +7,7 @@
 #
 # Requires SNMP gem
 #
-# Examples:
+# USAGE:
 #
 #   snmp-bulk-metrics -h host -C community -O oid1,oid2... -s suffix
 #
@@ -22,79 +22,74 @@ require 'sensu-plugin/metric/cli'
 require 'snmp'
 
 class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :short => '-h host',
-    :boolean =>true,
-    :default => "127.0.0.1",
-    :required => true
+         short: '-h host',
+         boolean: true,
+         default: '127.0.0.1',
+         required: true
 
   option :community,
-    :short => '-C snmp community',
-    :boolean =>true,
-    :default => "public"
+         short: '-C snmp community',
+         boolean: true,
+         default: 'public'
 
   option :objectid,
-    :short => '-O OID[,OID,OID...]',
-    :description => 'comma separated list of OIDs to bulkwalk',
-    :required => true
+         short: '-O OID[,OID,OID...]',
+         description: 'comma separated list of OIDs to bulkwalk',
+         required: true
 
   option :prefix,
-    :short => '-p prefix',
-    :description => 'prefix to attach to graphite path'
+         short: '-p prefix',
+         description: 'prefix to attach to graphite path'
 
   option :suffix,
-    :short => '-s suffix',
-    :description => 'suffix to attach to graphite path',
-    :required => true
+         short: '-s suffix',
+         description: 'suffix to attach to graphite path',
+         required: true
 
   option :snmp_version,
-    :short => '-v version',
-    :description => 'SNMP version to use (SNMPv1, SNMPv2c (default))',
-    :default => 'SNMPv2c'
+         short: '-v version',
+         description: 'SNMP version to use (SNMPv1, SNMPv2c (default))',
+         default: 'SNMPv2c'
 
   option :graphite,
-    :short => '-g',
-    :description => 'Replace dots with underscores in hostname',
-    :boolean => true
+         short: '-g',
+         description: 'Replace dots with underscores in hostname',
+         boolean: true
 
   option :maxrepeat,
-    :short => '-m maxrepeat',
-    :description => 'Number of iterations to perform on repeating variables (defaults to 10)',
-    :default => 10
+         short: '-m maxrepeat',
+         description: 'Number of iterations to perform on repeating variables (defaults to 10)',
+         default: 10
 
   option :nonrepeat,
-    :short => '-n non-repeaters',
-    :description => 'Number of supplied OIDs that should not be iterated over (defaults to 0)',
-    :default => 0
+         short: '-n non-repeaters',
+         description: 'Number of supplied OIDs that should not be iterated over (defaults to 0)',
+         default: 0
 
   option :timeout,
-    :short => '-t timeout (seconds) (defaults to 5)',
-    :default => 5
+         short: '-t timeout (seconds) (defaults to 5)',
+         default: 5
 
   def run
     oids = config[:objectid].split(',')
     begin
-      manager = SNMP::Manager.new(:host => "#{config[:host]}",
-                                  :community => "#{config[:community]}",
-                                  :version => config[:snmp_version].to_sym,
-                                  :timeout => config[:timeout].to_i)
+      manager = SNMP::Manager.new(host: "#{config[:host]}",
+                                  community: "#{config[:community]}",
+                                  version: config[:snmp_version].to_sym,
+                                  timeout: config[:timeout].to_i)
       response = manager.get_bulk(config[:nonrepeat].to_i,
                                   config[:maxrepeat].to_i,
                                   oids)
     rescue SNMP::RequestTimeout
       unknown "#{config[:host]} not responding"
-    rescue Exception => e
+    rescue => e
       unknown "An unknown error occured: #{e.inspect}"
     end
-    if config[:graphite]
-      config[:host] = config[:host].gsub('.', '_')
-    end
+    config[:host] = config[:host].gsub('.', '_') if config[:graphite]
     response.each_varbind do |vb|
       name = vb.oid
-      if config[:graphite]
-        name = "#{name}".gsub('.', '_')
-      end
+      name = "#{name}".gsub('.', '_') if config[:graphite]
       if config[:prefix]
         output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}.#{name}", vb.value.to_f
       else

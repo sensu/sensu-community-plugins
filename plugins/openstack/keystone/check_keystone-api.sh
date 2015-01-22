@@ -21,6 +21,8 @@
 #
 # Requirement: curl
 #
+
+# #RED
 set -e
 
 STATE_OK=0

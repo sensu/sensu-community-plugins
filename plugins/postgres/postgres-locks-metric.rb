@@ -20,39 +20,38 @@ require 'pg'
 require 'socket'
 
 class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :user,
-         :description => "Postgres User",
-         :short       => '-u USER',
-         :long        => '--user USER'
+         description: 'Postgres User',
+         short: '-u USER',
+         long: '--user USER'
 
   option :password,
-         :description => "Postgres Password",
-         :short       => '-p PASS',
-         :long        => '--password PASS'
+         description: 'Postgres Password',
+         short: '-p PASS',
+         long: '--password PASS'
 
   option :hostname,
-         :description => "Hostname to login to",
-         :short       => '-h HOST',
-         :long        => '--hostname HOST',
-         :default     => 'localhost'
+         description: 'Hostname to login to',
+         short: '-h HOST',
+         long: '--hostname HOST',
+         default: 'localhost'
 
   option :port,
-         :description => "Database port",
-         :short       => '-P PORT',
-         :long        => '--port PORT',
-         :default     => 5432
+         description: 'Database port',
+         short: '-P PORT',
+         long: '--port PORT',
+         default: 5432
 
   option :db,
-         :description => "Database name",
-         :short       => '-d DB',
-         :long        => '--db DB',
-         :default     => 'postgres'
+         description: 'Database name',
+         short: '-d DB',
+         long: '--db DB',
+         default: 'postgres'
 
   option :scheme,
-         :description => "Metric naming scheme, text to prepend to $queue_name.$metric",
-         :long        => "--scheme SCHEME",
-         :default     => "#{Socket.gethostname}.postgresql"
+         description: 'Metric naming scheme, text to prepend to $queue_name.$metric',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.postgresql"
 
   def run
     timestamp = Time.now.to_i
@@ -61,9 +60,9 @@ class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     con     = PG::Connection.new(config[:hostname], config[:port], nil, nil, 'postgres', config[:user], config[:password])
     request = [
-        "SELECT mode, count(mode) FROM pg_locks",
-        "where database = (select oid from pg_database where datname = '#{config[:db]}')",
-        "group by mode"
+      'SELECT mode, count(mode) FROM pg_locks',
+      "where database = (select oid from pg_database where datname = '#{config[:db]}')",
+      'group by mode'
     ]
 
     con.exec(request.join(' ')) do |result|
@@ -78,7 +77,5 @@ class PostgresStatsDBMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     ok
-
   end
-
 end

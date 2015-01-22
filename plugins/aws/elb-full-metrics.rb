@@ -1,30 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Fetch ELB metrics from CloudWatch
-# ===
+# elb-full-metrics
 #
-# Needs aws-sdk gem
-#
-# DESCRIPTION
+# DESCRIPTION:
 #   Gets latency metrics from CloudWatch and puts them in Graphite for longer term storage
 #
-#   By default fetches statistic from one minute ago.  You may need to fetch further back than this;
+# OUTPUT:
+#   metric-data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: fog
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#   Returns latency statistics by default.  You can specify any valid ELB metric type, see
+#   http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#elb-metricscollected
+#
+#   By default fetches statistics from one minute ago.  You may need to fetch further back than this;
 #   high traffic ELBs can sometimes experience statistic delays of up to 10 minutes.  If you experience this,
 #   raising a ticket with AWS support should get the problem resolved.
 #   As a workaround you can use eg -f 300 to fetch data from 5 minutes ago.
-#
-# OUTPUT:
-#   plain-text
-#
-# PLATFORMS:
-#   all
-#
-# DEPENDENCIES:
-#   aws-sdk
-#
-# EXAMPLES:
-#
-# NOTES:
 #
 # LICENSE:
 #   Copyright 2013 Bashton Ltd http://www.bashton.com/
@@ -37,45 +38,45 @@ require 'sensu-plugin/metric/cli'
 require 'aws-sdk'
 
 class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :elbname,
-    :description => "Name of the Elastic Load Balancer",
-    :short => "-n ELB_NAME",
-    :long => "--name ELB_NAME"
+         description: 'Name of the Elastic Load Balancer',
+         short: '-n ELB_NAME',
+         long: '--name ELB_NAME'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => ""
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: ''
 
   option :fetch_age,
-    :description => "How long ago to fetch metrics for",
-    :short => "-f AGE",
-    :long => "--fetch_age",
-    :default => 60,
-    :proc => proc { |a| a.to_i }
+         description: 'How long ago to fetch metrics for',
+         short: '-f AGE',
+         long: '--fetch_age',
+         default: 60,
+         proc: proc(&:to_i)
 
   option :aws_access_key,
-    :short => '-a AWS_ACCESS_KEY',
-    :long => '--aws-access-key AWS_ACCESS_KEY',
-    :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
-    :required => true,
-    :default => ENV['AWS_ACCESS_KEY']
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
+         required: true,
+         default: ENV['AWS_ACCESS_KEY']
 
   option :aws_secret_access_key,
-    :short => '-k AWS_SECRET_KEY',
-    :long => '--aws-secret-access-key AWS_SECRET_KEY',
-    :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
-    :required => true,
-    :default => ENV['AWS_SECRET_KEY']
+         short: '-k AWS_SECRET_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
+         required: true,
+         default: ENV['AWS_SECRET_KEY']
 
   option :aws_region,
-    :short => '-r AWS_REGION',
-    :long => '--aws-region REGION',
-    :description => "AWS Region (such as eu-west-1).",
-    :default => 'us-east-1'
+         short: '-r AWS_REGION',
+         long: '--aws-region REGION',
+         description: 'AWS Region (such as eu-west-1).',
+         default: 'us-east-1'
 
+<<<<<<< HEAD
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
@@ -93,7 +94,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
       'HTTPCode_Backend_4XX' => 'Sum',
       'HTTPCode_Backend_5XX' => 'Sum',
       'HTTPCode_ELB_4XX' => 'Sum',
-      'HTTPCode_ELB_5XX' => 'Sum',
+      'HTTPCode_ELB_5XX' => 'Sum'
     }
 
     begin
@@ -118,7 +119,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
       result = {}
       graphitepath = config[:scheme]
 
-      config[:elbname].split(' ').each do |elbname|
+      config[:elbname].split(' ').each do |elbname| 
         statistic_type.each do |key, value|
           if config[:scheme] == ""
             graphitepath = "#{config[:elbname]}.#{key.downcase}"
@@ -137,10 +138,9 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
         end
       end
-    rescue Exception => e
+    rescue => e
       critical "Error: exception: #{e}"
     end
     ok
   end
-
 end

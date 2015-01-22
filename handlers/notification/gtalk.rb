@@ -27,13 +27,12 @@ include Jabber
 
 # Sensu handler for Google Talk
 class GTALK < Sensu::Handler
-
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def action_to_string
-    @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
+    @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
   def handle
@@ -44,18 +43,18 @@ class GTALK < Sensu::Handler
 
     begin
       timeout 10 do
-        puts "gtalk -- Connecting to jabber server with user #{settings["gtalk"]["mail"]}"
-        jabber = Jabber::Simple.new(settings["gtalk"]["mail"], settings["gtalk"]["password"])
-        puts "gtalk -- Connected"
-        settings["gtalk"]["recipients"].each do |rcp|
+        puts "gtalk -- Connecting to jabber server with user #{settings['gtalk']['mail']}"
+        jabber = Jabber::Simple.new(settings['gtalk']['mail'], settings['gtalk']['password'])
+        puts 'gtalk -- Connected'
+        settings['gtalk']['recipients'].each do |rcp|
           puts "gtalk -- Sending alert to #{rcp}"
           jabber.deliver(rcp, "#{body}")
         end
         sleep(5)
-        puts "gtalk -- Alert successfully sent to recipients"
+        puts 'gtalk -- Alert successfully sent to recipients'
       end
     rescue Timeout::Error
-      puts "gtalk -- timed out while attempting to sent message"
+      puts 'gtalk -- timed out while attempting to sent message'
     end
   end
 end

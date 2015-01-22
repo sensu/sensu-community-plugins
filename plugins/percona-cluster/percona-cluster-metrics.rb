@@ -21,41 +21,40 @@ require 'mysql2'
 require 'socket'
 
 class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "Mysql Host to connect to",
-    :required => true
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Mysql Host to connect to',
+         required: true
 
   option :port,
-    :short => "-P PORT",
-    :long => "--port PORT",
-    :description => "Mysql Port to connect to",
-    :proc => proc {|p| p.to_i },
-    :default => 3306
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'Mysql Port to connect to',
+         proc: proc(&:to_i),
+         default: 3306
 
   option :username,
-    :short => "-u USERNAME",
-    :long => "--user USERNAME",
-    :description => "Mysql Username",
-    :required => true
+         short: '-u USERNAME',
+         long: '--user USERNAME',
+         description: 'Mysql Username',
+         required: true
 
   option :password,
-    :short => "-p PASSWORD",
-    :long => "--pass PASSWORD",
-    :description => "Mysql password",
-    :default => ""
+         short: '-p PASSWORD',
+         long: '--pass PASSWORD',
+         description: 'Mysql password',
+         default: ''
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.percona"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.percona"
 
   def fix_and_output_evs_repl_latency_data(row)
     # see https://github.com/codership/galera/issues/67 for documentation on field mappings
-    data = row["Value"].split("/")
+    data = row['Value'].split('/')
     output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_min", data[0]
     output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_avg", data[1]
     output "#{config[:scheme]}.mysql.wsrep_evs_repl_latency_max", data[2]
@@ -64,7 +63,6 @@ class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-
     metrics = {
       'cluster' => {
         'wsrep_last_committed' => 'last_committed',
@@ -96,16 +94,16 @@ class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'wsrep_cluster_conf_id' => 'cluster_conf_id',
         'wsrep_cluster_size' => 'cluster_size',
         'wsrep_local_index' => 'local_index',
-        'wsrep_evs_repl_latency' => 'evs_repl_latency',
+        'wsrep_evs_repl_latency' => 'evs_repl_latency'
       }
     }
 
     begin
       mysql = Mysql2::Client.new(
-        :host => config[:host],
-        :port =>config[:port],
-        :username => config[:username],
-        :password => config[:password]
+        host: config[:host],
+        port: config[:port],
+        username: config[:username],
+        password: config[:password]
         )
 
       results = mysql.query("SHOW GLOBAL STATUS LIKE 'wsrep_%'")
@@ -115,16 +113,14 @@ class PerconaCluster2Graphite < Sensu::Plugin::Metric::CLI::Graphite
 
     results.each do |row|
       # special handling for wsrep_evs_repl_latency as this contains forward slash delimited data
-      fix_and_output_evs_repl_latency_data(row) if row["Variable_name"] == "wsrep_evs_repl_latency"
+      fix_and_output_evs_repl_latency_data(row) if row['Variable_name'] == 'wsrep_evs_repl_latency'
       metrics.each do |category, var_mapping|
-        if var_mapping.has_key?(row["Variable_name"])
-          output "#{config[:scheme]}.mysql.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
+        if var_mapping.key?(row['Variable_name'])
+          output "#{config[:scheme]}.mysql.#{category}.#{var_mapping[row['Variable_name']]}", row['Value']
         end
       end
     end
 
     ok
-
   end
-
 end

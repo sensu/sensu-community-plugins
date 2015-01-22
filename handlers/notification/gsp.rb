@@ -48,43 +48,41 @@ class GAS < Sensu::Handler
   end
 
   COLUMNS = {
-    :timestamp => "timestamp",
-    :action => "action",
-    :name => "event_name",
-    :client => "client",
-    :check_name => "check_name",
-    :status => "check_status",
-    :output => "check_output",
-    :address => "client_address",
-    :command => "check_command",
-    :occurrences => "occurrences",
-    :flapping => "check_flapping"
+    timestamp: 'timestamp',
+    action: 'action',
+    name: 'event_name',
+    client: 'client',
+    check_name: 'check_name',
+    status: 'check_status',
+    output: 'check_output',
+    address: 'client_address',
+    command: 'check_command',
+    occurrences: 'occurrences',
+    flapping: 'check_flapping'
   }
 
   def handle
-    begin
-      timeout(5) do
-        session = GoogleDrive.login(username, apppassword)
-        ws = session.spreadsheet_by_key(sheet).worksheets[0]
-        ws.update_cells(1, 1, [COLUMNS.values])
-        ws.save
-        ws.list.push(
-          COLUMNS[:timestamp] => timestamp,
-          COLUMNS[:action] => action_to_string,
-          COLUMNS[:name] => event_name,
-          COLUMNS[:client] => @event['client']['name'],
-          COLUMNS[:check_name] => @event['check']['name'],
-          COLUMNS[:status] => @event['check']['status'],
-          COLUMNS[:output] => @event['check']['status'],
-          COLUMNS[:address] => @event['client']['address'],
-          COLUMNS[:command] => @event['check']['command'],
-          COLUMNS[:occurrences] => @event['occurrences'],
-          COLUMNS[:flapping] => @event['check']['flapping']
-        )
-        ws.save
-      end
-    rescue Timeout::Error
-      puts "Google SpreadSheet -- Timed out while attempting to send #{@event['action']} incident -- #{incident_key}"
+    timeout(5) do
+      session = GoogleDrive.login(username, apppassword)
+      ws = session.spreadsheet_by_key(sheet).worksheets[0]
+      ws.update_cells(1, 1, [COLUMNS.values])
+      ws.save
+      ws.list.push(
+        COLUMNS[:timestamp] => timestamp,
+        COLUMNS[:action] => action_to_string,
+        COLUMNS[:name] => event_name,
+        COLUMNS[:client] => @event['client']['name'],
+        COLUMNS[:check_name] => @event['check']['name'],
+        COLUMNS[:status] => @event['check']['status'],
+        COLUMNS[:output] => @event['check']['status'],
+        COLUMNS[:address] => @event['client']['address'],
+        COLUMNS[:command] => @event['check']['command'],
+        COLUMNS[:occurrences] => @event['occurrences'],
+        COLUMNS[:flapping] => @event['check']['flapping']
+      )
+      ws.save
     end
+  rescue Timeout::Error
+    puts "Google SpreadSheet -- Timed out while attempting to send #{@event['action']} incident -- #{incident_key}"
   end
 end

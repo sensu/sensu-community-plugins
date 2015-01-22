@@ -1,23 +1,22 @@
 #! /usr/bin/env ruby
 #
-# Check DynamoDB
-#
+# check-dynamodb-capacity
 #
 # DESCRIPTION:
-# Check DynamoDB statuses by CloudWatch and DynamoDB API.
+#   Check DynamoDB statuses by CloudWatch and DynamoDB API.
 #
 # OUTPUT:
 #   plain-text
 #
 # PLATFORMS:
-#   all
+#   Linux
 #
 # DEPENDENCIES:
 #   gem: aws-sdk
 #   gem: time
 #   gem: sensu-plugin
 #
-# EXAMPLES:
+# USAGE:
 #   Warning if any table's consumed read/write capacity is over 80%, critical if over 90%
 #   check-dynamodb-capacity --warning-over 80 --critical-over 90
 #
@@ -27,11 +26,12 @@
 # NOTES:
 #
 # LICENSE:
-# Copyright 2014 github.com/y13i
+#   Copyright 2014 github.com/y13i
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
 
+require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'aws-sdk'
 require 'time'
@@ -70,7 +70,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
          long:        '--period SECONDS',
          default:     60,
          # #YELLOW
-         proc:        proc { |a| a.to_i },
+         proc:        proc(&:to_i),
          description: 'CloudWatch metric statistics period'
 
   option :statistics,
@@ -91,7 +91,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
     option :"#{severity}_over",
            long:        "--#{severity}-over N",
            # #YELLOW
-           proc:        proc { |a| a.to_f },
+           proc:        proc(&:to_f),
            description: "Trigger a #{severity} if consumed capacity is over a percentage"
   end
 
@@ -126,7 +126,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
       start_time: config[:end_time] - config[:period],
       end_time:   config[:end_time],
       statistics: [config[:statistics].to_s.capitalize],
-      period:     config[:period],
+      period:     config[:period]
     }
   end
 
@@ -164,7 +164,7 @@ class CheckDynamoDB < Sensu::Plugin::Check::CLI
     @message    = "#{tables.size} tables total"
     @severities = {
       critical: false,
-      warning:  false,
+      warning:  false
     }
 
     tables.each { |table| check_capacity table }

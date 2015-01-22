@@ -30,7 +30,7 @@ require 'json'
 require 'timeout'
 
 class OpenTSDB < Sensu::Handler
-# override filters from Sensu::Handler. not appropriate for metric handlers
+  # override filters from Sensu::Handler. not appropriate for metric handlers
   def filter; end
 
   def handle
@@ -43,7 +43,7 @@ class OpenTSDB < Sensu::Handler
 
     begin
       metrics.split("\n").each do |output_line|
-        mutated_output = ""
+        mutated_output = ''
         (metric_name, metric_value, epoch_time) = output_line.split("\t")
         tokens = metric_name.split('.')
         host_name = tokens[0..host_name_len].join('.')
@@ -60,7 +60,7 @@ class OpenTSDB < Sensu::Handler
     end
 
     rescue Timeout::Error
-      puts "opentsdb -- timed out while sending metrics"
+      puts 'opentsdb -- timed out while sending metrics'
     rescue => error
       puts "opentsdb -- failed to send metrics : #{error}"
   end

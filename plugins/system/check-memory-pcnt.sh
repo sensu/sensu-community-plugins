@@ -2,15 +2,21 @@
 #
 # Evaluate free system memory from Linux based systems based on percentage
 # This was forked from Sensu Community Plugins
+#
+# Requires: bc
+#
 # Date: 2007-11-12
 # Author: Thomas Borger - ESG
 # Date: 2012-04-02
 # Modified: Norman Harman - norman.harman@mutualmobile.com
 # Date: 2013-9-30
 # Modified: Mario Harvey - Zumetrics
+# Date: 2015-01-10
+# Modified Ollie Armstrong <ollie@armstrong.io>
 
 # get arguments
 
+# #RED
 while getopts 'w:c:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;

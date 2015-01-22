@@ -1,17 +1,31 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   <script name>
 #
-# System Temperature Plugin
-# ===
+# DESCRIPTION:
+#   This plugin uses sensors to collect basic system metrics, produces
+#   Graphite formated output.
+
 #
-# This plugin uses sensors to collect basic system metrics, produces
-# Graphite formated output.
+# OUTPUT:
+#   metric data
 #
-# Copyright 2012 Wantudu SL <dsuarez@wantudu.com>
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#   lm-sensors
 #
-# Requires lm-sensors
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Wantudu SL <dsuarez@wantudu.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -19,11 +33,10 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class Sensors < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to .$parent.$child",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.sensors"
+         description: 'Metric naming scheme, text to prepend to .$parent.$child',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.sensors"
 
   def run
     raw = `sensors`
@@ -35,9 +48,9 @@ class Sensors < Sensu::Plugin::Metric::CLI::Graphite
     sections.each do |section|
       section.split("\n").drop(1).each do |line|
         begin
-          key, value = line.split(":")
+          key, value = line.split(':')
           key = key.downcase.gsub(/\s/, '')
-          if key[0 ..3] == "temp" || key[0 .. 3] == "core"
+          if key[0..3] == 'temp' || key[0..3] == 'core'
             value.strip =~ /[\+\-]?(\d+(\.\d)?)/
             value = $1 # rubocop:disable PerlBackrefs
             metrics[key] = value
@@ -51,10 +64,9 @@ class Sensors < Sensu::Plugin::Metric::CLI::Graphite
     timestamp = Time.now.to_i
 
     metrics.each do |key, value|
-        output [config[:scheme], key].join("."), value, timestamp
+      output [config[:scheme], key].join('.'), value, timestamp
     end
 
     ok
   end
-
 end
