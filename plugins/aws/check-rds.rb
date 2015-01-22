@@ -144,7 +144,10 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def latest_value(metric, unit)
-    metric.statistics(statistics_options.merge unit: unit).datapoints.sort_by { |datapoint| datapoint[:timestamp] }.last[config[:statistics]]
+    values = metric.statistics(statistics_options.merge unit: unit).datapoints.sort_by { |datapoint| datapoint[:timestamp] }
+
+    # handle time periods that are too small to return usable values
+    values.empty? ? unknown('Requested time period did not return values from Cloudwatch. Try increasing your time period.') : values.last[config[:statistics]]
   end
 
   def flag_alert(severity, message)
