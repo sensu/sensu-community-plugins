@@ -171,7 +171,10 @@ class CheckRDS < Sensu::Plugin::Check::CLI
       'db.cr1.8xlarge' => 244.0,
       'db.m1.medium'   => 3.75,
       'db.m1.large'    => 7.5,
-      'db.m1.xlarge'   => 15.0
+      'db.m1.xlarge'   => 15.0,
+      'db.t2.micro' => 1,
+      'db.t2.small' => 2,
+      'db.t2.medium' => 4
     }
 
     memory_total_gigabytes.fetch(instance_class) * 1024**3
