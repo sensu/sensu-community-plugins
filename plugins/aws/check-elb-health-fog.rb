@@ -118,3 +118,4 @@ class ELBHealth < Sensu::Plugin::Check::CLI
       warning "An issue occured while communicating with the AWS EC2 API: #{e.message}"
     end
   end
+end

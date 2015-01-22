@@ -37,54 +37,54 @@ require 'aws-sdk'
 
 class CheckELBNodes < Sensu::Plugin::Check::CLI
   option :aws_access_key,
-         :short => '-a AWS_ACCESS_KEY',
-         :long => '--aws-access-key AWS_ACCESS_KEY',
-         :description => "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
 
   option :aws_secret_access_key,
-         :short => '-s AWS_SECRET_ACCESS_KEY',
-         :long => '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-         :description => "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
+         short: '-s AWS_SECRET_ACCESS_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
 
   option :aws_region,
-         :short => '-r AWS_REGION',
-         :long => '--aws-region REGION',
-         :description => "AWS Region (such as eu-west-1).",
-         :default => 'us-east-1'
+         short: '-r AWS_REGION',
+         long: '--aws-region REGION',
+         description: "AWS Region (such as eu-west-1).",
+         default: 'us-east-1'
 
   option :load_balancer,
-         :short => '-n ELB_NAME',
-         :long => '--name ELB_NAME',
-         :description => 'The name of the ELB',
-         :required => true
+         short: '-n ELB_NAME',
+         long: '--name ELB_NAME',
+         description: 'The name of the ELB',
+         required: true
 
   option :warn_under,
-         :short  => '-w WARN_NUM',
-         :long  => '--warn WARN_NUM',
-         :description => 'Minimum number of nodes InService on the ELB to be considered a warning',
-         :default => -1,
-         :proc => proc { |a| a.to_i }
+         short: '-w WARN_NUM',
+         long: '--warn WARN_NUM',
+         description: 'Minimum number of nodes InService on the ELB to be considered a warning',
+         default: -1,
+         proc: proc { |a| a.to_i }
 
   option :crit_under,
-         :short  => '-c CRIT_NUM',
-         :long  => '--crit CRIT_NUM',
-         :description => 'Minimum number of nodes InService on the ELB to be considered critical',
-         :default => -1,
-         :proc => proc { |a| a.to_i }
+         short: '-c CRIT_NUM',
+         long: '--crit CRIT_NUM',
+         description: 'Minimum number of nodes InService on the ELB to be considered critical',
+         default: -1,
+         proc: proc { |a| a.to_i }
 
   option :warn_percent,
-         :short => '-W WARN_PERCENT',
-         :long => '--warn_perc WARN_PERCENT',
-         :description => 'Warn when the percentage of InService nodes is at or below this number',
-         :default => -1,
-         :proc => proc { |a| a.to_i }
+         short: '-W WARN_PERCENT',
+         long: '--warn_perc WARN_PERCENT',
+         description: 'Warn when the percentage of InService nodes is at or below this number',
+         default: -1,
+         proc: proc { |a| a.to_i }
 
   option :crit_percent,
-         :short => '-C CRIT_PERCENT',
-         :long => '--crit_perc CRIT_PERCENT',
-         :description => 'Minimum percentage of nodes needed to be InService',
-         :default => -1,
-         :proc => proc { |a| a.to_i }
+         short: '-C CRIT_PERCENT',
+         long: '--crit_perc CRIT_PERCENT',
+         description: 'Minimum percentage of nodes needed to be InService',
+         default: -1,
+         proc: proc { |a| a.to_i }
 
   def aws_config
     hash = {}
