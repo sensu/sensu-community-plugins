@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-#
-# check-selinux.rb
+# encoding UTF-8
+#   check-selinux.rb
 #
 # DESCRIPTION:
 #   By default, checks to see if selinux is enforcing.
@@ -9,9 +9,14 @@
 # DEPENDENCIES:
 #   gem: sensu-plugin
 #
+# PLATFORMS:
+#   Linux
+#
 # USAGE:
 #   /usr/bin/ruby plugins/security/check-selinux.rb
 #   /usr/bin/ruby plugins/security/check-selinux.rb -d
+#
+# NOTES:
 #
 # LICENSE:
 #   Jacob Royal j.w.r.1215@gmail.com
@@ -23,10 +28,10 @@ require 'sensu-plugin/check/cli'
 
 class SELinuxCheck < Sensu::Plugin::Check::CLI
   option :disabled,
-          short: '-d',
-          long: '--disabled',
-          description: 'check that SELinux is disabled',
-	  required: false
+         short: '-d',
+         long: '--disabled',
+         description: 'check that SELinux is disabled',
+         required: false
 
   def enforcing?(check)
     if check.downcase == 'enforcing'
