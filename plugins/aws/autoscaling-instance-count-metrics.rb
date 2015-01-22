@@ -12,11 +12,10 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: fog
+#   gem: aws-sdk
 #   gem: sensu-plugin
 #
 # USAGE:
-#   #YELLOW
 #
 # NOTES:
 #
@@ -28,7 +27,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
-require 'fog'
+require 'aws-sdk'
 
 class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :groupname,
@@ -69,17 +68,14 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    puts aws_config
     if config[:scheme] == ""
       graphitepath = "#{config[:groupname]}.autoscaling.instance_count"
     else
       graphitepath = config[:scheme]
     end
     begin
-      #Fog is used here to get access to the get method for autoscaling groups. Consider replacing with native
-      #AWS::Autoscaling calls in the future
-      as = Fog::AWS::AutoScaling.new aws_config
-      count = as.groups.get(config[:groupname]).instances.map{|i| i.life_cycle_state}.count('InService')
+      as = AWS::AutoScaling.new aws_config
+      count = as.groups[config[:groupname]].auto_scaling_instances.map{|i| i.lifecycle_state}.count('InService')
       output graphitepath, count
 
     rescue => e

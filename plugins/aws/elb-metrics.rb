@@ -12,7 +12,6 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: fog
 #   gem: sensu-plugin
 #
 # USAGE:

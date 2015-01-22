@@ -12,7 +12,6 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: fog
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -76,7 +75,6 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
 
-<<<<<<< HEAD
   def aws_config
     hash = {}
     hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]

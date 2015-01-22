@@ -15,7 +15,6 @@
 #
 # DEPENDENCIES:
 #   sensu-plugin Ruby gem
-#   fog Ruby gem
 #
 # Copyright (c) 2014, Panagiotis Papadomitsos <pj@ezgr.net>
 #
