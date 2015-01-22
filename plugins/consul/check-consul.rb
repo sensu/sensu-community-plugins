@@ -73,9 +73,9 @@ class ConsulStatus < Sensu::Plugin::Check::CLI
     r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/v1/status/leader", timeout: 5).get
     if r.code == 200
       if valid_ip(strip_ip(r.body))
-        ok 'Consul node has a leader'
+        ok 'Consul is UP and has a leader'
       else
-        critical 'Consul node does not have a leader.'
+        critical 'Consul is UP, but it has NO leader'
       end
     else
       critical 'Consul is not responding'
