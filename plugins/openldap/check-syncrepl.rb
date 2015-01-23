@@ -74,6 +74,11 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
          long: '--password PASSWORD',
          description: 'Password used to bind'
 
+  option :insecure,
+         short: '-i',
+         long: '--insecure',
+         description: 'Do not use encryption'
+
   option :retries,
          short: '-r RETRIES',
          long: '--retries RETRIES',
@@ -85,9 +90,6 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
     if config[:user]
       ldap = Net::LDAP.new host: host,
                            port: config[:port],
-                           encryption: {
-                             method: :simple_tls
-                           },
                            auth: {
                              method: :simple,
                              username: config[:user],
@@ -96,6 +98,10 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
     else
       ldap = Net::LDAP.new host: host,
                            port: config[:port]
+    end
+
+    unless config[:insecure]
+      ldap.encryption(method: :simple_tls)
     end
 
     begin
