@@ -38,7 +38,8 @@ class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :mode,
          description: 'master or slave',
          short: '-m MODE',
-         long: '--mode MODE'
+         long: '--mode MODE',
+         required: true
 
   option :scheme,
          description: 'Metric naming scheme',

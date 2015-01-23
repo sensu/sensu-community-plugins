@@ -40,7 +40,8 @@ class MesosNodeStatus < Sensu::Plugin::Check::CLI
   option :mode,
          description: 'master or slave',
          short: '-m MODE',
-         long: '--mode MODE'
+         long: '--mode MODE',
+         required: true
 
   def run
     case config[:mode]
