@@ -43,7 +43,8 @@ if [ "$hlp" = "yes" ]; then
 fi
 
 if [ ${PROCESS} ]; then
-  ret=`ps aux | grep "${PROCESS}" | grep -v grep | grep -v $0`
+  scriptname=`basename $0`
+  ret=`ps aux | grep "${PROCESS}" | grep -v grep | grep -v $scriptname`
   if [ ! "${ret}" ]; then
     echo "CRITICAL - process ${PROCESS} does not exist"
     exit 2
