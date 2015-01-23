@@ -45,7 +45,7 @@ class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Metric naming scheme',
          short: '-s SCHEME',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}.mesos-#{config[:mode]}"
+         default: "#{Socket.gethostname}"
 
   option :server,
          description: 'Mesos Host',
@@ -62,10 +62,11 @@ class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
       port = '5051'
       uri = '/slave(1)/stats.json'
     end
+    scheme = "#{config[:scheme]}.mesos-#{config[:mode]}"
     r = RestClient::Resource.new("http://#{config[:server]}:#{port}#{uri}", timeout: 5).get
     JSON.parse(r).each do |k, v|
       k_copy = k.tr('/', '.')
-      output([config[:scheme], k_copy].join('.'), v)
+      output([scheme, k_copy].join('.'), v)
     end
     ok
   end
