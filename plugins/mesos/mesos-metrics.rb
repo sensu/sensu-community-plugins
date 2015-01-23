@@ -1,9 +1,9 @@
 #! /usr/bin/env ruby
 #
-#   mesos-master-metrics
+#   mesos-metrics
 #
 # DESCRIPTION:
-#   This plugin extracts the stats from a mesos master
+#   This plugin extracts the stats from a mesos master or slave
 #
 # OUTPUT:
 #    metric data
@@ -34,21 +34,34 @@ require 'rest-client'
 require 'socket'
 require 'json'
 
-class MesosMasterMetrics < Sensu::Plugin::Metric::CLI::Graphite
+class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
+  option :mode,
+         description: 'master or slave',
+         short: '-m MODE',
+         long: '--mode MODE'
+
   option :scheme,
          description: 'Metric naming scheme',
          short: '-s SCHEME',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}.mesos-master"
+         default: "#{Socket.gethostname}.mesos-#{config[:mode]}"
 
   option :server,
-         description: 'Mesos Master server',
+         description: 'Mesos Host',
          short: '-s SERVER',
          long: '--server SERVER',
          default: 'localhost'
 
   def run
-    r = RestClient::Resource.new("http://#{config[:server]}:5050/master/stats.json", timeout: 5).get
+    case config[:mode]
+    when 'master'
+      port = '5050'
+      uri = '/master/stats.json'
+    when 'slave'
+      port = '5051'
+      uri = '/slave(1)/stats.json'
+    end
+    r = RestClient::Resource.new("http://#{config[:server]}:#{port}#{uri}", timeout: 5).get
     JSON.parse(r).each do |k, v|
       k_copy = k.tr('/', '.')
       output([config[:scheme], k_copy].join('.'), v)
