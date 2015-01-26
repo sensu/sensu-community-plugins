@@ -38,17 +38,15 @@ class MarathonNodeStatus < Sensu::Plugin::Check::CLI
          default: 'localhost'
 
   def run
-    begin
-      r = RestClient::Resource.new("http://#{config[:server]}:8080/ping", timeout: 5).get
-      if r.code == 200
-        ok "Marathon Service is up"
-      else
-        critical "Marathon Service is not responding"
-      end
-    rescue Errno::ECONNREFUSED
-      critical "Marathon Service is not responding"
-    rescue RestClient::RequestTimeout
-      critical "Marathon Service Connection timed out"
+    r = RestClient::Resource.new("http://#{config[:server]}:8080/ping", timeout: 5).get
+    if r.code == 200
+      ok 'Marathon Service is up'
+    else
+      critical 'Marathon Service is not responding'
     end
+  rescue Errno::ECONNREFUSED
+    critical 'Marathon Service is not responding'
+  rescue RestClient::RequestTimeout
+    critical 'Marathon Service Connection timed out'
   end
 end

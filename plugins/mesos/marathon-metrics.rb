@@ -49,22 +49,20 @@ class MarathonMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: 'localhost'
 
   def run
-    begin
-      r = RestClient::Resource.new("http://#{config[:server]}:8080/metrics", timeout: 5).get
-      all_metrics = JSON.parse(r)
-      metric_groups = all_metrics.keys - SKIP_ROOT_KEYS
-      metric_groups.each do |metric_groups_key|
-        all_metrics[metric_groups_key].each do |metric_key, metric_value|
-          metric_value.each do |metric_hash_key, metric_hash_value|
-            output([config[:scheme], metric_groups_key, metric_key, metric_hash_key].join('.'), metric_hash_value) if metric_hash_value.is_a? Numeric and metric_hash_key == 'count'
-          end
+    r = RestClient::Resource.new("http://#{config[:server]}:8080/metrics", timeout: 5).get
+    all_metrics = JSON.parse(r)
+    metric_groups = all_metrics.keys - SKIP_ROOT_KEYS
+    metric_groups.each do |metric_groups_key|
+      all_metrics[metric_groups_key].each do |metric_key, metric_value|
+        metric_value.each do |metric_hash_key, metric_hash_value|
+          output([config[:scheme], metric_groups_key, metric_key, metric_hash_key].join('.'), metric_hash_value) if metric_hash_value.is_a?(Numeric) && metric_hash_key == 'count'
         end
       end
-      ok
-    rescue Errno::ECONNREFUSED
-      critical "Marathon is not responding"
-    rescue RestClient::RequestTimeout
-      critical "Marathon Connection timed out"
     end
+    ok
+  rescue Errno::ECONNREFUSED
+    critical 'Marathon is not responding'
+  rescue RestClient::RequestTimeout
+    critical 'Marathon Connection timed out'
   end
 end
