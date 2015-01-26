@@ -1,23 +1,33 @@
-#!/usr/bin/env ruby
-# Check SNMP
-# ===
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# This is a simple SNMP check script for Sensu, We need to supply details like
-# Server, port, SNMP community, and Limits
+#   check-snmp
 #
+# DESCRIPTION:
+#   This is a simple SNMP check script for Sensu, We need to supply details like
+#   Server, port, SNMP community, and Limits
 #
-# Requires SNMP gem
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: snmp
 #
 # USAGE:
-#
 #   check-snmp -h host -C community -O oid -w warning -c critical
 #   check-snmp -h host -C community -O oid -m "(P|p)attern to match\.?"
 #
+# NOTES:
 #
-#  Author Deepak Mohan Das   <deepakmdass88@gmail.com>
+# LICENSE:
+#   Author Deepak Mohan Das   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

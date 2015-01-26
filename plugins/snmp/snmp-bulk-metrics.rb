@@ -1,21 +1,32 @@
-#!/usr/bin/env ruby
-# SNMP Bulk Metrics
-# ===
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# This is a script to 'bulk walk' an SNMP OID value, collecting metrics
+#   snmp-bulk-metrics
 #
+# DESCRIPTION:
+#   This is a script to 'bulk walk' an SNMP OID value, collecting metrics
 #
-# Requires SNMP gem
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: snmp
 #
 # USAGE:
-#
 #   snmp-bulk-metrics -h host -C community -O oid1,oid2... -s suffix
 #
+# NOTES:
+#
+# LICENSE:
 #   Copyright 2014 Matthew Richardson <m.richardson@ed.ac.uk>
 #   Based on snmp-metrics.rb by Double Negative Limited
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

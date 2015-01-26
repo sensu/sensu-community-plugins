@@ -1,21 +1,32 @@
-#!/usr/bin/env ruby
-# SNMP Metrics
-# ===
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# This is a simple script to collect metrics from a SNMP OID value
+#   snmp-metrics
 #
+# DESCRIPTION:
+#   This is a simple script to collect metrics from a SNMP OID value
 #
-# Requires SNMP gem
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: snmp
 #
 # USAGE:
-#
 #   check-snmp -h host -C community -O oid -p prefix -s suffix
 #
+# NOTES:
+#
+# LICENSE:
 #   Copyright (c) 2013 Double Negative Limited
 #   Based on check-snmp.rb by Deepak Mohan Das   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
