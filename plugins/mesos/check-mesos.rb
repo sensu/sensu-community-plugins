@@ -52,15 +52,17 @@ class MesosNodeStatus < Sensu::Plugin::Check::CLI
       port = '5051'
       uri = '/slave(1)/health'
     end
-    r = RestClient::Resource.new("http://#{config[:server]}:#{port}#{uri}", timeout: 5).get
-    if r.code == 200
-      ok "Mesos #{config[:mode]} is up"
-    else
+    begin
+      r = RestClient::Resource.new("http://#{config[:server]}:#{port}#{uri}", timeout: 5).get
+      if r.code == 200
+        ok "Mesos #{config[:mode]} is up"
+      else
+        critical "Mesos #{config[:mode]} is not responding"
+      end
+    rescue Errno::ECONNREFUSED
       critical "Mesos #{config[:mode]} is not responding"
+    rescue RestClient::RequestTimeout
+      critical "Mesos #{config[:mode]} Connection timed out"
     end
-  rescue Errno::ECONNREFUSED
-    critical "Mesos #{config[:mode]} is not responding"
-  rescue RestClient::RequestTimeout
-    critical "Mesos #{config[:mode]} Connection timed out"
   end
 end

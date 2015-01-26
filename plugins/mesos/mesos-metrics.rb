@@ -63,10 +63,16 @@ class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
       uri = '/slave(1)/stats.json'
     end
     scheme = "#{config[:scheme]}.mesos-#{config[:mode]}"
-    r = RestClient::Resource.new("http://#{config[:server]}:#{port}#{uri}", timeout: 5).get
-    JSON.parse(r).each do |k, v|
-      k_copy = k.tr('/', '.')
-      output([scheme, k_copy].join('.'), v)
+    begin
+      r = RestClient::Resource.new("http://#{config[:server]}:#{port}#{uri}", timeout: 5).get
+      JSON.parse(r).each do |k, v|
+        k_copy = k.tr('/', '.')
+        output([scheme, k_copy].join('.'), v)
+      end
+    rescue Errno::ECONNREFUSED
+      critical "Mesos #{config[:mode]} is not responding"
+    rescue RestClient::RequestTimeout
+      critical "Mesos #{config[:mode]} Connection timed out"
     end
     ok
   end
