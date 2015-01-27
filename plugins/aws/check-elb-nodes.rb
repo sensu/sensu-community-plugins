@@ -39,14 +39,12 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
   option :aws_access_key,
          short: '-a AWS_ACCESS_KEY',
          long: '--aws-access-key AWS_ACCESS_KEY',
-         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
-         required: true
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option"
 
   option :aws_secret_access_key,
          short: '-s AWS_SECRET_ACCESS_KEY',
          long: '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
-         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
-         required: true
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option"
 
   option :aws_region,
          short: '-r AWS_REGION',
@@ -65,36 +63,40 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
          long: '--warn WARN_NUM',
          description: 'Minimum number of nodes InService on the ELB to be considered a warning',
          default: -1,
-         proc: proc(&:to_i)
+         proc: proc { |a| a.to_i }
 
   option :crit_under,
          short: '-c CRIT_NUM',
          long: '--crit CRIT_NUM',
          description: 'Minimum number of nodes InService on the ELB to be considered critical',
          default: -1,
-         proc: proc(&:to_i)
+         proc: proc { |a| a.to_i }
 
   option :warn_percent,
          short: '-W WARN_PERCENT',
          long: '--warn_perc WARN_PERCENT',
          description: 'Warn when the percentage of InService nodes is at or below this number',
          default: -1,
-         proc: proc(&:to_i)
+         proc: proc { |a| a.to_i }
 
   option :crit_percent,
          short: '-C CRIT_PERCENT',
          long: '--crit_perc CRIT_PERCENT',
          description: 'Minimum percentage of nodes needed to be InService',
          default: -1,
-         # #YELLOW
-         proc: proc(&:to_i)
+         proc: proc { |a| a.to_i }
+
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
+    hash
+  end
 
   def run
     AWS.start_memoizing
-    elb = AWS::ELB.new(
-      access_key_id: config[:aws_access_key],
-      secret_access_key: config[:aws_secret_access_key],
-      region: config[:aws_region])
+    elb = AWS::ELB.new aws_config
 
     begin
       instances = elb.load_balancers[config[:load_balancer]].instances.health
@@ -120,8 +122,7 @@ class CheckELBNodes < Sensu::Plugin::Check::CLI
       message << " (#{state['OutOfService'].join(', ')})"
     end
     message << "; Unknown: #{state['Unknown'].count}"
-    # #YELLOW
-    if state['Unknown'].count > 0 # rubocop:disable IfUnlessModifier
+    if state['Unknown'].count > 0
       message << " (#{state['Unknown'].join(', ')})"
     end
 

@@ -61,6 +61,14 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
          description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
+    hash
+  end
+
   def run
     event_instances = []
     aws_config =   {}
@@ -74,7 +82,6 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
 
     ec2 = AWS::EC2::Client.new(aws_config.merge!(region: config[:aws_region]))
     begin
-      # #YELLOW
       ec2.describe_instance_status[:instance_status_set].each do |i| # rubocop:disable Next
 
         unless i[:events_set].empty?

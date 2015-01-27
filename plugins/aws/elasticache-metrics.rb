@@ -83,6 +83,13 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'AWS Region (such as us-east-1).',
          default: 'us-east-1'
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
+    hash.update region: config[:aws_region]
+    hash
+  end
+
   def run
     if config[:scheme] == ''
       graphitepath = "#{config[:elasticachename]}.#{config[:metric].downcase}"
@@ -151,17 +158,10 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
     }
 
     begin
-
-      AWS.config(
-        access_key_id: config[:aws_access_key],
-        secret_access_key: config[:aws_secret_access_key],
-        region: config[:aws_region]
-      )
-
       et = Time.now - config[:fetch_age]
       st = et - 60
 
-      cw = AWS::CloudWatch::Client.new
+      cw = AWS::CloudWatch::Client.new aws_config
 
       # define all options
       options = {
