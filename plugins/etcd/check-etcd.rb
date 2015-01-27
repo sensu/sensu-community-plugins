@@ -39,8 +39,14 @@ class EtcdNodeStatus < Sensu::Plugin::Check::CLI
          long: '--server SERVER',
          default: 'localhost'
 
+  option :port,
+         description: 'etcd port',
+         short: '-p PORT',
+         long: '--port PORT',
+         default: '4001'
+
   def run
-    r = RestClient::Resource.new("http://#{config[:server]}:4001/v2/stats/self", timeout: 5).get
+    r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}/v2/stats/self", timeout: 5).get
     if r.code == 200
       ok 'etcd is up'
     else
