@@ -54,7 +54,7 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
          description: 'Metric naming scheme, text to prepend to .$parent.$child',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}.disk_usage"
+         default: "#{Socket.gethostname}"
 
   option :ignore_mnt,
          description: 'Ignore mounts matching pattern(s)',
@@ -107,9 +107,9 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
         end
         # Fix subsequent slashes
         mnt = mnt.gsub '/', delim
-        output [config[:scheme], mnt, 'used'].join('.'), used.gsub(config[:block_size], '')
-        output [config[:scheme], mnt, 'avail'].join('.'), avail.gsub(config[:block_size], '')
-        output [config[:scheme], mnt, 'used_percentage'].join('.'), used_p.gsub('%', '')
+        output [config[:scheme], 'disk_usage', mnt, 'used'].join('.'), used.gsub(config[:block_size], '')
+        output [config[:scheme], 'disk_usage', mnt, 'avail'].join('.'), avail.gsub(config[:block_size], '')
+        output [config[:scheme], 'disk_usage', mnt, 'used_percentage'].join('.'), used_p.gsub('%', '')
       end
     end
     ok
