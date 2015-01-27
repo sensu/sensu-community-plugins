@@ -63,7 +63,6 @@ class JenkinsMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: '/metrics/currentUser/metrics'
 
   def run
-    scheme = "#{config[:scheme]}"
     begin
       r = RestClient::Resource.new("http://#{config[:server]}:#{config[:port]}#{config[:uri]}", timeout: 5).get
       all_metrics = JSON.parse(r)

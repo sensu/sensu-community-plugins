@@ -46,12 +46,11 @@ class JenkinsMasterStatus < Sensu::Plugin::Check::CLI
          default: '/metrics/currentUser/healthcheck'
 
   def run
-    health_key = 'healthy'
     r = RestClient::Resource.new("http://#{config[:server]}:8080#{config[:uri]}", timeout: 5).get
     if r.code == 200
       healthchecks = JSON.parse(r)
       healthchecks.each do |_, healthcheck_hash_value|
-        if healthcheck_hash_value.has_key?(health_key) && healthcheck_hash_value[health_key] != true
+        if healthcheck_hash_value['healthy'] != true
           critical 'Jenkins Health Parameters not OK'
         end
       end
