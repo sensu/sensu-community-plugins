@@ -63,4 +63,3 @@ class SELinuxCheck < Sensu::Plugin::Check::CLI
     exit 1
   end
 end
-
