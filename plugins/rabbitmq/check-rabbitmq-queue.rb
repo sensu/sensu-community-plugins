@@ -80,7 +80,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     rabbitmq = acquire_rabbitmq_info
     queues = rabbitmq.queues
     config[:queue].each do |q|
-      if not queues.map  { |hash| hash['name'] }.include? q
+      unless (queues.map  { |hash| hash['name'] }.include? q)
         @warn << "Queue #{ q } not available"
         next
       end
@@ -94,10 +94,10 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
       end
     end
     if @crit.empty? && @warn.empty?
-      ok 
-    elsif not(@crit.empty?)
+      ok
+    elsif !(@crit.empty?)
       critical "critical: #{ @crit } warning: #{ @warn }"
-    elsif not(@warn.empty?)
+    elsif !(@warn.empty?)
       warning "critical: #{ @crit } warning: #{ @warn }"
     end
   end
