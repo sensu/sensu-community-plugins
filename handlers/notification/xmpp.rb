@@ -18,6 +18,7 @@ class XmppHandler < Sensu::Handler
     xmpp_target = settings['xmpp']['target']
     xmpp_target_type = settings['xmpp']['target_type']
     xmpp_server = settings['xmpp']['server']
+    xmpp_room_password = settings['xmpp']['room_password']
 
     if @event['action'].eql?('resolve')
       #      body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
@@ -37,7 +38,7 @@ class XmppHandler < Sensu::Handler
       m = Message.new(xmpp_target, body)
       room = MUC::MUCClient.new(cl)
       room.my_jid = jid
-      room.join(Jabber::JID.new(xmpp_target + '/' + cl.jid.node))
+      room.join(Jabber::JID.new(xmpp_target + '/' + cl.jid.node), xmpp_room_password)
       room.send m
       room.exit
     else
