@@ -42,7 +42,7 @@ class JenkinsMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Metric naming scheme',
          short: '-s SCHEME',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}"
+         default: "#{Socket.gethostname}.jenkins"
 
   option :server,
          description: 'Jenkins Host',
