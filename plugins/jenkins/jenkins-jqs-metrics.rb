@@ -77,9 +77,9 @@ class JenkinsMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
       ok
     rescue Errno::ECONNREFUSED
-      critical "Jenkins is not responding"
+      critical 'Jenkins is not responding'
     rescue RestClient::RequestTimeout
-      critical "Jenkins Connection timed out"
+      critical 'Jenkins Connection timed out'
     end
     ok
   end
