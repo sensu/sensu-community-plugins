@@ -159,21 +159,21 @@ module Sensu
       end
 
       def proc_net_dev_metrics
-        dev_metrics = %w(rxBytes 
-                         rxPackets 
-                         rxErrors 
-                         rxDrops 
-                         rxFifo 
-                         rxFrame 
-                         rxCompressed 
-                         rxMulticast 
-                         txBytes 
-                         txPackets 
-                         txErrors 
-                         txDrops 
-                         txFifo 
-                         txColls 
-                         txCarrier 
+        dev_metrics = %w(rxBytes
+                         rxPackets
+                         rxErrors
+                         rxDrops
+                         rxFifo
+                         rxFrame
+                         rxCompressed
+                         rxMulticast
+                         txBytes
+                         txPackets
+                         txErrors
+                         txDrops
+                         txFifo
+                         txColls
+                         txCarrier
                          txCompressed)
         read_file('/proc/net/dev') do |proc_net_dev|
           proc_net_dev.each_line do |line|
