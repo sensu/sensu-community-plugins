@@ -44,8 +44,8 @@ class MarathonMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :server,
          description: 'Marathon Host',
-         short: '-s SERVER',
-         long: '--server SERVER',
+         short: '-h SERVER',
+         long: '--host SERVER',
          default: 'localhost'
 
   def run
