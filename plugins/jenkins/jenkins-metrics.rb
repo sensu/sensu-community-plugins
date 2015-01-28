@@ -77,9 +77,9 @@ class JenkinsMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
       ok
     rescue Errno::ECONNREFUSED
-      critical "Mesos #{config[:mode]} is not responding"
+      critical "Jenkins is not responding"
     rescue RestClient::RequestTimeout
-      critical "Mesos #{config[:mode]} Connection timed out"
+      critical "Jenkins Connection timed out"
     end
     ok
   end
