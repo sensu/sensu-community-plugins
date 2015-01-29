@@ -98,7 +98,7 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
     delim = config[:flatten] == true ? '_' : '.'
     if config[:disk_type]
       types = config[:disk_type]
-      type_option = types.map { |type| "-t #{type}"}.join(' ')
+      type_option = types.map { |type| "-t #{type}" }.join(' ')
     else
       type_option = ''
     end
