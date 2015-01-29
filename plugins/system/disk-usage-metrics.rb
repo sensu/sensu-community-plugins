@@ -88,11 +88,23 @@ class DiskUsageMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--block-size BLOCK_SIZE',
          default: 'M'
 
+  option :disk_type,
+         description: 'Disk types (e.g. ext4) to filter (df -t <type> option)',
+         short: '-t DISK_TYPE,[DISK_TYPE]',
+         long: '--type DISK_TYPE,[DISK_TYPE]',
+         proc: proc { |a| a.split(',') }
+
   def run
     delim = config[:flatten] == true ? '_' : '.'
+    if config[:disk_type]
+      types = config[:disk_type]
+      type_option = types.map { |type| "-t #{type}" }.join(' ')
+    else
+      type_option = ''
+    end
     # Get disk usage from df with used and avail in megabytes
     # #YELLOW
-    `df -PB#{config[:block_size]} #{config[:local] ? '-l' : ''}`.split("\n").drop(1).each do |line| # rubocop:disable Style/Next
+    `df -PB#{config[:block_size]} #{config[:local] ? '-l' : ''} #{type_option}`.split("\n").drop(1).each do |line| # rubocop:disable Style/Next
       _, _, used, avail, used_p, mnt = line.split
 
       unless %r{/sys|/dev|/run}.match(mnt)
