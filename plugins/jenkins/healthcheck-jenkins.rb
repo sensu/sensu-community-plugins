@@ -32,7 +32,7 @@ require 'sensu-plugin/check/cli'
 require 'rest-client'
 require 'json'
 
-class JenkinsMasterStatus < Sensu::Plugin::Check::CLI
+class JenkinsMetricsHealthChecker < Sensu::Plugin::Check::CLI
   option :server,
          description: 'Jenkins Host',
          short: '-s SERVER',
