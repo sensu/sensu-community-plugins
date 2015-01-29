@@ -66,6 +66,9 @@ class InterfaceGraphite < Sensu::Plugin::Metric::CLI::Graphite
       interface, stats_string = line.scan(/^\s*([^:]+):\s*(.*)$/).first
       next if config[:excludeinterface] && config[:excludeinterface].find { |x| line.match(x) }
       next unless interface
+      if interface.is_a?(String)
+        interface = interface.gsub('.', '_')
+      end
 
       stats = stats_string.split(/\s+/)
       next if stats == ['0'].cycle.take(stats.size)
