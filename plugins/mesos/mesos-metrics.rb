@@ -49,8 +49,8 @@ class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   option :server,
          description: 'Mesos Host',
-         short: '-s SERVER',
-         long: '--server SERVER',
+         short: '-h SERVER',
+         long: '--host SERVER',
          default: 'localhost'
 
   def run
