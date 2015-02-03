@@ -44,10 +44,12 @@ require 'time'
 class CheckGpgExpire < Sensu::Plugin::Check::CLI
   option :warn,
          short: '-w WARN',
+         proc: proc(&:to_i),
          default: 60
 
   option :crit,
          short: '-c CRIT',
+         proc: proc(&:to_i),
          default: 30
 
   option :homedir,
