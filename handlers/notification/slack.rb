@@ -16,8 +16,18 @@ require 'sensu-handler'
 require 'json'
 
 class Slack < Sensu::Handler
+  option :json_config,
+         description: 'Configuration name',
+         short: '-j JSONCONFIG',
+         long: '--json JSONCONFIG',
+         default: 'slack'
+
   def slack_webhook_url
     get_setting('webhook_url')
+  end
+
+  def slack_channel
+    get_setting('channel')
   end
 
   def slack_message_prefix
@@ -37,7 +47,7 @@ class Slack < Sensu::Handler
   end
 
   def get_setting(name)
-    settings['slack'][name]
+    settings[config[:json_config]][name]
   end
 
   def handle
@@ -83,6 +93,7 @@ class Slack < Sensu::Handler
         color: color
       }]
     }.tap do |payload|
+      payload[:channel] = slack_channel if slack_channel
       payload[:username] = slack_bot_name if slack_bot_name
     end
   end
