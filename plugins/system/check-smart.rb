@@ -76,6 +76,11 @@ class CheckSMART < Sensu::Plugin::Check::CLI
          proc: proc(&:to_sym),
          default: :unknown
 
+  option :exclude_pattern,
+         long: '--exclude PATTERN[,PATTERN]',
+         description: 'Exclude disks matching pattern(s)',
+         proc: proc { |a| a.split(',') }
+
   def initialize
     super
     @devices = []
@@ -85,6 +90,7 @@ class CheckSMART < Sensu::Plugin::Check::CLI
   def scan_disks!
     `lsblk -nro NAME,TYPE`.each_line do |line|
       name, type = line.split
+      next if config[:exclude_pattern] && config[:exclude_pattern].find { |x| name.match(x) }
       @devices << Disk.new(name) if type == 'disk'
     end
   end
