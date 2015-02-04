@@ -26,6 +26,10 @@ class Slack < Sensu::Handler
     get_setting('webhook_url')
   end
 
+  def slack_channel
+    get_setting('channel')
+  end
+
   def slack_message_prefix
     get_setting('message_prefix')
   end
@@ -89,6 +93,7 @@ class Slack < Sensu::Handler
         color: color
       }]
     }.tap do |payload|
+      payload[:channel] = slack_channel if slack_channel
       payload[:username] = slack_bot_name if slack_bot_name
     end
   end
