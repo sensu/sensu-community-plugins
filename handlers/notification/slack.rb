@@ -16,6 +16,12 @@ require 'sensu-handler'
 require 'json'
 
 class Slack < Sensu::Handler
+  option :json_config,
+         description: 'Configuration name',
+         short: '-j JSONCONFIG',
+         long: '--json JSONCONFIG',
+         default: 'slack'
+
   def slack_webhook_url
     get_setting('webhook_url')
   end
@@ -37,7 +43,7 @@ class Slack < Sensu::Handler
   end
 
   def get_setting(name)
-    settings['slack'][name]
+    settings[config[:json_config]][name]
   end
 
   def handle
