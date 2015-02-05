@@ -33,7 +33,7 @@ class Pushover < Sensu::Handler
       ]
     end
 
-    if @event['check']['status'] != 3
+    if @event['check']['status'] < 3
       priority = @event['check']['status'] - 1
     else
       priority = 0
