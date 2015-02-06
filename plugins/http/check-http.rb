@@ -183,7 +183,6 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   end
 
   def acquire_resource
-
     http = nil
 
     if config[:no_proxy]
