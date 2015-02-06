@@ -47,7 +47,6 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
          required: true,
          proc: proc { |q| q.split(',') }
 
-
   option :warn,
          short: '-w NUM_MESSAGES',
          long: '--warn NUM_MESSAGES',
