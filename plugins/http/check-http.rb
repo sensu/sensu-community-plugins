@@ -145,7 +145,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :response_code,
          long: '--response-code CODE',
          description: 'Check for a specific response code'
-         
+
   option :proxy_url,
          long: '--proxy-url PROXY_URL',
          description: 'Use a proxy server to connect'
@@ -183,16 +183,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   end
 
   def acquire_resource
-    
+
     http = nil
 
     if config[:no_proxy]
-         http = Net::HTTP.new(config[:host], config[:port], nil, nil)
+      http = Net::HTTP.new(config[:host], config[:port], nil, nil)
     elsif config[:proxy_url]
-         proxy_uri = URI.parse(config[:proxy_url])
-         http = Net::HTTP.new(config[:host], config[:port], proxy_uri.host, proxy_uri.port)
+      proxy_uri = URI.parse(config[:proxy_url])
+      http = Net::HTTP.new(config[:host], config[:port], proxy_uri.host, proxy_uri.port)
     else
-       http = Net::HTTP.new(config[:host], config[:port])
+      http = Net::HTTP.new(config[:host], config[:port])
     end
 
     warn_cert_expire = nil
