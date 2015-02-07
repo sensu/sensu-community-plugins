@@ -87,7 +87,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
       queues.each do |queue|
         if queue['name'] == q
           total = queue['messages']
-          if total == nil
+          if total.nil?
             total = 0
           end
           message "#{total}"
