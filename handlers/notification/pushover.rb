@@ -33,9 +33,16 @@ class Pushover < Sensu::Handler
       ]
     end
 
+    if @event['check']['status'] < 3
+      priority = @event['check']['status'] - 1
+    else
+      priority = 0
+    end
+
     params = {
       title: event_name,
       token: settings['pushover']['token'],
+      priority: priority,
       message: @event['check']['output']
     }
 
