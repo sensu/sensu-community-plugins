@@ -108,12 +108,12 @@ class Mailer < Sensu::Handler
           BODY
 
     headers = {
-      "X-Sensu-Host"   => "#{@event['client']['name']}",
-      "X-Sensu-Timestamp" => "#{Time.at(@event['check']['issued'])}",
-      "X-Sensu-Address"   => "#{@event['client']['address']}",
-      "X-Sensu-Check-Name" => "#{@event['check']['name']}",
-      "X-Sensu-Status" => "#{status_to_string}",
-      "X-Sensu-Occurrences" => "#{@event['occurrences']}"
+      'X-Sensu-Host'        => "#{@event['client']['name']}",
+      'X-Sensu-Timestamp'   => "#{Time.at(@event['check']['issued'])}",
+      'X-Sensu-Address'     => "#{@event['client']['address']}",
+      'X-Sensu-Check-Name'  => "#{@event['check']['name']}",
+      'X-Sensu-Status'      => "#{status_to_string}",
+      'X-Sensu-Occurrences' => "#{@event['occurrences']}"
     }
 
     if @event['check']['notification'].nil?
