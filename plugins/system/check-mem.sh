@@ -41,7 +41,11 @@ fi
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 
-FREE_MEMORY=`free -m | grep buffers/cache | awk '{ print $4 }'`
+if [ -f /etc/redhat-release ] && [ `awk '{print $3}' /etc/redhat-release` = "21" ]; then
+  FREE_MEMORY=`free -m | grep Mem | awk '{ print $7 }'`
+else
+  FREE_MEMORY=`free -m | grep buffers/cache | awk '{ print $4 }'`
+fi
 
 if [ "$FREE_MEMORY" = "" ]; then
   echo "MEM UNKNOWN -"
