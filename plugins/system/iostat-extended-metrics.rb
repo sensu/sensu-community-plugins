@@ -89,7 +89,7 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
       fields = line.split(/\s+/)
 
       key = fields.shift
-      key = "avg-cpu" if stage == :cpu
+      key = 'avg-cpu' if stage == :cpu
       stats[key] = Hash[headers.zip(fields.map(&:to_f))]
     end
     stats
