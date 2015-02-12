@@ -29,6 +29,8 @@ class Pagerduty < Sensu::Handler
     else
       api_key = settings['pagerduty']['api_key']
     end
+    pagerduty_prefix = settings['pagerduty']['prefix']
+    
     begin
       timeout(10) do
         response = case @event['action']
@@ -36,7 +38,7 @@ class Pagerduty < Sensu::Handler
                      Redphone::Pagerduty.trigger_incident(
                        service_key: api_key,
                        incident_key: incident_key,
-                       description: event_summary,
+                       description: [pagerduty_prefix, event_summary].compact.join(' '),
                        details: @event
                      )
                    when 'resolve'
