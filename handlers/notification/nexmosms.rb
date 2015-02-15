@@ -47,7 +47,7 @@ class NexmoSMS < Sensu::Handler
     message = "Sensu #{action_to_string}: #{short_name} (#{@event['client']['address']}) #{@event['check']['output']}"
     message[157..message.length] = '...' if message.length > 160
 
-    nexmo = Nexmo::Client.new(key:api_key,secret:api_secret)
+    nexmo = Nexmo::Client.new(key: api_key, secret: api_secret)
     recipients.each do |recipient|
       begin
         nexmo.send.message(
