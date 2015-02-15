@@ -62,8 +62,8 @@ class GraphiteEvent < Sensu::Handler
     body = {
       'what' => 'sensu_event',
       'tags' => tags.join(','),
-      'data' => event_status,
-      'when' => Time.now.to_i
+      'data' => @event['check']['output'],
+      'when' => @event['client']['timestamp']
     }
 
     uri = settings['graphite_event']['server_uri']
