@@ -4,7 +4,7 @@
 #
 # This handler formats alerts as SMSes and sends them off to a pre-defined recipient.
 #
-# Copyright 2015 Abdulrahim Umar <harsh001@gmail.com>
+# Copyright 2015 Abdulrahim Umar <harsh001(at)gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.

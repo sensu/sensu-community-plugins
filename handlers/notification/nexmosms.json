@@ -5,9 +5,9 @@
 		"sender_id":"111111111",
 		"recipients":{
 			"11111111111": {
-				"sensu_roles":[ "web-server" ], // subscribers
-				"sensu_checks":[], // checks
-				"sensu_level": 1 // 1 for warnging, 2 for critical alerts
+				"sensu_roles":[ "web-server" ],
+				"sensu_checks":[],
+				"sensu_level": 1 
 			},
 			"11111222222": {
 				"sensu_roles":[],
