@@ -31,6 +31,13 @@ class PonyMailer < Sensu::Handler
   end
 
   def handle
+    if settings['ponymailer']['only_send_on_change']
+      last_status = @event['check']['history'][-2].to_i
+      if last_status == @event['check']['status']
+        return
+      end
+    end
+
     mail_options = {
       subject: "Sensu Monitoring Alert: #{action_to_string} :: #{short_name}",
       from: "#{settings['ponymailer']['fromname']} <#{settings['ponymailer']['from']}>",

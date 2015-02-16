@@ -1,6 +1,7 @@
 {
 	"ponymailer": {
 		"authenticate":true,
+		"only_send_on_change":false,
 		"username":"ops@example.com",
 		"tls":true,
 		"port":"587",
