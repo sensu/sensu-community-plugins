@@ -66,6 +66,7 @@ class Opsgenie < Sensu::Handler
   def post_to_opsgenie(action = :create, params = {})
     params['customerKey'] = settings[@json_config]['customerKey']
     params['recipients']  = settings[@json_config]['recipients']
+    params['teams'] = settings[@json_config]['teams']
 
     # override source if specified, default is ip
     params['source'] = settings[@json_config]['source'] if settings[@json_config]['source']
