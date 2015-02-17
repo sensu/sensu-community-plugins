@@ -67,12 +67,12 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
         end
       end
     end
-    ok
   rescue Timeout::Error
-    puts "timed out connecting to memcached on port #{config[:port]}"
+    warning "timed out connecting to memcached on port #{config[:port]}"
   rescue
-    puts "Can't connect to port #{config[:port]}"
-    exit(1)
+    critical "Can't connect to port #{config[:port]}"
+  else
+    ok
   end
 
   def sort_metrics(stats)
