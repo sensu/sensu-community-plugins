@@ -16,24 +16,26 @@
 #
 # DEPENDENCIES:
 #
-#   json and time Ruby gems
+#   json and time gems
 #
 # Copyright 2013 Jean-Francois Theroux <failshell@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems'
 require 'json'
 require 'time'
 
 # parse event
 event = JSON.parse(STDIN.read, symbolize_names: true)
 t = Time.now
+start_time = '9:00'
+end_time =  '17:00'
+gmt_offset = '+00:00'
 
 # Verify if we're opened for business
 if t.wday.between?(1, 5)
-  if t.between?(Time.parse('9:00'), Time.parse('17:00'))
+  if t.between?(Time.parse("#{start_time} #{gmt_offset}"), Time.parse("#{end_time} #{gmt_offset}"))
     event.merge!(mutated: true, office_hours: true)
   end
 end
