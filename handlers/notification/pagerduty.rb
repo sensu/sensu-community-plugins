@@ -13,11 +13,16 @@
 #   sensu-plugin >= 1.0.0
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'redphone/pagerduty'
 
 class Pagerduty < Sensu::Handler
+  option :json_config,
+         description: 'Configuration name',
+         short: '-j JSONCONFIG',
+         long: '--json JSONCONFIG',
+         default: 'pagerduty'
+
   def incident_key
     source = @event['check']['source'] || @event['client']['name']
     [source, @event['check']['name']].join('/')
@@ -25,12 +30,12 @@ class Pagerduty < Sensu::Handler
 
   def handle
     if @event['check']['pager_team']
-      api_key = settings['pagerduty'][@event['check']['pager_team']]['api_key']
+      api_key = settings[config[:json_config]][@event['check']['pager_team']]['api_key']
     else
-      api_key = settings['pagerduty']['api_key']
+      api_key = settings[config[:json_config]]['api_key']
     end
-    incident_key_prefix = settings['pagerduty']['incident_key_prefix']
-    description_prefix = settings['pagerduty']['description_prefix']
+    incident_key_prefix = settings[config[:json_config]]['incident_key_prefix']
+    description_prefix = settings[config[:json_config]]['description_prefix']
     begin
       timeout(10) do
         response = case @event['action']
