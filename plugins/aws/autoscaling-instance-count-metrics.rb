@@ -12,7 +12,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -27,7 +27,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1-v1'
 
 class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :groupname,

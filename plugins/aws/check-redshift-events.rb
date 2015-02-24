@@ -12,7 +12,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -35,7 +35,7 @@
 #
 
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 class CheckRedshiftEvents < Sensu::Plugin::Check::CLI
   option :aws_access_key,
@@ -63,7 +63,7 @@ class CheckRedshiftEvents < Sensu::Plugin::Check::CLI
          proc: proc { |a| a.split(',') },
          default: []
 
-  # setup a redshift connection using aws-sdk
+  # setup a redshift connection using aws-sdk-v1
   def redshift
     @redshift ||= AWS::Redshift::Client.new(
       access_key_id: config[:aws_access_key],
