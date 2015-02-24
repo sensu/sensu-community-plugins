@@ -34,7 +34,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :elbname,
