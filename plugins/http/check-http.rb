@@ -67,7 +67,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :header,
          short: '-H HEADER',
          long: '--header HEADER',
-         description: 'Check for a HEADER'
+         description: 'Headers you want to send in the format of header1:value1,header2:value2'
 
   option :ssl,
          short: '-s',
