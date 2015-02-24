@@ -51,7 +51,7 @@ class Slack < Sensu::Handler
   end
 
   def handle
-    description = @event['notification'] || build_description
+    description = @event['check']['notification'] || build_description
     post_data("#{incident_key}: #{description}")
   end
 
@@ -70,7 +70,7 @@ class Slack < Sensu::Handler
 
     req = Net::HTTP::Post.new("#{uri.path}?#{uri.query}")
     text = slack_surround ? slack_surround + notice + slack_surround : notice
-    req.body = "payload=#{payload(text).to_json}"
+    req.body = payload(text).to_json
 
     response = http.request(req)
     verify_response(response)
