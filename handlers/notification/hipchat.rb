@@ -36,7 +36,7 @@ class HipChatNotif < Sensu::Handler
          required: false
 
   def event_name
-    @event['check']['name'] + '@' + @event['client']['name']
+    @event['check']['name'] + ' @ ' + @event['client']['name']
   end
 
   def handle

@@ -40,7 +40,7 @@ class Mailer < Sensu::Handler
          required: false
 
   def short_name
-    @event['check']['name'] + '@' + @event['client']['name']
+    @event['check']['name'] + ' @ ' + @event['client']['name']
   end
 
   def action_to_string
