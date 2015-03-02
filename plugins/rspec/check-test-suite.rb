@@ -157,7 +157,7 @@ class CheckTestSuite < Sensu::Plugin::Check::CLI
 
           ok "OK! Rspec returned no failed tests for #{ tests[path]['branch'] }.\n\n#{ tests[path]['metadata'] }\n\nCompleted in #{ tests[path]['runtime'] }" if config[:paths].split(',').length == 1
         else
-          unknown "Strange exit status detected for rspec on #{ tests[path]['branch'] }.\n\n#{ tests[path]['test_suite_out'] }::#{ final_gem_home }"
+          unknown "Strange exit status detected for rspec on #{ tests[path]['branch'] }.\n\n#{ tests[path]['test_suite_out'] }"
         end
       end
 
