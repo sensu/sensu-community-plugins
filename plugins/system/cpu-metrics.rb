@@ -1,5 +1,29 @@
-#!/usr/bin/env ruby
-
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#
+#   cpu-metrics
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
@@ -25,7 +49,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
         # #YELLOW
         cpu_count = cpu_count + 1 # rubocop:disable Style/SelfAssignment
         name = 'total' if name == 'cpu'
-        cpu_metrics.size.times { |i| output "#{config[:scheme]}.#{name}.#{cpu_metrics[i]}", info[i] }
+        info.size.times { |i| output "#{config[:scheme]}.#{name}.#{cpu_metrics[i]}", info[i] }
       end
 
       output "#{config[:scheme]}.#{name}", info.last if other_metrics.include? name

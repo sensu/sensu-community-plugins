@@ -113,18 +113,29 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     jvm_stats = !config[:disable_jvm_stats]
     tp_stats = !config[:disable_thread_pool_stats]
 
-    stats_query_string = [
-      'clear=true',
-      'indices=true',
-      'http=true',
-      "jvm=#{jvm_stats}",
-      'network=true',
-      "os=#{os_stat}",
-      "process=#{process_stats}",
-      "thread_pool=#{tp_stats}",
-      'transport=true',
-      'thread_pool=true'
-    ].join('&')
+    es_version = Gem::Version.new(acquire_es_version)
+
+    if es_version >= Gem::Version.new('1.0.0')
+      stats_query_array = %w(indices http network transport thread_pool)
+      stats_query_array.push('jvm') if jvm_stats == true
+      stats_query_array.push('os') if os_stat == true
+      stats_query_array.push('process') if process_stats == true
+      stats_query_array.push('tp_stats') if tp_stats == true
+      stats_query_string = stats_query_array.join(',')
+    else
+      stats_query_string = [
+        'clear=true',
+        'indices=true',
+        'http=true',
+        "jvm=#{jvm_stats}",
+        'network=true',
+        "os=#{os_stat}",
+        "process=#{process_stats}",
+        "thread_pool=#{tp_stats}",
+        'transport=true',
+        'thread_pool=true'
+      ].join('&')
+    end
 
     if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
       stats = get_es_resource("_nodes/_local/stats?#{stats_query_string}")

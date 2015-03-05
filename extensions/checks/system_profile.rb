@@ -63,7 +63,8 @@ module Sensu
           interval: 10,
           handler: 'graphite',
           add_client_prefix: true,
-          path_prefix: 'system'
+          path_prefix: 'system',
+          prefix_at_start: 0
         }
         if settings[:system_profile].is_a?(Hash)
           @options.merge!(settings[:system_profile])
@@ -80,8 +81,9 @@ module Sensu
       def add_metric(*args)
         value = args.pop
         path = []
+        path << options[:path_prefix] if options[:prefix_at_start]
         path << settings[:client][:name] if options[:add_client_prefix]
-        path << options[:path_prefix]
+        path << options[:path_prefix] unless options[:prefix_at_start]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
@@ -157,21 +159,21 @@ module Sensu
       end
 
       def proc_net_dev_metrics
-        dev_metrics = %w(rxBytes \
-                         rxPackets \
-                         rxErrors \
-                         rxDrops \
-                         rxFifo \
-                         rxFrame \
-                         rxCompressed \
-                         rxMulticast \
-                         txBytes \
-                         txPackets \
-                         txErrors \
-                         txDrops \
-                         txFifo \
-                         txColls \
-                         txCarrier \
+        dev_metrics = %w(rxBytes
+                         rxPackets
+                         rxErrors
+                         rxDrops
+                         rxFifo
+                         rxFrame
+                         rxCompressed
+                         rxMulticast
+                         txBytes
+                         txPackets
+                         txErrors
+                         txDrops
+                         txFifo
+                         txColls
+                         txCarrier
                          txCompressed)
         read_file('/proc/net/dev') do |proc_net_dev|
           proc_net_dev.each_line do |line|

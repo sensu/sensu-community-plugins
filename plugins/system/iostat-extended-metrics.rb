@@ -1,15 +1,32 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# IOStatExtended Metrics Plugin
+#   iostat-extended-metrics
 #
-# This plugin collects iostat data for a specified disk or all disks.
-# Output is in Graphite format. See `man iostat` for detailed
-# explaination of each field.
+# DESCRIPTION:
+#   This plugin collects iostat data for a specified disk or all disks.
+#   Output is in Graphite format. See `man iostat` for detailed
+#   explaination of each field.
 #
-# Peter Fern <ruby@0xc0dedbad.com>
+# OUTPUT:
+#   metric data
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Peter Fern <ruby@0xc0dedbad.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -71,7 +88,8 @@ class IOStatExtended < Sensu::Plugin::Metric::CLI::Graphite
 
       fields = line.split(/\s+/)
 
-      key = fields.shift if stage == :device
+      key = fields.shift
+      key = 'avg-cpu' if stage == :cpu
       stats[key] = Hash[headers.zip(fields.map(&:to_f))]
     end
     stats

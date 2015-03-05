@@ -1,24 +1,41 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   <script name>
 #
-# System Load Stats Plugin
-# ===
+# DESCRIPTION:
+#   This plugin uses uptime to collect load metrics
+#   Basically copied from sensu-community-plugins/plugins/system/vmstat-metrics.rb
 #
-# This plugin uses uptime to collect load metrics
-# Basically copied from sensu-community-plugins/plugins/system/vmstat-metrics.rb
+#   Load per processor
+#   ------------------
 #
-# Load per processor
-# ------------------
+#   Optionally, with `--per-core`, this plugin will calculate load per
+#   processor from the raw load average by dividing load average by the number
+#   of processors.
 #
-# Optionally, with `--per-core`, this plugin will calculate load per
-# processor from the raw load average by dividing load average by the number
-# of processors.
+#   The number of CPUs is determined by reading `/proc/cpuinfo`. This makes the
+#   feature Linux specific. Other OSs can be supported by adding OS # detection
+#   and a method to determine the number of CPUs.
 #
-# The number of CPUs is determined by reading `/proc/cpuinfo`. This makes the
-# feature Linux specific. Other OSs can be supported by adding OS # detection
-# and a method to determine the number of CPUs.
+# OUTPUT:
+#   metric data
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

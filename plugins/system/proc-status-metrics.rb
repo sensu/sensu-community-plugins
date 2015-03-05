@@ -1,34 +1,41 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
 #
-# /proc/[PID]/status memory metrics plugin
-# ===
+#   proc-status-metrics
 #
 # DESCRIPTION:
 #   For all processes owned by a user AND/OR matching a provided process
 #   name substring, return selected memory metrics from /proc/[PID]/status
+
+#
+# OUTPUT:
+#   plain text, metric data, etc
 #
 # PLATFORMS:
-#   Anything with a /proc dir
-#
-# LIMITATIONS:
-# - This check names the metrics after the full process name
-#   string as found in /proc/[PID]/cmdline, so data will be lost if
-#   you have multiple processes with identical cmdlines.
-# - A process that changes its cmdline but still matches the search
-#   query will be duplicated as multiple discovered processes.
-# - We make some assumptions in parsing /proc/[PID]/status, this will
-#   mostly only work with the memory-related stats.
+#   Linux, Windows, BSD, Solaris, etc
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: sensu-plugin
+#   gem: <?>
 #
-# AUTHOR:
+# USAGE:
+#
+# NOTES:
+#   - This check names the metrics after the full process name
+#     string as found in /proc/[PID]/cmdline, so data will be lost if
+#     you have multiple processes with identical cmdlines.
+#   - A process that changes its cmdline but still matches the search
+#     query will be duplicated as multiple discovered processes.
+#   - We make some assumptions in parsing /proc/[PID]/status, this will
+#     mostly only work with the memory-related stats.
+
+#
+# LICENSE:
+#   Copyright (c) 2014 Cozy Services Ltd. opensource@cozy.co
 #   Matt Greensmith mgreensmith@cozy.co
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Copyright (c) 2014 Cozy Services Ltd. opensource@cozy.co
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'

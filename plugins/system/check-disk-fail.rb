@@ -1,15 +1,28 @@
-#!/usr/bin/env ruby
-
+#! /usr/bin/env ruby
 #
-# Check for failing disks
+#   check-disk-fail
 #
-# Greps through dmesg output looking for
-# indications that a drive is failing.
+# DESCRIPTION:
+#   Check for failing disks
+#   Greps through dmesg output looking for indications that a drive is failing.
 #
-# All failures are reported as critical.
+# OUTPUT:
+#   plain text
 #
-# Originally by Shane Feek, cleaned up by Alan Smith.
-# Date: 07/14/2014
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Coppyright 07/14/2014 Shane Feek and  Alan Smith.
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'

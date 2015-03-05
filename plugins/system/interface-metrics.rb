@@ -1,4 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#
+#   interface-metrics
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
@@ -41,6 +66,9 @@ class InterfaceGraphite < Sensu::Plugin::Metric::CLI::Graphite
       interface, stats_string = line.scan(/^\s*([^:]+):\s*(.*)$/).first
       next if config[:excludeinterface] && config[:excludeinterface].find { |x| line.match(x) }
       next unless interface
+      if interface.is_a?(String)
+        interface = interface.gsub('.', '_')
+      end
 
       stats = stats_string.split(/\s+/)
       next if stats == ['0'].cycle.take(stats.size)

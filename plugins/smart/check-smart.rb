@@ -13,7 +13,7 @@
 #   http://en.wikipedia.org/wiki/S.M.A.R.T.#cite_note-kingston1-32
 #   http://media.kingston.com/support/downloads/MKP_306_SMART_attribute.pdf
 #
-#   I tested on several Seagate, WesternDigital hdd and Cosair force Gt SSD
+#   I tested on several Seagate, Western Digital hdd and Cosair force Gt SSD
 #
 #   It is possible some hdd give strange attribute values and warnings based on it
 #   but in this case simply define attribute list with '-a' parameter
@@ -38,7 +38,7 @@
 #
 # USAGE:
 #   You need to add 'sensu' user to suduers or you can't use 'smartctl'
-#   sensu   ALL=(ALL) NOPASSWD:ALL
+#   sensu  ALL=(ALL) NOPASSWD:/usr/sbin/smartctl
 #
 #   PARAMETERS:
 #   -b: smartctl binary to use, in case you hide yours (default: /usr/sbin/smartctl)

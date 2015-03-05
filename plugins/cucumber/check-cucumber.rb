@@ -32,6 +32,7 @@ require 'timeout'
 require 'json'
 require 'yaml'
 require 'socket'
+require 'English'
 
 class CheckCucumber < Sensu::Plugin::Check::CLI
   OK = 0

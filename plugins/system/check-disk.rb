@@ -1,15 +1,29 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Disk Plugin
-# ===
+#   check-disk
 #
-# Uses GNU's -T option for listing filesystem type; unfortunately, this
-# is not portable to BSD. Warning/critical levels are percentages only.
+# DESCRIPTION:
+#   Uses GNU's -T option for listing filesystem type; unfortunately, this
+#   is not portable to BSD. Warning/critical levels are percentages only.
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'

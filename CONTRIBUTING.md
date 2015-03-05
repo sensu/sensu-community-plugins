@@ -26,7 +26,7 @@ Each plugin, handler, mutator, extension should use the following standard heade
 
 ````
 #! /usr/bin/env ruby
-#
+#  encoding: UTF-8
 #   <script name>
 #
 # DESCRIPTION:
@@ -119,20 +119,24 @@ to run all specs and rubocop tests.  RSpec tests are currently run against 1.9.2
    
 This is ~~little bit hard~~ almost impossible for non-ruby checks. Let someone from [team](https://github.com/sensu?tab=members) know and maybe can can help.
 
-### Issue and PR Tracking
+## Issue and Pull Request Submissions
+
+If you see something wrong or come across a bug please open up an issue.  Try to include as much data in the issue as possible.  If you feel the issue is critical than tag a core  member and we will respond as soon as is feasible.
+
+When submitting a pull request please follow the guidelines below for the quickest possible merge.  These not only make our lives eaiser, but also keep the repo and commit history as clean as possible.
+
+* When at all possible do a  ```git pull --rebase``` both before you start working on the repo and then before you commit.  This will help ensure you have the most up to date codebase, Rubocop rules, and documentation.  It will also go along way towards cutting down or eliminating(hopefully) annoying merge commits.
+* 
 
 If you wish to track the status of your PR or issue, check out our [waffle.io](https://waffle.io/sensu/sensu-community-plugins).  This single location will allow contributers to stay on top of interwinding issues more effectively.
 
-Please do not not abandon your pull request, only you can help us merge
-it. We will wait for feedback from you on your pull request for up to
-one month. A lack of feedback in one month may require you to re-open
-your pull request.  
+Please do not not abandon your pull request, only you can help us merge it. We will wait for feedback from you on your pull request for up to one month. A lack of feedback in one month may require you to re-open your pull request.  
 
-### Technical Debt
+## Technical Debt
 
 For those who don't deal with or understand technical debt, it is debt incurred when designing or developing software.  All the #FIXME, #HACK, etc littered through a script add up over time, this is your technical debt.
 
-#### Technical Debt Levels
+### Technical Debt Levels
 
 **YELLOW**
 

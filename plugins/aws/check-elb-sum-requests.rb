@@ -12,7 +12,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -32,9 +32,9 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
-class CheckELBLatency < Sensu::Plugin::Check::CLI
+class CheckELBSumRequests < Sensu::Plugin::Check::CLI
   option :access_key_id,
          short:       '-k N',
          long:        '--access-key-id ID',
@@ -124,7 +124,8 @@ class CheckELBLatency < Sensu::Plugin::Check::CLI
   def check_sum_requests(elb)
     metric        = latency_metric elb.name
     metric_value  = begin
-                      latest_value metric
+                      value = latest_value metric
+                      puts value
                     rescue
                       0
                     end

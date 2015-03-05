@@ -12,7 +12,6 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: fog
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -36,7 +35,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
-require 'fog'
+require 'aws-sdk-v1'
 
 class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :elbname,
@@ -63,24 +62,22 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--metric',
          default: 'Latency'
 
-  option :statistics,
-         description: 'Statistics type',
-         short: '-t STATISTICS',
-         long: '--statistics',
+  option :statistic,
+         rescription: 'Statistics type',
+         short: '-t STATISTIC',
+         long: '--statistic',
          default: ''
 
   option :aws_access_key,
          short: '-a AWS_ACCESS_KEY',
          long: '--aws-access-key AWS_ACCESS_KEY',
          description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY'] or provide it as an option",
-         required: true,
          default: ENV['AWS_ACCESS_KEY']
 
   option :aws_secret_access_key,
          short: '-k AWS_SECRET_KEY',
          long: '--aws-secret-access-key AWS_SECRET_KEY',
          description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_KEY'] or provide it as an option",
-         required: true,
          default: ENV['AWS_SECRET_KEY']
 
   option :aws_region,
@@ -89,65 +86,61 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
 
-  def query_instance_region
-    instance_az = nil
-    Timeout.timeout(3) do
-      instance_az = Net::HTTP.get(URI('http://169.254.169.254/latest/meta-data/placement/availability-zone/'))
-    end
-    instance_az[0...-1]
-  rescue
-    raise "Cannot obtain this instance's Availability Zone. Maybe not running on AWS?"
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
+    hash.update region: config[:aws_region]
+    hash
   end
 
   def run
-    if config[:scheme] == ''
-      graphitepath = "#{config[:elbname]}.#{config[:metric].downcase}"
-    else
-      graphitepath = config[:scheme]
-    end
-    statistics = ''
-    if config[:statistics] == ''
-      statistic_type = {
+    statistic = ''
+    if config[:statistic] == ''
+      default_statistic_per_metric = {
         'Latency' => 'Average',
         'RequestCount' => 'Sum',
-        'UnHealthyHostCount' => 'Sum',
-        'HealthyHostCount' => 'Sum',
+        'UnHealthyHostCount' => 'Average',
+        'HealthyHostCount' => 'Average',
         'HTTPCode_Backend_2XX' => 'Sum',
         'HTTPCode_Backend_4XX' => 'Sum',
         'HTTPCode_Backend_5XX' => 'Sum',
         'HTTPCode_ELB_4XX' => 'Sum',
         'HTTPCode_ELB_5XX' => 'Sum'
       }
-      statistics = statistic_type[config[:metric]]
+      statistic = default_statistic_per_metric[config[:metric]]
     else
-      statistics = config[:statistics]
+      statistic = config[:statistic]
     end
+
     begin
-
-      aws_region = (config[:aws_region].nil? || config[:aws_region].empty?) ? query_instance_region : config[:aws_region]
-      cw = Fog::AWS::CloudWatch.new(
-        aws_access_key_id: config[:aws_access_key],
-        aws_secret_access_key: config[:aws_secret_access_key],
-        region: aws_region
-      )
-
       et = Time.now - config[:fetch_age]
       st = et - 60
 
-      result = cw.get_metric_statistics('Namespace' => 'AWS/ELB',
-                                        'MetricName' => config[:metric],
-                                        'Dimensions' => [{
-                                          'Name' => 'LoadBalancerName',
-                                          'Value' => config[:elbname]
-                                        }],
-                                        'Statistics' => [statistics],
-                                        'StartTime' => st.iso8601,
-                                        'EndTime' => et.iso8601,
-                                        'Period' => '60                                  ')
-      data = result.body['GetMetricStatisticsResult']['Datapoints'][0]
+      cw = AWS::CloudWatch::Client.new aws_config
+
+      options = {
+        'namespace' => 'AWS/ELB',
+        'metric_name' => config[:metric],
+        'dimensions' => [
+          {
+            'name' => 'LoadBalancerName',
+            'value' => config[:elbname]
+          }
+        ],
+        'statistics' => [statistic],
+        'start_time' => st.iso8601,
+        'end_time' => et.iso8601,
+        'period' => 60
+      }
+      result = cw.get_metric_statistics(options)
+      data = result[:datapoints][0]
       unless data.nil?
         # We only return data when we have some to return
-        output graphitepath, data[statistics], data['Timestamp'].to_i
+        graphitepath = config[:scheme]
+        if config[:scheme] == ''
+          graphitepath = "#{config[:elbname]}.#{config[:metric].downcase}"
+        end
+        output graphitepath, data[statistic.downcase.to_sym], data[:timestamp].to_i
       end
     rescue => e
       critical "Error: exception: #{e}"

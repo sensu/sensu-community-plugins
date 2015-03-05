@@ -9,9 +9,13 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
+# Note: The default mailer config is fetched from the predefined json config file which is "mailer.json" or any other
+#       file defiend using the "json_config" command line option. The mailing list could also be configured on a per client basis
+#       by defining the "mail_to" attribute in the client config file. This will override the default mailing list where the
+#       alerts are being routed to for that particular client.
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
-gem 'mail', '~> 2.5.4'
 require 'mail'
 require 'timeout'
 
@@ -58,7 +62,7 @@ class Mailer < Sensu::Handler
 
   def build_mail_to_list
     json_config = config[:json_config] || 'mailer'
-    mail_to = settings[json_config]['mail_to']
+    mail_to = @event['client']['mail_to'] || settings[json_config]['mail_to']
     if settings[json_config].key?('subscriptions')
       @event['check']['subscribers'].each do |sub|
         if settings[json_config]['subscriptions'].key?(sub)
@@ -85,16 +89,19 @@ class Mailer < Sensu::Handler
     smtp_password = settings[json_config]['smtp_password'] || nil
     smtp_authentication = settings[json_config]['smtp_authentication'] || :plain
     smtp_enable_starttls_auto = settings[json_config]['smtp_enable_starttls_auto'] == 'false' ? false : true
+    # try to redact passwords from output and command
+    output = "#{@event['check']['output']}".gsub(/(-p|-P|--password)\s*\S+/, '\1 <password redacted>')
+    command = "#{@event['check']['command']}".gsub(/(-p|-P|--password)\s*\S+/, '\1 <password redacted>')
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
-            #{@event['check']['output']}
+            #{output}
             Admin GUI: #{admin_gui}
             Host: #{@event['client']['name']}
             Timestamp: #{Time.at(@event['check']['issued'])}
             Address:  #{@event['client']['address']}
             Check Name:  #{@event['check']['name']}
-            Command:  #{@event['check']['command']}
+            Command:  #{command}
             Status:  #{status_to_string}
             Occurrences:  #{@event['occurrences']}
             #{playbook}

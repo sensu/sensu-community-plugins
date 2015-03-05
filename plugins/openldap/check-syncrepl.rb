@@ -3,8 +3,10 @@
 #   check-syncrepl
 #
 # DESCRIPTION:
-#   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working
-#   This currently only works with TLS and binding as a user
+#   This plugin checks OpenLDAP nodes to veryfiy syncrepl is working.
+#   The plugin will attempt to use an unauthenticated connection if no
+#   user name (with the -u or --user option) and password (with the -p
+#   or --password option) are specified.
 #
 # OUTPUT:
 #   plain text
@@ -17,7 +19,17 @@
 #   gem: net-ldap
 #
 # USAGE:
-#   #YELLOW
+#   bind to LDAP without authorisation
+#   ----------------------------------
+#   ./check-syncrepl.rb -h 'ldap1.domain,ldap2.domain'
+#   will compare the contextCSN of the ldap servers ldap1.domain and
+#   ldap2.domain
+#
+#   bind to LDAP requiring authorisation
+#   ------------------------------------
+#   ./check-syncrepl.rb -h 'ldap1.domain,ldap2.domain' -u auser -p passwd
+#   will bind to the ldap servers ldap1.domain and ldap2.domain as user
+#   auser with password passwd and compare the contextCSN
 #
 # NOTES:
 #
@@ -43,7 +55,7 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
          short: '-t PORT',
          long: '--port PORT',
          description: 'Port to connect to OpenLDAP on',
-         default: 636,
+         default: 389,
          proc: proc(&:to_i)
 
   option :base,
@@ -55,14 +67,17 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
   option :user,
          short: '-u USER',
          long: '--user USER',
-         description: 'User to bind as',
-         required: true
+         description: 'User to bind as'
 
   option :password,
          short: '-p PASSWORD',
          long: '--password PASSWORD',
-         description: 'Password used to bind',
-         required: true
+         description: 'Password used to bind'
+
+  option :insecure,
+         short: '-i',
+         long: '--insecure',
+         description: 'Do not use encryption'
 
   option :retries,
          short: '-r RETRIES',
@@ -72,16 +87,22 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
          proc: proc(&:to_i)
 
   def get_csns(host)
-    ldap = Net::LDAP.new host: host,
-                         port: config[:port],
-                         encryption: {
-                           method: :simple_tls
-                         },
-                         auth: {
-                           method: :simple,
-                           username: config[:user],
-                           password: config[:password]
-                         }
+    if config[:user]
+      ldap = Net::LDAP.new host: host,
+                           port: config[:port],
+                           auth: {
+                             method: :simple,
+                             username: config[:user],
+                             password: config[:password]
+                           }
+    else
+      ldap = Net::LDAP.new host: host,
+                           port: config[:port]
+    end
+
+    unless config[:insecure]
+      ldap.encryption(method: :simple_tls)
+    end
 
     begin
       if ldap.bind
@@ -89,11 +110,19 @@ class CheckSyncrepl < Sensu::Plugin::Check::CLI
           return entry['contextcsn']
         end
       else
-        critical "Cannot connect to #{host}:#{config[:port]} as #{config[:user]}"
+        message = "Cannot connect to #{host}:#{config[:port]}"
+        if config[:user]
+          message += " as #{config[:user]}"
+        end
+        critical message
       end
     end
   rescue
-    critical "Cannot connect to #{host}:#{config[:port]} as #{config[:user]}"
+    message = "Cannot connect to #{host}:#{config[:port]}"
+    if config[:user]
+      message += " as #{config[:user]}"
+    end
+    critical message
   end
 
   def run
