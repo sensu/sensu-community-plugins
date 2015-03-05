@@ -58,7 +58,7 @@ class UserPercent < Sensu::Plugin::Metric::CLI::Graphite
     users = {}
     pslist.lines.each do |line|
       user, cpu, mem = line.split
-      users[user] = {} if not users[user]
+      users[user] = {} unless users[user]
       h = { 'cpu' => cpu.to_f, 'mem' => mem.to_f }
       users[user] = users[user].merge(h) { |_key, oldval, newval| newval + oldval }
     end
