@@ -5,7 +5,7 @@
 # Heavily inspried (er, copied from) the GELF Handler writeen by
 # Joe Miller.
 #
-# Designed to take sensu events, transform them into logstah JSON events
+# Designed to take sensu events, transform them into logstash JSON events
 # and ship them to a redis server for logstash to index.  This also
 # generates a tag with either 'sensu-ALERT' or 'sensu-RECOVERY' so that
 # searching inside of logstash can be a little easier.
@@ -24,13 +24,12 @@ require 'time'
 require 'json'
 
 class LogstashHandler < Sensu::Handler
-
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
   end
 
   def action_to_string
-    @event['action'].eql?('resolve') ? "RESOLVE" : "ALERT"
+    @event['action'].eql?('resolve') ? 'RESOLVE' : 'ALERT'
   end
 
   def handle
@@ -51,17 +50,16 @@ class LogstashHandler < Sensu::Handler
       :occurrences   => @event['occurrences'],
       :action        => @event['action']
     }
-    logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].has_key?('type')
+    logstash_msg[:type] = settings['logstash']['type'] if settings['logstash'].key?('type')
 
     case settings['logstash']['output']
     when 'redis'
-      redis = Redis.new(:host => settings['logstash']['server'], :port => settings['logstash']['port'])
+      redis = Redis.new(host: settings['logstash']['server'], port: settings['logstash']['port'])
       redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
     when 'udp'
       socket = UDPSocket.new
       socket.send(JSON.parse(logstash_msg), 0, settings['logstash']['server'], settings['logstash']['port'])
       socket.close
     end
-
   end
 end

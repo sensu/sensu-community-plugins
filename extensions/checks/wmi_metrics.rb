@@ -33,17 +33,17 @@ module Sensu
 
       def definition
         {
-          :type => 'metric',
-          :name => name,
-          :interval => options[:interval],
-          :standalone => true,
-          :handler => options[:handler]
+          type: 'metric',
+          name: name,
+          interval: options[:interval],
+          standalone: true,
+          handler: options[:handler]
         }
       end
 
       def post_init
         @metrics = []
-        @wmi = WIN32OLE.connect("winmgmts://")
+        @wmi = WIN32OLE.connect('winmgmts://')
       end
 
       def run
@@ -63,10 +63,11 @@ module Sensu
       def options
         return @options if @options
         @options = {
-          :interval => 10,
-          :handler => 'graphite',
-          :add_client_prefix => true,
-          :path_prefix => 'WMI'
+          interval: 10,
+          handler: 'graphite',
+          add_client_prefix: true,
+          path_prefix: 'WMI',
+          prefix_at_start: 0
         }
         if settings[:wmi_metrics].is_a?(Hash)
           @options.merge!(settings[:wmi_metrics])
@@ -83,24 +84,21 @@ module Sensu
       def add_metric(*args)
         value = args.pop
         path = []
-        if options[:add_client_prefix]
-          path << settings[:client][:name]
-        end
-        path << options[:path_prefix]
+        path << options[:path_prefix] if options[:prefix_at_start]
+        path << settings[:client][:name] if options[:add_client_prefix]
+        path << options[:path_prefix] unless options[:prefix_at_start]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
 
-      def formatted_perf_data(provider, &callback)
+      def formatted_perf_data(provider, &_callback)
         full_provider = 'Win32_PerfFormattedData_' + provider
         EM.next_tick do
           result = []
           begin
             result = @wmi.ExecQuery('select * from ' + full_provider)
           rescue => error
-            @logger.debug('wmi query error', {
-              :error => error.to_s
-            })
+            @logger.debug('wmi query error', error: error.to_s)
           end
           yield result
         end
@@ -109,11 +107,11 @@ module Sensu
       def memory_metrics
         formatted_perf_data('PerfOS_Memory') do |result|
           result.each do |data|
-            %w[
+            %w(
               AvailableBytes
               CacheBytes
               CommittedBytes
-            ].each do |point|
+            ).each do |point|
               add_metric('Memory', point, data.send(point.to_sym))
             end
           end
@@ -124,12 +122,12 @@ module Sensu
       def disk_metrics
         formatted_perf_data('PerfDisk_LogicalDisk') do |disks|
           disks.each do |data|
-            %w[
+            %w(
               AvgDiskQueueLength
               FreeMegabytes
               PercentDiskTime
               PercentFreeSpace
-            ].each do |point|
+            ).each do |point|
               disk_name = data.Name.gsub(/[^0-9a-z]/i, '')
               add_metric('Disk', disk_name, point, data.send(point.to_sym))
             end
@@ -141,14 +139,14 @@ module Sensu
       def cpu_metrics
         formatted_perf_data('PerfOS_Processor') do |processors|
           processors.each do |data|
-            %w[
+            %w(
               InterruptsPerSec
               PercentIdleTime
               PercentInterruptTime
               PercentPrivilegedTime
               PercentProcessorTime
               PercentUserTime
-            ].each do |point|
+            ).each do |point|
               cpu_name = data.Name.gsub(/[^0-9a-z]/i, '')
               add_metric('CPU', cpu_name, point, data.send(point.to_sym))
             end
@@ -160,7 +158,7 @@ module Sensu
       def network_interface_metrics
         formatted_perf_data('Tcpip_NetworkInterface') do |interfaces|
           interfaces.each do |data|
-            %w[
+            %w(
               BytesReceivedPerSec
               BytesSentPerSec
               BytesTotalPerSec
@@ -172,7 +170,7 @@ module Sensu
               PacketsReceivedErrors
               PacketsReceivedPerSec
               PacketsSentPerSec
-            ].each do |point|
+            ).each do |point|
               interface_name = data.Name.gsub(/[^0-9a-z]/i, '')
               add_metric('Interface', interface_name, point, data.send(point.to_sym))
             end

@@ -1,0 +1,8 @@
+{
+  "elasticsearch": {
+    "host": "localhost",
+    "port": 9200,
+    "timeout": "sensu-metrics",
+    "timeout": 5
+  }
+}

@@ -13,7 +13,6 @@ require 'json'
 require 'fileutils'
 
 class LogEvent < Sensu::Handler
-
   def handle
     eventdir = "#{settings['logevent']['eventdir']}/#{@event['client']['name']}/#{@event['check']['name']}"
     FileUtils.mkdir_p(eventdir)
@@ -23,9 +22,9 @@ class LogEvent < Sensu::Handler
     end
 
     events = Dir.glob("#{eventdir}/*.#{@event['action']}")
-    if settings['logevent']['keep'] < events.length
+    # #YELLOW
+    if settings['logevent']['keep'] < events.length # rubocop:disable GuardClause
       FileUtils.rm_f(events.sort.reverse.shift(settings['logevent']['keep']))
     end
   end
-
 end

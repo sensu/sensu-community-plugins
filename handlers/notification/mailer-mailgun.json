@@ -1,0 +1,8 @@
+{
+  "mailer-mailgun": {
+    "mail_from": "sensu@example.com",
+    "mail_to": "bob@example.com",
+    "mg_apikey": "mailgunapikeygoeshere",
+    "mg_domain": "mailgun.domain.com"
+  }
+}

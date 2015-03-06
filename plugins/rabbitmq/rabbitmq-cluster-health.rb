@@ -23,46 +23,45 @@ require 'json'
 require 'rest_client'
 
 class CheckRabbitMQCluster < Sensu::Plugin::Check::CLI
-
   option :host,
-    :description => "RabbitMQ host",
-    :short => '-w',
-    :long => '--host HOST',
-    :default => 'localhost'
+         description: 'RabbitMQ host',
+         short: '-w',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :username,
-    :description => "RabbitMQ username",
-    :short => '-u',
-    :long => '--username USERNAME',
-    :default => 'guest'
+         description: 'RabbitMQ username',
+         short: '-u',
+         long: '--username USERNAME',
+         default: 'guest'
 
   option :password,
-    :description => "RabbitMQ password",
-    :short => '-p',
-    :long => '--password PASSWORD',
-    :default => 'guest'
+         description: 'RabbitMQ password',
+         short: '-p',
+         long: '--password PASSWORD',
+         default: 'guest'
 
   option :port,
-    :description => "RabbitMQ API port",
-    :short => '-P',
-    :long => '--port PORT',
-    :default => '15672'
+         description: 'RabbitMQ API port',
+         short: '-P',
+         long: '--port PORT',
+         default: '15672'
 
   option :nodes,
-    :description => "Optional comma separated list of expected nodes in the cluster",
-    :short => '-n',
-    :long => '--nodes NODE1,NODE2',
-    :default => ""
+         description: 'Optional comma separated list of expected nodes in the cluster',
+         short: '-n',
+         long: '--nodes NODE1,NODE2',
+         default: ''
 
   def run
     res = cluster_healthy?
 
-    if res["status"] == "ok"
-      ok res["message"]
-    elsif res["status"] == "critical"
-      critical res["message"]
+    if res['status'] == 'ok'
+      ok res['message']
+    elsif res['status'] == 'critical'
+      critical res['message']
     else
-      unknown res["message"]
+      unknown res['message']
     end
   end
 
@@ -77,7 +76,7 @@ class CheckRabbitMQCluster < Sensu::Plugin::Check::CLI
 
   def failed_nodes?(servers_status)
     failed_nodes = []
-    servers_status.each { |sv, stat| failed_nodes << sv unless stat==true }
+    servers_status.each { |sv, stat| failed_nodes << sv unless stat == true }
     failed_nodes
   end
 
@@ -100,19 +99,18 @@ class CheckRabbitMQCluster < Sensu::Plugin::Check::CLI
       failed_nodes = failed_nodes?(servers_status)
 
       # build status and message
-      status = failed_nodes.empty? && missing_nodes.empty? ? "ok" : "critical"
+      status = failed_nodes.empty? && missing_nodes.empty? ? 'ok' : 'critical'
       if failed_nodes.empty?
         message = "#{servers_status.keys.count} healthy cluster nodes"
       else
         message = "#{failed_nodes.count} failed cluster node: #{failed_nodes.sort.join(',')}"
       end
       message.prepend("#{missing_nodes.count } node(s) not found: #{missing_nodes.join(',')}. ") unless missing_nodes.empty?
-      { "status" => status, "message" => message }
+      { 'status' => status, 'message' => message }
     rescue Errno::ECONNREFUSED => e
-      { "status" => "critical", "message" => e.message }
-    rescue Exception => e
-      { "status" => "unknown", "message" => e.message }
+      { 'status' => 'critical', 'message' => e.message }
+    rescue => e
+      { 'status' => 'unknown', 'message' => e.message }
     end
   end
-
 end

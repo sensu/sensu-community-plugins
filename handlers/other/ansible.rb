@@ -21,7 +21,6 @@ require 'sensu-handler'
 require 'json'
 
 class Ansible < Sensu::Handler
-
   def handle
     ansible = settings['ansible']['command'] || 'ansible-playbook'
     playbook = settings['ansible']['playbook'] || nil
@@ -34,12 +33,11 @@ class Ansible < Sensu::Handler
     command = "#{ansible} -e '#{extra_vars}' #{playbook}"
     output = `#{command}`
 
-    if $?.exitstatus > 0
+    if $CHILD_STATUS.exitstatus > 0
       puts output
       exit 1
     else
       puts "SUCCESS: #{command}"
     end
   end
-
 end
