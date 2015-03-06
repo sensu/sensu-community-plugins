@@ -50,7 +50,6 @@ class CheckRabbitMQPartitions < Sensu::Plugin::Check::CLI
          boolean: true,
          default: false
 
-
   def run
     critical 'network partition detected' if partition?
     ok 'no network partition detected'
@@ -70,7 +69,7 @@ class CheckRabbitMQPartitions < Sensu::Plugin::Check::CLI
       port: config[:port],
       user: config[:user],
       password: config[:password],
-      ssl: config[:ssl],
+      ssl: config[:ssl]
     )
   end
 end
