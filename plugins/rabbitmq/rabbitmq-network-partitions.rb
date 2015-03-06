@@ -67,7 +67,7 @@ class CheckRabbitMQPartitions < Sensu::Plugin::Check::CLI
     CarrotTop.new(
       host: config[:host],
       port: config[:port],
-      user: config[:user],
+      user: config[:username],
       password: config[:password],
       ssl: config[:ssl]
     )
