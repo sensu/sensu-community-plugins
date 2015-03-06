@@ -1,6 +1,28 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+#   package-updates-metric.py
+#
+# DESCRIPTION:
+# package-updates-metric is used to check avaliable package updates
+# for Debian or Ubuntu system.
+# The script is inspired by /usr/lib/update-notifier/apt_check.py
+#
+# OUTPUT:
+#   JSON-formatted text
+#
+# PLATFORMS:
+#   Debian, Ubuntu
+#
+# DEPENDENCIES:
+# Python APT Library
+#
+# LICENSE:
+#   Huang Yaming <yumminhuang@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 import apt
 import apt_pkg
 import json
@@ -9,12 +31,6 @@ import subprocess
 import sys
 
 
-"""
-security-updates-metric is used to check avaliable package updates
-for Debian or Ubuntu system.
-
-The program is inspired by /usr/lib/update-notifier/apt_check.py
-"""
 SYNAPTIC_PINFILE = "/var/lib/synaptic/preferences"
 DISTRO = subprocess.check_output(["lsb_release", "-c", "-s"],
                                  universal_newlines=True).strip()
@@ -110,7 +126,7 @@ def get_update_packages():
 
 def package_check_metric():
     """
-    Return output and exit status as Sensu required.
+    Print output and exit status as Sensu required.
     OK       0: no updates
     WARNING  1: available normal updates
     CRITICAL 2: available security updates
