@@ -46,17 +46,16 @@ class CheckSheduledTask < Sensu::Plugin::Check::CLI
     end
   end
 
-  def disabled_task_summary
-    @tasks.select { |task| task[:next_run].downcase == 'disabled' }
-      .map { |task| "Name: #{task[:name]}, Next Run: #{task[:next_run]}, Status: #{task[:status]}" }.join(', ')
-  end
-
-  def task_summary
-    @tasks.map { |task| "Name: #{task[:name]}, Next Run: #{task[:next_run]}, Status: #{task[:status]}" }.join('\n')
+  def summary(tasks)
+    tasks.map { |task| "Name: #{task[:name]}, Next Run: #{task[:next_run]}, Status: #{task[:status]}" }.join('\n')
   end
 
   def disabled?
-    @tasks.any? { |task| task[:next_run].downcase == 'disabled' }
+    disabled_tasks.any?
+  end
+
+  def disabled_tasks
+    @tasks.select { |task| task[:next_run].downcase == 'disabled' }
   end
 
   def run
@@ -71,8 +70,8 @@ class CheckSheduledTask < Sensu::Plugin::Check::CLI
       conf << "\nIgnoring: #{config[:ignore].join(', ')}"
     end
 
-    warning(disabled_task_summary + conf) if disabled?
-    output_string = task_summary
+    warning(summary(disabled_tasks) + conf) if disabled?
+    output_string = summary(@tasks)
     ok(output_string + conf)
   end
 end
