@@ -57,6 +57,7 @@ class CheckMTU < Sensu::Plugin::Check::CLI
          boolean: true,
          default: false
 
+  # rubocop:disable Metrics/AbcSize
   def run
     device = config[:interface]
     required_mtu = config[:mtu]
