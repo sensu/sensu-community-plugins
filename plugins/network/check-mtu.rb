@@ -59,12 +59,16 @@ class CheckMTU < Sensu::Plugin::Check::CLI
          Description: 'Specify the level of criticality to warning (instead of critical) if MTU size does not match',
          default: false
 
+  def get_mtu_file
+    "/sys/class/net/#{config[:interface]}/mtu"
+  end
+
   # rubocop:disable Metrics/AbcSize
   def run
     device = config[:interface]
     required_mtu = config[:mtu]
 
-    mtu_file = "/sys/class/net/#{device}/mtu"
+    mtu_file = get_mtu_file
 
     error_handling = 'critical'
     error_handling = 'warning' if config[:warn]
