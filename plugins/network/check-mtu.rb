@@ -27,7 +27,7 @@
 #     check-mtu.rb --interface eth1 --mtu 9000 --warn
 #
 # NOTES:
-#   Does it behave differently on specific platforms, specific use cases, etc
+#   No special notes. This should be fairly straight forward.
 #
 # LICENSE:
 #   Robin <robin81@gmail.com>
@@ -48,6 +48,7 @@ class CheckMTU < Sensu::Plugin::Check::CLI
   option :mtu,
          short: '-m MTU',
          long: '--mtu MTU',
+         description: 'Optionally specify desired MTU size',
          proc: proc(&:to_i),
          default: 1500
 
@@ -55,6 +56,7 @@ class CheckMTU < Sensu::Plugin::Check::CLI
          short: '-w',
          long: '--warn',
          boolean: true,
+         Description: 'Specify the level of criticality to warning (instead of critical) if MTU size does not match',
          default: false
 
   # rubocop:disable Metrics/AbcSize
