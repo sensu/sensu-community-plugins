@@ -35,9 +35,11 @@ describe CheckMTU  do
   let(:checker) { described_class.new }
   let(:checker_9000) { described_class.new }
   let(:checker_no_file) { described_class.new }
+  let(:exit_code){ nil }
 
   ## Simulate the system MTU to be 1500
   before(:each) do
+    exit_code = nil
     def checker.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-1500'
     end
@@ -47,8 +49,9 @@ describe CheckMTU  do
     begin
       checker.run
     rescue SystemExit => e
-      expect(e.status).to eq 0
+      exit_code = e.status
     end
+    expect(exit_code).to eq 0
   end
 
   it 'returns ok by default with 1500 MTU (with warn setting)' do
@@ -56,8 +59,9 @@ describe CheckMTU  do
     begin
       checker.run
     rescue SystemExit => e
-      expect(e.status).to eq 0
+      exit_code = e.status
     end
+    expect(exit_code).to eq 0
   end
 
   it 'returns critical if we ask it to check for 9000 while it has 1500 MTU interface' do
@@ -65,8 +69,9 @@ describe CheckMTU  do
     begin
       checker.run
     rescue SystemExit => e
-      expect(e.status).to eq 2
+      exit_code = e.status
     end
+    expect(exit_code).to eq 2
   end
 
   it 'returns critical if we ask it to check for 9000 while it has 1500 MTU interface (with warn setting)' do
@@ -75,12 +80,14 @@ describe CheckMTU  do
     begin
       checker.run
     rescue SystemExit => e
-      expect(e.status).to eq 1
+      exit_code = e.status
     end
+    expect(exit_code).to eq 1
   end
 
   ## Simulate system MTU to be 9000
   before(:each) do
+    exit_code = nil
     def checker_9000.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-9000'
     end
@@ -90,8 +97,9 @@ describe CheckMTU  do
     begin
       checker_9000.run
     rescue SystemExit => e
-      expect(e.status).to eq 2
+      exit_code = e.status
     end
+    expect(exit_code).to eq 2
   end
 
   it 'returns warning if we ask it to check for 1500 MTU while we have 9000 MTU interface (with warn setting on)' do
@@ -99,8 +107,9 @@ describe CheckMTU  do
     begin
       checker_9000.run
     rescue SystemExit => e
-      expect(e.status).to eq 1
+      exit_code = e.status
     end
+    expect(exit_code).to eq 1
   end
 
   it 'returns ok if we ask it to check for 9000 MTU while we have 9000 MTU interface' do
@@ -108,8 +117,9 @@ describe CheckMTU  do
     begin
       checker_9000.run
     rescue SystemExit => e
-      expect(e.status).to eq 0
+      exit_code = e.status
     end
+    expect(exit_code).to eq 0
   end
 
   it 'returns ok if we ask it to check for 9000 MTU while we have 9000 MTU interface (with warn setting on)' do
@@ -118,12 +128,14 @@ describe CheckMTU  do
     begin
       checker_9000.run
     rescue SystemExit => e
-      expect(e.status).to eq 0
+      exit_code = e.status
     end
+    expect(exit_code).to eq 0
   end
 
   ## This should never happen. This simulates a situation (which may not happen) whereby a system's MTU info cannot be read
   before(:each) do
+    exit_code = nil
     def checker_no_file.locate_mtu_file
       'no_existing_file'
     end
@@ -133,8 +145,9 @@ describe CheckMTU  do
     begin
       checker_no_file.run
     rescue SystemExit => e
-      expect(e.status).to eq 2
+      exit_code = e.status
     end
+    expect(exit_code).to eq 2
   end
 
   it 'returns warning (with warn setting is on)' do
@@ -142,8 +155,9 @@ describe CheckMTU  do
     begin
       checker_no_file.run
     rescue SystemExit => e
-      expect(e.status).to eq 1
+      exit_code = e.status
     end
+    expect(exit_code).to eq 1
   end
 
 end
