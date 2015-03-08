@@ -3,8 +3,10 @@
 #   check-mtu_spec
 #
 # DESCRIPTION:
+#  rspect tests for check-mtu
 #
 # OUTPUT:
+#   RSpec testing output: passes and failures info
 #
 # PLATFORMS:
 #   Linux
