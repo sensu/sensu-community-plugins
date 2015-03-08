@@ -35,7 +35,8 @@ describe CheckMTU  do
   let(:checker) { described_class.new }
   let(:checker_9000) { described_class.new }
   let(:checker_no_file) { described_class.new }
-  
+
+  ## Simulate the system MTU to be 1500
   before(:each) do
     def checker.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-1500'
@@ -78,6 +79,7 @@ describe CheckMTU  do
     end
   end
 
+  ## Simulate system MTU to be 9000
   before(:each) do
     def checker_9000.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-9000'
@@ -120,6 +122,7 @@ describe CheckMTU  do
     end
   end
 
+  ## This should never happen. This simulates a situation (which may not happen) whereby a system's MTU info cannot be read
   before(:each) do
     def checker_no_file.locate_mtu_file
       'no_existing_file'
