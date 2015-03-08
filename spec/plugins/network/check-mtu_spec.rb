@@ -29,17 +29,15 @@ require_relative '../../../plugins/network/check-mtu'
 require 'plugin_stub'
 
 describe CheckMTU  do
-
   include_context :plugin_stub
 
   let(:checker) { described_class.new }
   let(:checker_9000) { described_class.new }
   let(:checker_no_file) { described_class.new }
-  let(:exit_code){ nil }
+  let(:exit_code) { nil }
 
   ## Simulate the system MTU to be 1500
   before(:each) do
-    exit_code = nil
     def checker.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-1500'
     end
@@ -87,7 +85,6 @@ describe CheckMTU  do
 
   ## Simulate system MTU to be 9000
   before(:each) do
-    exit_code = nil
     def checker_9000.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-9000'
     end
@@ -135,7 +132,6 @@ describe CheckMTU  do
 
   ## This should never happen. This simulates a situation (which may not happen) whereby a system's MTU info cannot be read
   before(:each) do
-    exit_code = nil
     def checker_no_file.locate_mtu_file
       'no_existing_file'
     end
@@ -159,5 +155,4 @@ describe CheckMTU  do
     end
     expect(exit_code).to eq 1
   end
-
 end
