@@ -1,0 +1,146 @@
+#! /usr/bin/env ruby
+#
+#   check-mtu_spec
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   rspec
+#
+# USAGE:
+#   For Rspec Testing
+#
+# NOTES:
+#   For Rspec Testing
+#
+# LICENSE:
+#   Copyright 2015 Robin <robin81@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+require_relative '../../../plugins/network/check-mtu'
+
+require 'plugin_stub'
+
+describe CheckMTU  do
+
+  include_context :plugin_stub
+
+  let(:checker) { described_class.new }
+  let(:checker_9000) { described_class.new }
+  let(:checker_no_file) { described_class.new }
+  
+  before(:each) do
+    def checker.locate_mtu_file
+      'spec/fixtures/plugins/network/check-mtu-1500'
+    end
+  end
+
+  it 'returns ok by default with 1500 MTU ' do
+    begin
+      checker.run
+    rescue SystemExit => e
+      expect(e.status).to eq 0
+    end
+  end
+
+  it 'returns ok by default with 1500 MTU (with warn setting)' do
+    checker.config[:warn] = true
+    begin
+      checker.run
+    rescue SystemExit => e
+      expect(e.status).to eq 0
+    end
+  end
+
+  it 'returns critical if we ask it to check for 9000 while it has 1500 MTU interface' do
+    checker.config[:mtu] = 9000
+    begin
+      checker.run
+    rescue SystemExit => e
+      expect(e.status).to eq 2
+    end
+  end
+
+  it 'returns critical if we ask it to check for 9000 while it has 1500 MTU interface (with warn setting)' do
+    checker.config[:mtu] = 9000
+    checker.config[:warn] = true
+    begin
+      checker.run
+    rescue SystemExit => e
+      expect(e.status).to eq 1
+    end
+  end
+
+  before(:each) do
+    def checker_9000.locate_mtu_file
+      'spec/fixtures/plugins/network/check-mtu-9000'
+    end
+  end
+
+  it 'returns critical if we ask it to check for 1500 MTU while we have 9000 MTU interface' do
+    begin
+      checker_9000.run
+    rescue SystemExit => e
+      expect(e.status).to eq 2
+    end
+  end
+
+  it 'returns warning if we ask it to check for 1500 MTU while we have 9000 MTU interface (with warn setting on)' do
+    checker_9000.config[:warn] = true
+    begin
+      checker_9000.run
+    rescue SystemExit => e
+      expect(e.status).to eq 1
+    end
+  end
+
+  it 'returns ok if we ask it to check for 9000 MTU while we have 9000 MTU interface' do
+    checker_9000.config[:mtu] = 9000
+    begin
+      checker_9000.run
+    rescue SystemExit => e
+      expect(e.status).to eq 0
+    end
+  end
+
+  it 'returns ok if we ask it to check for 9000 MTU while we have 9000 MTU interface (with warn setting on)' do
+    checker_9000.config[:warn] = true
+    checker_9000.config[:mtu] = 9000
+    begin
+      checker_9000.run
+    rescue SystemExit => e
+      expect(e.status).to eq 0
+    end
+  end
+
+  before(:each) do
+    def checker_no_file.locate_mtu_file
+      'no_existing_file'
+    end
+  end
+
+  it 'returns critical' do
+    begin
+      checker_no_file.run
+    rescue SystemExit => e
+      expect(e.status).to eq 2
+    end
+  end
+
+  it 'returns warning (with warn setting is on)' do
+    checker_no_file.config[:warn] = true
+    begin
+      checker_no_file.run
+    rescue SystemExit => e
+      expect(e.status).to eq 1
+    end
+  end
+
+end
