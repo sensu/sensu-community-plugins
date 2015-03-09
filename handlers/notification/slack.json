@@ -6,7 +6,7 @@
     "surround": "optional - can be used for bold(*), italics(_), code(`) and preformatted(```)",
     "bot_name": "optional bot name, defaults to slack defined",
     "proxy_addr": "optional - your proxy address for http proxy, like squid, i.e. 192.168.10.100",
-    "proxy_port": "optional - should be port used by proxy, i.e. 3128"
+    "proxy_port": "optional - should be port used by proxy, i.e. 3128",
     "markdown_enabled": false
   }
 }
