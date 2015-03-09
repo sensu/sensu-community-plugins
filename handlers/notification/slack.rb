@@ -30,6 +30,14 @@ class Slack < Sensu::Handler
     get_setting('channel')
   end
 
+  def slack_proxy_addr
+    get_setting('proxy_addr')
+  end
+
+  def slack_proxy_port
+    get_setting('proxy_port')
+  end
+
   def slack_message_prefix
     get_setting('message_prefix')
   end
@@ -69,7 +77,13 @@ class Slack < Sensu::Handler
 
   def post_data(notice)
     uri = URI(slack_webhook_url)
-    http = Net::HTTP.new(uri.host, uri.port)
+
+    if (defined?(slack_proxy_addr)).nil?
+      http = Net::HTTP.new(uri.host, uri.port)
+    else
+      http = Net::HTTP::Proxy(slack_proxy_addr, slack_proxy_port).new(uri.host, uri.port)
+    end
+
     http.use_ssl = true
 
     req = Net::HTTP::Post.new("#{uri.path}?#{uri.query}")
