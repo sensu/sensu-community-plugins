@@ -40,7 +40,7 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
          short: '-h HOST',
          long: '--host HOST',
          description: 'HOST to check mod_status output',
-         default: '127.0.0.1'
+         default: 'localhost'
 
   option :port,
          short: '-p PORT',
