@@ -52,8 +52,7 @@ module Sensu
 
         # setup timer for cumulative metrics
         EM.add_periodic_timer(1) do
-          network_interface_metrics do
-          end
+          network_interface_metrics
         end
         true
       end
@@ -62,10 +61,10 @@ module Sensu
         memory_metrics do
           disk_metrics do
             cpu_metrics do
+              yield flush_metrics, 0
             end
           end
         end
-        yield flush_metrics, 0
       end
 
       private
