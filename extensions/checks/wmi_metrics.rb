@@ -85,7 +85,7 @@ module Sensu
       end
 
       def flush_metrics
-        metrics = @metrics.collect { |k, v| [k, v, Time.now.to_i].join(" ") }
+        metrics = @metrics.map { |k, v| [k, v, Time.now.to_i].join(' ') }
         @metrics = {}
         metrics.join("\n") + "\n"
       end
