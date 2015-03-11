@@ -15,6 +15,11 @@
 #
 # Copyright 2014 Heavy Water Operations, LLC.
 #
+# Changelog
+# ----------
+# 03/11/2015 - Alan Smith (@cloakedcode) added cumulative metric
+#              collection for network traffic over interval timespan.
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
@@ -42,20 +47,25 @@ module Sensu
       end
 
       def post_init
-        @metrics = []
+        @metrics = {}
         @wmi = WIN32OLE.connect('winmgmts://')
+
+        # setup timer for cumulative metrics
+        EM.add_periodic_timer(1) do
+          network_interface_metrics do
+          end
+        end
+        true
       end
 
       def run
         memory_metrics do
           disk_metrics do
             cpu_metrics do
-              network_interface_metrics do
-                yield flush_metrics, 0
-              end
             end
           end
         end
+        yield flush_metrics, 0
       end
 
       private
@@ -63,7 +73,7 @@ module Sensu
       def options
         return @options if @options
         @options = {
-          interval: 10,
+          interval: 60,
           handler: 'graphite',
           add_client_prefix: true,
           path_prefix: 'WMI'
@@ -75,9 +85,9 @@ module Sensu
       end
 
       def flush_metrics
-        metrics = @metrics.join("\n") + "\n"
-        @metrics = []
-        metrics
+        metrics = @metrics.collect { |k, v| [k, v, Time.now.to_i].join(" ") }
+        @metrics = {}
+        metrics.join("\n") + "\n"
       end
 
       def add_metric(*args)
@@ -86,7 +96,9 @@ module Sensu
         path << settings[:client][:name] if options[:add_client_prefix]
         path << options[:path_prefix]
         path = (path + args).join('.')
-        @metrics << [path, value, Time.now.to_i].join(' ')
+
+        @metrics[path] = 0 if @metrics[path].nil?
+        @metrics[path] += value.to_i
       end
 
       def formatted_perf_data(provider, &_callback)
