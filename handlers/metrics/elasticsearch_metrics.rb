@@ -33,15 +33,11 @@ class ElasticsearchMetrics < Sensu::Handler
     Digest::MD5.new.update rdm
   end
 
-  def time_stamp
-    DateTime.now.to_s
-  end
-
   def handle
     @event['check']['output'].split("\n").each do |line|
       v = line.split "\t"
       metrics = {
-        :@timestamp => time_stamp,
+        :@timestamp => ( DateTime.strptime( v[2], '%s' ) rescue DateTime.now.to_s ),
         client: @event['client']['name'],
         check_name: @event['check']['name'],
         status: @event['check']['status'],
