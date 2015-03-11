@@ -45,7 +45,7 @@ class ElasticsearchMetrics < Sensu::Handler
         command: @event['check']['command'],
         occurrences: @event['occurrences'],
         key: v[0],
-        value: v[1]
+        value: ( Float( v[1] ) rescue v[1] )
       }
 
       begin
