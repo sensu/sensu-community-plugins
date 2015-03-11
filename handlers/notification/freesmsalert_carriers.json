@@ -1,0 +1,33 @@
+{
+  "free_sms_alert": {
+    "carrier_portal": {
+      // US carriers:
+      "att": "%number%@txt.att.net", 
+      "verizon": "%number%@vtext.com",
+      "tmobile": "%number%@tmomail.net",
+      "sprint": "%number%@messaging.sprintpcs.com",
+      "virgin": "%number%@vmobl.com",
+      "uscellular": "%number%@email.uscc.net",
+      "nextel": "%number%@messaging.nextel.com",
+      "boost": "%number%@myboostmobile.com",
+      "alltel": "%number%@message.alltel.com",
+      // Canadian carriers:
+      "telus": "%number%@msg.telus.com",
+      "rogers": "%number%@pcs.rogers.com",
+      "fido": "%number%@fido.ca",
+      "bell": "%number%@txt.bell.ca",
+      "mts": "%number%@text.mtsmobility.com",
+      "kudo": "%number%@msg.koodomobile.com",
+      "presidentschoice": "%number%@txt.bell.ca",
+      "sasktel": "%number%@sms.sasktel.com",
+      "solo": "%number%@txt.bell.ca",
+      "virgincanada": "%number%@vmobile.ca",
+      // Dummy carrier (in case you actually want to send an email):
+      "email": "%number%"
+    },
+    "smtp_address": "localhost",
+    "smtp_domain":  "localhost.localdomain",
+    "smtp_port":    "25",
+    "mail_from":    "sensu_alert@mydomain.com"
+  }
+}
