@@ -346,8 +346,8 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       num_indents = line.count("\t")
       if m = line.match(/^Keyspace:\s+(\w+)$/)
         keyspace = m[1]
-      elsif m = line.match(/\t\tColumn Family[^:]*:\s+(\w+)$/)
-        cf = m[1]
+      elsif m = line.match(/\t\t(Column Family|Table)[^:]*:\s+(\w+)$/)
+        cf = m[2]
       elsif num_indents == 0
         # keyspace = nil
         cf = nil
