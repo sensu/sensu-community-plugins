@@ -18,7 +18,8 @@
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
-#   gem: httparty
+#   gem: rest-client
+#   gem: json
 #
 # USAGE:
 #   # Basic usage
@@ -36,7 +37,8 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'httparty'
+require 'rest-client'
+require 'json'
 
 # Checks a single DNS entry has a rating above a certain level
 class CheckSSLQualys < Sensu::Plugin::Check::CLI
@@ -68,19 +70,45 @@ class CheckSSLQualys < Sensu::Plugin::Check::CLI
          proc: proc { |g| GRADE_OPTIONS.index(g) },
          default: 3 # 'B'
 
-  def ssl_info
-    r = HTTParty.get("#{config[:api_url]}analyze?host=#{config[:domain]}")
-    check_status = r['status']
-    if check_status == 'ERROR'
-      critical "ERROR on #{config[:domain]} check"
-    elsif check_status != 'READY'
-      warning "#{config[:domain]} check not READY"
+  option :num_checks,
+         short: '-n NUM_CHECKS',
+         long: '--number-checks NUM_CHECKS',
+         description: 'The number of checks to make before giving up',
+         proc: proc { |t| t.to_i },
+         default: 24
+
+  option :between_checks,
+         short: '-t SECONDS',
+         long: '--time-between SECONDS',
+         description: 'The time between each poll of the API',
+         proc: proc { |t| t.to_i },
+         default: 10
+
+  def ssl_api_request(fromCache)
+    params = { host: config[:domain] }
+    params.merge!(startNew: 'on') unless fromCache
+    r = RestClient.get("#{config[:api_url]}analyze", params: params)
+    warning "HTTP#{r.code} recieved from API" unless r.code == 200
+    JSON.parse(r.body)
+  end
+
+  def ssl_check(fromCache)
+    json = ssl_api_request(fromCache)
+    warning "ERROR on #{config[:domain]} check" if json['status'] == 'ERROR'
+    json
+  end
+
+  def ssl_recheck
+    1.upto(config[:num_checks]) do |step|
+      json = ssl_check(step != 1)
+      return json if json['status'] == 'READY'
+      sleep(config[:between_checks])
     end
-    r
+    warning 'Timeout waiting for check to finish'
   end
 
   def ssl_grades
-    ssl_info['endpoints'].map do |endpoint|
+    ssl_recheck['endpoints'].map do |endpoint|
       endpoint['grade']
     end
   end
