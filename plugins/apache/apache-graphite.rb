@@ -33,6 +33,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/http'
 require 'net/https'
+require 'uri'
 
 class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :host,
@@ -73,29 +74,36 @@ class ApacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--secure',
          description: 'Use SSL'
 
-  def acquire_mod_status
-    http = Net::HTTP.new(config[:host], config[:port])
+  def acquire_mod_status(uri,request_max=5)
+    http = Net::HTTP.new(uri.host, config[:port])
     if config[:secure]
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.use_ssl = true
     end
-    req = Net::HTTP::Get.new(config[:path])
+    req = Net::HTTP::Get.new(uri.request_uri)
     if !config[:user].nil? && !config[:password].nil?
       req.basic_auth config[:user], config[:password]
     end
-    res = http.request(req)
+    
+    res = Net::HTTP.start(uri.host, uri.port) {|http|
+        http.request(req)
+    }
+    
     case res.code
     when '200'
       res.body
+    when '301', '303'
+        acquire_mod_status(URI(res['location']), request_max - 1)
     else
       critical "Unable to get Apache metrics, unexpected HTTP response code: #{res.code}"
     end
   end
 
   def run
+    uri = URI.parse('http://'+config[:host]+config[:path])
     timestamp = Time.now.to_i
     stats = {}
-    acquire_mod_status.split("\n").each do |line|
+    acquire_mod_status(uri).split("\n").each do |line|
       name, value = line.split(': ')
       case name
       when 'Total Accesses'
