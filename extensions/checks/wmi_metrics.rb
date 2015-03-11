@@ -52,7 +52,8 @@ module Sensu
 
         # setup timer for cumulative metrics
         EM.add_periodic_timer(1) do
-          network_interface_metrics
+          network_interface_metrics do
+          end
         end
         true
       end
