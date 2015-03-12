@@ -62,9 +62,11 @@ module Sensu
         @options = {
           interval: 10,
           handler: 'graphite',
+          add_metric_prefix: true,
+          metric_prefix: 'os',
           add_client_prefix: true,
           path_prefix: 'system',
-          prefix_at_start: 0
+          prefix_at_start: 1
         }
         if settings[:system_profile].is_a?(Hash)
           @options.merge!(settings[:system_profile])
@@ -84,6 +86,7 @@ module Sensu
         path << options[:path_prefix] if options[:prefix_at_start]
         path << settings[:client][:name] if options[:add_client_prefix]
         path << options[:path_prefix] unless options[:prefix_at_start]
+        path << options[:metric_prefix] if options[:add_metric_prefix]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
