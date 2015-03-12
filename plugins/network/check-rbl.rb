@@ -53,7 +53,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'dnsbl-client'
+require 'dnsbl/client'
 require 'set'
 
 class RblCheck < Sensu::Plugin::Check::CLI
