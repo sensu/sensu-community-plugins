@@ -22,3 +22,6 @@ Documentation:
 
 IfUnlessModifier:
   Enabled: false
+
+Metrics/AbcSize:
+  Max: 103
