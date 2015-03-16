@@ -37,7 +37,7 @@ class Pagerduty < Sensu::Handler
                    when 'create'
                      Redphone::Pagerduty.trigger_incident(
                        service_key: api_key,
-                       incident_key: [incident_key_prefix, incident_key].compact.join(' '),
+                       incident_key: [incident_key_prefix, incident_key].compact.join(''),
                        description: [description_prefix, event_summary].compact.join(' '),
                        details: @event
                      )
