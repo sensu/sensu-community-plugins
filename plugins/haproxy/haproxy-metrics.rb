@@ -162,8 +162,12 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
         output "#{config[:scheme]}.#{line[0]}.response_4xx", line[42]
         output "#{config[:scheme]}.#{line[0]}.response_5xx", line[43]
         output "#{config[:scheme]}.#{line[0]}.response_other", line[44]
-        output "#{config[:scheme]}.#{line[0]}.requests_per_second", line[46]
-        output "#{config[:scheme]}.#{line[0]}.requests_per_second_max", line[47]
+        unless line[46].nil?
+          output "#{config[:scheme]}.#{line[0]}.requests_per_second", line[46]
+        end
+        unless line[47].nil?
+          output "#{config[:scheme]}.#{line[0]}.requests_per_second_max", line[47]
+        end
         output "#{config[:scheme]}.#{line[0]}.queue_time", line[58]
         output "#{config[:scheme]}.#{line[0]}.connect_time", line[59]
         output "#{config[:scheme]}.#{line[0]}.response_time", line[60]
