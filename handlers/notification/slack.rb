@@ -9,6 +9,22 @@
 # integration in slack. You can create the required webhook by visiting
 # https://{your team}.slack.com/services/new/incoming-webhook
 #
+# ## Client Configuraiton
+#
+# It is possible to select the Slack channel a message will be sent to at
+# event time using the 'sensu_channel' check configuration.
+#
+#    {
+#      "checks": {
+#      "my_check": {
+#        "handlers": ["default", "slack"],
+#        "slack_channel": "#mycustomchannel",
+#        "command": "some-command.sh",
+#        ...
+#      }
+#    }
+#
+#
 # After you configure your webhook, you'll need the webhook URL from the integration.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -27,6 +43,9 @@ class Slack < Sensu::Handler
   end
 
   def slack_channel
+    if @event['check']['slack_channel']
+      return @event['check']['slack_channel']
+    end
     get_setting('channel')
   end
 
@@ -63,6 +82,7 @@ class Slack < Sensu::Handler
   end
 
   def handle
+
     description = @event['check']['notification'] || build_description
     post_data("*Check*\n#{incident_key}\n\n*Description*\n#{description}")
   end
