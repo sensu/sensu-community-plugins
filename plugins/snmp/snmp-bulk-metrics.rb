@@ -67,17 +67,30 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Number of supplied OIDs that should not be iterated over (defaults to 0)',
          default: 0
 
+  option :mibdir,
+         short: '-d mibdir',
+         description: 'Full path to custom MIB directory.'
+
+  option :mibs,
+         short: '-l mib[,mib,mib...]',
+         description: 'Custom MIBs to load (from custom mib path).',
+         default: ''
+
   option :timeout,
          short: '-t timeout (seconds) (defaults to 5)',
          default: 5
 
   def run
     oids = config[:objectid].split(',')
+    mibs = config[:mibs].split(',')
     begin
       manager = SNMP::Manager.new(host: "#{config[:host]}",
                                   community: "#{config[:community]}",
                                   version: config[:snmp_version].to_sym,
                                   timeout: config[:timeout].to_i)
+      if config[:mibdir] and not mibs.empty?
+        manager.load_modules(mibs, config[:mibdir])
+      end
       response = manager.get_bulk(config[:nonrepeat].to_i,
                                   config[:maxrepeat].to_i,
                                   oids)
