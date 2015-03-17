@@ -81,7 +81,6 @@ class Slack < Sensu::Handler
   end
 
   def handle
-
     description = @event['check']['notification'] || build_description
     post_data("*Check*\n#{incident_key}\n\n*Description*\n#{description}")
   end
