@@ -103,10 +103,14 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     response.each_varbind do |vb|
       name = vb.oid
       name = "#{name}".gsub('.', '_') if config[:graphite]
-      if config[:prefix]
-        output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}.#{name}", vb.value.to_f
-      else
-        output "#{config[:host]}.#{config[:suffix]}.#{name}", vb.value.to_f
+      begin
+        if config[:prefix]
+          output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}.#{name}", value.to_f
+        else
+          output "#{config[:host]}.#{config[:suffix]}.#{name}", vb.value.to_f
+        end
+      rescue NameError
+        # Some values may fail to cast to float
       end
     end
     manager.close
