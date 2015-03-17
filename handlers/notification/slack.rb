@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # Copyright 2014 Dan Shultz and contributors.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
