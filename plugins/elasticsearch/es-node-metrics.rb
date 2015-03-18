@@ -85,7 +85,12 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
     metrics['process.mem.resident_in_bytes'] = node['process']['mem']['resident_in_bytes']
     metrics['jvm.mem.heap_used_in_bytes'] = node['jvm']['mem']['heap_used_in_bytes']
     metrics['jvm.mem.non_heap_used_in_bytes'] = node['jvm']['mem']['non_heap_used_in_bytes']
-    metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis']
+    if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
+      metrics['jvm.gc.collectors.young.collection_time'] = node['jvm']['gc']['collectors']['young']['collection_time_in_millis']
+      metrics['jvm.gc.collectors.old.collection_time'] = node['jvm']['gc']['collectors']['old']['collection_time_in_millis']
+    else
+      metrics['jvm.gc.collection_time_in_millis'] = node['jvm']['gc']['collection_time_in_millis']
+    end
     metrics.each do |k, v|
       output([config[:scheme], k].join('.'), v, timestamp)
     end
