@@ -1,4 +1,5 @@
 #! /usr/bin/env ruby
+# encoding: UTF-8
 #
 #   es-node-metrics
 #
@@ -68,7 +69,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
-      ln =RestClient::Resource.new "http://#{config[:host]}:#{config[:port]}/_nodes/_local", timeout: 30
+      ln = RestClient::Resource.new "http://#{config[:host]}:#{config[:port]}/_nodes/_local", timeout: 30
       stats = RestClient::Resource.new "http://#{config[:host]}:#{config[:port]}/_nodes/stats", timeout: 30
     else
       ln = RestClient::Resource.new "http://#{config[:host]}:#{config[:port]}/_cluster/nodes/_local", timeout: 30
