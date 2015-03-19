@@ -45,23 +45,32 @@ class UserPercent < Sensu::Plugin::Metric::CLI::Graphite
          long: '--ignore_inactive',
          default: true
 
+  option :uid,
+         description: 'Boolean. If true, uses uid instead of username',
+         long: '--uid',
+         default: false
+
   def run
     timestamp = Time.now.to_i
-    pslist = `ps -A -o user= -o %cpu=`
+    usertype = config[:uid] ? 'uid' : 'user'
+    pslist = `ps -A -o #{usertype}= -o %cpu= -o %mem=`
 
     users = {}
     pslist.lines.each do |line|
-      user, value = line.split
-      h = { user => value.to_f }
-      users = users.merge(h) { |_key, oldval, newval| newval + oldval }
+      user, cpu, mem = line.split
+      users[user] = {} unless users[user]
+      h = { 'cpu' => cpu.to_f, 'mem' => mem.to_f }
+      users[user] = users[user].merge(h) { |_key, oldval, newval| newval + oldval }
     end
 
     if config[:ignore_inactive]
       users.delete_if { |_key, value| value == 0 }
     end
 
-    users.each do |key, value|
-      output [config[:scheme], key].join('.'), value, timestamp
+    users.each do |user, h|
+      h.each do |key, value|
+        output [config[:scheme], user].join(".#{key}."), value, timestamp
+      end
     end
     ok
   end
