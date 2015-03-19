@@ -88,7 +88,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
                                   community: "#{config[:community]}",
                                   version: config[:snmp_version].to_sym,
                                   timeout: config[:timeout].to_i)
-      if config[:mibdir] and not mibs.empty?
+      if config[:mibdir] && ! mibs.empty?
         manager.load_modules(mibs, config[:mibdir])
       end
       response = manager.get_bulk(config[:nonrepeat].to_i,
@@ -109,7 +109,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
         else
           output "#{config[:host]}.#{config[:suffix]}.#{name}", vb.value.to_f
         end
-      rescue NameError
+      rescue NameError # rubocop:disable all
         # Some values may fail to cast to float
       end
     end
