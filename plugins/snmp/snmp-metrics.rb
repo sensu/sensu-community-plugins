@@ -70,7 +70,7 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
     mibs = config[:mibs].split(',')
     begin
       manager = SNMP::Manager.new(host: "#{config[:host]}", community: "#{config[:community]}", version: config[:snmp_version].to_sym)
-      if config[:mibdir] && ! mibs.empty?
+      if config[:mibdir] && !mibs.empty?
         manager.load_modules(mibs, config[:mibdir])
       end
       response = manager.get(["#{config[:objectid]}"])
