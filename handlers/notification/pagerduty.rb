@@ -44,7 +44,7 @@ class Pagerduty < Sensu::Handler
                    when 'resolve'
                      Redphone::Pagerduty.resolve_incident(
                        service_key: api_key,
-                       incident_key: incident_key
+                       incident_key: [incident_key_prefix, incident_key].compact.join('')
                      )
                     end
         if response['status'] == 'success'
