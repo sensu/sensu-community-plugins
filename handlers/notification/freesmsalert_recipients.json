@@ -1,0 +1,18 @@
+{
+  "free_sms_alert": {
+    "alert_recipient_mappings": {
+
+      "ttutone": {
+        "name": "Tommy Tutone",
+        "carrier": "att",
+        "number": "800-867-5309"
+      },
+
+      "ghostbuster": {
+        "name": "Ghost Busters",
+        "carrier": "tmobile",
+        "number": "800-555-2368"
+      }
+    }
+  }
+}
