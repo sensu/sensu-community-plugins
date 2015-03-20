@@ -58,6 +58,21 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
          short: '-s SCHEME',
          default: "#{Socket.gethostname}.mongodb"
 
+  option :ssl,
+         description: 'Use SSL to connect',
+         long: '--ssl',
+         default: false
+
+  option :ssl_cert,
+         description: 'SSL certificate (optional)',
+         long: '--ssl_cert /path/to/cert',
+         default: nil
+
+  option :ssl_ca_cert,
+         description: 'SSL CA certificate (optional)',
+         long: '--ssl_ca_cert /path/to/ca_cert',
+         default: nil
+
   def run
     host = config[:host]
     port = config[:port]
@@ -65,7 +80,20 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     db_user = config[:user]
     db_password = config[:password]
 
-    mongo_client = MongoClient.new(host, port)
+    ssl_opts = {}
+    ssl_opts[:ssl] = config[:ssl]
+
+    if config[:ssl]
+      if config[:ssl_cert]
+        ssl_opts[:ssl_cert] = config[:ssl_cert]
+      end
+
+      if config[:ssl_ca_cert]
+        ssl_opts[:ssl_ca_cert] = config[:ssl_ca_cert]
+      end
+    end
+
+    mongo_client = MongoClient.new(host, port, ssl_opts)
     @db = mongo_client.db(db_name)
     @db.authenticate(db_user, db_password) unless db_user.nil?
 
