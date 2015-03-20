@@ -72,7 +72,6 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
 
   rescue
-    message "Could not connect to #{config[:url]}"
-    exit 1
+    unknown "Could not connect to #{config[:url]}"
   end
 end
