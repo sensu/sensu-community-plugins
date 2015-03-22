@@ -31,6 +31,7 @@ require_relative '../../../plugins/network/check-mtu'
 require 'plugin_stub'
 
 describe CheckMTU  do
+
   include_context :plugin_stub
 
   let(:checker) { described_class.new }
@@ -42,6 +43,15 @@ describe CheckMTU  do
   before(:each) do
     def checker.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-1500'
+    end
+    def checker.ok(*_args)
+      exit 0
+    end
+    def checker.warning(*_args)
+      exit 1
+    end
+    def checker.critical(*_args)
+      exit 2
     end
   end
 
@@ -90,6 +100,15 @@ describe CheckMTU  do
     def checker_9000.locate_mtu_file
       'spec/fixtures/plugins/network/check-mtu-9000'
     end
+    def checker_9000.ok(*_args)
+      exit 0
+    end
+    def checker_9000.warning(*_args)
+      exit 1
+    end
+    def checker_9000.critical(*_args)
+      exit 2
+    end
   end
 
   it 'returns critical if we ask it to check for 1500 MTU while we have 9000 MTU interface' do
@@ -136,6 +155,15 @@ describe CheckMTU  do
   before(:each) do
     def checker_no_file.locate_mtu_file
       'no_existing_file'
+    end
+    def checker_no_file.ok(*_args)
+      exit 0
+    end
+    def checker_no_file.warning(*_args)
+      exit 1
+    end
+    def checker_no_file.critical(*_args)
+      exit 2
     end
   end
 
