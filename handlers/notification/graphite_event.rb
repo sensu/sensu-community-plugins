@@ -27,7 +27,7 @@ class GraphiteEvent < Sensu::Handler
     uri          = URI.parse(uri)
     req          = Net::HTTP::Post.new(uri.path)
     sock         = Net::HTTP.new(uri.host, uri.port)
-    sock.use_ssl = true
+    sock.use_ssl = true if uri.scheme == 'https'
     req.body     = body
 
     req.basic_auth(uri.user, uri.password) if uri.user
@@ -62,8 +62,8 @@ class GraphiteEvent < Sensu::Handler
     body = {
       'what' => 'sensu_event',
       'tags' => tags.join(','),
-      'data' => event_status,
-      'when' => Time.now.to_i
+      'data' => @event['check']['output'],
+      'when' => @event['client']['timestamp']
     }
 
     uri = settings['graphite_event']['server_uri']

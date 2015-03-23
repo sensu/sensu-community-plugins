@@ -13,7 +13,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -27,9 +27,8 @@
 #   for details.
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 class CheckInstanceEvents < Sensu::Plugin::Check::CLI
   option :aws_access_key,
@@ -61,6 +60,14 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
          description: 'AWS Region (such as eu-west-1).',
          default: 'us-east-1'
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
+    hash
+  end
+
   def run
     event_instances = []
     aws_config =   {}
@@ -74,7 +81,6 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
 
     ec2 = AWS::EC2::Client.new(aws_config.merge!(region: config[:aws_region]))
     begin
-      # #YELLOW
       ec2.describe_instance_status[:instance_status_set].each do |i| # rubocop:disable Next
 
         unless i[:events_set].empty?
@@ -88,7 +94,7 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
           #         "not_after": "2015-01-05 18:00:00 UTC"
           #     }
           # ]
-          unless i[:events_set].select { |x| x[:code] == 'system-reboot' && x[:description] =~ /\[Completed\]/ }
+          if i[:events_set].select { |x| x[:code] == 'system-reboot' && x[:description] =~ /\[Completed\]/ }.empty?
             event_instances << i[:instance_id]
           end
         end

@@ -86,6 +86,9 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
           request = Net::HTTP::Get.new("/#{config[:path]}")
           connection.request(request)
         end
+        if response.code == '200'
+          found = true
+        end
       end
     end # until
 

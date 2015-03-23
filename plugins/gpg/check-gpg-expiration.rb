@@ -44,10 +44,12 @@ require 'time'
 class CheckGpgExpire < Sensu::Plugin::Check::CLI
   option :warn,
          short: '-w WARN',
+         proc: proc(&:to_i),
          default: 60
 
   option :crit,
          short: '-c CRIT',
+         proc: proc(&:to_i),
          default: 30
 
   option :homedir,
@@ -77,7 +79,7 @@ class CheckGpgExpire < Sensu::Plugin::Check::CLI
   # Run the GPG command and return the expiration date in epoch
   def key_expire
     return_val = [false, nil]
-    args = ['--with-colons', '--fixed-list-mode', '--list-key', config[:id]]
+    args = ['--with-colons', '--fixed-list-mode', '--lock-never', '--list-key', config[:id]]
     gpg_cmd = config[:homedir].nil? ? [GPG] + args : [GPG, "--homedir #{config[:homedir]}"] + args
     cmd_out, cmd_err, status = Open3.capture3 gpg_cmd.join ' '
     if status.success?

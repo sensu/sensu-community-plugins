@@ -12,7 +12,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -45,24 +45,28 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 require 'time'
 
 class CheckRDS < Sensu::Plugin::Check::CLI
   option :access_key_id,
          short:       '-k N',
          long:        '--access-key-id ID',
-         description: 'AWS access key ID'
+         description: 'AWS access key ID',
+         default: ENV['AWS_ACCESS_KEY_ID']
 
   option :secret_access_key,
          short:       '-s N',
          long:        '--secret-access-key KEY',
-         description: 'AWS secret access key'
+         description: 'AWS secret access key',
+         default: ENV['AWS_SECRET_ACCESS_KEY']
 
   option :region,
          short:       '-r R',
          long:        '--region REGION',
-         description: 'AWS region'
+         description: 'AWS region',
+         description: 'AWS Region (such as eu-west-1).',
+         default: 'us-east-1'
 
   option :db_instance_id,
          short:       '-i N',
@@ -119,7 +123,6 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def find_db_instance(id)
-    fail if !id || id.empty?
     db = rds.instances[id]
     fail unless db.exists?
     db
@@ -141,7 +144,10 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def latest_value(metric, unit)
-    metric.statistics(statistics_options.merge unit: unit).datapoints.sort_by { |datapoint| datapoint[:timestamp] }.last[config[:statistics]]
+    values = metric.statistics(statistics_options.merge unit: unit).datapoints.sort_by { |datapoint| datapoint[:timestamp] }
+
+    # handle time periods that are too small to return usable values
+    values.empty? ? unknown('Requested time period did not return values from Cloudwatch. Try increasing your time period.') : values.last[config[:statistics]]
   end
 
   def flag_alert(severity, message)
@@ -168,7 +174,10 @@ class CheckRDS < Sensu::Plugin::Check::CLI
       'db.cr1.8xlarge' => 244.0,
       'db.m1.medium'   => 3.75,
       'db.m1.large'    => 7.5,
-      'db.m1.xlarge'   => 15.0
+      'db.m1.xlarge'   => 15.0,
+      'db.t2.micro' => 1,
+      'db.t2.small' => 2,
+      'db.t2.medium' => 4
     }
 
     memory_total_gigabytes.fetch(instance_class) * 1024**3
@@ -207,8 +216,12 @@ class CheckRDS < Sensu::Plugin::Check::CLI
   end
 
   def run
+    if config[:db_instance_id].nil? || config[:db_instance_id].empty?
+      unknown 'No DB instance provided.  See help for usage details'
+    end
+
     @db_instance  = find_db_instance config[:db_instance_id]
-    @message      = @db_instance.inspect
+    @message      = "#{config[:db_instance_id]}: "
     @severities   = {
       critical: false,
       warning:  false
@@ -223,7 +236,7 @@ class CheckRDS < Sensu::Plugin::Check::CLI
     end
 
     if %w(cpu memory disk).any? { |item| %w(warning critical).any? { |severity| config[:"#{item}_#{severity}_over"] } }
-      @message += "; (#{config[:statistics].to_s.capitalize} within #{config[:period]} seconds "
+      @message += "(#{config[:statistics].to_s.capitalize} within #{config[:period]}s "
       @message += "between #{config[:end_time] - config[:period]} to #{config[:end_time]})"
     end
 

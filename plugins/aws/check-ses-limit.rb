@@ -14,7 +14,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -59,19 +59,23 @@ class CheckSESLimit < Sensu::Plugin::Check::CLI
          default: 90,
          proc: proc(&:to_i)
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash
+  end
+
   def run
     begin
-      ses = AWS::SES::Base.new(
-        access_key_id: config[:aws_access_key],
-        secret_access_key: config[:aws_secret_access_key])
+      ses = AWS::SES::Base.new aws_config
 
       response = ses.quota
     rescue AWS::SES::ResponseError => e
       critical "An issue occured while communicating with the AWS SES API: #{e.message}"
     end
 
-    # #YELLOW
-    unless response.empty? # rubocop:disable GuardClause
+    unless response.empty?
       percent = (response.sent_last_24_hours.to_i / response.max_24_hour_send.to_i) * 100
       message = "SES sending limit is at #{percent}%"
 

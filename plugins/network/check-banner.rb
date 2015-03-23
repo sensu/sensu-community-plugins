@@ -1,34 +1,4 @@
-#! /usr/bin/env ruby
-#
-#   <script name>
-#
-# DESCRIPTION:
-#   what is this thing supposed to do, monitor?  How do alerts or
-#   alarms work?
-#
-# OUTPUT:
-#   plain text, metric data, etc
-#
-# PLATFORMS:
-#   Linux, Windows, BSD, Solaris, etc
-#
-# DEPENDENCIES:
-#   gem: sensu-plugin
-#   gem: <?>
-#
-# USAGE:
-#   example commands
-#
-# NOTES:
-#   Does it behave differently on specific platforms, specific use cases, etc
-#
-# LICENSE:
-#   <your name>  <your email>
-#   Released under the same terms as Sensu (the MIT license); see LICENSE
-#   for details.
-#
-
-# !/usr/bin/env ruby
+#!/usr/bin/env ruby
 #
 # Check Banner
 # ===
@@ -67,8 +37,7 @@ class CheckBanner < Sensu::Plugin::Check::CLI
   option :pattern,
          short: '-q PAT',
          long: '--pattern PAT',
-         description: 'Pattern to search for',
-         default: 'OpenSSH'
+         description: 'Pattern to search for'
 
   option :timeout,
          short: '-t SECS',
@@ -78,24 +47,27 @@ class CheckBanner < Sensu::Plugin::Check::CLI
          default: 30
 
   def acquire_banner
-    timeout(config[:timeout]) do
-      sock = TCPSocket.new(config[:host], config[:port])
+    sock = TCPSocket.new(config[:host], config[:port])
+    case config[:pattern]
+    when nil
+      sock.close
+      sock ? ok : critical
+    else
       sock.puts config[:write] if config[:write]
-      sock.readline
+      banner = sock.readline
+      message banner
+      banner =~ /#{config[:pattern]}/ ? ok : warning
     end
-  rescue Errno::ECONNREFUSED
-    critical "Connection refused by #{config[:host]}:#{config[:port]}"
-  rescue Timeout::Error
-    critical 'Connection or read timed out'
-  rescue Errno::EHOSTUNREACH
-    critical 'Check failed to run: No route to host'
-  rescue EOFError
-    critical 'Connection closed unexpectedly'
   end
 
   def run
-    banner = acquire_banner
-    message banner
-    banner =~ /#{config[:pattern]}/ ? ok : warning
+    timeout(config[:timeout]) do
+      acquire_banner
+      true
+    end
+    rescue Timeout::Error
+      critical 'Request timed out'
+    rescue => e
+      critical "Request error: #{e.message}"
   end
 end

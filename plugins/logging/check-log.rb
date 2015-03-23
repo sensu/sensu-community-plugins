@@ -161,7 +161,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
       @log = File.open(log_file)
     end
 
-    @state_file = File.join(state_dir, File.expand_path(log_file))
+    @state_file = File.join(state_dir, File.expand_path(log_file).sub(/^([A-Z]):\//, '\1/'))
     @bytes_to_skip = begin
       File.open(@state_file) do |file|
         file.readline.to_i

@@ -12,7 +12,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -29,7 +29,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 class SQSMsgs < Sensu::Plugin::Check::CLI
   option :aws_access_key,
@@ -84,13 +84,15 @@ class SQSMsgs < Sensu::Plugin::Check::CLI
          default: -1,
          proc: proc(&:to_i)
 
-  def run
-    AWS.config(
-      access_key_id: config[:aws_access_key],
-      secret_access_key: config[:aws_secret_access_key],
-      region: config[:aws_region]
-    )
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash
+  end
 
+  def run
+    AWS.config aws_config
     sqs = AWS::SQS.new
     messages = sqs.queues.named(config[:queue]).approximate_number_of_messages
 

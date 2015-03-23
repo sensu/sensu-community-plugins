@@ -1,0 +1,7 @@
+{
+    "mysql":{
+        "hostname": "localhost",
+        "username": "sensu_user",
+        "password": "sensu_user_pass"
+    }
+}

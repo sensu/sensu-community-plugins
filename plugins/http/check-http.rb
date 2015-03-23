@@ -67,7 +67,7 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   option :header,
          short: '-H HEADER',
          long: '--header HEADER',
-         description: 'Check for a HEADER'
+         description: 'Headers you want to send in the format of header1:value1,header2:value2'
 
   option :ssl,
          short: '-s',
@@ -146,6 +146,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
          long: '--response-code CODE',
          description: 'Check for a specific response code'
 
+  option :proxy_url,
+         long: '--proxy-url PROXY_URL',
+         description: 'Use a proxy server to connect'
+
+  option :no_proxy,
+         long: '--noproxy',
+         boolean: true,
+         description: 'Do not use proxy server even from environment http_proxy setting',
+         default: false
+
   def run
     if config[:url]
       uri = URI.parse(config[:url])
@@ -173,7 +183,16 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
   end
 
   def acquire_resource
-    http = Net::HTTP.new(config[:host], config[:port])
+    http = nil
+
+    if config[:no_proxy]
+      http = Net::HTTP.new(config[:host], config[:port], nil, nil)
+    elsif config[:proxy_url]
+      proxy_uri = URI.parse(config[:proxy_url])
+      http = Net::HTTP.new(config[:host], config[:port], proxy_uri.host, proxy_uri.port)
+    else
+      http = Net::HTTP.new(config[:host], config[:port])
+    end
 
     warn_cert_expire = nil
     if config[:ssl]

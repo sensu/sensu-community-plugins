@@ -44,5 +44,6 @@ class IisGetRequests < Sensu::Plugin::Metric::CLI::Graphite
     get_requests = io.readlines[2].split(',')[1].gsub(/"/, '').to_f
 
     output [config[:scheme], config[:site]].join('.'), get_requests
+    ok
   end
 end

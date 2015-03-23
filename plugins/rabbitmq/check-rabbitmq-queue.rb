@@ -43,8 +43,9 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
 
   option :queue,
          description: 'RabbitMQ queue to monitor',
-         long: '--queue queue_name',
-         required: true
+         long: '--queue queue_names',
+         required: true,
+         proc: proc { |a| a.split(',') }
 
   option :warn,
          short: '-w NUM_MESSAGES',
@@ -74,20 +75,33 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   end
 
   def run
+    @crit = []
+    @warn = []
     rabbitmq = acquire_rabbitmq_info
     queues = rabbitmq.queues
-    # #YELLOW
-    queues.each do |queue| # rubocop:disable Style/Next
-      if queue['name'] == config[:queue]
-        total = queue['messages']
-        message "#{total}"
-        critical if total > config[:critical].to_i
-        warning if total > config[:warn].to_i
-        ok
+    config[:queue].each do |q|
+      unless queues.map  { |hash| hash['name'] }.include? q
+        @warn << "Queue #{ q } not available"
+        next
+      end
+      queues.each do |queue|
+        if queue['name'] == q
+          total = queue['messages']
+          if total.nil?
+            total = 0
+          end
+          message "#{total}"
+          @crit <<  "#{ q }:#{ total }" if total > config[:critical].to_i
+          @warn << "#{ q }:#{ total }" if total > config[:warn].to_i
+        end
       end
     end
-
-    warning "No Queue: #{config[:queue]}"
-    ok
+    if @crit.empty? && @warn.empty?
+      ok
+    elsif !(@crit.empty?)
+      critical "critical: #{ @crit } warning: #{ @warn }"
+    elsif !(@warn.empty?)
+      warning "critical: #{ @crit } warning: #{ @warn }"
+    end
   end
 end

@@ -13,8 +13,10 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
+#   gem: openssl
+#   gem: net/http
 #
 # USAGE:
 #  ./check-ec2-network.rb -r ${you_region} -i ${your_instance_id} --warning-over 1000000 --critical-over 1500000
@@ -31,7 +33,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 require 'net/http'
 require 'openssl'
 
@@ -80,6 +82,14 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
     message += (limit == 1 ? '' : 's') # rubocop:disable UselessAssignment
   end
 
+  def aws_config
+    hash = {}
+    hash.update access_key_id: config[:aws_access_key], secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
+    hash
+  end
+
   def run
     ok_message = []
     warning_message = []
@@ -87,14 +97,10 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
 
     AWS.start_memoizing
 
-    elb = AWS::ELB.new(
-      access_key_id: config[:aws_access_key],
-      secret_access_key: config[:aws_secret_access_key],
-      region: config[:aws_region])
+    elb = AWS::ELB.new aws_config
 
     begin
       elb.load_balancers.each do |lb|
-        # #YELLOW
         lb.listeners.each do |listener| # rubocop:disable Style/Next
           if listener.protocol.to_s == 'https'
             url = URI.parse("https://#{lb.dns_name}:#{listener.port}")

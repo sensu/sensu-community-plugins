@@ -16,7 +16,7 @@
 #   Linux
 #
 # DEPENDENCIES:
-#   gem: aws-sdk
+#   gem: aws-sdk-v1
 #   gem: sensu-plugin
 #
 # USAGE:
@@ -30,9 +30,8 @@
 #   for details.
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 class CheckRDSEvents < Sensu::Plugin::Check::CLI
   option :aws_access_key,
@@ -70,7 +69,7 @@ class CheckRDSEvents < Sensu::Plugin::Check::CLI
         next if events_record[:events].empty?
 
         # if the last event is a start maint event then the cluster is still in maint
-        maint_clusters.push(cluster_name) if events_record[:events][-1][:message] =~ /has started/ || events_record[:events][-1][:message] =~ /is being/
+        maint_clusters.push(cluster_name) if events_record[:events][-1][:message] =~ /has started|is being|off-line|shutdown/
       end
     rescue => e
       unknown "An error occurred processing AWS RDS API: #{e.message}"
