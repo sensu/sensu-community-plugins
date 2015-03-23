@@ -124,11 +124,11 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
       if percent_up < config[:crit_percent]
         critical status
       elsif !critical_sessions.empty?
-        critical status + '; Active sessions critical: ' + critical_sessions.map { |s| "#{s[:scur]} #{s[:svname]}" }.join(', ')
+        critical status + '; Active sessions critical: ' + critical_sessions.map { |s| "#{s[:scur]} #{s[:pxname]}.#{s[:svname]}" }.join(', ')
       elsif percent_up < config[:warn_percent]
         warning status
       elsif !warning_sessions.empty?
-        warning status + '; Active sessions warning: ' + warning_sessions.map { |s| "#{s[:scur]} #{s[:svname]}" }.join(', ')
+        warning status + '; Active sessions warning: ' + warning_sessions.map { |s| "#{s[:scur]} #{s[:pxname]}.#{s[:svname]}" }.join(', ')
       else
         ok status
       end
