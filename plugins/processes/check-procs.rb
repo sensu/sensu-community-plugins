@@ -149,7 +149,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   option :encoding,
          description: 'Explicit encoding when reading process list',
          long: '--encoding ENCODING',
-         default: 'ASCII-8BIT''
+         default: 'ASCII-8BIT'
 
   def read_pid(path)
     if File.exist?(path)
