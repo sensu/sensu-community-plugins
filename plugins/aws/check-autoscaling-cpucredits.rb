@@ -125,7 +125,7 @@ class CheckEc2CpuCredits < Sensu::Plugin::Check::CLI
     latest_value metric
   end
 
-  def check_group(group,reportstring)
+  def check_group(group, reportstring, warnflag, critflag)
     metric_value = check_metric group
     if !metric_value.nil? && metric_value < config[:critical_under].to_f
       critflag = 1
@@ -134,7 +134,7 @@ class CheckEc2CpuCredits < Sensu::Plugin::Check::CLI
       warnflag = 1
       reportstring = reportstring + group + ': ' + metric_value.to_s + ' '
     end
-    return reportstring, warnflag, critflag
+    [reportstring, warnflag, critflag]
   end
 
   def run
@@ -143,10 +143,10 @@ class CheckEc2CpuCredits < Sensu::Plugin::Check::CLI
     reportstring = ''
     if config[:group].nil?
       asg.groups.each do |group|
-        reportstring, warnflag, critflag = check_group(group.name, reportstring)
+        reportstring, warnflag, critflag = check_group(group.name, reportstring, warnflag, critflag)
       end
     else
-      reportstring, warnflag, critflag = check_group(config[:group], reportstring)
+      reportstring, warnflag, critflag = check_group(config[:group], reportstring, warnflag, critflag)
     end
 
     if critflag == 1
