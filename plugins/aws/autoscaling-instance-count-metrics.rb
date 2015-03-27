@@ -1,12 +1,12 @@
 #! /usr/bin/env ruby
 #
-# check-autoscaling-cpucredits
+# autoscaling-instance-count-metrics
 #
 # DESCRIPTION:
-#   Check AutoScaling CPU Credits through CloudWatch API.
+#   Get a count of instances in a given AutoScaling group
 #
 # OUTPUT:
-#   plain-text
+#   metric-data
 #
 # PLATFORMS:
 #   Linux
@@ -16,145 +16,72 @@
 #   gem: sensu-plugin
 #
 # USAGE:
-#   ./check-autoscaling-cpucredits.rb -r ${your_region} --warning-under 100 --critical-under 50
 #
 # NOTES:
-#   Based heavily on Yohei Kawahara's check-ec2-network
 #
 # LICENSE:
-#   Gavin Hamill <gavin@bashton.com>
+#   Copyright 2013 Bashton Ltd http://www.bashton.com/
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
-require 'sensu-plugin/check/cli'
+require 'sensu-plugin/metric/cli'
 require 'aws-sdk-v1'
 
-class CheckEc2CpuCredits < Sensu::Plugin::Check::CLI
-  option :access_key_id,
-         short:       '-k N',
-         long:        '--access-key-id ID',
-         description: 'AWS access key ID'
+class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
+  option :groupname,
+         description: 'Name of the AutoScaling group',
+         short: '-g GROUP_NAME',
+         long: '--autoscaling-group GROUP_NAME',
+         required: true
 
-  option :secret_access_key,
-         short:       '-s N',
-         long:        '--secret-access-key KEY',
-         description: 'AWS secret access key'
+  option :scheme,
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: ''
 
-  option :region,
-         short:       '-r R',
-         long:        '--region REGION',
-         description: 'AWS region'
+  option :aws_access_key,
+         short: '-a AWS_ACCESS_KEY',
+         long: '--aws-access-key AWS_ACCESS_KEY',
+         description: "AWS Access Key. Either set ENV['AWS_ACCESS_KEY_ID'] or provide it as an option",
+         default: ENV['AWS_ACCESS_KEY']
 
-  option :group,
-         short:       '-g G',
-         long:        '--autoscaling-group GROUP',
-         description: 'AutoScaling group to check'
+  option :aws_secret_access_key,
+         short: '-k AWS_SECRET_ACCESS_KEY',
+         long: '--aws-secret-access-key AWS_SECRET_ACCESS_KEY',
+         description: "AWS Secret Access Key. Either set ENV['AWS_SECRET_ACCESS_KEY'] or provide it as an option",
+         default: ENV['AWS_SECRET_KEY']
 
-  option :end_time,
-         short:       '-t T',
-         long:        '--end-time TIME',
-         default:     Time.now,
-         description: 'CloudWatch metric statistics end time'
-
-  option :period,
-         short:       '-p N',
-         long:        '--period SECONDS',
-         default:     60,
-         description: 'CloudWatch metric statistics period'
-
-  option :countmetric,
-         short:       '-d M',
-         long:        '--countmetric METRIC',
-         default:     'CPUCreditBalance',
-         description: 'Select any CloudWatch _Count_ based metric (Status Checks / CPU Credits)'
-
-  option :warning_under,
-         short:       '-w N',
-         long:        '--warning-under VALUE',
-         description: 'Issue a warning if the CloudWatch _Count_ based metric (Status Check / CPU Credits) is below this value'
-
-  option :critical_under,
-         short:       '-c N',
-         long:        '--critical-under VALUE',
-         description: 'Issue a critical if the CloudWatch _Count_ based metric (Status Check / CPU Credits) is below this value'
+  option :aws_region,
+         short: '-r AWS_REGION',
+         long: '--aws-region REGION',
+         description: 'AWS Region (such as eu-west-1).',
+         default: 'us-east-1'
 
   def aws_config
     hash = {}
-    hash.update access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key] if config[:access_key_id] && config[:secret_access_key]
-    hash.update region: config[:region] if config[:region]
+    hash.update aws_access_key_id: config[:aws_access_key], aws_secret_access_key: config[:aws_secret_access_key]\
+      if config[:aws_access_key] && config[:aws_secret_access_key]
+    hash.update region: config[:aws_region]
     hash
   end
 
-  def asg
-    @asg ||= AWS::AutoScaling.new aws_config
-  end
-
-  def cloud_watch
-    @cloud_watch ||= AWS::CloudWatch.new aws_config
-  end
-
-  def get_count_metric(group)
-    cloud_watch.metrics
-      .with_namespace('AWS/EC2')
-      .with_metric_name("#{config[:countmetric]}")
-      .with_dimensions(name: 'AutoScalingGroupName', value: group)
-      .first
-  end
-
-  def statistics_options
-    {
-      start_time: config[:end_time] - 600,
-      end_time:   config[:end_time],
-      statistics: ['Average'],
-      period:     config[:period]
-    }
-  end
-
-  def latest_value(metric)
-    value = metric.statistics(statistics_options.merge unit: 'Count')
-    # #YELLOW
-    unless value.datapoints[0].nil? # rubocop:disable IfUnlessModifier, GuardClause
-      value.datapoints[0][:average].to_f
-    end
-  end
-
-  def check_metric(group)
-    metric = get_count_metric group
-    latest_value metric
-  end
-
-  def check_group(group, reportstring, warnflag, critflag)
-    metric_value = check_metric group
-    if !metric_value.nil? && metric_value < config[:critical_under].to_f
-      critflag = 1
-      reportstring = reportstring + group + ': ' + metric_value.to_s + ' '
-    elsif !metric_value.nil? && metric_value < config[:warning_under].to_f
-      warnflag = 1
-      reportstring = reportstring + group + ': ' + metric_value.to_s + ' '
-    end
-    return reportstring, warnflag, critflag
-  end
-
   def run
-    warnflag = 0
-    critflag = 0
-    reportstring = ''
-    if config[:group].nil?
-      asg.groups.each do |group|
-        reportstring, warnflag, critflag = check_group(group.name, reportstring, warnflag, critflag)
-      end
+    if config[:scheme] == ''
+      graphitepath = "#{config[:groupname]}.autoscaling.instance_count"
     else
-      reportstring, warnflag, critflag = check_group(config[:group], reportstring, warnflag, critflag)
+      graphitepath = config[:scheme]
     end
-
-    if critflag == 1
-      critical reportstring
-    elsif warnflag == 1
-      warning reportstring
-    else
-      ok 'All checked AutoScaling Groups are cool'
+    begin
+      as = AWS::AutoScaling.new aws_config
+      count = as.groups[config[:groupname]].auto_scaling_instances.map { |i| i.lifecycle_state }.count('InService')
+      output graphitepath, count
+    rescue => e
+      puts "Error: exception: #{e}"
+      critical
     end
+    ok
   end
 end
