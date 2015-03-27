@@ -160,7 +160,7 @@ class CheckProcs < Sensu::Plugin::Check::CLI
   end
 
   def read_lines(cmd)
-    IO.popen(cmd + ' 2>&1', {external_encoding:config[:encoding]}) do |child|
+    IO.popen(cmd + ' 2>&1', external_encoding: config[:encoding]) do |child|
       child.read.split("\n")
     end
   end
