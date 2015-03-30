@@ -21,7 +21,6 @@ require 'redis'
 require 'json'
 require 'socket'
 require 'time'
-require 'json'
 
 class LogstashHandler < Sensu::Handler
   def event_name
