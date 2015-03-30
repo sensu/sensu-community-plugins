@@ -4,11 +4,11 @@
 # ===
 #
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# Copyright 2015 Tim Smith <tim@cozy.co> and Cozy Services Ltd.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 require 'carrot-top'
@@ -69,11 +69,14 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     timestamp = Time.now.to_i
     acquire_rabbitmq_queues.each do |queue|
       if config[:filter]
-        # #YELLOW
-        unless queue['name'].match(config[:filter]) # rubocop:disable IfUnlessModifier
-          next
-        end
+        next unless queue['name'].match(config[:filter])
       end
+
+      # calculate and output time till the queue is drained in drain metrics
+      drain_time = queue['messages'] / queue['backing_queue_status']['avg_egress_rate']
+      drain_time = 0 if drain_time.nan? # 0 rate with 0 messages is 0 time to drain
+      output([config[:scheme], queue['name'], 'drain_time'].join('.'), drain_time.to_i, timestamp)
+
       %w(messages).each do |metric|
         output([config[:scheme], queue['name'], metric].join('.'), queue[metric], timestamp)
       end
