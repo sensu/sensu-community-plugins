@@ -40,11 +40,6 @@ class CheckRabbitMQQueueDrainTime < Sensu::Plugin::Check::CLI
          long: '--password PASSWORD',
          default: 'guest'
 
-  option :scheme,
-         description: 'Metric naming scheme, text to prepend to $queue_name.$metric',
-         long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}.rabbitmq"
-
   option :filter,
          description: 'Regular expression for filtering queues',
          long: '--filter REGEX'
