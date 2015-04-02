@@ -93,6 +93,16 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'cassandra JMX port',
          default: '7199'
 
+  option :username,
+         short: '-u USERNAME',
+         long: '--username USERNAME',
+         description: 'cassandra JMX username'
+
+  option :password,
+         short: '-p PASSWORD',
+         long: '--password PASSWORD',
+         description: 'cassandra JMX password'
+
   option :scheme,
          description: 'Metric naming scheme, text to prepend to metric',
          short: '-s SCHEME',
@@ -145,7 +155,11 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   # execute cassandra's nodetool and return output as string
   def nodetool_cmd(cmd)
-    `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd}`
+    if config[:username] && config[:password]
+      `nodetool -h #{config[:hostname]} -u #{config[:username]} -pw #{config[:password]} -p #{config[:port]} #{cmd}`
+    else
+      `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd}`
+    end
   end
 
   # nodetool -h localhost info:
