@@ -77,6 +77,8 @@ class WPScan < Sensu::Plugin::Check::CLI
   end
 
   def run
+    unknown "wpscan does not exist at #{config[:wpscan]}" unless File.exist?(config[:wpscan])
+
     update_wpscan
 
     vulnerabilities = run_wpscan
