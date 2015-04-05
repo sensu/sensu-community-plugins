@@ -50,19 +50,19 @@ class StatusPage < Sensu::Handler
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     begin
       timeout(3) do
-        if @event['check'].has_key?('component_id')
-            status = case @event['action']
-                when 'create'
-                    'major_outage'
-                when 'resolve'
-                    'operational'
-                else
-                    nil
+        if @event['check'].key?.('component_id')
+          status = case @event['action']
+            when 'create'
+              'major_outage'
+            when 'resolve'
+              'operational'
+            else
+              nil
             end
             unless status.nil?
-                statuspage.update_component(
-                    :component_id => @event['check']['component_id'],
-                    :status => status)
+              statuspage.update_component(
+                :component_id => @event['check']['component_id'],
+                :status => status)
             end
         end
         response = case @event['action']
