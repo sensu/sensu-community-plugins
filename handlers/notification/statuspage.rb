@@ -5,7 +5,7 @@
 #
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
 # Copyright 2013 DISQUS, Inc.
-# Updated by jfledvin with Redphone Instructions 4/5/2015
+# Updated by jfledvin with Redphone Instructions & Component Support 4/5/2015
 #
 # NOTE: As of this writing redphone has not added StatusPage.io support
 # You must manually create th gem by:
