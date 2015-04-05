@@ -59,11 +59,11 @@ class StatusPage < Sensu::Handler
                    else
                      nil
                    end
-            unless status.nil?
-              statuspage.update_component(
-                component_id: @event['check']['component_id'],
-                status: status)
-            end
+          unless status.nil?
+            statuspage.update_component(
+              component_id: @event['check']['component_id'],
+              status: status)
+          end
         end
         response = case @event['action']
                    when 'create'
