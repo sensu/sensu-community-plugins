@@ -50,7 +50,7 @@ class StatusPage < Sensu::Handler
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     begin
       timeout(3) do
-        if @event['check'].key?.('component_id')
+        if @event['check'].key?('component_id')
           status = case @event['action']
             when 'create'
               'major_outage'
