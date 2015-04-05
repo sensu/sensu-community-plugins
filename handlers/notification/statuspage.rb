@@ -5,6 +5,14 @@
 #
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
 # Copyright 2013 DISQUS, Inc.
+# Updated by jfledvin with Redphone Instructions 4/5/2015
+#
+# NOTE: As of this writing redphone has not added StatusPage.io support
+# You must manually create th gem by:
+# git clone https://github.com/portertech/redphone.git
+# cd redphone
+# gem build redphone.gemspec OR /opt/sensu/embedded/bin/gem build redphone.gemspec
+# gem install redphone-0.0.6.gem OR /opt/sensu/embedded/bin/gem install redphone-0.0.6.gem
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -26,6 +34,21 @@ class StatusPage < Sensu::Handler
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     begin
       timeout(3) do
+        if @event['check'].has_key?('component_id')
+            status = case @event['action']
+                when 'create'
+                    'major_outage'
+                when 'resolve'
+                    'operational'
+                else
+                    nil
+            end
+            unless status.nil?
+                statuspage.update_component(
+                    :component_id => @event['check']['component_id'],
+                    :status => status)
+            end
+        end
         response = case @event['action']
                    when 'create'
                      # #YELLOW
