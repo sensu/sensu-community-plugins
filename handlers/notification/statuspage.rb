@@ -15,7 +15,8 @@
 # gem build redphone.gemspec OR /opt/sensu/embedded/bin/gem build redphone.gemspec
 # gem install redphone-0.0.6.gem OR /opt/sensu/embedded/bin/gem install redphone-0.0.6.gem
 #
-# To update a component add a "component_id": "IDHERE" attribute to the corresponding check defination
+# To update a component add a "component_id": "IDHERE" attribute to the corresponding check definition
+
 # Example:
 # {
 #    "checks": {
@@ -28,6 +29,7 @@
 #      }
 #    }
 # }
+
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
