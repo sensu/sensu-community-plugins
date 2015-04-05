@@ -52,13 +52,13 @@ class StatusPage < Sensu::Handler
       timeout(3) do
         if @event['check'].key?('component_id')
           status = case @event['action']
-            when 'create'
-              'major_outage'
-            when 'resolve'
-              'operational'
-            else
-              nil
-            end
+                   when 'create'
+                     'major_outage'
+                   when 'resolve'
+                     'operational'
+                   else
+                     nil
+                   end
             unless status.nil?
               statuspage.update_component(
                 component_id: @event['check']['component_id'],
