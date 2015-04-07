@@ -103,6 +103,11 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--password PASSWORD',
          description: 'cassandra JMX password'
 
+  option :passwordfile,
+         short: '-F PASSWORD-FILE',
+         long: '--password-file PASSWORD-FILE',
+         description: 'cassandra JMX password file'
+
   option :scheme,
          description: 'Metric naming scheme, text to prepend to metric',
          short: '-s SCHEME',
@@ -155,8 +160,12 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   # execute cassandra's nodetool and return output as string
   def nodetool_cmd(cmd)
-    if config[:username] && config[:password]
-      `nodetool -h #{config[:hostname]} -u #{config[:username]} -pw #{config[:password]} -p #{config[:port]} #{cmd}`
+    if config[:username]
+      if config[:passwordfile]
+        `nodetool -h #{config[:hostname]} -u #{config[:username]} -pwf #{config[:passwordfile]} -p #{config[:port]} #{cmd}`
+      elsif config[:password]
+        `nodetool -h #{config[:hostname]} -u #{config[:username]} -pw #{config[:password]} -p #{config[:port]} #{cmd}`
+      end
     else
       `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd}`
     end
