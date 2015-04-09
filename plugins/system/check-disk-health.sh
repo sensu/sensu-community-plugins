@@ -18,7 +18,7 @@ FAILS=()
 # loop devices
 for DEVICE in $DEVICES; do
 	# get device status
-	STATUS=$( smartctl -H /dev/$DEVICE | grep PASSED > /dev/null && echo "OK" )
+	STATUS=$( smartctl -H /dev/$DEVICE | grep 'OK\|PASSED' > /dev/null && echo "OK" )
 
 	# push to fails
 	if ! [ "$STATUS" == "OK" ]; then
