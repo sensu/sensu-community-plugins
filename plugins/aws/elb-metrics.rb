@@ -105,7 +105,10 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
         'HTTPCode_Backend_4XX' => 'Sum',
         'HTTPCode_Backend_5XX' => 'Sum',
         'HTTPCode_ELB_4XX' => 'Sum',
-        'HTTPCode_ELB_5XX' => 'Sum'
+        'HTTPCode_ELB_5XX' => 'Sum',
+        'BackendConnectionErrors' => 'Sum',
+        'SurgeQueueLength' => 'Max',
+        'SpilloverCount' => 'Sum'
       }
       statistic = default_statistic_per_metric[config[:metric]]
     else
