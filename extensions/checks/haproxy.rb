@@ -61,13 +61,14 @@ module Sensu
       def run(check)
         unless check_options check
           yield 'MISSING REQUIRED CONFIG PARAMS', 2
-          return
+          return false
         end
 
         if options[:service] || options[:all_services]
           services = acquire_services
         else
           yield 'No service specified', 3
+          return
         end
 
         if services.empty?
@@ -83,7 +84,7 @@ module Sensu
           warning_sessions = services.select { |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > options[:session_warn_percent] }
 
           status = "#{100 - percent_up}% of #{services.size} of #{options[:service]} are DOWN; "\
-                             + (failed_names.empty? ? '' : " NODES: #{failed_names.join(', ')}")
+            + (failed_names.empty? ? '' : " NODES: #{failed_names.join(', ')}")
           if percent_up < options[:crit_percent]
             yield status, 2
           elsif !critical_sessions.empty?
@@ -98,36 +99,40 @@ module Sensu
         end
       end
 
-      private
+      def socket_request
+        srv = UNIXSocket.open(options[:stats_source])
+        srv.write("show stat\n")
+        out = srv.read
+        srv.close
+        out
+      end
+
+      def http_request
+        res = Net::HTTP.start(options[:stats_source], options[:port]) do |http|
+          req = Net::HTTP::Get.new("/#{options[:path]};csv;norefresh")
+          unless options[:username].nil?
+            req.basic_auth options[:username], options[:password]
+          end
+          http.request(req)
+        end
+        unless res.code.to_i == 200
+          unknown "Failed to fetch from #{options[:stats_source]}:#{options[:port]}/#{options[:path]}: #{res.code}"
+        end
+        res.body
+      end
 
       def acquire_services
         uri = URI.parse(options[:stats_source])
-
         if uri.is_a?(URI::Generic) && File.socket?(uri.path)
-          srv = UNIXSocket.open(options[:stats_source])
-          srv.write("show stat\n")
-          out = srv.read
-          srv.close
+          out = socket_request
         else
-          res = Net::HTTP.start(options[:stats_source], options[:port]) do |http|
-            req = Net::HTTP::Get.new("/#{options[:path]};csv;norefresh")
-            unless options[:username].nil?
-              req.basic_auth options[:username], options[:password]
-            end
-            http.request(req)
-          end
-          unless res.code.to_i == 200
-            unknown "Failed to fetch from #{options[:stats_source]}:#{options[:port]}/#{options[:path]}: #{res.code}"
-          end
-
-          out = res.body
+          out = http_request 
         end
 
         parsed = CSV.parse(out, skip_blanks: true)
         keys = parsed.shift.reject(&:nil?).map { |k| k.match(/(\w+)/)[0].to_sym }
         haproxy_stats = parsed.map { |line| Hash[keys.zip(line)] }
-
-        if options['all_services']
+        if options[:all_services]
           haproxy_stats
         else
           regexp = options[:exact_match] ? Regexp.new("^#{options[:service]}$") : Regexp.new("#{options[:service]}")
@@ -143,6 +148,7 @@ module Sensu
       def options
         # we need options to merge in the check[:extension_opts] every time the class is called, as the check may be different
         return @options if @options
+
         @options = {
           stats_source: '',
           port: 80,
@@ -154,8 +160,8 @@ module Sensu
           session_warn_percent: 75,
           session_crit_percent: 90,
           all_services: true,
-          missiong_ok: true,
-          service: '',
+          missing_ok: true,
+          service: false,
           exact_match: false
         }
 
@@ -167,7 +173,9 @@ module Sensu
         @options
       end
 
+      private
       def check_options(check)
+        options
         @check = check
         if @check[:haproxy].is_a?(Hash)
           @required_options.each do |required_option|
@@ -177,8 +185,10 @@ module Sensu
             end
           end
           @options.merge!(@check[:haproxy])
+          true
+        else
+          false
         end
-        true
       end
     end
   end
