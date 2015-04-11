@@ -121,7 +121,7 @@ module Sensu
           http.request(req)
         end
         unless res.code.to_i == 200
-          raise "Failed to fetch from #{options[:stats_source]}:#{options[:port]}/#{options[:path]}: #{res.code}"
+          fail "Failed to fetch from #{options[:stats_source]}:#{options[:port]}/#{options[:path]}: #{res.code}"
         end
         res.body
       end
@@ -131,7 +131,7 @@ module Sensu
         if uri.is_a?(URI::Generic) && File.socket?(uri.path)
           out = socket_request
         else
-          out = http_request 
+          out = http_request
         end
 
         parsed = CSV.parse(out, skip_blanks: true)
@@ -179,6 +179,7 @@ module Sensu
       end
 
       private
+
       def check_options(check)
         options
         @check = check
