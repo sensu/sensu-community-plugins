@@ -118,7 +118,7 @@ module Sensu
       def retrieve_data
         # #YELLOW
         unless options[:server].start_with?('https://', 'http://')
-          options[:server].prepend('http://')
+          options[:server] = 'http://' + options[:server]
         end
 
         url = "#{options[:server]}/render?format=json&target=#{formatted_target}&from=#{options[:from]}"
