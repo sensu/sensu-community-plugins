@@ -26,7 +26,6 @@ require_relative '../../../plugins/dns/check-dns'
 require_relative '../../../spec_helper'
 
 describe DNS, 'run' do
-
   it 'returns unknown if there is no domain specified' do
     dns = DNS.new
     dns.should_receive('unknown')
@@ -75,5 +74,4 @@ describe DNS, 'run' do
     dns.should_receive('warning')
     dns.run
   end
-
 end

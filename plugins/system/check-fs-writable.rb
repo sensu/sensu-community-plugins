@@ -67,7 +67,7 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
 
   def rw_in_proc?(mount_info)
     mount_info.each  do |pt|
-      @crit_pt_proc <<  "#{ pt.split[0] }" if pt.split[1] != 'rw'
+      @crit_pt_proc << "#{ pt.split[0] }" if pt.split[1] != 'rw'
     end
   end
 
@@ -78,8 +78,8 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
       puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
       # #YELLOW
       #  need to add a check here to validate permissions, if none it pukes
-      file.write('mops') || @crit_pt_test <<  "#{ pt.split[0] }"
-      file.read || @crit_pt_test <<  "#{ pt.split[0] }"
+      file.write('mops') || @crit_pt_test << "#{ pt.split[0] }"
+      file.read || @crit_pt_test << "#{ pt.split[0] }"
       file.close
       file.unlink
     end
@@ -106,8 +106,8 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
       puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
       # #YELLOW
       #  need to add a check here to validate permissions, if none it pukes
-      file.write('mops') || @crit_pt_test <<  "#{ d }"
-      file.read || @crit_pt_test <<  "#{ d }"
+      file.write('mops') || @crit_pt_test << "#{ d }"
+      file.read || @crit_pt_test << "#{ d }"
       file.close
       file.unlink
     end

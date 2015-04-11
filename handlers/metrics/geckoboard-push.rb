@@ -51,7 +51,6 @@ class GeckoboardPush < Sensu::Handler
           Geckoboard::Push.new(wk).funnel(all)
         end
       end
-
     end
   end
 end

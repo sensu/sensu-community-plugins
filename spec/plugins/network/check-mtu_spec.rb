@@ -31,7 +31,6 @@ require_relative '../../../plugins/network/check-mtu'
 require 'plugin_stub'
 
 describe CheckMTU  do
-
   include_context :plugin_stub
 
   let(:checker) { described_class.new }

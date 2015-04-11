@@ -29,7 +29,6 @@ def cpu_output
 end
 
 describe CheckCPU, 'run' do
-
   it '' do
   end
 
@@ -38,5 +37,4 @@ describe CheckCPU, 'run' do
 
   it '' do
   end
-
 end

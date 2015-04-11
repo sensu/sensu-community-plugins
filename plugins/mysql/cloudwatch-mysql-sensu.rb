@@ -55,7 +55,6 @@ aws_debug = false
 
 options = {}
 optparse = OptionParser.new do|opts|
-
   opts.on('-h', '--help', '') do
     puts opts
     exit
@@ -80,7 +79,6 @@ optparse = OptionParser.new do|opts|
   opts.on('-l', '--lessthan', 'Threshold is less than') do|lessthan|
     options[:lessthan] = lessthan
   end
-
 end
 begin
   optparse.parse!

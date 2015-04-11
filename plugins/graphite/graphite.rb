@@ -213,7 +213,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     max_values = {}
     values = get_graphite_values target
     if values
-      values.each do | val |
+      values.each do |val|
         max = get_max_value(val[:datapoints])
         max_values[val[:target]] = max
       end
@@ -233,7 +233,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_values = {}
     values = get_graphite_values target
     if values
-      values.each do | val |
+      values.each do |val|
         last = get_last_metric(val[:datapoints], count)
         last_values[val[:target]] = last
       end
@@ -262,8 +262,8 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_metrics = last_graphite_metric(target, count)
     last_values = {}
     if last_metrics
-      last_metrics.each do | target_name, metrics |
-        last_values[target_name] = metrics.map { | metric |  metric[0] }.mean
+      last_metrics.each do |target_name, metrics|
+        last_values[target_name] = metrics.map { |metric|  metric[0] }.mean
       end
     end
     last_values
@@ -273,7 +273,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_time_stamp = last_graphite_metric target
     warnings = []
     if last_time_stamp
-      last_time_stamp.each do | target_name, value |
+      last_time_stamp.each do |target_name, value|
         last_time_stamp_bool = value[1] > time.to_i ? true : false
         warnings << "The metric #{target_name} has not been updated in #{updated_since} seconds" unless last_time_stamp_bool
       end
@@ -295,7 +295,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_gv = last_graphite_value target
     if last_gv.is_a?(Hash) && max_gv.is_a?(Hash)
       # #YELLOW
-      last_gv.each do | target_name, value | # rubocop:disable Style/Next
+      last_gv.each do |target_name, value| # rubocop:disable Style/Next
         if value && max_gv[target_name]
           last = value
           max = max_gv[target_name]
@@ -321,7 +321,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     criticals = []
     fatal = []
-    values.each do | data |
+    values.each do |data|
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
@@ -339,7 +339,7 @@ class Graphite < Sensu::Plugin::Check::CLI
           text = "The last value of metric #{target} is #{percent}% #{greater_less} than allowed #{max_value}% of the average value #{avg_value}"
           case type
           when 'warning'
-            warnings <<  text
+            warnings << text
           when 'error'
             criticals << text
           when 'fatal'
@@ -360,7 +360,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     criticals = []
     fatal = []
-    values.each do | data |
+    values.each do |data|
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
@@ -376,7 +376,7 @@ class Graphite < Sensu::Plugin::Check::CLI
           text = "The average value of metric #{target} is #{avg_value} that is #{greater_less} than allowed average of #{max_value}"
           case type
           when 'warning'
-            warnings <<  text
+            warnings << text
           when 'error'
             criticals << text
           when 'fatal'
@@ -398,7 +398,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     criticals = []
     fatal = []
-    values.each do | data |
+    values.each do |data|
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
@@ -416,7 +416,7 @@ class Graphite < Sensu::Plugin::Check::CLI
             #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
           case type
           when 'warning'
-            warnings <<  text
+            warnings << text
           when 'error'
             criticals << text
           when 'fatal'
@@ -438,7 +438,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     criticals = []
     fatal = []
     # #YELLOW
-    last_targets.each do | target_name, last |   # rubocop:disable Style/Next
+    last_targets.each do |target_name, last|   # rubocop:disable Style/Next
       last_value = last.first
       unless last_value.nil?
         # #YELLOW
@@ -451,7 +451,7 @@ class Graphite < Sensu::Plugin::Check::CLI
             text = "The metric #{target_name} is #{last_value} that is #{greater_less} than max allowed #{max_value}"
             case type
             when 'warning'
-              warnings <<  text
+              warnings << text
             when 'error'
               criticals << text
             when 'fatal'

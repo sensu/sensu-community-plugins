@@ -190,7 +190,7 @@ class ESMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metrics['jvm.threads.peak_count']           = node['jvm']['threads']['peak_count']
     end
 
-    node['indices'].each do |type,  index|
+    node['indices'].each do |type, index|
       index.each do |k, v|
         # #YELLOW
         unless k =~ /(_time$)/ || v =~ /\d+/ # rubocop:disable IfUnlessModifier

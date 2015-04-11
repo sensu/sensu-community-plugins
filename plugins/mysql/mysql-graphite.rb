@@ -285,7 +285,6 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       rescue => e
         puts e.message
       end
-
     end
 
     ok
