@@ -65,7 +65,12 @@ module Sensu
         end
 
         if options[:service] || options[:all_services]
-          services = acquire_services
+          begin
+            services = acquire_services
+          rescue => e
+            yield e.message, 3
+            return
+          end
         else
           yield 'No service specified', 3
           return
@@ -116,7 +121,7 @@ module Sensu
           http.request(req)
         end
         unless res.code.to_i == 200
-          unknown "Failed to fetch from #{options[:stats_source]}:#{options[:port]}/#{options[:path]}: #{res.code}"
+          raise "Failed to fetch from #{options[:stats_source]}:#{options[:port]}/#{options[:path]}: #{res.code}"
         end
         res.body
       end

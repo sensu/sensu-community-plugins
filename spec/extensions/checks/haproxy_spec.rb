@@ -1,27 +1,11 @@
-
-#require 'spec_helper'
-
 require 'rbconfig'
 require 'ostruct'
 
-
 module Sensu
-   module Extension
-     class Check
-       attr_accessor :settings
-       # def run(data=nil, options={}, &callback)
-       #   callback.call("noop", 0)
-       # end
-       def self.run(data=nil, options={}, &callback)
-         callback.call("noop", 0)
-       end
-       def self.descendants
-         ObjectSpace.each_object(Class).select do |klass|
-           klass < self
-         end
-       end
-     end
-   end
+  module Extension
+    class Check
+    end
+  end
 end
 
 require_relative "../../../extensions/checks/haproxy.rb"
@@ -37,13 +21,14 @@ describe Sensu::Extension::Haproxy do
     } }
   end
 
+# because of the way csv parses strings, there should be no indentation/spaces before the first character of the line or it will be included in the parsed value.
   let(:stats_good) do
-      "# pxname,svname,qcur,qmax,scur,smax,slim,stot,bin,bout,dreq,dresp,ereq,econ,eresp,wretr,wredis,status,weight,act,bck,chkfail,chkdown,lastchg,downtime,qlimit,pid,iid,sid,throttle,lbtot,tracked,type,rate,rate_lim,rate_max,check_status,check_code,check_duration,hrsp_1xx,hrsp_2xx,hrsp_3xx,hrsp_4xx,hrsp_5xx,hrsp_other,hanafail,req_rate,req_rate_max,req_tot,cli_abrt,srv_abrt,comp_in,comp_out,comp_byp,comp_rsp,lastsess,
-     generic-service,FRONTEND,,,0,0,500000,0,0,0,0,0,0,,,,,OPEN,,,,,,,,,1,2,0,,,,0,0,0,0,,,,0,0,0,0,0,0,,0,0,0,,,0,0,0,0,,
-    generic-service,node-1,0,0,0,0,,0,0,0,,0,,0,0,0,0,UP,1,1,0,6,0,1468949,0,,1,2,1,,0,,2,0,,0,L7OK,200,1,0,0,0,0,0,0,0,,,,0,0,,,,,-1,
-   generic-service,node-2,0,0,0,0,,0,0,0,,0,,0,0,0,0,UP,1,1,0,0,0,1468949,0,,1,2,2,,0,,2,0,,0,L7OK,200,1,0,0,0,0,0,0,0,,,,0,0,,,,,-1,
-  generic-service,node-3,0,0,0,0,,0,0,0,,0,,0,0,0,0,UP,1,1,0,0,0,1468949,0,,1,2,3,,0,,2,0,,0,L7OK,200,3,0,0,0,0,0,0,0,,,,0,0,,,,,-1, 
-  generic-service,BACKEND,0,0,0,0,50000,0,0,0,0,0,,0,0,0,0,UP,3,3,0,,0,1468949,0,,1,11,0,,0,,1,0,,0,,,,0,0,0,0,0,0,,,,,0,0,0,0,0,0,-1,"
+    "# pxname,svname,qcur,qmax,scur,smax,slim,stot,bin,bout,dreq,dresp,ereq,econ,eresp,wretr,wredis,status,weight,act,bck,chkfail,chkdown,lastchg,downtime,qlimit,pid,iid,sid,throttle,lbtot,tracked,type,rate,rate_lim,rate_max,check_status,check_code,check_duration,hrsp_1xx,hrsp_2xx,hrsp_3xx,hrsp_4xx,hrsp_5xx,hrsp_other,hanafail,req_rate,req_rate_max,req_tot,cli_abrt,srv_abrt,comp_in,comp_out,comp_byp,comp_rsp,lastsess,
+generic-service,FRONTEND,,,0,0,500000,0,0,0,0,0,0,,,,,OPEN,,,,,,,,,1,2,0,,,,0,0,0,0,,,,0,0,0,0,0,0,,0,0,0,,,0,0,0,0,,
+generic-service,node-1,0,0,0,0,,0,0,0,,0,,0,0,0,0,UP,1,1,0,6,0,1468949,0,,1,2,1,,0,,2,0,,0,L7OK,200,1,0,0,0,0,0,0,0,,,,0,0,,,,,-1,
+generic-service,node-2,0,0,0,0,,0,0,0,,0,,0,0,0,0,UP,1,1,0,0,0,1468949,0,,1,2,2,,0,,2,0,,0,L7OK,200,1,0,0,0,0,0,0,0,,,,0,0,,,,,-1,
+generic-service,node-3,0,0,0,0,,0,0,0,,0,,0,0,0,0,UP,1,1,0,0,0,1468949,0,,1,2,3,,0,,2,0,,0,L7OK,200,3,0,0,0,0,0,0,0,,,,0,0,,,,,-1, 
+generic-service,BACKEND,0,0,0,0,50000,0,0,0,0,0,,0,0,0,0,UP,3,3,0,,0,1468949,0,,1,11,0,,0,,1,0,,0,,,,0,0,0,0,0,0,,,,,0,0,0,0,0,0,-1,"
   end
 
   let(:stats_multiple) do
@@ -68,6 +53,7 @@ generic-service,node-2,UP,0,0,
 generic-service,node-3,DN,0,0,
 generic-service,BACKEND,0,0,0"
   end
+
   let(:stats_critical) do
     "# pxname,svname, status, slim, scur
 generic-service,FRONTEND,UP,0,0
@@ -76,7 +62,6 @@ generic-service,node-2,DN,0,0,
 generic-service,node-3,DN,0,0,
 generic-service,BACKEND,0,0,0"
   end
-
 
   describe "returns name and description" do
     it "should have sane name" do
@@ -109,7 +94,7 @@ generic-service,BACKEND,0,0,0"
       expect(opts).to have_key(:service)
     end
   end
-  
+
   describe "check required params" do
     before do
       allow(subject).to receive(:acquire_services).and_return({})
@@ -142,7 +127,7 @@ generic-service,BACKEND,0,0,0"
         expect(status).to eq(3)
       end
     end
-    
+
     it "should warn if missing services not ok" do
       check[:haproxy][:missing_ok] = false
       subject.run(check) do |message, status|
@@ -158,7 +143,7 @@ generic-service,BACKEND,0,0,0"
         expect(status).to eq(0)
       end
     end 
-    
+
     it "should return a warning" do
       check[:haproxy][:warn_percent] = 65
       expect(subject).to receive(:http_request).and_return(stats_warning)
@@ -243,14 +228,25 @@ generic-service,BACKEND,0,0,0"
   end
 
   describe "http_request" do
+    before do
+      allow_any_instance_of(Net::HTTP).to receive(:start).and_return(OpenStruct.new({code: 300}))
+      allow_any_instance_of(Net::HTTP::Get).to receive(:request).and_return(true)
+    end
     it "throws an error on non 200 code" do
-        allow_any_instance_of(Net::HTTP).to receive(:start).and_return(OpenStruct.new({code: 300}))
-        allow_any_instance_of(Net::HTTP::Get).to receive(:request).and_return(true)
+      begin
         subject.http_request
+      rescue => e
+        expect(e).to be_a_kind_of(RuntimeError)
+      end
+    end
 
+    it "should return status 3 on http_request error" do
+      subject.run(check) do |message, status|
+        expect(status).to eq(3)
+        expect(message).to include("Failed to fetch from")
+      end
     end
 
   end
 
 end
-
