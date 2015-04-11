@@ -1,8 +1,25 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
 # RabbitMQ Queue Metrics
 # ===
 #
+# DESCRIPTION:
+# This plugin checks gathers the following per queue rabbitmq metrics:
+#   - message count
+#   - average egress rate
+#   - "drain time" metric, which is the time a queue will take to reach 0 based on the egress rate
+#   - consumer count
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
 # Copyright 2015 Tim Smith <tim@cozy.co> and Cozy Services Ltd.
 #
@@ -13,6 +30,7 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 require 'carrot-top'
 
+# main plugin class
 class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :host,
          description: 'RabbitMQ management API host',
@@ -77,9 +95,12 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
       drain_time = 0 if drain_time.nan? # 0 rate with 0 messages is 0 time to drain
       output([config[:scheme], queue['name'], 'drain_time'].join('.'), drain_time.to_i, timestamp)
 
-      %w(messages).each do |metric|
+      %w(messages consumers).each do |metric|
         output([config[:scheme], queue['name'], metric].join('.'), queue[metric], timestamp)
       end
+
+      # fetch the average egress rate of the queue
+      output([config[:scheme], queue['name'], 'avg_egress_rate'].join('.'), queue['backing_queue_status']['avg_egress_rate'], timestamp)
     end
     ok
   end

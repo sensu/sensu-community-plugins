@@ -1,16 +1,24 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
 # RabbitMQ check cluster nodes health plugin
 # ===
 #
+# DESCRIPTION:
 # This plugin checks if RabbitMQ server's cluster nodes are in a running state.
 # It also accepts and optional list of nodes and verifies that those nodes are
 # present in the cluster.
 # The plugin is based on the RabbitMQ alive plugin by Abhijith G.
 #
-#  Todo:
-#    - Add ability to specify http vs. https
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris
 #
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: rest-client
+#
+# LICENSE:
 # Copyright 2012 Abhijith G <abhi@runa.com> and Runa Inc.
 # Copyright 2014 Tim Smith <tim@cozy.co> and Cozy Services Ltd.
 #
@@ -21,6 +29,7 @@ require 'sensu-plugin/check/cli'
 require 'json'
 require 'rest_client'
 
+# main plugin class
 class CheckRabbitMQCluster < Sensu::Plugin::Check::CLI
   option :host,
          description: 'RabbitMQ host',

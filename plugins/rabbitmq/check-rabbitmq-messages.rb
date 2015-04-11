@@ -1,8 +1,21 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Check RabbitMQ messages
+# Check RabbitMQ Messages
 # ===
 #
+# DESCRIPTION:
+# This plugin checks the total number of messages queued on the RabbitMQ server
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2012 Evan Hazlett <ejhazlett@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -12,6 +25,7 @@ require 'sensu-plugin/check/cli'
 require 'socket'
 require 'carrot-top'
 
+# main plugin class
 class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   option :host,
          description: 'RabbitMQ management API host',
