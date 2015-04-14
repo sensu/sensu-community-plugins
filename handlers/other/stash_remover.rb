@@ -15,7 +15,6 @@ require 'sensu-handler'
 require 'timeout'
 
 class Stasher < Sensu::Handler
-
   def filter
     filter_disabled
     filter_dependencies
