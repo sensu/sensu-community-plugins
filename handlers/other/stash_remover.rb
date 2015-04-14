@@ -23,14 +23,14 @@ class Stasher < Sensu::Handler
 
   def handle
     stash = '/silence/' + @event['client']['name'] + '/' + @event['check']['name']
-    if @event['action'].eql?('resolve') and stash_exists?(stash)
+    if @event['action'].eql?('resolve') && stash_exists?(stash)
       begin
         timeout(2) do
           api_request(:DELETE, '/stash' + stash)
-          puts "deleted stash " + stash
+          puts 'deleted stash ' + stash
         end
       rescue Timeout::Error
-        puts "timed out while attempting to delete the stash"
+        puts 'timed out while attempting to delete the stash'
       end
     end
   end
