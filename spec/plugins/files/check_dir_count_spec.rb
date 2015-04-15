@@ -30,7 +30,15 @@ require 'plugin_stub'
 describe DirCount, 'run' do
 
   include_context :plugin_stub
-
+  
+  ROOTDIR = 'spec/fixtures/plugins/files'
+  
+  before(:all) do
+    ['another-sample-1', 'another-sample-2', 'another-sample-3', 'sample-1', 'sample-2', 'test-sample'].each do |foldername| 
+      FileUtils.mkdir_p "#{ROOTDIR}/#{foldername}"
+    end
+  end 
+  
   describe '#directory' do
     it 'return unknown if given incorrect path to directory' do
       args = [
@@ -148,5 +156,9 @@ describe DirCount, 'run' do
       expect(check_dir).to receive('ok').with(expected_output)
       check_dir.run
     end
+  end
+
+  after(:all) do
+    FileUtils.rm_rf("#{ROOTDIR}")
   end
 end
