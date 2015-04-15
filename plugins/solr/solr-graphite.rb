@@ -56,7 +56,6 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     cores.each do |core|
-
       if config[:core]
         # Don't include core name in scheme to match previous functionality
         graphitepath = config[:scheme]

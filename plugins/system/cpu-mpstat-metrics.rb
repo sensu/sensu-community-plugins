@@ -57,7 +57,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def delta_cpu_metrics(baseline_cpus, sample_cpus)
     delta_cpus = {}
-    baseline_cpus.each do | cpu, columns|
+    baseline_cpus.each do |cpu, columns|
       delta_cpus[:"#{cpu}"] = {}
       columns.each do |task, time|
         delta_cpus[:"#{cpu}"][:"#{task}"] = sample_cpus[:"#{cpu}"][:"#{task}"] - time

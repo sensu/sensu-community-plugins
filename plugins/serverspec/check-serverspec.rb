@@ -95,7 +95,6 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
           output
         )
       end
-
     end
 
     puts parsed['summary_line']

@@ -25,7 +25,6 @@ require_relative '../../../plugins/apache/apache-graphite'
 require_relative '../../../spec_helper'
 
 describe ApacheMetrics, 'run' do
-
   it 'should get valid output from mod_status' do
   end
 
@@ -34,5 +33,4 @@ describe ApacheMetrics, 'run' do
 
   it 'should return valid graphite metrics' do
   end
-
 end

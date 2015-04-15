@@ -48,8 +48,8 @@ class CheckLXCSTATUS < Sensu::Plugin::Check::CLI
       else
         ok "container  #{config[:name]} is Running"
       end
-      else
-        critical "container #{config[:name]} does not Exists"
+    else
+      critical "container #{config[:name]} does not Exists"
     end
   end
 end

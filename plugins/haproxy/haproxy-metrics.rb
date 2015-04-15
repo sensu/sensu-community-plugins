@@ -175,7 +175,6 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       elsif config[:server_metrics]
         output "#{config[:scheme]}.#{line[0]}.#{line[1]}.session_total", line[7]
       end
-
     end
 
     ok

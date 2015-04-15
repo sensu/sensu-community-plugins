@@ -78,16 +78,16 @@ class Icecast2Metrics < Sensu::Plugin::Metric::CLI::Graphite
       resource = RestClient::Resource.new "http://#{host}:#{port}/admin/stats", username, password
       status = Crack::XML.parse(resource.get)
 
-      %w{
+      %w(
         clients
         listeners
         sources
         stats
-      }.each do |stat|
+      ).each do |stat|
         output "#{scheme}.active.#{stat}", status['icestats'][stat]
       end
 
-      %w{
+      %w(
         client_connections
         connections
         file_connections
@@ -96,18 +96,18 @@ class Icecast2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         source_relay_connections
         source_total_connections
         stats_connections
-      }.each do |stat|
+      ).each do |stat|
         output "#{scheme}.connections.#{stat}", status['icestats'][stat]
       end
       status['icestats']['source'].each do |source|
         source_name = source['mount'].gsub(/^\//, '')
-        %w{
+        %w(
           bitrate
           listeners
           slow_listeners
           total_bytes_read
           total_bytes_sent
-        }.each do |stat|
+        ).each do |stat|
           if source[stat]
             output "#{scheme}.sources.#{source_name}.#{stat}", source[stat]
           else

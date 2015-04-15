@@ -91,7 +91,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
             total = 0
           end
           message "#{total}"
-          @crit <<  "#{ q }:#{ total }" if total > config[:critical].to_i
+          @crit << "#{ q }:#{ total }" if total > config[:critical].to_i
           @warn << "#{ q }:#{ total }" if total > config[:warn].to_i
         end
       end
