@@ -37,7 +37,7 @@ class DirCount < Sensu::Plugin::Check::CLI
          required: true
 
   option :file_pattern,
-         description: 'file file_pattern to search for',
+         description: 'file pattern to search for',
          short: '-p PAT',
          long: '--pattern PAT',
          default: '*'

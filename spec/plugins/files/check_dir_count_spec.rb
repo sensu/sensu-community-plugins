@@ -30,15 +30,15 @@ require 'plugin_stub'
 describe DirCount, 'run' do
 
   include_context :plugin_stub
-  
+
   ROOTDIR = 'spec/fixtures/plugins/files'
-  
+
   before(:all) do
-    ['another-sample-1', 'another-sample-2', 'another-sample-3', 'sample-1', 'sample-2', 'test-sample'].each do |foldername| 
+    %w[another-sample-1, another-sample-2, another-sample-3, sample-1, sample-2, test-sample].each do |foldername|
       FileUtils.mkdir_p "#{ROOTDIR}/#{foldername}"
     end
-  end 
-  
+  end
+
   describe '#directory' do
     it 'return unknown if given incorrect path to directory' do
       args = [
@@ -60,7 +60,7 @@ describe DirCount, 'run' do
     it 'return ok if given a correct path' do
       args = [
         '--dir',
-        'spec/fixtures/plugins/files',
+        ROOTDIR,
         '-w',
         '10',
         '-c',
@@ -75,7 +75,7 @@ describe DirCount, 'run' do
     it 'return warning when number of files exceed threshold' do
       args = [
         '--dir',
-        'spec/fixtures/plugins/files',
+        ROOTDIR,
         '-w',
         '6',
         '-c',
@@ -90,7 +90,7 @@ describe DirCount, 'run' do
     it 'return critical when number of files exceed threshold' do
       args = [
         '--dir',
-        'spec/fixtures/plugins/files',
+        ROOTDIR,
         '-w',
         '1',
         '-c',
@@ -108,7 +108,7 @@ describe DirCount, 'run' do
     it 'return all files with default file pattern' do
       args = [
         '--dir',
-        'spec/fixtures/plugins/files',
+        ROOTDIR,
         '-w',
         '10',
         '-c',
@@ -124,7 +124,7 @@ describe DirCount, 'run' do
     it 'return 3 matches that matches with another-sample* file_pattern' do
       args = [
         '--dir',
-        'spec/fixtures/plugins/files',
+        ROOTDIR,
         '-w',
         '10',
         '-c',
@@ -142,7 +142,7 @@ describe DirCount, 'run' do
     it 'return 0 matches when given no-match-* file_pattern' do
       args = [
         '--dir',
-        'spec/fixtures/plugins/files',
+        ROOTDIR,
         '-w',
         '10',
         '-c',
@@ -159,6 +159,6 @@ describe DirCount, 'run' do
   end
 
   after(:all) do
-    FileUtils.rm_rf("#{ROOTDIR}")
+    FileUtils.rm_rf(ROOTDIR)
   end
 end
