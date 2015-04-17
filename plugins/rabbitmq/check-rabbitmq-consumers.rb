@@ -18,7 +18,7 @@
 # LICENSE:
 # Copyright 2014 Daniel Kerwin <d.kerwin@gini.net>
 # Copyright 2014 Tim Smith <tim@cozy.co>
-# 
+#
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
