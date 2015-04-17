@@ -38,6 +38,7 @@ describe HttpJsonGraphite do
         checker.config[:url] = 'http://localhost:8080'
         checker.run
       rescue SystemExit
+        puts
       end
     }.to output(/localhost.c3p0.Connections 15\s\d+\nlocalhost.c3p0.BusyConnections 0\s\d+/).to_stdout
   end
