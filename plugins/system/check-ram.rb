@@ -48,9 +48,9 @@ class CheckRAM < Sensu::Plugin::Check::CLI
     total_ram, free_ram, buffer_ram, cache_ram = 0, 0, 0, 0
 
     if `free --help` =~ /.*wide output.*/
-      lines = `free -tmw`.split("\n").drop(1)
+      lines = `free -mw`.split("\n").drop(1)
     else
-      lines = `free -tm`.split("\n").drop(1)
+      lines = `free -m`.split("\n").drop(1)
     end
 
     lines.each do |line|
