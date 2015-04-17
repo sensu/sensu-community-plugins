@@ -1,8 +1,21 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
 # Check RabbitMQ consumers
-# ========================
+# ===
 #
+# DESCRIPTION:
+# This plugin checks the number of consumers on the RabbitMQ server
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2014 Daniel Kerwin <d.kerwin@gini.net>
 # Copyright 2014 Tim Smith <tim@cozy.co>
 #
@@ -12,6 +25,7 @@
 require 'sensu-plugin/check/cli'
 require 'carrot-top'
 
+# main plugin class
 class CheckRabbitMQConsumers < Sensu::Plugin::Check::CLI
   option :host,
          description: 'RabbitMQ management API host',

@@ -1,13 +1,25 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
 # RabbitMQ check alive plugin
 # ===
 #
+# DESCRIPTION:
 # This plugin checks if RabbitMQ server is alive and responding to STOMP
 # requests.
 #
-# Copyright 2014 Adam Ashley
 # Based on rabbitmq-amqp-alive by Milos Gajdos
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: stomp
+#
+# LICENSE:
+# Copyright 2014 Adam Ashley
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
@@ -15,6 +27,7 @@
 require 'sensu-plugin/check/cli'
 require 'stomp'
 
+# main plugin class
 class CheckRabbitStomp < Sensu::Plugin::Check::CLI
   option :host,
          description: 'RabbitMQ host',
