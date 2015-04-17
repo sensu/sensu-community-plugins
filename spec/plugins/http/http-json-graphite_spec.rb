@@ -29,7 +29,7 @@ describe HttpJsonGraphite do
 
     RestClient.stub(:get).and_return(data)
 
-    expect {
+    expected = expect do
       begin
         checker = HttpJsonGraphite.new
         checker.config[:object] = 'value'
@@ -40,7 +40,8 @@ describe HttpJsonGraphite do
       rescue SystemExit
         puts
       end
-    }.to output(/localhost.c3p0.Connections 15\s\d+\nlocalhost.c3p0.BusyConnections 0\s\d+/).to_stdout
+    end
+    expected.to output(/localhost.c3p0.Connections 15\s\d+\nlocalhost.c3p0.BusyConnections 0\s\d+/).to_stdout
   end
 
 end
