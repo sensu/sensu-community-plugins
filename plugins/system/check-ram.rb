@@ -51,6 +51,10 @@ class CheckRAM < Sensu::Plugin::Check::CLI
       # #YELLOW
       free_ram = line.split[3].to_i if line =~ /^Total:/ # rubocop:disable RegexpLiteral
       total_ram = line.split[1].to_i if line =~ /^Total:/
+      free_swap = line.split[3].to_i if line =~ /^Swap:/
+      total_swap = line.split[1].to_i if line =~ /^Swap:/
+      free_ram -= free_swap
+      total_ram -= total_swap
     end
 
     if config[:megabytes]
