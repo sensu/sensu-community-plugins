@@ -49,6 +49,7 @@ Gem::Specification.new do |gem|
   # gem.add_development_dependency 'guard-rspec',     '~> 4.0'
   # gem.add_development_dependency 'guard-cucumber',  '~> 1.4'
   # gem.add_development_dependency 'guard-rubocop',   '~> 1.0'
+  gem.add_development_dependency 'rest-client'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rspec-mocks'
   # gem.add_development_dependency 'ruby_gntp',       '~> 0.3.4'
