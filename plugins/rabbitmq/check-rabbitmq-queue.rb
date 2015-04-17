@@ -98,7 +98,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
         next
       end
       queues.each do |queue|
-        skip unless queue['name'] == q
+        next unless queue['name'] == q
         total = queue['messages']
         total = 0 if total.nil?
         message "#{total}"
