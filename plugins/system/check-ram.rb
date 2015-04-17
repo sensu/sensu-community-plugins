@@ -45,7 +45,7 @@ class CheckRAM < Sensu::Plugin::Check::CLI
          default: 5
 
   def run
-    total_ram, free_ram = 0, 0
+    total_ram, free_ram, total_swap, free_swap = 0, 0, 0, 0
 
     `free -tm`.split("\n").drop(1).each do |line|
       # #YELLOW
@@ -53,9 +53,10 @@ class CheckRAM < Sensu::Plugin::Check::CLI
       total_ram = line.split[1].to_i if line =~ /^Total:/
       free_swap = line.split[3].to_i if line =~ /^Swap:/
       total_swap = line.split[1].to_i if line =~ /^Swap:/
-      free_ram -= free_swap
-      total_ram -= total_swap
     end
+
+    free_ram -= free_swap
+    total_ram -= total_swap
 
     if config[:megabytes]
       message "#{free_ram} megabytes free RAM left"
