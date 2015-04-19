@@ -32,31 +32,30 @@ require 'json'
 
 class SidekiqCheck < Sensu::Plugin::Check::CLI
   option :url,
-    short: '-u URL',
-    long: '--url URL',
-    description: 'Url to query',
-    required: true
+         short: '-u URL',
+         long: '--url URL',
+         description: 'Url to query',
+         required: true
 
   option :auth,
-    short: '-a USER:PASSWORD',
-    long: '--auth USER:PASSWORD',
-    description: 'Basic auth credentials if you need them',
-    proc: proc { |auth| auth.split(":") }
+         short: '-a USER:PASSWORD',
+         long: '--auth USER:PASSWORD',
+         description: 'Basic auth credentials if you need them',
+         proc: proc { |auth| auth.split(':') }
 
   option :warn,
-    short: '-w SECONDS',
-    long: '--warn SECONDS',
-    description: 'Warn after job has been SECONDS seconds in a queue',
-    proc: proc { |seconds| seconds.to_i },
-    default: 120
+         short: '-w SECONDS',
+         long: '--warn SECONDS',
+         description: 'Warn after job has been SECONDS seconds in a queue',
+         proc: proc { |seconds| seconds.to_i },
+         default: 120
 
   option :crit,
-    short: '-c SECONDS',
-    long: '--crit SECONDS',
-    description: 'Critical after job has been SECONDS seconds in a queue',
-    proc: proc { |seconds| seconds.to_i },
-    default: 300
-
+         short: '-c SECONDS',
+         long: '--crit SECONDS',
+         description: 'Critical after job has been SECONDS seconds in a queue',
+         proc: proc { |seconds| seconds.to_i },
+         default: 300
 
   def run
     begin
@@ -68,15 +67,15 @@ class SidekiqCheck < Sensu::Plugin::Check::CLI
         end
       )
 
-    rescue
-      unknown "Could not load Sidekiq stats from #{config[:url]}. Error: #{$!}"
+    rescue => error
+      unknown "Could not load Sidekiq stats from #{config[:url]}. Error: #{error}"
     end
 
     maximum_latency   = stats['queues'].map { |name, data| data['latency'] }.max
-    total_concurrency = stats['processes'].map { |process| process['concurrency'] }.inject(&:+) || 0
+    total_concurrency = stats['processes'].map { |process| process['concurrency'] }.reduce(&:+) || 0
 
     if total_concurrency.zero?
-      critical "There are no Sidekiq workers"
+      critical 'There are no Sidekiq workers'
     end
 
     if maximum_latency > config[:warn]
