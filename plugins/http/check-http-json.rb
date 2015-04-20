@@ -21,6 +21,13 @@
 # USAGE:
 #   #YELLOW
 #
+# EXAMPLE:
+#   # simple key access
+#     $ ruby plugins/http/check-http-json.rb -u https://example.com/health --key "health" --value "ok"
+#
+#   # nested key access
+#     $ ruby plugins/http/check-http-json.rb -u https://example.com/health --key "health,systemx" --value "ok"
+#
 # NOTES:
 #   Based on Check HTTP by Sonian Inc.
 #
@@ -88,6 +95,31 @@ class CheckJson < Sensu::Plugin::Check::CLI
   end
 
   def acquire_resource
+    res = request_http
+
+    case res.code
+    when /^2/
+      if json_valid?(res.body)
+        if !config[:key].nil? && !config[:value].nil?
+          json = JSON.parse(res.body)
+          # #YELLOW
+          if json_has_value?(json, config[:key], config[:value])
+            ok 'Valid JSON and key present and correct'
+          else
+            critical 'JSON key check failed'
+          end
+        else
+          ok 'Valid JSON returned'
+        end
+      else
+        critical 'Response contains invalid JSON'
+      end
+    else
+      critical res.code
+    end
+  end
+
+  def request_http
     http = Net::HTTP.new(config[:host], config[:port])
 
     if config[:ssl]
@@ -111,27 +143,28 @@ class CheckJson < Sensu::Plugin::Check::CLI
         req[h] = v.strip
       end
     end
-    res = http.request(req)
 
-    case res.code
-    when /^2/
-      if json_valid?(res.body)
-        if !config[:key].nil? && !config[:value].nil?
-          json = JSON.parse(res.body)
-          # #YELLOW
-          if json[config[:key]].to_s == config[:value].to_s # rubocop:disable BlockNesting
-            ok 'Valid JSON and key present and correct'
-          else
-            critical 'JSON key check failed'
-          end
+    res = http.request(req)
+  end
+
+  def json_has_value?(json, k, v)
+    if k.match(/,/)
+      # nested keys
+      begin
+        if k.split(",").inject(json) { |h, key| h[key] }.to_s == v.to_s
+          return true
         else
-          ok 'Valid JSON returned'
+          return false
         end
-      else
-        critical 'Response contains invalid JSON'
+      rescue NoMethodError
+        # key path is wrong for this json
+        return false
       end
     else
-      critical res.code
+      if json[k].to_s == v.to_s # rubocop:disable BlockNesting
+        return true
+      end
     end
   end
+
 end
