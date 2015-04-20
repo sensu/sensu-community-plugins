@@ -34,16 +34,16 @@ require 'rest-client'
 #
 class KegbotMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :url,
-    description: 'Kegbot API URL',
-    short: '-u URL',
-    long: '--url URL',
-    required: true
+         description: 'Kegbot API URL',
+         short: '-u URL',
+         long: '--url URL',
+         required: true
 
   option :scheme,
-    description: 'Metric naming scheme, text to prepend to metric',
-    short: '-s SCHEME',
-    long: '--scheme SCHEME',
-    default: 'kegbot'
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: 'kegbot'
 
   def run
     begin
