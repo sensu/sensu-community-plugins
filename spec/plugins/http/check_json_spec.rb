@@ -91,4 +91,18 @@ describe CheckJson, 'run' do
     json.run
   end
 
+  it 'should be able to check against a malformed nested json key/value and send a critical message' do
+    nested_json = "{\"toplevel\":{\"health\":\"good\"}}"
+    stub_with_webmock(nested_json)
+
+    json = CheckJson.new
+    json.config[:url] = "https://example.com:45699/health/check"
+    json.config[:key] = "no,such,key,path"
+    json.config[:value] = "WRONG"
+
+    expect(json).to receive(:critical).with("JSON key check failed")
+    json.run
+  end
+
+
 end
