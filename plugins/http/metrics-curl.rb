@@ -29,7 +29,6 @@
 #   for details.
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'socket'
 require 'sensu-plugin/metric/cli'
 
