@@ -16,6 +16,6 @@
       { "id": 199, "name": "UDMA_CRC_Error_Count" },
       { "id": 201, "name": "Unc_Soft_read_Err_Rate", "read": "left16bit" },
       { "id": 230, "name": "Life_Curve_Status", "crit_min": 100, "warn_min": 100, "warn_max": 100, "crit_max": 100 }
-    ] 
+    ]
   }
 }
