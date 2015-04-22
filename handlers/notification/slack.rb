@@ -11,7 +11,6 @@
 #
 # After you configure your webhook, you'll need the webhook URL from the integration.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'json'
 
