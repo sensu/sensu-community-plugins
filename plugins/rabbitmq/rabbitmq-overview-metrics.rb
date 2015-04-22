@@ -137,6 +137,10 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
         output "#{config[:scheme]}.message_stats.deliver_get.rate", overview['message_stats']['deliver_get_details']['rate'], timestamp
       end
     end
+    # overview[object_totals]
+    overview['object_totals'].each do |metric, value|
+      output "#{config[:scheme]}.global_counts.#{metric}", value, timestamp
+    end
     ok
   end
 end
