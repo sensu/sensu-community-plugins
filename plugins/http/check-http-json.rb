@@ -100,16 +100,15 @@ class CheckJson < Sensu::Plugin::Check::CLI
     case res.code
     when /^2/
       if json_valid?(res.body)
-        if !config[:key].nil? && !config[:value].nil?
-          json = JSON.parse(res.body)
-          # #YELLOW
-          if json_has_value?(json, config[:key], config[:value])
-            ok 'Valid JSON and key present and correct'
-          else
-            critical 'JSON key check failed'
-          end
-        else
+        if config[:key].nil? || config[:value].nil?
           ok 'Valid JSON returned'
+        end
+        json = JSON.parse(res.body)
+        # YELLOW
+        if json_has_value?(json, config[:key], config[:value])
+          ok 'Valid JSON and key present and correct'
+        else
+          critical 'JSON key check failed'
         end
       else
         critical 'Response contains invalid JSON'
@@ -144,22 +143,13 @@ class CheckJson < Sensu::Plugin::Check::CLI
       end
     end
 
-    res = http.request(req)
+    http.request(req)
   end
 
   def json_has_value?(json, k, v)
     if k.match(/,/)
       # nested keys
-      begin
-        if k.split(",").inject(json) { |h, key| h[key] }.to_s == v.to_s
-          return true
-        else
-          return false
-        end
-      rescue NoMethodError
-        # key path is wrong for this json
-        return false
-      end
+      return nested_value?(json, k.split(','), v)
     else
       if json[k].to_s == v.to_s # rubocop:disable BlockNesting
         return true
@@ -167,4 +157,13 @@ class CheckJson < Sensu::Plugin::Check::CLI
     end
   end
 
+  def nested_value?(json, keys, v)
+    found = keys.reduce(json) do |h, k|
+      h[k]
+    end
+    found.to_s == v.to_s
+  rescue NoMethodError
+    # key path is wrong for this json
+    false
+  end
 end

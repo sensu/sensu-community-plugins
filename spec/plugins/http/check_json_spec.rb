@@ -34,9 +34,9 @@ describe CheckJson, 'run' do
   end
 
   def stub_with_webmock(resp_json)
-    stub_request(:get, "https://example.com:45699/health/check").
-    with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
-    to_return(:status => 200, :body => resp_json, :headers => {"Content-type" => "application/json"})
+    stub_request(:get, 'https://example.com:45699/health/check')
+    .with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' })
+    .to_return(status: 200, body: resp_json, headers: { 'Content-type' => 'application/json' })
   end
 
   it 'should be able to check against a flat json key/value pair and report ok successfully' do
@@ -44,11 +44,11 @@ describe CheckJson, 'run' do
     stub_with_webmock(json)
 
     json = CheckJson.new
-    json.config[:url] = "https://example.com:45699/health/check"
-    json.config[:key] = "health"
-    json.config[:value] = "good"
+    json.config[:url] = 'https://example.com:45699/health/check'
+    json.config[:key] = 'health'
+    json.config[:value] = 'good'
 
-    expect(json).to receive(:ok).with("Valid JSON and key present and correct")
+    expect(json).to receive(:ok).with('Valid JSON and key present and correct')
     json.run
   end
 
@@ -57,11 +57,11 @@ describe CheckJson, 'run' do
     stub_with_webmock(json)
 
     json = CheckJson.new
-    json.config[:url] = "https://example.com:45699/health/check"
-    json.config[:key] = "health"
-    json.config[:value] = "NOT-PRESENT-VALUE!"
+    json.config[:url] = 'https://example.com:45699/health/check'
+    json.config[:key] = 'health'
+    json.config[:value] = 'NOT-PRESENT-VALUE!'
 
-    expect(json).to receive(:critical).with("JSON key check failed")
+    expect(json).to receive(:critical).with('JSON key check failed')
     json.run
   end
 
@@ -70,11 +70,11 @@ describe CheckJson, 'run' do
     stub_with_webmock(nested_json)
 
     json = CheckJson.new
-    json.config[:url] = "https://example.com:45699/health/check"
-    json.config[:key] = "toplevel,health"
-    json.config[:value] = "good"
+    json.config[:url] = 'https://example.com:45699/health/check'
+    json.config[:key] = 'toplevel,health'
+    json.config[:value] = 'good'
 
-    expect(json).to receive(:ok).with("Valid JSON and key present and correct")
+    expect(json).to receive(:ok).with('Valid JSON and key present and correct')
     json.run
   end
 
@@ -83,11 +83,11 @@ describe CheckJson, 'run' do
     stub_with_webmock(nested_json)
 
     json = CheckJson.new
-    json.config[:url] = "https://example.com:45699/health/check"
-    json.config[:key] = "toplevel"
-    json.config[:value] = "WRONG"
+    json.config[:url] = 'https://example.com:45699/health/check'
+    json.config[:key] = 'toplevel'
+    json.config[:value] = 'WRONG'
 
-    expect(json).to receive(:critical).with("JSON key check failed")
+    expect(json).to receive(:critical).with('JSON key check failed')
     json.run
   end
 
@@ -96,13 +96,12 @@ describe CheckJson, 'run' do
     stub_with_webmock(nested_json)
 
     json = CheckJson.new
-    json.config[:url] = "https://example.com:45699/health/check"
-    json.config[:key] = "no,such,key,path"
-    json.config[:value] = "WRONG"
+    json.config[:url] = 'https://example.com:45699/health/check'
+    json.config[:key] = 'no,such,key,path'
+    json.config[:value] = 'WRONG'
 
-    expect(json).to receive(:critical).with("JSON key check failed")
+    expect(json).to receive(:critical).with('JSON key check failed')
     json.run
   end
-
 
 end
