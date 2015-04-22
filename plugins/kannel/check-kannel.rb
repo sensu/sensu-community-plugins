@@ -50,6 +50,11 @@ class CheckKannel < Sensu::Plugin::Check::CLI
          long: '--password PASSWORD',
          description: 'Your Kannel password'
 
+  option :pattern,
+         short: '-i PATTERN',
+         long: '--id PATTERN',
+         description: 'Match a SMSC id against this pattern'
+
   def run
     path = "/status.xml?password=#{config[:password]}"
 
@@ -67,6 +72,8 @@ class CheckKannel < Sensu::Plugin::Check::CLI
     smscs_status = Hash[REXML::XPath.each(document, '//smsc').map do |smsc|
       [smsc.text('id'), smsc.text('status')]
     end]
+
+    smscs_status.reject! { |id, _| /#{config[:pattern]}/ !~ id } if config[:pattern]
 
     offline_smscs = smscs_status.reject { |_, status| status.start_with? 'online' }.keys
 
