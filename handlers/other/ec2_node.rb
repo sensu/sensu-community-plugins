@@ -124,12 +124,9 @@ class Ec2Node < Sensu::Handler
 
   def ec2
     @ec2 ||= begin
-      key = settings['aws']['access_key'] || ENV['AWS_ACCESS_KEY_ID']
-      secret = settings['aws']['secret_key'] || ENV['AWS_SECRET_ACCESS_KEY']
       region = settings['aws']['region'] || ENV['EC2_REGION']
-      Fog::Compute.new(provider: 'AWS',
-                       aws_access_key_id: key,
-                       aws_secret_access_key: secret,
+      Fog::Compute.new(use_iam_profile: true,
+                       provider: 'AWS',
                        region: region)
     end
   end
