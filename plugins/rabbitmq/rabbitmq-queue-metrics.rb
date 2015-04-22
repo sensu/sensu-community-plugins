@@ -44,6 +44,10 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Regular expression for filtering queues',
          long: '--filter REGEX'
 
+  option :exclude,
+         description: 'Regular expression for excluding queues',
+         long: '--exclude REGEX'
+
   option :ssl,
          description: 'Enable SSL for connection to the API',
          long: '--ssl',
@@ -72,10 +76,17 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
         next unless queue['name'].match(config[:filter])
       end
 
+      if config[:exclude]
+        next if queue['name'].match(config[:exclude])
+      end
+
       # calculate and output time till the queue is drained in drain metrics
-      drain_time = queue['messages'] / queue['backing_queue_status']['avg_egress_rate']
-      drain_time = 0 if drain_time.nan? # 0 rate with 0 messages is 0 time to drain
-      output([config[:scheme], queue['name'], 'drain_time'].join('.'), drain_time.to_i, timestamp)
+      drain_time_divider = queue['backing_queue_status']['avg_egress_rate']
+      if drain_time_divider != 0
+        drain_time = queue['messages'] / drain_time_divider
+        drain_time = 0 if drain_time.nan? # 0 rate with 0 messages is 0 time to drain
+        output([config[:scheme], queue['name'], 'drain_time'].join('.'), drain_time.to_i, timestamp)
+      end
 
       %w(messages).each do |metric|
         output([config[:scheme], queue['name'], metric].join('.'), queue[metric], timestamp)
