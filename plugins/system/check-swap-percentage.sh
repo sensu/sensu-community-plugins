@@ -7,7 +7,11 @@
 # License: MIT
 #
 # Usage: check-swap-percentage.sh -w warn_percent -c critical_percent
-# Uses free (Linux-only) & bc
+
+typeset -i TOTAL
+typeset -i FREE
+typeset -i USED
+typeset -i PERCENT
 
 # #RED
 # input options
@@ -18,26 +22,26 @@ while getopts ':w:c:' OPT; do
   esac
 done
 
-WARN=${WARN:=100}
-CRIT=${CRIT:=100}
-
+WARN=${WARN:=101}
+CRIT=${CRIT:=101}
 
 # get swap details
-USED=`free -m | grep 'Swap:' | awk '{ print $3 }'`
-TOTAL=`free -m | grep 'Swap:' | awk '{ print $2 }'`
+FREE=$(grep SwapFree /proc/meminfo 2>/dev/null | awk '{ print $2 }')
+TOTAL=$(grep SwapTotal /proc/meminfo 2>/dev/null | awk '{ print $2 }')
 
 if [[ $TOTAL -eq 0 ]] ; then
   echo "There is no SWAP on this machine"
   exit 0
 else
-  PERCENT=`echo "scale=3;$USED/$TOTAL*100" | bc -l | awk '{printf "%f", $0}'`
+  USED=$(( $TOTAL-$FREE ))
+  PERCENT=$(( $USED*100/$TOTAL ))
 
-  OUTPUT="Swap usage: $PERCENT%, $USED/$TOTAL"
+  OUTPUT="Swap usage: $PERCENT%, "$(($USED/1024))/$(($TOTAL/1024))
 
-  if [ "$(echo "$PERCENT >= $CRIT" | bc)" -eq 1 ] ; then
+  if (( $PERCENT >= $CRIT )); then
     echo "SWAP CRITICAL - $OUTPUT"
     exit 2
-  elif [ "$(echo "$PERCENT >= $WARN" | bc)" -eq 1 ] ; then
+  elif (( $PERCENT >= $WARN )); then
     echo "SWAP WARNING - $OUTPUT"
     exit 1
   else
