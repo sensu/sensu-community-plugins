@@ -6,9 +6,8 @@
 # Author: Thomas Borger - ESG
 # Date: 2012-04-02
 # Modified: Norman Harman - norman.harman@mutualmobile.com
-#
-# The memory check is done with following command line:
-# free -m | grep buffers/cache | awk '{ print $4 }'
+# Date: 2015-04-23
+# Modified Peter Viertel <peter@viertel.org>
 
 # get arguments
 
@@ -41,16 +40,14 @@ fi
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 
-if [ -f /etc/redhat-release ] && [ `awk '{print $3}' /etc/redhat-release` = "21" ]; then
-  FREE_MEMORY=`free -m | grep Mem | awk '{ print $7 }'`
-else
-  FREE_MEMORY=`free -m | grep buffers/cache | awk '{ print $4 }'`
-fi
+FREE_KB=$( (grep MemAvailable: /proc/meminfo || free | grep buffers/cache | awk '{ print $3,$4 }' ) | awk '{ print $2 }')
 
-if [ "$FREE_MEMORY" = "" ]; then
+if [ "$FREE_KB" = "" ]; then
   echo "MEM UNKNOWN -"
   exit 3
 fi
+
+FREE_MEMORY=$((($FREE_KB+512)/1024))
 
 if [ "$perform" = "yes" ]; then
   output="free system memory: $FREE_MEMORY MB | free memory="$FREE_MEMORY"MB;$WARN;$CRIT;0"
