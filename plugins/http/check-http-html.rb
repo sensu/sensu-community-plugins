@@ -1,4 +1,4 @@
-#! /opt/sensu/embedded/bin/ruby
+#! /usr/bin/env ruby
 #
 #   check-http-html
 #
@@ -76,7 +76,7 @@ class CheckHtml < Sensu::Plugin::Check::CLI
     res = http.request(req)
 
     redirects = 0
-    while redirects < 100 and res.code =~ /^3/
+    while redirects < 100 && res.code =~ /^3/
       req = Net::HTTP::Get.new(URI.parse(res.header['Location']))
       res = http.request(req)
       redirects = redirects + 1
@@ -84,19 +84,19 @@ class CheckHtml < Sensu::Plugin::Check::CLI
 
     case res.code
     when /^2/
-      if config[:validate] and html_malformed_xml?(res.body)
+      if config[:validate] && html_malformed_xml?(res.body)
         critical 'Malformed html response'
       elsif config[:xpath]
         html = Nokogiri::HTML(res.body)
-        matches = html.xpath(config[:xpath]).map{|x| x.to_s}
+        matches = html.xpath(config[:xpath]).map { |x| x.to_s }
 
         if matches.empty?
           critical 'Xpath miss'
         elsif config[:regex]
-          if matches.all?{ |x| x =~ /#{config[:regex]}/ }
+          if matches.all? { |x| x =~ /#{config[:regex]}/ } # rubocop:disable BlockNesting
             ok 'Pattern match against the xpath results'
           else
-            critical matches.select{ |x| x !~ /#{config[:regex]}/ }
+            critical matches.select { |x| x !~ /#{config[:regex]}/ }
           end
         else
           ok 'Xpath match'
