@@ -32,10 +32,10 @@ module Sensu
       def options
         return @options if @options
         @options = {
-          :host    => '127.0.0.1',
-          :port    => 6379,
-          :channel => 'sensu:logstash',
-          :db      => 0
+          host:    '127.0.0.1',
+          port:    6379,
+          channel: 'sensu:logstash',
+          db:      0
         }
         if @settings[:logstash].is_a?(Hash)
           @options.merge!(@settings[:logstash])
@@ -45,9 +45,9 @@ module Sensu
 
       def definition
         {
-          :type => "extension",
-          :name => name,
-          :mutator => "ruby_hash"
+          type:    'extension',
+          name:    name,
+          mutator: 'ruby_hash'
         }
       end
 
@@ -198,7 +198,6 @@ module Sensu
       end
 
       def run(event)
-
         # Is this event a resolution?
         resolved = event[:action].eql?(:resolve)
 
@@ -208,13 +207,13 @@ module Sensu
           client = event[:client]
           check = event[:check]
           state = check[:status]
-          state_msg, color, notify = clarify_state(state, check)
+          state_msg, _color, _notify = clarify_state(state, check)
           status_msg = "#{event[:action].to_s.upcase}"
           tags = []
           tags.concat(client[:tags]) if client[:tags].is_a?(Array)
           tags.concat(check[:tags]) if check[:tags].is_a?(Array)
           tags << client[:environment] unless client[:environment].nil?
-          unless check[:subscribers].nil? || check[:subscribers].empty?
+          if !check[:subscribers].nil? || !check[:subscribers].empty?
             tags.concat(client[:subscriptions] - (client[:subscriptions] - check[:subscribers]))
           else
             tags.concat(client[:subscriptions])
@@ -225,27 +224,27 @@ module Sensu
 
           time = Time.now.utc.iso8601
           logstash_event = {
-            :@timestamp  => time,
-            :@version    => 1,
-            :type        => 'sensu',
-            :source      => ::Socket.gethostname,
-            :message     => check[:notification] || check[:output],
-            :host        => client[:name],
-            :issued      => check[:issued],
-            :executed    => check[:executed],
-            :address     => client[:address],
-            :check       => check[:name],
-            :command     => check[:command],
-            :status      => Sensu::SEVERITIES[check[:status]] || 'unknown',
-            :action      => event[:action],
-            :occurrences => check[:occurrences],
-            :interval    => check[:interval],
-            :refresh     => check[:refresh],
-            :state_msg   => state_msg,
-            :status_msg  => status_msg,
-            :tags        => tags,
-            :level       => 6
+            type:        'sensu',
+            source:      ::Socket.gethostname,
+            message:     check[:notification] || check[:output],
+            host:        client[:name],
+            issued:      check[:issued],
+            executed:    check[:executed],
+            address:     client[:address],
+            check:       check[:name],
+            command:     check[:command],
+            status:      Sensu::SEVERITIES[check[:status]] || 'unknown',
+            action:      event[:action],
+            occurrences: check[:occurrences],
+            interval:    check[:interval],
+            refresh:     check[:refresh],
+            state_msg:   state_msg,
+            status_msg:  status_msg,
+            tags:        tags,
+            level:       6
           }
+          logstash_event[:@timestamp] = time
+          logstash_event[:@version]   = 1
           send_redis(logstash_event)
           yield 'Logstash handler: Sent an event to the logstash redis queue', 0
         end
