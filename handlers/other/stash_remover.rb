@@ -1,16 +1,32 @@
-#!/usr/bin/env ruby1.9.3
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#   stash_remover.rb
 #
-# Sensu Handler: stash_remover
+# DESCRIPTION:
+#   This handler removes stashes of services coming back to OK.
+#   So new errors on a service won't be ignored silently.
 #
-# This handler removes stashes of services coming back to OK.
-# So new errors on a service won't be ignored silently.
 #
-# Copyright 2015 Christoph Glaubitz <c.glaubitz@syseleven.de>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   All
+#
+# DEPENDENCIES:
+#   gem: sensu-handler
+#   gem: timeout
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Christoph Glaubitz <c.glaubitz@syseleven.de>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'timeout'
 
