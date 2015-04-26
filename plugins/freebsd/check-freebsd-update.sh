@@ -2,6 +2,13 @@
 
 # this needs to run with sudo as the tag file is only readable by root
 
+HAS_FREEBSD_VERSION=$(which freebsd-version)
+
+if [ -z ${HAS_FREEBSD_VERSION} ]; then
+  echo "Only FreeBSD > 10.0 is supported."
+  exit 3
+fi
+
 TAGFILE="/var/db/freebsd-update/tag"
 
 if [ ! -f ${TAGFILE} ]; then
