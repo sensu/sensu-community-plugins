@@ -2,7 +2,7 @@
 #
 # Sensu Logstash Handler
 #
-# Heavily inspried (er, copied from) the GELF Handler writeen by
+# Heavily inspried (er, copied from) the GELF Handler written by
 # Joe Miller.
 #
 # Designed to take sensu events, transform them into logstash JSON events
