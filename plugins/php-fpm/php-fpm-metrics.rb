@@ -3,7 +3,7 @@
 # Pull php-fpm metrics from php-fpm status page
 # ===
 #
-# Requires `crack` gem to parse xml.
+# Requires `json` gem to parse json.
 #
 # Copyright 2014 Ilari Makela ilari at i28.fi
 #
@@ -13,7 +13,7 @@
 require 'sensu-plugin/metric/cli'
 require 'net/https'
 require 'uri'
-require 'crack'
+require 'json'
 
 class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :url,
@@ -46,7 +46,7 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
-        request = Net::HTTP::Get.new(uri.request_uri + '?xml', 'User-Agent' => "#{config[:agent]}")
+        request = Net::HTTP::Get.new(uri.request_uri + '?json', 'User-Agent' => "#{config[:agent]}")
         response = http.request(request)
         if response.code == '200'
           found = true
@@ -56,7 +56,7 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
     end # until
 
-    stats = Crack::XML.parse(response.body)
+    stats = JSON.parse(response.body)
     stat = %w(start_since
               accepted_conn
               listen_queue
@@ -69,7 +69,7 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
               max_children_reached
               slow_requests)
     stat.each do |name|
-      output "#{config[:scheme]}.#{name}", stats['status'][name]
+      output "#{config[:scheme]}.#{name}", stats[name.stats[name.gsub(/_/,' ')]
     end
     ok
   end
