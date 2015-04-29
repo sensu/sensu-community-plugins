@@ -69,7 +69,7 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
               max_children_reached
               slow_requests)
     stat.each do |name|
-      output "#{config[:scheme]}.#{name}", stats[name.stats[name.gsub(/_/,' ')]
+      output "#{config[:scheme]}.#{name}", stats[name.gsub(/_/,' ')]
     end
     ok
   end
