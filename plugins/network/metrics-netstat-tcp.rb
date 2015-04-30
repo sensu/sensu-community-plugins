@@ -99,6 +99,12 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--port PORT',
          proc: proc(&:to_i)
 
+  option :protocol,
+         description: 'Protocol to get metrics for',
+         short: '-P PROTOCOL',
+         long: '--protocol PROCOTOL',
+         default: 'tcp'
+
   def netstat(protocol = 'tcp')
     state_counts = Hash.new(0)
     TCP_STATES.each_pair { |_hex, name| state_counts[name] = 0 }
@@ -122,7 +128,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     timestamp = Time.now.to_i
-    netstat('tcp').each do |state, count|
+    netstat(config[:protocol]).each do |state, count|
       graphite_name = config[:port] ? "#{config[:scheme]}.#{config[:port]}.#{state}" :
         "#{config[:scheme]}.#{state}"
       output "#{graphite_name}", count, timestamp
