@@ -100,7 +100,7 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
 
       # fetch the average egress rate of the queue
-      rate = sprintf('%.4f' % queue['backing_queue_status']['avg_egress_rate'])
+      rate = format('%.4f', queue['backing_queue_status']['avg_egress_rate'])
       output([config[:scheme], queue['name'], 'avg_egress_rate'].join('.'), rate, timestamp)
     end
     ok
