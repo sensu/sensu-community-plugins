@@ -41,7 +41,7 @@ fi
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 
-if [ -f /etc/redhat-release ] && [ `awk '{print $3}' /etc/redhat-release` = "21" ]; then
+if [ $(free -m |grep -c available) -ne 0 ]; then
   FREE_MEMORY=`free -m | grep Mem | awk '{ print $7 }'`
 else
   FREE_MEMORY=`free -m | grep buffers/cache | awk '{ print $4 }'`
