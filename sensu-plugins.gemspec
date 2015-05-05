@@ -28,6 +28,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec-mocks'
   gem.add_development_dependency 'webmock'
   gem.add_development_dependency 'pry'
+  gem.add_development_dependency 'nokogiri'           '~> 1.6.6'
   # gem.add_development_dependency 'ruby_gntp',       '~> 0.3.4'
   # gem.add_development_dependency 'simplecov',       '~> 0.7.1'
   # gem.add_development_dependency 'yard',            '~> 0.8'
