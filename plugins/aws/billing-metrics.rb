@@ -31,7 +31,6 @@ require 'sensu-plugin/metric/cli'
 require 'aws-sdk-v1'
 
 class BillingMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
          description: 'Metric naming scheme, text to prepend to metric',
          short: '-s SCHEME',
@@ -72,7 +71,7 @@ class BillingMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     if config[:scheme] == ''
-      graphitepath = "billing"
+      graphitepath = 'billing'
     else
       graphitepath = config[:scheme]
     end
@@ -81,14 +80,14 @@ class BillingMetrics < Sensu::Plugin::Metric::CLI::Graphite
       metric = AWS::CloudWatch::Metric.new(
         'AWS/Billing',
         'EstimatedCharges',
-        :dimensions => [
-          {:name => 'Currency', :value => 'USD'}
+        dimensions: [
+          { name: 'Currency', value: 'USD' }
         ]
       )
       stats = metric.statistics(
-        :start_time => Time.now - 15000,
-        :end_time => Time.now,
-        :statistics => ['Maximum'])
+        start_time: Time.now - 15_000,
+        end_time: Time.now,
+        statistics: ['Maximum'])
 
       bill = 0
       stats.each do |datapoint|
@@ -101,5 +100,4 @@ class BillingMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end
     ok
   end
-
 end
