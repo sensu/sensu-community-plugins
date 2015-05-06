@@ -1,9 +1,9 @@
 #! /usr/bin/env ruby
 #
-# elb-full-metrics
+# rds-metrics
 #
 # DESCRIPTION:
-#   Gets latency metrics from CloudWatch and puts them in Graphite for longer term storage
+#   Gets RDS metrics from CloudWatch and puts them in Graphite for longer term storage
 #
 # OUTPUT:
 #   metric-data
@@ -15,17 +15,11 @@
 #   gem: sensu-plugin
 #
 # USAGE:
-#   elb-full-metrics.rb --aws-region eu-west-1
-#   elb-full-metrics.rb --aws-region eu-west-1 --elbname develop-p-elasticL-1B5CNWBVIG17G
+#   rds-metrics --aws-region eu-west-1
+#   rds-metrics --aws-region eu-west-1 --name sr2x8pbti0eon1
 #
 # NOTES:
-#   Returns latency statistics by default.  You can specify any valid ELB metric type, see
-#   http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/CW_Support_For_AWS.html#elb-metricscollected
-#
-#   By default fetches statistics from one minute ago.  You may need to fetch further back than this;
-#   high traffic ELBs can sometimes experience statistic delays of up to 10 minutes.  If you experience this,
-#   raising a ticket with AWS support should get the problem resolved.
-#   As a workaround you can use eg -f 300 to fetch data from 5 minutes ago.
+#   Returns all RDS statistics for all RDS instances in this account unless you specify --name
 #
 # LICENSE:
 #   Copyright 2013 Bashton Ltd http://www.bashton.com/
@@ -37,11 +31,11 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'aws-sdk-v1'
 
-class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
-  option :elbname,
-         description: 'Name of the Elastic Load Balancer',
-         short: '-n ELB_NAME',
-         long: '--name ELB_NAME'
+class RDSMetrics < Sensu::Plugin::Metric::CLI::Graphite
+  option :rdsname,
+         description: 'Name of the Relational Database Service instance',
+         short: '-n RDS_NAME',
+         long: '--name RDS_NAME'
 
   option :scheme,
          description: 'Metric naming scheme, text to prepend to metric',
@@ -85,18 +79,19 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     statistic_type = {
-      'Latency' => 'Average',
-      'RequestCount' => 'Sum',
-      'UnHealthyHostCount' => 'Average',
-      'HealthyHostCount' => 'Average',
-      'HTTPCode_Backend_2XX' => 'Sum',
-      'HTTPCode_Backend_4XX' => 'Sum',
-      'HTTPCode_Backend_5XX' => 'Sum',
-      'HTTPCode_ELB_4XX' => 'Sum',
-      'HTTPCode_ELB_5XX' => 'Sum',
-      'BackendConnectionErrors' => 'Sum',
-      'SurgeQueueLength' => 'Maximum',
-      'SpilloverCount' => 'Sum'
+               'CPUUtilization' => 'Average',
+               'DatabaseConnections' => 'Average',
+               'FreeStorageSpace' => 'Average',
+               'ReadIOPS' => 'Average',
+               'ReadLatency' => 'Average',
+               'ReadThroughput' => 'Average',
+               'WriteIOPS' => 'Average',
+               'WriteLatency' => 'Average',
+               'WriteThroughput' => 'Average',
+               'ReplicaLag' => 'Average',
+               'SwapUsage' => 'Average',
+               'BinLogDiskUsage' => 'Average',
+               'DiskQueueDepth' => 'Average'
     }
 
     begin
@@ -105,19 +100,19 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       cw = AWS::CloudWatch::Client.new aws_config
 
-      unless config[:elbname]
-        elbs = AWS::ELB.new aws_config
-        config[:elbname] = ''
-        elbs.load_balancers.each do |elb|
-          config[:elbname] += elb.name + ' '
+      unless config[:rdsname]
+        rdss = AWS::RDS.new aws_config
+        config[:rdsname] = ''
+        rdss.instances.each do |rds|
+          config[:rdsname] += rds.db_instance_id + ' '
         end
       end
 
       options = {
-        'namespace' => 'AWS/ELB',
+        'namespace' => 'AWS/RDS',
         'dimensions' => [
           {
-            'name' => 'LoadBalancerName',
+            'name' => 'DBInstanceIdentifier',
             'value' => '' # Will be filled in the each block below
           }
         ],
@@ -128,16 +123,17 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       result = {}
       graphitepath = config[:scheme]
-      config[:elbname].split(' ').each do |elbname|
+
+      config[:rdsname].split(' ').each do |rdsname|
         statistic_type.each do |key, value|
           unless config[:scheme] == ''
             graphitepath = "#{config[:scheme]}."
           end
           options['metric_name'] = key
-          options['dimensions'][0]['value'] = elbname
+          options['dimensions'][0]['value'] = rdsname
           options['statistics'] = [value]
           r = cw.get_metric_statistics(options)
-          result[elbname + '.' + key] = r[:datapoints][0] unless r[:datapoints][0].nil?
+          result[rdsname + '.' + key] = r[:datapoints][0] unless r[:datapoints][0].nil?
         end
         unless result.nil?
           # We only return data when we have some to return
