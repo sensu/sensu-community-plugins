@@ -79,19 +79,19 @@ class RDSMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     statistic_type = {
-               'CPUUtilization' => 'Average',
-               'DatabaseConnections' => 'Average',
-               'FreeStorageSpace' => 'Average',
-               'ReadIOPS' => 'Average',
-               'ReadLatency' => 'Average',
-               'ReadThroughput' => 'Average',
-               'WriteIOPS' => 'Average',
-               'WriteLatency' => 'Average',
-               'WriteThroughput' => 'Average',
-               'ReplicaLag' => 'Average',
-               'SwapUsage' => 'Average',
-               'BinLogDiskUsage' => 'Average',
-               'DiskQueueDepth' => 'Average'
+      'CPUUtilization' => 'Average',
+      'DatabaseConnections' => 'Average',
+      'FreeStorageSpace' => 'Average',
+      'ReadIOPS' => 'Average',
+      'ReadLatency' => 'Average',
+      'ReadThroughput' => 'Average',
+      'WriteIOPS' => 'Average',
+      'WriteLatency' => 'Average',
+      'WriteThroughput' => 'Average',
+      'ReplicaLag' => 'Average',
+      'SwapUsage' => 'Average',
+      'BinLogDiskUsage' => 'Average',
+      'DiskQueueDepth' => 'Average'
     }
 
     begin
@@ -124,7 +124,7 @@ class RDSMetrics < Sensu::Plugin::Metric::CLI::Graphite
       result = {}
       graphitepath = config[:scheme]
 
-      config[:rdsname].split(' ').each do |rdsname|
+      config[:rdsname].split(' ').each do |rdsname| # rubocop:disable Next
         statistic_type.each do |key, value|
           unless config[:scheme] == ''
             graphitepath = "#{config[:scheme]}."

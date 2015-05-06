@@ -128,7 +128,7 @@ class ELBMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       result = {}
       graphitepath = config[:scheme]
-      config[:elbname].split(' ').each do |elbname|
+      config[:elbname].split(' ').each do |elbname| # rubocop:disable Next
         statistic_type.each do |key, value|
           unless config[:scheme] == ''
             graphitepath = "#{config[:scheme]}."
