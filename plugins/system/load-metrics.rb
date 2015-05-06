@@ -37,19 +37,8 @@
 #   for details.
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
-
-if RUBY_VERSION < '1.9.0'
-  require 'bigdecimal'
-
-  class Float
-    def round(val = 0)
-      BigDecimal.new(to_s).round(val).to_f
-    end
-  end
-end
 
 class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,

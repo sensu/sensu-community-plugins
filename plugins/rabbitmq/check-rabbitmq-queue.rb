@@ -1,18 +1,31 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
-# Check RabbitMQ messages
+# Check RabbitMQ Queue Messages
 # ===
 #
+# DESCRIPTION:
+# This plugin checks the number of messages queued on the RabbitMQ server in a specific queues
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2012 Evan Hazlett <ejhazlett@gmail.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'socket'
 require 'carrot-top'
 
+# main plugin class
 class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
   option :host,
          description: 'RabbitMQ management API host',
@@ -85,15 +98,12 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
         next
       end
       queues.each do |queue|
-        if queue['name'] == q
-          total = queue['messages']
-          if total.nil?
-            total = 0
-          end
-          message "#{total}"
-          @crit <<  "#{ q }:#{ total }" if total > config[:critical].to_i
-          @warn << "#{ q }:#{ total }" if total > config[:warn].to_i
-        end
+        next unless queue['name'] == q
+        total = queue['messages']
+        total = 0 if total.nil?
+        message "#{total}"
+        @crit << "#{ q }:#{ total }" if total > config[:critical].to_i
+        @warn << "#{ q }:#{ total }" if total > config[:warn].to_i
       end
     end
     if @crit.empty? && @warn.empty?

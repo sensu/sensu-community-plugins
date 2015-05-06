@@ -14,32 +14,6 @@ Gem::Specification.new do |gem|
   gem.files                 = Dir['Rakefile', '{plugins,extensions,handlers,mutators,lib,spec,scripts}/**/*', 'README*', 'LICENSE*', 'CONTRIB*', 'CHANGELOG*']
 
   gem.add_dependency 'sensu-plugin', '1.1.0'
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-  # gem.add_dependency
-
   gem.add_development_dependency 'bundler',           '~> 1.3'
   gem.add_development_dependency 'rubocop',           '~> 0.17.0'
   gem.add_development_dependency 'rake'
@@ -49,8 +23,11 @@ Gem::Specification.new do |gem|
   # gem.add_development_dependency 'guard-rspec',     '~> 4.0'
   # gem.add_development_dependency 'guard-cucumber',  '~> 1.4'
   # gem.add_development_dependency 'guard-rubocop',   '~> 1.0'
+  gem.add_development_dependency 'rest-client'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rspec-mocks'
+  gem.add_development_dependency 'webmock'
+  gem.add_development_dependency 'pry'
   # gem.add_development_dependency 'ruby_gntp',       '~> 0.3.4'
   # gem.add_development_dependency 'simplecov',       '~> 0.7.1'
   # gem.add_development_dependency 'yard',            '~> 0.8'

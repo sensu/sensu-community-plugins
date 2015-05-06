@@ -1,0 +1,12 @@
+{
+    "request": {
+        "mbean": "com.mchange.v2.c3p0:name=datasourcename,type=PooledDataSource", 
+        "type": "read"
+    }, 
+    "status": 200, 
+    "timestamp": 1428678241, 
+    "value": {
+        "numBusyConnections": 0, 
+        "numConnections": 15
+    }
+}

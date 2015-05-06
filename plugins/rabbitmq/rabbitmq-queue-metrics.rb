@@ -1,18 +1,36 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
 # RabbitMQ Queue Metrics
 # ===
 #
+# DESCRIPTION:
+# This plugin checks gathers the following per queue rabbitmq metrics:
+#   - message count
+#   - average egress rate
+#   - "drain time" metric, which is the time a queue will take to reach 0 based on the egress rate
+#   - consumer count
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# Copyright 2015 Tim Smith <tim@cozy.co> and Cozy Services Ltd.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 require 'carrot-top'
 
+# main plugin class
 class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :host,
          description: 'RabbitMQ management API host',
@@ -69,14 +87,20 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
     timestamp = Time.now.to_i
     acquire_rabbitmq_queues.each do |queue|
       if config[:filter]
-        # #YELLOW
-        unless queue['name'].match(config[:filter]) # rubocop:disable IfUnlessModifier
-          next
-        end
+        next unless queue['name'].match(config[:filter])
       end
-      %w(messages).each do |metric|
+
+      # calculate and output time till the queue is drained in drain metrics
+      drain_time = queue['messages'] / queue['backing_queue_status']['avg_egress_rate']
+      drain_time = 0 if drain_time.nan? # 0 rate with 0 messages is 0 time to drain
+      output([config[:scheme], queue['name'], 'drain_time'].join('.'), drain_time.to_i, timestamp)
+
+      %w(messages consumers).each do |metric|
         output([config[:scheme], queue['name'], metric].join('.'), queue[metric], timestamp)
       end
+
+      # fetch the average egress rate of the queue
+      output([config[:scheme], queue['name'], 'avg_egress_rate'].join('.'), queue['backing_queue_status']['avg_egress_rate'], timestamp)
     end
     ok
   end

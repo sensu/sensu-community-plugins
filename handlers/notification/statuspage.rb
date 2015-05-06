@@ -1,11 +1,35 @@
 #!/usr/bin/env ruby
 #
-# This handler creates and updates incidents for StatusPage.IO.
+# This handler creates and updates incidents and changes a component status (optional) for StatusPage.IO.
 # Due to a bug with their API, please pair a Twitter account to your StatusPage even if you don't plan to tweet.
+# Components only support 'major_outage' and 'operational' at this time
 #
 # Copyright 2011 Sonian, Inc <chefs@sonian.net>
 # Copyright 2013 DISQUS, Inc.
+# Updated by jfledvin with Redphone Instructions & Basic Component Support 4/5/2015
 #
+# NOTE: As of this writing Redphone has not added StatusPage.io support to v0.0.6
+# You must manually build and install the gem:
+# git clone https://github.com/portertech/redphone.git
+# cd redphone
+# gem build redphone.gemspec OR /opt/sensu/embedded/bin/gem build redphone.gemspec
+# gem install redphone-0.0.6.gem OR /opt/sensu/embedded/bin/gem install redphone-0.0.6.gem
+#
+# To update a component add a "component_id": "IDHERE" attribute to the corresponding check definition
+
+# Example:
+# {
+#    "checks": {
+#      "check_sshd": {
+#        "handlers": ["statuspage"],
+#        "component_id": "IDHERE",
+#        "command": "/etc/sensu/plugins/check-procs.rb -p sshd -C 1 ",
+#        "interval": 60,
+#        "subscribers": [ "default" ]
+#      }
+#    }
+# }
+
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
@@ -26,6 +50,21 @@ class StatusPage < Sensu::Handler
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' : ')
     begin
       timeout(3) do
+        if @event['check'].key?('component_id')
+          status = case @event['action']
+                   when 'create'
+                     'major_outage'
+                   when 'resolve'
+                     'operational'
+                   else
+                     nil
+                   end
+          unless status.nil?
+            statuspage.update_component(
+              component_id: @event['check']['component_id'],
+              status: status)
+          end
+        end
         response = case @event['action']
                    when 'create'
                      # #YELLOW

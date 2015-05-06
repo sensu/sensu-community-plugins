@@ -27,7 +27,6 @@
 #   for details.
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/https'
 require 'uri'
@@ -100,9 +99,9 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
       end
       if line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/)
         requests = line.match(/^\s+(\d+)\s+(\d+)\s+(\d+)/).to_a
-        output "#{config[:scheme]}.accepted", requests[1]
+        output "#{config[:scheme]}.accepts", requests[1]
         output "#{config[:scheme]}.handled", requests[2]
-        output "#{config[:scheme]}.handles", requests[3]
+        output "#{config[:scheme]}.requests", requests[3]
       end
       if line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/)
         queue = line.match(/^Reading:\s+(\d+).*Writing:\s+(\d+).*Waiting:\s+(\d+)/).to_a

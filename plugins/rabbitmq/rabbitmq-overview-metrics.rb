@@ -1,16 +1,10 @@
 #!/usr/bin/env ruby
-
+#  encoding: UTF-8
 #
 # RabbitMQ Overview Metrics
 # ===
 #
-# Dependencies
-# -----------
-# - RabbitMQ `rabbitmq_management` plugin
-# - Ruby gem `carrot-top`
-#
-# Overview stats
-# ---------------
+# DESCRIPTION:
 # RabbitMQ 'overview' stats are similar to what is shown on the main page
 # of the rabbitmq_management web UI. Example:
 #
@@ -28,16 +22,25 @@
 #    host.rabbitmq.message_stats.deliver_get.count 6661111 1344186404
 #    host.rabbitmq.message_stats.deliver_get.rate  24.6867565643405  1344186404#
 #
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2012 Joe Miller - https://github.com/joemiller
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 require 'carrot-top'
 
+# main plugin class
 class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :host,
          description: 'RabbitMQ management API host',
@@ -133,6 +136,10 @@ class RabbitMQMetrics < Sensu::Plugin::Metric::CLI::Graphite
          overview['message_stats']['deliver_get_details'].include?('rate')
         output "#{config[:scheme]}.message_stats.deliver_get.rate", overview['message_stats']['deliver_get_details']['rate'], timestamp
       end
+    end
+    # overview[object_totals]
+    overview['object_totals'].each do |metric, value|
+      output "#{config[:scheme]}.global_counts.#{metric}", value, timestamp
     end
     ok
   end

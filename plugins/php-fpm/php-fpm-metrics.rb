@@ -10,7 +10,6 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'net/https'
 require 'uri'
@@ -28,6 +27,12 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--scheme SCHEME',
          default: "#{Socket.gethostname}.php_fpm"
 
+  option :agent,
+         description: 'User Agent to make the request with',
+         short: '-a USERAGENT',
+         long: '--agent USERAGENT',
+         default: 'Sensu-Agent'
+
   def run
     found = false
     attempts = 0
@@ -41,7 +46,7 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
-        request = Net::HTTP::Get.new(uri.request_uri + '?xml')
+        request = Net::HTTP::Get.new(uri.request_uri + '?xml', 'User-Agent' => "#{config[:agent]}")
         response = http.request(request)
         if response.code == '200'
           found = true
@@ -52,14 +57,16 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
     end # until
 
     stats = Crack::XML.parse(response.body)
-    stat = %w(start_since accepted_conn listen_queue \
-              max_listen_queue \
-              listen_queue_len \
-              idle_processes \
-              active_processes \
-              total_processes \
-              max_active_processes \
-              max_children_reached \
+    stat = %w(start_since
+              accepted_conn
+              listen_queue
+              max_listen_queue
+              listen_queue_len
+              idle_processes
+              active_processes
+              total_processes
+              max_active_processes
+              max_children_reached
               slow_requests)
     stat.each do |name|
       output "#{config[:scheme]}.#{name}", stats['status'][name]
