@@ -3,7 +3,7 @@
 # Check percent of used RAM
 #
 # Drew Rogers
-# Copyright 20135 <drogers@chariotsolutions.com>
+# Copyright 2015 <drogers@chariotsolutions.com>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
