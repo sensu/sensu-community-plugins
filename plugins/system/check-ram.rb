@@ -1,7 +1,4 @@
-#! /usr/bin/env ruby
-#  encoding: UTF-8
-#
-#   check-ram
+eck-ram
 #
 # DESCRIPTION:
 #
@@ -49,14 +46,18 @@ class CheckRAM < Sensu::Plugin::Check::CLI
 
     memhash = Hash.new
     meminfo = File.read('/proc/meminfo')
-    meminfo.each_line do |i| 
+    meminfo.each_line do |i|
       key, val = i.split(':')
       if val.include?('kB') then val = val.gsub(/\s+kB/, ''); end
       memhash["#{key}"] = val.strip
     end
- 
-    total_ram = memhash["MemTotal"].to_i/1024
-    free_ram = (memhash["MemFree"].to_i + memhash["Buffers"].to_i + memhash["Cached"].to_i)/1024
+
+    total_ram = (memhash["MemTotal"].to_i << 10) >> 20
+    if memhash.has_key?("MemAvailable")
+      free_ram = (memhash["MemAvailable"].to_i << 10) >> 20
+    else
+      free_ram = ((memhash["MemFree"].to_i + memhash["Buffers"].to_i + memhash["Cached"].to_i) << 10) >> 20
+    end
 
     if config[:megabytes]
       message "#{free_ram} megabytes free RAM left"
