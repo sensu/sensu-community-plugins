@@ -1,4 +1,7 @@
-eck-ram
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#
+#   check-ram
 #
 # DESCRIPTION:
 #
