@@ -35,7 +35,7 @@ describe CheckJson, 'run' do
 
   def stub_with_webmock(resp_json)
     stub_request(:get, 'https://example.com:45699/health/check')
-    .with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' })
+    .with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' })
     .to_return(status: 200, body: resp_json, headers: { 'Content-type' => 'application/json' })
   end
 
