@@ -19,7 +19,7 @@
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
-require 'net/https'
+require 'net/http'
 require 'uri'
 
 class ChatWkNotif < Sensu::Handler
@@ -69,7 +69,6 @@ class ChatWkNotif < Sensu::Handler
   def handle
     http = Net::HTTP.new(access_uri.host, access_uri.port)
     http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     body = 'body=' + URI.encode("#{sensu_message}")
     res = http.post(access_uri, body, access_header)
     puts JSON.parse(res.body)
