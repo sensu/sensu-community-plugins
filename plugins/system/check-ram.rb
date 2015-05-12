@@ -45,8 +45,6 @@ class CheckRAM < Sensu::Plugin::Check::CLI
          default: 5
 
   def run
-    total_ram, free_ram = 0, 0
-
     memhash = {}
     meminfo = File.read('/proc/meminfo')
     meminfo.each_line do |i|
