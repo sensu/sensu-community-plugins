@@ -55,11 +55,11 @@ class CheckRAM < Sensu::Plugin::Check::CLI
       memhash["#{key}"] = val.strip
     end
 
-    total_ram = (memhash["MemTotal"].to_i << 10) >> 20
-    if memhash.has_key?("MemAvailable")
-      free_ram = (memhash["MemAvailable"].to_i << 10) >> 20
+    total_ram = (memhash['MemTotal'].to_i << 10) >> 20
+    if memhash.key?('MemAvailable')
+      free_ram = (memhash['MemAvailable'].to_i << 10) >> 20
     else
-      free_ram = ((memhash["MemFree"].to_i + memhash["Buffers"].to_i + memhash["Cached"].to_i) << 10) >> 20
+      free_ram = ((memhash['MemFree'].to_i + memhash['Buffers'].to_i + memhash['Cached'].to_i) << 10) >> 20
     end
 
     if config[:megabytes]
