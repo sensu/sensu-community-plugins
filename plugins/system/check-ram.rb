@@ -47,11 +47,11 @@ class CheckRAM < Sensu::Plugin::Check::CLI
   def run
     total_ram, free_ram = 0, 0
 
-    memhash = Hash.new
+    memhash = {}
     meminfo = File.read('/proc/meminfo')
     meminfo.each_line do |i|
       key, val = i.split(':')
-      if val.include?('kB') then val = val.gsub(/\s+kB/, ''); end
+      val = val.include?('kB') ? val.gsub(/\s+kB/, '') : val
       memhash["#{key}"] = val.strip
     end
 
