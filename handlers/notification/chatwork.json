@@ -1,0 +1,8 @@
+{
+  "chatwork": {
+    "serverurl": "https://api.chatwork.com/",
+    "apitoken": "YOUR CHATWORK API TOKEN",
+    "apiversion": "v1",
+    "roomid": "YOUR CHATWORK ROOM ID"
+  }
+}
