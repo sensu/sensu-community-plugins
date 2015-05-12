@@ -1,8 +1,8 @@
 {
   "chatwork": {
     "serverurl": "https://api.chatwork.com/",
-    "apitoken": "YOUR CHATWORK API TOKEN",
+    "apitoken": "123456789abcdefghijklmnopqrstuvw",
     "apiversion": "v1",
-    "roomid": "YOUR CHATWORK ROOM ID"
+    "roomid": "12345678"
   }
 }
