@@ -67,15 +67,23 @@ class ChatWkNotif < Sensu::Handler
     "\s\s\s***by Sensu***\s\s\s"
   end
 
+  def event_name
+    @event['client']['name'] + '/' + @event['check']['name']
+  end
+
   def handle
     http = Net::HTTP.new(access_uri.host, access_uri.port)
     http.use_ssl = true
     body = 'body=' + URI.encode("#{sensu_message}")
-    timeout(10) do
-      res = http.post(access_uri, body, access_header)
-      puts JSON.parse(res.body)
+    begin
+      timeout(10) do
+        res = http.post(access_uri, body, access_header)
+        puts JSON.parse(res.body)
+      end
+    rescue Timeout::Error
+      puts 'chatwork -- timed out while attempting to ' + @event['action'] + ' a incident -- ' + event_name
+    rescue Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+      puts "chatwork -- HTTP Connection error #{e.message}"
     end
-  rescue => e
-    puts "Exception occured in ChatWorkNotifier: #{e.message}", e.backtrace
   end
 end
