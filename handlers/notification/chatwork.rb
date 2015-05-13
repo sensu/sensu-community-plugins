@@ -20,6 +20,7 @@
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'net/http'
+require 'net/https'
 require 'uri'
 require 'timeout'
 
@@ -74,6 +75,7 @@ class ChatWkNotif < Sensu::Handler
   def handle
     http = Net::HTTP.new(access_uri.host, access_uri.port)
     http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     body = 'body=' + URI.encode("#{sensu_message}")
     begin
       timeout(10) do
