@@ -2,7 +2,7 @@
 #
 ## Sensu Handler: campfire
 ##
-## Copyright 2015, AJ Christensen <tsubasa11@marble.ocn.ne.jp>
+## Copyright 2015, Tsubasa Hirota <tsubasa11@marble.ocn.ne.jp>
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
