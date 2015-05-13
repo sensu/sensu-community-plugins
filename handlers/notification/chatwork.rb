@@ -21,6 +21,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'net/http'
 require 'uri'
+require 'timeout'
 
 class ChatWkNotif < Sensu::Handler
   def server_url
@@ -70,8 +71,10 @@ class ChatWkNotif < Sensu::Handler
     http = Net::HTTP.new(access_uri.host, access_uri.port)
     http.use_ssl = true
     body = 'body=' + URI.encode("#{sensu_message}")
-    res = http.post(access_uri, body, access_header)
-    puts JSON.parse(res.body)
+    timeout(10) do
+      res = http.post(access_uri, body, access_header)
+      puts JSON.parse(res.body)
+    end
   rescue => e
     puts "Exception occured in ChatWorkNotifier: #{e.message}", e.backtrace
   end
