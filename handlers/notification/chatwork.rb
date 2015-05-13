@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-## Sensu Handler: campfire
+## Sensu Handler: chatwork
 ##
 ## Copyright 2015, Tsubasa Hirota <tsubasa11@marble.ocn.ne.jp>
 ##
