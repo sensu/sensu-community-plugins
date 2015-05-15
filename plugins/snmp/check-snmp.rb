@@ -80,16 +80,16 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
     response.each_varbind do |vb|
       if config[:match]
         if vb.value.to_s =~ /#{config[:match]}/
-          ok
+          ok "#{vb.value.to_s} matched pattern #{config[:match]}"
         else
-          critical "Value: #{vb.value} failed to match Pattern: #{config[:match]}"
+          critical "#{vb.value} failed to match pattern #{config[:match]}"
         end
       else
-        critical 'Critical state detected' if "#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)
+        critical "#{vb.value} #{symbol} #{config[:critical]}" if "#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)
         # #YELLOW
-        warning 'Warning state detected' if ("#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)) && !("#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)) # rubocop:disable LineLength
+        warning "#{vb.value} #{symbol} #{config[:warning]}" if ("#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)) && !("#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)) # rubocop:disable LineLength
         unless "#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)
-          ok 'All is well!'
+          ok "#{vb.value.to_s}"
         end
       end
     end
