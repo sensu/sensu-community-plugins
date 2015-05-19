@@ -48,7 +48,7 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
          short: '-k APP_KEY',
          long: '--application-key APP_KEY',
          required: true
-
+  
   option :warn_sms,
          long: '--warn-available-sms COUNT',
          default: 10,
@@ -69,7 +69,8 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
 
   option :timeout,
          short: '-t SECS',
-         default: 10
+         default: 10,
+         proc: proc(&:to_i)
 
   option :account_email,
          short: '-e ACCOUNT_EMAIL',
