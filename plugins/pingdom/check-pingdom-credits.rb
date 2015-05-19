@@ -71,6 +71,10 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
          short: '-t SECS',
          default: 10
 
+  option :account_email,
+         short: '-e ACCOUNT_EMAIL',
+         long:  '--account-email ACCOUNT_EMAIL'
+
   def run
     check_sms!
     check_checks! # LOL @ name clashes
@@ -115,12 +119,20 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
     @credits ||= api_call[:credits]
   end
 
+  def headers
+    if config[:account_email]
+      { 'App-Key' => config[:application_key], 'Account-Email' => config[:account_email] }
+    else
+      { 'App-Key' => config[:application_key] }
+    end
+  end
+
   def api_call
     resource = RestClient::Resource.new(
       'https://api.pingdom.com/api/2.0/credits',
       user: config[:user],
       password: config[:password],
-      headers: { 'App-Key' => config[:application_key] },
+      headers: headers,
       timeout: config[:timeout]
     )
     JSON.parse(resource.get, symbolize_names: true)
