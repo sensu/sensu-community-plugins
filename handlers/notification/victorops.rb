@@ -3,7 +3,7 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
-# 
+#
 # arguments:
 #   - settingsname: Sensu settings name, defaults to victorops
 #   - routingkey: VictorOps routing key
@@ -30,11 +30,11 @@ class VictorOps < Sensu::Handler
 
   def handle
     # validate that we have settings
-    if not defined? settings[config[:settingsname]] or settings[config[:settingsname]] == nil
-      raise "victorops.rb sensu setting '#{config[:settingsname]}' not found or empty"
+    if ! defined? settings[config[:settingsname]] || settings[config[:settingsname]] == nil
+      fail "victorops.rb sensu setting '#{config[:settingsname]}' not found or empty"
     end
-    if not defined? settings[config[:settingsname]]['api_url'] or settings[config[:settingsname]]['api_url'] == nil
-      raise "victorops.rb sensu setting '#{config[:settingsname]}.api_url' not found or empty"
+    if ! defined? settings[config[:settingsname]]['api_url'] || settings[config[:settingsname]]['api_url'] == nil
+      fail "victorops.rb sensu setting '#{config[:settingsname]}.api_url' not found or empty"
     end
     api_url = settings[config[:settingsname]]['api_url']
 
@@ -42,8 +42,8 @@ class VictorOps < Sensu::Handler
     routing_key = config[:routing_key]
     routing_key = settings[config[:settingsname]]['routing_key'] if routing_key.nil?
 
-    if not defined? routing_key or routing_key.nil?
-      raise "routing key not defined, should be in Sensu settings or passed via command arguments"
+    if ! defined? routing_key || routing_key.nil?
+      fail 'routing key not defined, should be in Sensu settings or passed via command arguments'
     end
 
     incident_key = @event['client']['name'] + '/' + @event['check']['name']
