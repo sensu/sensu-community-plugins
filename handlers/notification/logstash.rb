@@ -2,7 +2,7 @@
 #
 # Sensu Logstash Handler
 #
-# Heavily inspried (er, copied from) the GELF Handler writeen by
+# Heavily inspried (er, copied from) the GELF Handler written by
 # Joe Miller.
 #
 # Designed to take sensu events, transform them into logstash JSON events
@@ -31,6 +31,19 @@ class LogstashHandler < Sensu::Handler
     @event['action'].eql?('resolve') ? 'RESOLVE' : 'ALERT'
   end
 
+  def event_status
+    case @event['check']['status']
+    when 0
+      'OK'
+    when 1
+      'WARNING'
+    when 2
+      'CRITICAL'
+    else
+      'unknown'
+    end
+  end
+
   def handle
     time = Time.now.utc.iso8601
     logstash_msg = {
@@ -44,7 +57,7 @@ class LogstashHandler < Sensu::Handler
       :address       => @event['client']['address'],
       :check_name    => @event['check']['name'],
       :command       => @event['check']['command'],
-      :status        => @event['check']['status'],
+      :status        => event_status,
       :flapping      => @event['check']['flapping'],
       :occurrences   => @event['occurrences'],
       :action        => @event['action']

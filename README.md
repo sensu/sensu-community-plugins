@@ -1,4 +1,6 @@
-# Sensu Community Plugins
+# On July 6th 2015, we will be freezing this repo for all new code.  
+
+###Bug fixes and security fixes will still be permitted.  All new code should be directed to [sensu-plugins](https://github.com/sensu-plugins).  If your plugin does not belong in an existing repo or if you are unsure than make a PR against [sensu-plugins-feature-requests](https://github.com/sensu-plugins/sensu-plugins-feature-requests) and we can take a look at it and move it if necessary.
 
 [![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)[![Code Climate](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/gpa.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)[![Test Coverage](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/coverage.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)
 
