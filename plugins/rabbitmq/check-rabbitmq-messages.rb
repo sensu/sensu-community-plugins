@@ -54,16 +54,24 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
          boolean: true,
          default: false
 
+  option :queue,
+         description: 'RabbitMQ queue to monitor. To check 2+ queues use a comma separated list',
+         long: '--queue queue_name',
+         required: true,
+         proc: proc { |q| q.split(',') }
+
   option :warn,
          short: '-w NUM_MESSAGES',
          long: '--warn NUM_MESSAGES',
          description: 'WARNING message count threshold',
+         proc: proc(&:to_i),
          default: 250
 
   option :critical,
          short: '-c NUM_MESSAGES',
          long: '--critical NUM_MESSAGES',
          description: 'CRITICAL message count threshold',
+         proc: proc(&:to_i),
          default: 500
 
   def acquire_rabbitmq_info
@@ -81,13 +89,33 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
     rabbitmq_info
   end
 
+  def return_condition(missing, critical, warning)
+    if critical.count > 0 || missing.count > 0
+      message = ''
+      message << "Queues in critical state: #{critical.join(', ')}. " if critical.count > 0
+      message << "Queues missing: #{missing.join(', ')}" if missing.count > 0
+      critical(message)
+    elsif warning.count > 0
+      warning("Queues in warning state: #{warning.join(', ')}")
+    else
+      ok
+    end
+  end
+
   def run
     rabbitmq = acquire_rabbitmq_info
-    overview = rabbitmq.overview
-    total = overview['queue_totals']['messages']
-    message "#{total}"
-    critical if total > config[:critical].to_i
-    warning if total > config[:warn].to_i
-    ok
+    missing = config[:queue]
+    critical = []
+    warn = []
+
+    rabbitmq.queues.each do |queue|
+      next unless config[:queue].include?(queue['name'])
+      missing.delete(queue['name'])
+      messages = queue['messages']
+      critical.push(queue['name']) if messages > config[:critical]
+      warn.push(queue['name']) if messages > config[:warn]
+    end
+
+    return_condition(missing, critical, warn)
   end
 end
