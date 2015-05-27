@@ -1,56 +1,69 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Checks the number of files in a directory
-# ===
+#   check-dir-count
 #
 # DESCRIPTION:
-#   This plugin checks the number of files in a directory
+#   Checks the number of files in a directory
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
-#   linux
-#   bsd
+#   Linux, BSD
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: sensu-plugin
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'fileutils'
 
 class DirCount < Sensu::Plugin::Check::CLI
-
   option :directory,
-    :description => 'Directory to count files in',
-    :short => '-d DIR',
-    :long => '--dir DIR',
-    :required => true
+         description: 'Directory to count files in',
+         short: '-d DIR',
+         long: '--dir DIR',
+         required: true
+
+  option :file_pattern,
+         description: 'file pattern to search for',
+         short: '-p PAT',
+         long: '--pattern PAT',
+         default: '*'
 
   option :warning_num,
-    :description => 'Warn if count of files is greater than provided number',
-    :short => '-w NUM',
-    :long => '--warning NUM',
-    :required => true
+         description: 'Warn if count of files is greater than provided number',
+         short: '-w NUM',
+         long: '--warning NUM',
+         required: true
 
   option :critical_num,
-    :description => 'Critical if count of files is greater than provided number',
-    :short => '-c NUM',
-    :long => '--critical NUM',
-    :required => true
+         description: 'Critical if count of files is greater than provided number',
+         short: '-c NUM',
+         long: '--critical NUM',
+         required: true
 
   def run
-    begin
-      # Subtract two for '.' and '..'
-      num_files = Dir.entries(config[:directory]).count - 2
-    rescue
-      unknown "Error listing files in #{config[:directory]}"
+    if File.directory?(config[:directory])
+      num_files = Dir.glob(File.join(config[:directory], config[:file_pattern])).count
+    else
+      num_files = nil
     end
 
-    if num_files >= config[:critical_num].to_i
+    if num_files.nil?
+      unknown "Error listing files in #{config[:directory]}"
+    elsif num_files >= config[:critical_num].to_i
       critical "#{config[:directory]} has #{num_files} files (threshold: #{config[:critical_num]})"
     elsif num_files >= config[:warning_num].to_i
       warning "#{config[:directory]} has #{num_files} files (threshold: #{config[:warning_num]})"

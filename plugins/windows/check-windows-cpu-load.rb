@@ -1,27 +1,42 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Windows's CPU usage
-# ===
+#   check-windows-cpu-load
 #
-# Tested on Windows 2008RC2.
+# DESCRIPTION:
 #
-# Jean-Francois Theroux <me@failshell.io>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Windows
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#  Tested on Windows 2008RC2.
+#
+# LICENSE:
+#   Jean-Francois Theroux <me@failshell.io>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckWindowsCpuLoad < Sensu::Plugin::Check::CLI
-
   option :warning,
-    :short => '-w WARNING',
-    :default => 85
+         short: '-w WARNING',
+         default: 85,
+         proc: proc(&:to_i)
 
   option :critical,
-    :short => '-c CRITICAL',
-    :default => 95
+         short: '-c CRITICAL',
+         default: 95,
+         proc: proc(&:to_i)
 
   def run
     io = IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\"")

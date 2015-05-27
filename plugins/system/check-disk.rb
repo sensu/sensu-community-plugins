@@ -1,74 +1,86 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Disk Plugin
-# ===
+#   check-disk
 #
-# Uses GNU's -T option for listing filesystem type; unfortunately, this
-# is not portable to BSD. Warning/critical levels are percentages only.
+# DESCRIPTION:
+#   Uses GNU's -T option for listing filesystem type; unfortunately, this
+#   is not portable to BSD. Warning/critical levels are percentages only.
 #
-# Copyright 2011 Sonian, Inc <chefs@sonian.net>
+# OUTPUT:
+#   plain text
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2011 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckDisk < Sensu::Plugin::Check::CLI
-
   option :fstype,
-    :short => '-t TYPE[,TYPE]',
-    :description => 'Only check fs type(s)',
-    :proc => proc {|a| a.split(',') }
+         short: '-t TYPE[,TYPE]',
+         description: 'Only check fs type(s)',
+         proc: proc { |a| a.split(',') }
 
   option :ignoretype,
-    :short => '-x TYPE[,TYPE]',
-    :description => 'Ignore fs type(s)',
-    :proc => proc {|a| a.split(',') }
+         short: '-x TYPE[,TYPE]',
+         description: 'Ignore fs type(s)',
+         proc: proc { |a| a.split(',') }
 
   option :ignoremnt,
-    :short => '-i MNT[,MNT]',
-    :description => 'Ignore mount point(s)',
-    :proc => proc {|a| a.split(',') }
+         short: '-i MNT[,MNT]',
+         description: 'Ignore mount point(s)',
+         proc: proc { |a| a.split(',') }
 
   option :ignoreline,
-    :short => '-l PATTERN[,PATTERN]',
-    :description => 'Ignore df line(s) matching pattern(s)',
-    :proc => proc { |a| a.split(',') }
+         short: '-l PATTERN[,PATTERN]',
+         description: 'Ignore df line(s) matching pattern(s)',
+         proc: proc { |a| a.split(',') }
 
   option :includeline,
-    :short => '-L PATTERN[,PATTERN]',
-    :description => 'Only include df line(s) matching pattern(s)',
-    :proc => proc { |a| a.split(',') }
+         short: '-L PATTERN[,PATTERN]',
+         description: 'Only include df line(s) matching pattern(s)',
+         proc: proc { |a| a.split(',') }
 
   option :warn,
-    :short => '-w PERCENT',
-    :description => 'Warn if PERCENT or more of disk full',
-    :proc => proc {|a| a.to_i },
-    :default => 85
+         short: '-w PERCENT',
+         description: 'Warn if PERCENT or more of disk full',
+         proc: proc(&:to_i),
+         default: 85
 
   option :crit,
-    :short => '-c PERCENT',
-    :description => 'Critical if PERCENT or more of disk full',
-    :proc => proc {|a| a.to_i },
-    :default => 95
+         short: '-c PERCENT',
+         description: 'Critical if PERCENT or more of disk full',
+         proc: proc(&:to_i),
+         default: 95
 
   option :iwarn,
-    :short => '-W PERCENT',
-    :description => 'Warn if PERCENT or more of inodes used',
-    :proc => proc {|a| a.to_i },
-    :default => 85
+         short: '-W PERCENT',
+         description: 'Warn if PERCENT or more of inodes used',
+         proc: proc(&:to_i),
+         default: 85
 
   option :icrit,
-    :short => '-K PERCENT',
-    :description => 'Critical if PERCENT or more of inodes used',
-    :proc => proc {|a| a.to_i },
-    :default => 95
+         short: '-K PERCENT',
+         description: 'Critical if PERCENT or more of inodes used',
+         proc: proc(&:to_i),
+         default: 95
 
   option :debug,
-      :short => '-d',
-      :long => '--debug',
-      :description => 'Output list of included filesystems'
+         short: '-d',
+         long: '--debug',
+         description: 'Output list of included filesystems'
 
   def initialize
     super
@@ -124,14 +136,11 @@ class CheckDisk < Sensu::Plugin::Check::CLI
   end
 
   def run
-    if config[:includeline] && config[:ignoreline]
-      unknown 'Do not use -l and -L options concurrently'
-    end
+    unknown 'Do not use -l and -L options concurrently' if config[:includeline] && config[:ignoreline]
     read_df
     unknown 'No filesystems found' unless @line_count > 0
     critical usage_summary unless @crit_fs.empty?
     warning usage_summary unless @warn_fs.empty?
     ok "All disk usage under #{config[:warn]}% and inode usage under #{config[:iwarn]}%"
   end
-
 end

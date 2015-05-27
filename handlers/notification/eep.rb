@@ -61,7 +61,7 @@ class Eep < Sensu::Handler
     bail 'CONFIG ERROR: api_token not found in eep settings in sensu configuration files' unless api_token
 
     # remap config to options hash with sym keys
-    options = { }
+    options = {}
     config.each { |k, v| options[k.to_sym] = v }
 
     ec = EepClient.new(api_token, options)
@@ -83,21 +83,21 @@ class Eep < Sensu::Handler
 
       # map to event
       data = {
-        :local_instance_id => local_instance_id,
-        :source_location => source,
-        :creation_time => executed,
-        :msg => output,
-        :event_class => SENSU_CHECK,
-        :severity => SEVERITY_MAP[status],
-        :reporter_location => client_name,
-        :reporter_component => check_name
+        local_instance_id: local_instance_id,
+        source_location: source,
+        creation_time: executed,
+        msg: output,
+        event_class: SENSU_CHECK,
+        severity: SEVERITY_MAP[status],
+        reporter_location: client_name,
+        reporter_component: check_name
       }
     else
       send_type = CLEAR
       # map to clear
       data = {
-        :local_instance_id => local_instance_id,
-        :source_location => source
+        local_instance_id: local_instance_id,
+        source_location: source
       }
     end
 

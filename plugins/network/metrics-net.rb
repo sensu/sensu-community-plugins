@@ -1,4 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+#   <script name>
+#
+# DESCRIPTION:
+#   what is this thing supposed to do, monitor?  How do alerts or
+#   alarms work?
+#
+# OUTPUT:
+#   plain text, metric data, etc
+#
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   <your name>  <your email>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+# !/usr/bin/env ruby
 #
 # Linux network interface metrics
 # ====
@@ -38,12 +68,11 @@ require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class LinuxPacketMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.net"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.net"
 
   def run
     timestamp = Time.now.to_i
@@ -59,14 +88,19 @@ class LinuxPacketMetrics < Sensu::Plugin::Metric::CLI::Graphite
       rx_bytes = File.open(iface_path + '/statistics/rx_bytes').read.strip
       tx_errors = File.open(iface_path + '/statistics/tx_errors').read.strip
       rx_errors = File.open(iface_path + '/statistics/rx_errors').read.strip
+      begin
+        if_speed = File.open(iface_path + '/speed').read.strip
+      rescue
+        if_speed = 0
+      end
       output "#{config[:scheme]}.#{iface}.tx_packets", tx_pkts, timestamp
       output "#{config[:scheme]}.#{iface}.rx_packets", rx_pkts, timestamp
       output "#{config[:scheme]}.#{iface}.tx_bytes", tx_bytes, timestamp
       output "#{config[:scheme]}.#{iface}.rx_bytes", rx_bytes, timestamp
       output "#{config[:scheme]}.#{iface}.tx_errors", tx_errors, timestamp
       output "#{config[:scheme]}.#{iface}.rx_errors", rx_errors, timestamp
+      output "#{config[:scheme]}.#{iface}.if_speed", if_speed, timestamp
     end
     ok
   end
-
 end

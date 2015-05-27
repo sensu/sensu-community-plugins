@@ -1,0 +1,19 @@
+{
+	"nexmosms":{
+		"api_key":"NEXMO_API_KEY",
+		"api_secret":"NEXMO_API_SECRET",
+		"sender_id":"111111111",
+		"recipients":{
+			"11111111111": {
+				"sensu_roles":[ "web-server" ],
+				"sensu_checks":[],
+				"sensu_level": 1 
+			},
+			"11111222222": {
+				"sensu_roles":[],
+				"sensu_checks":[ "mysql-alive" ],
+				"sensu_level": 2
+			}
+		}
+	}
+}

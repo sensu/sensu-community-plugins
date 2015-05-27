@@ -25,7 +25,8 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-module Sensu::Extension
+# #YELLOW
+module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
   class Graphite < Mutator
     def name
       'graphite'
@@ -39,10 +40,10 @@ module Sensu::Extension
       @reverse = false
       @replace = '_'
 
-      if settings['graphite']
-        if settings['graphite']['reverse'] == true
-          @reverse = true
-        end
+      # #YELLOW
+      if settings['graphite'] # rubocop:disable GuardClause
+        # #YELLOW
+        @reverse = true if settings['graphite']['reverse'] == true
         if settings['graphite']['replace']
           @replace = settings['graphite']['replace']
         end

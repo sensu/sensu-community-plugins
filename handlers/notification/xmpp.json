@@ -4,7 +4,8 @@
     "password": "guest",
     "target": "room@conference.domain",
     "target_type": "conference",
-    "server": "server.domain"
+    "server": "server.domain",
+    "room_passord": "roompassword"
   }
 }
 

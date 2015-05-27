@@ -1,5 +1,29 @@
-require_relative 'check-dns'
-require_relative '../../spec_helper'
+#! /usr/bin/env ruby
+#
+#   check-dns_spec
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: check-dns
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+require_relative '../../../plugins/dns/check-dns'
+require_relative '../../../spec_helper'
 
 describe DNS, 'run' do
 
@@ -12,7 +36,7 @@ describe DNS, 'run' do
   it 'returns ok if entries are resolved' do
     dns = DNS.new
     dns.config[:domain] = 'www.google.com'
-    dns.should_receive('resolve_domain') {['a']}
+    dns.should_receive('resolve_domain') { ['a'] }
     dns.should_receive('ok')
     dns.run
   end
@@ -21,7 +45,7 @@ describe DNS, 'run' do
     dns = DNS.new
     dns.config[:domain] = 'www.google.com'
     dns.config[:result] = '1.2.3.4'
-    dns.should_receive('resolve_domain') {['1.2.3.4']}
+    dns.should_receive('resolve_domain') { ['1.2.3.4'] }
     dns.should_receive('ok')
     dns.run
   end
@@ -30,7 +54,7 @@ describe DNS, 'run' do
     dns = DNS.new
     dns.config[:domain] = 'www.google.com'
     dns.config[:result] = '1.2.3.4'
-    dns.should_receive('resolve_domain') {['4.3.2.1']}
+    dns.should_receive('resolve_domain') { ['4.3.2.1'] }
     dns.should_receive('critical')
     dns.run
   end
@@ -38,7 +62,7 @@ describe DNS, 'run' do
   it 'returns critical without records' do
     dns = DNS.new
     dns.config[:domain] = 'www.google.com'
-    dns.should_receive('resolve_domain') {[]}
+    dns.should_receive('resolve_domain') { [] }
     dns.should_receive('critical')
     dns.run
   end
@@ -47,7 +71,7 @@ describe DNS, 'run' do
     dns = DNS.new
     dns.config[:domain] = 'www.google.com'
     dns.config[:warn_only] = true
-    dns.should_receive('resolve_domain') {[]}
+    dns.should_receive('resolve_domain') { [] }
     dns.should_receive('warning')
     dns.run
   end

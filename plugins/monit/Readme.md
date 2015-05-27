@@ -6,7 +6,7 @@ Do you already have Monit running for your process monitoring and restarting but
 Notes
 -----
 
-I currently use an array of "Events" that monit produce to figure out if the alert should be critical or resolved.  Also monit does not seem to have a warning level so I left that out.  You can learn more about monit events [here](http://mmonit.com/monit/documentation/monit.html#alert_messages)
+I currently use an array of "Events" that monit produce to figure out if the alert should be critical or resolved.  Also monit does not seem to have a warning level so I left that out.  You can learn more about monit events [here](http://mmonit.com/monit/documentation/monit.html#ALERT-MESSAGES)
 
 As with all open source projects this should be treated as alpha code and needs more TLC.
 

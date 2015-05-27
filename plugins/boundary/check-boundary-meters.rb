@@ -1,12 +1,33 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Check Boundary meter connection health
+# check-boundary-meters
 #
 # DESCRIPTION:
-# This plugin interrogates a boundary api endpoint for the connection health of meters.
-# It reports a list of meters that are currently disconnected.
+#   This plugin interrogates a boundary api endpoint for the connection health of meters.
+#   It reports a list of meters that are currently disconnected.
 #
-# Based on code from check-chef-nodes.rb
+# OUTPUT:
+#   metric-data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: beaneater
+#   gem: json
+#   gem: sensu-plugin
+#
+# USAGE:
+#   #YELLOW
+#
+# NOTES:
+#  Based on code from check-chef-nodes.rb
+#
+# LICENSE:
+#   Copyright 2014 Sonian, Inc. and contributors. <support@sensuapp.org>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
@@ -15,22 +36,22 @@ require 'json'
 
 class BoundaryMetersChecker < Sensu::Plugin::Check::CLI
   option :endpoint,
-    :description => 'Boundary API endpoint',
-    :short => '-e API-ENDPOINT',
-    :long => '--endpoint API-ENDPOINT',
-    :default => 'api.boundary.com'
+         description: 'Boundary API endpoint',
+         short: '-e API-ENDPOINT',
+         long: '--endpoint API-ENDPOINT',
+         default: 'api.boundary.com'
 
   option :org,
-    :description => 'Organisation ID',
-    :short => '-o ORG-ID',
-    :long => '--org-id ORG-ID',
-    :required => true
+         description: 'Organisation ID',
+         short: '-o ORG-ID',
+         long: '--org-id ORG-ID',
+         required: true
 
   option :key,
-    :description => 'API key',
-    :short => '-k API-KEY',
-    :long => '--key API-KEY',
-    :required => true
+         description: 'API key',
+         short: '-k API-KEY',
+         long: '--key API-KEY',
+         required: true
 
   def meter_connected_status
     meters.map do |meter|

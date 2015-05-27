@@ -22,16 +22,16 @@ class Mailer < Sensu::Handler
   end
 
   def action_to_string
-   @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
+    @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
   def handle
     params = {
-      :mail_to   => settings['mailer-ses']['mail_to'],
-      :mail_from => settings['mailer-ses']['mail_from'],
-      :aws_access_key => settings['mailer-ses']['aws_access_key'],
-      :aws_secret_key => settings['mailer-ses']['aws_secret_key'],
-      :aws_ses_endpoint => settings['mailer-ses']['aws_ses_endpoint']
+      mail_to: settings['mailer-ses']['mail_to'],
+      mail_from: settings['mailer-ses']['mail_from'],
+      aws_access_key: settings['mailer-ses']['aws_access_key'],
+      aws_secret_key: settings['mailer-ses']['aws_secret_key'],
+      aws_ses_endpoint: settings['mailer-ses']['aws_ses_endpoint']
     }
 
     body = <<-BODY.gsub(/^ {14}/, '')
@@ -47,18 +47,18 @@ class Mailer < Sensu::Handler
     subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
 
     ses = AWS::SES::Base.new(
-      :access_key_id     => params[:aws_access_key],
-      :secret_access_key => params[:aws_secret_key],
-      :server            => params[:aws_ses_endpoint]
+      access_key_id: params[:aws_access_key],
+      secret_access_key: params[:aws_secret_key],
+      server: params[:aws_ses_endpoint]
     )
 
     begin
       timeout 10 do
         ses.send_email(
-          :to        => params[:mail_to],
-          :source    => params[:mail_from],
-          :subject   => subject,
-          :text_body => body
+          to: params[:mail_to],
+          source: params[:mail_from],
+          subject: subject,
+          text_body: body
         )
 
         puts 'mail -- sent alert for ' + short_name + ' to ' + params[:mail_to]

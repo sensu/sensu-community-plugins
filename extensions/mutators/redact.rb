@@ -12,13 +12,13 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-module Sensu::Extension
+# #YELLOW
+module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
   class Redact < Mutator
-
     def definition
       {
         type: 'extension',
-        name: 'redact',
+        name: 'redact'
       }
     end
 
@@ -32,7 +32,8 @@ module Sensu::Extension
 
     def run(event_data, settings)
       event = JSON.parse(event_data, symbolize_names: true)
-      unless event[:client][:redact]
+      # #YELLOW
+      unless event[:client][:redact] # rubocop:disable UnlessElse
         keys = settings['redact'] unless settings['redact'].nil?
         keys ||= nil # just so we can pass the variable in to redact_sensitive
       else
@@ -44,12 +45,12 @@ module Sensu::Extension
     end
 
     def redact_sensitive(hash, keys = nil)
-      keys ||= %w[
+      keys ||= %w(
         password passwd pass
         api_key api_token
         access_key secret_key
         private_key secret
-      ]
+      )
       hash = hash.dup
       hash.each do |key, value|
         if keys.include?(key.to_s)
@@ -60,6 +61,5 @@ module Sensu::Extension
       end
       hash
     end
-
   end
 end

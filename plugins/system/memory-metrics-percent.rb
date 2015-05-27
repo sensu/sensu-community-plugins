@@ -1,16 +1,40 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#  encoding: UTF-8
+#
+#   mermory-metrics-percent
+#
+# DESCRIPTION:
+#
+# OUTPUT:
+#   metric data
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: socket
+#
+# USAGE:
+#
+# NOTES:
+#
+# LICENSE:
+#   Copyright 2012 Sonian, Inc <chefs@sonian.net>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
 
 class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.memory_percent"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.memory_percent"
 
   def run
     # Based on memory-metrics.rb
@@ -52,26 +76,23 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
       swptot = mem['swapTotal']
     end
 
-    mem.each do |k, v|
+    mem.each do |k, _v|
       # with percentages, used and free are exactly complementary
       # no need to have both
       # the one to drop here is "used" because "free" will
       # stack up neatly to 100% with all the others (except swapUsed)
-      if k != "total" && k !~ /swap/ && k != "used"
-        memp[k] = 100.0 * mem[k] / mem['total']
-      end
+      # #YELLOW
+      memp[k] = 100.0 * mem[k] / mem['total'] if k != 'total' && k !~ /swap/ && k != 'used'
 
       # with percentages, swapUsed and swapFree are exactly complementary
       # no need to have both
-      if k != "swapTotal" && k =~ /swap/ && k != "swapFree"
-        memp[k] = 100.0 * mem[k] / swptot
-      end
+      memp[k] = 100.0 * mem[k] / swptot if k != 'swapTotal' && k =~ /swap/ && k != 'swapFree'
     end
 
     memp
   end
 
   def meminfo_output
-    File.open("/proc/meminfo", "r")
+    File.open('/proc/meminfo', 'r')
   end
 end

@@ -1,13 +1,12 @@
 #! /usr/bin/env ruby
 #
-# Check Filesystem Writability Plugin
-# ===
+# check-fs-writable
 #
 # DESCRIPTION:
 # This plugin checks that a filesystem is writable. Useful for checking for stale NFS mounts.
 #
 # OUTPUT:
-#   plain-text
+#   plain text
 #
 # PLATFORMS:
 #   all
@@ -16,7 +15,7 @@
 #   gem: sensu-plugin
 #   gem: tempfile
 #
-# EXAMPLES:
+# USAGE:
 #   ./check-fs-writable.rb --auto  (check all volgroups in fstab)
 #   ./check-fs-writable.rb --dir /,/var,/usr,/home  (check a defined list of directories)
 #
@@ -33,21 +32,20 @@ require 'sensu-plugin/check/cli'
 require 'tempfile'
 
 class CheckFSWritable < Sensu::Plugin::Check::CLI
-
   option :dir,
-         :description => 'Directory to check for writability',
-         :short       => '-d DIRECTORY',
-         :long        => '--directory DIRECTORY',
-         :proc        => proc { |a| a.split(',') }
+         description: 'Directory to check for writability',
+         short: '-d DIRECTORY',
+         long: '--directory DIRECTORY',
+         proc: proc { |a| a.split(',') }
 
   option :auto,
-         :description => 'Auto discover mount points via fstab',
-         :short       => '-a',
-         :long        => '--auto-discover'
+         description: 'Auto discover mount points via fstab',
+         short: '-a',
+         long: '--auto-discover'
 
   option :debug,
-         :description => 'Print debug statements',
-         :long        => '--debug'
+         description: 'Print debug statements',
+         long: '--debug'
 
   def initialize
     super
@@ -63,40 +61,40 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
     end
   end
 
-  def get_mnt_pts
+  def acquire_mnt_pts
     `grep VolGroup /proc/self/mounts | awk '{print $2, $4}' | awk -F, '{print $1}' | awk '{print $1, $2}'`
   end
 
-  def is_rw_in_proc(mount_info)
+  def rw_in_proc?(mount_info)
     mount_info.each  do |pt|
       @crit_pt_proc <<  "#{ pt.split[0] }" if pt.split[1] != 'rw'
     end
   end
 
-  def is_rw_test(mount_info)
+  def rw_test?(mount_info)
     mount_info.each do |pt|
-    (Dir.exist? pt.split[0]) || (@crit_pt_test << "#{ pt.split[0] }")
-    file = Tempfile.new('.sensu', pt.split[0])
-    puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
-    # #YELLOW
-    #  need to add a check here to validate permissions, if none it pukes
-    file.write('mops') || @crit_pt_test <<  "#{ pt.split[0] }"
-    file.read || @crit_pt_test <<  "#{ pt.split[0] }"
-    file.close
-    file.unlink
+      (Dir.exist? pt.split[0]) || (@crit_pt_test << "#{ pt.split[0] }")
+      file = Tempfile.new('.sensu', pt.split[0])
+      puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
+      # #YELLOW
+      #  need to add a check here to validate permissions, if none it pukes
+      file.write('mops') || @crit_pt_test <<  "#{ pt.split[0] }"
+      file.read || @crit_pt_test <<  "#{ pt.split[0] }"
+      file.close
+      file.unlink
     end
   end
 
   def auto_discover
     # #YELLOW
     # this will only work for a single namespace as of now
-    mount_info = get_mnt_pts.split("\n")
+    mount_info = acquire_mnt_pts.split("\n")
     warning 'No mount points found' if mount_info.length == 0
     # #YELLOW
     #  I want to map this at some point to make it pretty and eaiser to read for large filesystems
     puts 'This is a list of mount_pts and their current status: ', mount_info if config[:debug]
-    is_rw_in_proc(mount_info)
-    is_rw_test(mount_info)
+    rw_in_proc?(mount_info)
+    rw_test?(mount_info)
     puts "The critical mount points according to proc are: #{ @crit_pt_proc }" if config[:debug]
     puts "The critical mount points according to actual testing are: #{ @crit_pt_test }" if config[:debug]
   end

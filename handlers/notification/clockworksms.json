@@ -1,6 +1,7 @@
 {
     "clockworksms": {
         "key": "1234abc1esg1234abcdfdfg",
+        "from": "SENSU",
         "to": {
             "3864153012": [
                 "ok",

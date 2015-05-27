@@ -37,32 +37,32 @@ require 'json'
 
 class CheckPingdomAggregates < Sensu::Plugin::Check::CLI
   option :user,
-    :short => '-u EMAIL',
-    :required => true
+         short: '-u EMAIL',
+         required: true
   option :password,
-    :short => '-p PASSWORD',
-    :required => true
+         short: '-p PASSWORD',
+         required: true
   option :application_key,
-    :short => '-k APP_KEY',
-    :long => '--application-key APP_KEY',
-    :required => true
+         short: '-k APP_KEY',
+         long: '--application-key APP_KEY',
+         required: true
 
   option :warn,
-    :short => '-w COUNT',
-    :default => 1,
-    :proc => proc {|a| a.to_i },
-    :required => true
+         short: '-w COUNT',
+         default: 1,
+         proc: proc(&:to_i),
+         required: true
   option :crit,
-    :short => '-c COUNT',
-    :default => 1,
-    :proc => proc {|a| a.to_i },
-    :required => true
+         short: '-c COUNT',
+         default: 1,
+         proc: proc(&:to_i),
+         required: true
 
   option :timeout,
-    :short => '-t SECS',
-    :default => 10
+         short: '-t SECS',
+         default: 10
   option :verbose,
-    :short => '-v'
+         short: '-v'
 
   def run
     down_count = down_checks.size
@@ -78,7 +78,7 @@ class CheckPingdomAggregates < Sensu::Plugin::Check::CLI
 
   def details
     return nil unless config[:verbose]
-    ":\n#{ down_checks.map{ |check| "#{check[:name]} is down"}.join("\n") }"
+    ":\n#{ down_checks.map { |check| "#{check[:name]} is down" }.join("\n") }"
   end
 
   def down_checks
@@ -89,27 +89,26 @@ class CheckPingdomAggregates < Sensu::Plugin::Check::CLI
   def api_call
     resource = RestClient::Resource.new(
       'https://api.pingdom.com/api/2.0/checks',
-      :user     => config[:user],
-      :password => config[:password],
-      :headers  => { 'App-Key' => config[:application_key] },
-      :timeout  => config[:timeout]
+      user: config[:user],
+      password: config[:password],
+      headers: { 'App-Key' => config[:application_key] },
+      timeout: config[:timeout]
     )
-    JSON.parse(resource.get, :symbolize_names => true)
+    JSON.parse(resource.get, symbolize_names: true)
 
   rescue RestClient::RequestTimeout
-    warning "Connection timeout"
+    warning 'Connection timeout'
   rescue SocketError
-    warning "Network unavailable"
+    warning 'Network unavailable'
   rescue Errno::ECONNREFUSED
-    warning "Connection refused"
+    warning 'Connection refused'
   rescue RestClient::RequestFailed
-    warning "Request failed"
+    warning 'Request failed'
   rescue RestClient::RequestTimeout
-    warning "Connection timed out"
+    warning 'Connection timed out'
   rescue RestClient::Unauthorized
-    warning "Missing or incorrect API credentials"
+    warning 'Missing or incorrect API credentials'
   rescue JSON::ParserError
-    warning "API returned invalid JSON"
+    warning 'API returned invalid JSON'
   end
-
 end

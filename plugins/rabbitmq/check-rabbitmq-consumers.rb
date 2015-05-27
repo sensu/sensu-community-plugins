@@ -1,66 +1,78 @@
 #!/usr/bin/env ruby
+#  encoding: UTF-8
 #
 # Check RabbitMQ consumers
-# ========================
+# ===
 #
+# DESCRIPTION:
+# This plugin checks the number of consumers on the RabbitMQ server
+#
+# PLATFORMS:
+#   Linux, BSD, Solaris
+#
+# DEPENDENCIES:
+#   RabbitMQ rabbitmq_management plugin
+#   gem: sensu-plugin
+#   gem: carrot-top
+#
+# LICENSE:
 # Copyright 2014 Daniel Kerwin <d.kerwin@gini.net>
 # Copyright 2014 Tim Smith <tim@cozy.co>
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'carrot-top'
 
+# main plugin class
 class CheckRabbitMQConsumers < Sensu::Plugin::Check::CLI
-
   option :host,
-    :description => "RabbitMQ management API host",
-    :long => "--host HOST",
-    :default => "localhost"
+         description: 'RabbitMQ management API host',
+         long: '--host HOST',
+         default: 'localhost'
 
   option :port,
-    :description => "RabbitMQ management API port",
-    :long => "--port PORT",
-    :proc => proc { |p| p.to_i },
-    :default => 15672
+         description: 'RabbitMQ management API port',
+         long: '--port PORT',
+         proc: proc(&:to_i),
+         default: 15_672
 
   option :ssl,
-    :description => "Enable SSL for connection to the API",
-    :long => "--ssl",
-    :boolean => true,
-    :default => false
+         description: 'Enable SSL for connection to the API',
+         long: '--ssl',
+         boolean: true,
+         default: false
 
   option :user,
-    :description => "RabbitMQ management API user",
-    :long => "--user USER",
-    :default => "guest"
+         description: 'RabbitMQ management API user',
+         long: '--user USER',
+         default: 'guest'
 
   option :password,
-    :description => "RabbitMQ management API password",
-    :long => "--password PASSWORD",
-    :default => "guest"
+         description: 'RabbitMQ management API password',
+         long: '--password PASSWORD',
+         default: 'guest'
 
   option :queue,
-    :description => "RabbitMQ queue to monitor. To check 2+ queues use a comma separated list",
-    :long => "--queue queue_name",
-    :required => true,
-    :proc => proc { |q| q.split(',') }
+         description: 'RabbitMQ queue to monitor. To check 2+ queues use a comma separated list',
+         long: '--queue queue_name',
+         required: true,
+         proc: proc { |q| q.split(',') }
 
   option :warn,
-    :short => '-w NUM_CONSUMERS',
-    :long => '--warn NUM_CONSUMERS',
-    :proc => proc { |w| w.to_i },
-    :description => 'WARNING consumer count threshold',
-    :default => 5
+         short: '-w NUM_CONSUMERS',
+         long: '--warn NUM_CONSUMERS',
+         proc: proc(&:to_i),
+         description: 'WARNING consumer count threshold',
+         default: 5
 
   option :critical,
-    :short => '-c NUM_CONSUMERS',
-    :long => '--critical NUM_CONSUMERS',
-    :description => 'CRITICAL consumer count threshold',
-    :proc => proc { |c| c.to_i },
-    :default => 2
+         short: '-c NUM_CONSUMERS',
+         long: '--critical NUM_CONSUMERS',
+         description: 'CRITICAL consumer count threshold',
+         proc: proc(&:to_i),
+         default: 2
 
   def rabbit
     begin
@@ -69,10 +81,10 @@ class CheckRabbitMQConsumers < Sensu::Plugin::Check::CLI
         port: config[:port],
         user: config[:user],
         password: config[:password],
-        ssl: config[:ssl],
+        ssl: config[:ssl]
       )
     rescue
-      warning "could not connect to rabbitmq"
+      warning 'could not connect to rabbitmq'
     end
     connection
   end
@@ -106,5 +118,4 @@ class CheckRabbitMQConsumers < Sensu::Plugin::Check::CLI
 
     return_condition(missing, critical, warn)
   end
-
 end

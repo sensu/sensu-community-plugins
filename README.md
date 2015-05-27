@@ -1,8 +1,12 @@
-# Sensu Community Plugins
+# On July 6th 2015, we will be freezing this repo for all new code.  
+
+###Bug fixes and security fixes will still be permitted.  All new code should be directed to [sensu-plugins](https://github.com/sensu-plugins).  If your plugin does not belong in an existing repo or if you are unsure than make a PR against [sensu-plugins-feature-requests](https://github.com/sensu-plugins/sensu-plugins-feature-requests) and we can take a look at it and move it if necessary.
 
 [![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)[![Code Climate](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/gpa.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)[![Test Coverage](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/coverage.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)
 
 [![Backlog Issues](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=Backlog&title=Issue and Pull Request Backlog)](http://waffle.io/sensu/sensu-community-plugins)[![Issues In Progress](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/sensu/sensu-community-plugins)
+
+![sensu](https://raw.github.com/sensu/sensu/master/sensu-logo.png)
 
 ## Community plugins, extensions, and handlers
 
@@ -17,9 +21,11 @@ and copy the plugins you want to use.
 
 ## Production usage
 
+Linters currently run against Ruby 1.9.3, 2.0 and 2.1 and RSpec3 tests are being written to support 1.9.2, 1.9.3, 2.0, and 2.1.  There are no plans to support prior versions of Ruby, if you have no access to these versions please use the embedded Ruby that is installed with Sensu.
+
 Because of the nature of this repository:
 
-* no test coverage
+* little test coverage
 * specific and exotic software being checked
 * no versioning system for plugins
 

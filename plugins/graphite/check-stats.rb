@@ -1,17 +1,36 @@
-#!/usr/bin/env ruby
-
+#! /usr/bin/env ruby
 #
-# Checks metrics in graphite, averaged over a period of time.
+#   check-stats
 #
-# The fired sensu event will only be critical if a stat is
-# above the critical threshold. Otherwise, the event will be warning,
-# if a stat is above the warning threshold.
+# DESCRIPTION:
+#   Checks metrics in graphite, averaged over a period of time.
 #
-# Multiple stats will be checked if * are used
-# in the "target" query.
+#   The fired sensu event will only be critical if a stat is
+#   above the critical threshold. Otherwise, the event will be warning,
+#   if a stat is above the warning threshold.
 #
-# Author: Alan Smith (alan@asmith.me)
-# Date: 08/28/2014
+#   Multiple stats will be checked if * are used
+#   in the "target" query.
+#
+# OUTPUT:
+#   plain text
+#
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#
+# LICENSE:
+#   Alan Smith (alan@asmith.me)
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
@@ -20,52 +39,51 @@ require 'net/http'
 require 'sensu-plugin/check/cli'
 
 class CheckGraphiteStat < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "graphite hostname",
-    :proc => proc {|p| p.to_s },
-    :default => "graphite"
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'graphite hostname',
+         proc: proc(&:to_s),
+         default: 'graphite'
 
   option :period,
-    :short => "-p PERIOD",
-    :long => "--period PERIOD",
-    :description => "The period back in time to extract from Graphite. Use -24hours, -2days, -15mins, etc, same format as in Graphite",
-    :proc => proc {|p| p.to_s },
-    :required => true
+         short: '-p PERIOD',
+         long: '--period PERIOD',
+         description: 'The period back in time to extract from Graphite. Use -24hours, -2days, -15mins, etc, same format as in Graphite',
+         proc: proc(&:to_s),
+         required: true
 
   option :target,
-    :short => "-t TARGET",
-    :long => "--target TARGET",
-    :description => "The graphite metric name. Can include * to query multiple metrics",
-    :proc => proc {|p| p.to_s },
-    :required => true
+         short: '-t TARGET',
+         long: '--target TARGET',
+         description: 'The graphite metric name. Can include * to query multiple metrics',
+         proc: proc(&:to_s),
+         required: true
 
   option :warn,
-    :short => "-w WARN",
-    :long => "--warn WARN",
-    :description => "Warning level",
-    :proc => proc {|p| p.to_f },
-    :required => false
+         short: '-w WARN',
+         long: '--warn WARN',
+         description: 'Warning level',
+         proc: proc(&:to_f),
+         required: false
 
   option :crit,
-    :short => "-c Crit",
-    :long => "--crit CRIT",
-    :description => "Critical level",
-    :proc => proc {|p| p.to_f },
-    :required => false
+         short: '-c Crit',
+         long: '--crit CRIT',
+         description: 'Critical level',
+         proc: proc(&:to_f),
+         required: false
 
   option :unknown_ignore,
-    :short => "-u",
-    :long => "--unknown-ignore",
-    :description => "Do nothing for UNKNOWN status (when you wildcard-match a ton of metrics at once and you don't care for a few missing data)",
-    :boolean => true,
-    :default => false
+         short: '-u',
+         long: '--unknown-ignore',
+         description: "Do nothing for UNKNOWN status (when you wildcard-match a ton of metrics at once and you don't care for a few missing data)",
+         boolean: true,
+         default: false
 
   def average(a)
     total = 0
-    a.to_a.each {|i| total += i.to_f}
+    a.to_a.each { |i| total += i.to_f }
 
     total / a.length
   end
@@ -73,7 +91,8 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
   def danger(metric)
     datapoints = metric['datapoints'].map(&:first).compact
 
-    unless datapoints.empty?
+    # #YELLOW
+    unless datapoints.empty? # rubocop:disable UnlessElse
       avg = average(datapoints)
 
       if !config[:crit].nil? && avg > config[:crit]
@@ -93,7 +112,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
         uri = URI("http://#{config[:host]}/render?format=json&target=#{config[:target]}&from=#{config[:period]}")
         res = Net::HTTP.get_response(uri)
         res.body
-      rescue Exception => e
+      rescue => e
         warning "Failed to query graphite: #{e.inspect}"
       end
 
@@ -106,7 +125,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
         []
       end
 
-    unknown "No data from graphite" if data.empty?
+    unknown 'No data from graphite' if data.empty?
 
     data.each do |metric|
       s, msg = danger(metric)
