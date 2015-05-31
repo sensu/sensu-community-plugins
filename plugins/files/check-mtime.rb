@@ -13,7 +13,6 @@
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
-#   gem: <?>
 #
 # USAGE:
 #  #YELLOW
