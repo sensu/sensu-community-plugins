@@ -3,7 +3,6 @@
 # Check service status
 #
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class CheckServiceStatus < Sensu::Plugin::Check::CLI
