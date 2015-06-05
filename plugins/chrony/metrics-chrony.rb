@@ -51,7 +51,7 @@ class ChronyMetrics < Sensu::Plugin::Metric::CLI::Graphite
     }
     metrics.each do |name, stats|
       stats.each do |key, value|
-        output([config[:scheme], name, key].join('.'), value)
+        output([config[:scheme], 'chrony', name, key].join('.'), value)
       end
     end
     ok
