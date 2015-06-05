@@ -62,7 +62,7 @@ class ChronyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       key, value = line.split(/\s*:\s*/)
       key = snakecase(key)
       next if value.nil?
-      digits = (value.match(/^-?\d+(\.\d+)?\s/) || [])[0]
+      digits = (value.match(/^(\+|-)?\d+(\.\d+)?\s/) || [])[0]
       number = digits ? digits.to_f : nil
       if key == 'system_time' && /slow/ =~ value
         number = - number
