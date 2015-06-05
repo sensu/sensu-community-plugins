@@ -5,3 +5,7 @@ node_modules
 scripts/tech_debt.rb
 .vagrant/*
 *.gem
+
+#Intellij files
+*.iml
+*.idea
