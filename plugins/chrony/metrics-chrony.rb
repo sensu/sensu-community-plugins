@@ -60,14 +60,13 @@ class ChronyMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def get_tracking(config)
     `chronyc tracking`.each_line.reduce({}) do |r, line|
       key, value = line.split(/\s*:\s*/)
+      next(r) if value.nil?
       key = snakecase(key)
-      next if value.nil?
-      digits = (value.match(/^(\+|-)?\d+(\.\d+)?\s/) || [])[0]
-      number = digits ? digits.to_f : nil
-      if key == 'system_time' && /slow/ =~ value
-        number = - number
-      end
-      r[key] = number if number
+      matches = value.match(/^[+-]?\d+(\.\d+)?\s/) or next(r)
+      digits = matches[0] or next(r)
+      number = digits.to_f
+      number = - number if /slow/ =~ value
+      r[key] = number
       r
     end
   end
