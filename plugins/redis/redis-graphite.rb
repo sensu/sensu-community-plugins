@@ -24,42 +24,42 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
                      'redis_build_id']
 
   option :host,
-         short: '-h HOST',
-         long: '--host HOST',
-         description: 'Redis Host to connect to',
-         default: '127.0.0.1'
+         :short => '-h HOST',
+         :long => '--host HOST',
+         :description => 'Redis Host to connect to',
+         :default => '127.0.0.1'
 
   option :port,
-         short: '-p PORT',
-         long: '--port PORT',
-         description: 'Redis Port to connect to',
-         proc: proc(&:to_i),
-         default: 6379
+         :short => '-p PORT',
+         :long => '--port PORT',
+         :description => 'Redis Port to connect to',
+         :proc => proc(&:to_i),
+         :default => 6379
 
   option :password,
-         short: '-P PASSWORD',
-         long: '--password PASSWORD',
-         description: 'Redis Password to connect with'
+         :short => '-P PASSWORD',
+         :long => '--password PASSWORD',
+         :description => 'Redis Password to connect with'
 
   option :scheme,
-         description: 'Metric naming scheme, text to prepend to metric',
-         short: '-s SCHEME',
-         long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}.redis"
+         :description => 'Metric naming scheme, text to prepend to metric',
+         :short => '-s SCHEME',
+         :long => '--scheme SCHEME',
+         :default => "#{Socket.gethostname}.redis"
 
   option :timeout,
-         description: 'Timeout to connect to redis host',
-         short: '-t TIMEOUT',
-         long: '--timeout TIMEOUT',
-         proc: proc(&:to_i),
-         default: Redis::Client::DEFAULTS[:timeout]
+         :description => 'Timeout to connect to redis host',
+         :short => '-t TIMEOUT',
+         :long => '--timeout TIMEOUT',
+         :proc => proc(&:to_i),
+         :default => Redis::Client::DEFAULTS[:timeout]
 
   option :reconnect_attempts,
-         description: 'Reconnect attempts to redis host',
-         short: '-r ATTEMPTS',
-         long: '--reconnect ATTEMPTS',
-         proc: proc(&:to_i),
-         default: Redis::Client::DEFAULTS[:reconnect_attempts]
+         :description => 'Reconnect attempts to redis host',
+         :short => '-r ATTEMPTS',
+         :long => '--reconnect ATTEMPTS',
+         :proc => proc(&:to_i),
+         :default => Redis::Client::DEFAULTS[:reconnect_attempts]
 
   def run
     options = {
