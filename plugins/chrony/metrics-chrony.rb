@@ -62,8 +62,8 @@ class ChronyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       key, value = line.split(/\s*:\s*/)
       next(r) if value.nil?
       key = snakecase(key)
-      matches = value.match(/^[+-]?\d+(\.\d+)?\s/) or next(r)
-      digits = matches[0] or next(r)
+      next(r) unless matches = value.match(/^[+-]?\d+(\.\d+)?\s/)
+      digits = matches[0]
       number = digits.to_f
       number = - number if /slow/ =~ value
       r[key] = number
