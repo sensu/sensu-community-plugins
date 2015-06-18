@@ -79,7 +79,6 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     if rs.successful?
       return rs.documents[0]
     end
-    return nil
   end
 
   def run
@@ -109,7 +108,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     _result = false
     # check if master
     begin
-      is_master = get_mongo_doc(@db, { 'isMaster' => 1 })
+      is_master = get_mongo_doc(@db, 'isMaster' => 1 )
       unless is_master.nil?
         _result = is_master['ok'] == 1
       end
@@ -119,7 +118,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     # get the metrics
     begin
       metrics = {}
-      server_status = get_mongo_doc(@db, {'serverStatus' => 1})
+      server_status = get_mongo_doc(@db, 'serverStatus' => 1 )
       unless server_status.nil? || server_status['ok'] != 1
         metrics.update(gather_replication_metrics(server_status))
         timestamp = Time.now.to_i
