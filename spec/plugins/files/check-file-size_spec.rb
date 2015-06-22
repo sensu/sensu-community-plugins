@@ -27,31 +27,27 @@
 require_relative '../../../plugins/files/check-file-size'
 require_relative '../../../spec_helper'
 
-describe CheckFileSize, 'run' do
+describe CheckFileSize do
 
-  check_file_size = nil
-
-  before(:each) do
-    check_file_size = CheckFileSize.new
+  it 'will fail with no parameters' do
   end
 
-  describe 'using no parameters' do
-    it 'will fail'
+  it 'returns CRITICAL if file is missing' do
   end
 
-  describe '#ignore-missing' do
-    it 'returns CRITICAL if file is missing'
-    it 'returns OK if file is missing and --ignore-missing is used'
+  it 'returns OK if file is missing and --ignore-missing is used' do
   end
 
-  describe '#warning' do
-    it 'returns OK if file size is under --warn value'
-    it 'returns WARNING if file size is over --warn value'
+  it 'returns OK if file size is under --warn value' do
   end
 
-  describe '#critical' do
-    it 'returns OK if file size is under --critical value'
-    it 'returns CRITICAL if file size is over --critical value'
+  it 'returns WARNING if file size is over --warn value' do
+  end
+
+  it 'returns OK if file size is under --critical value' do
+  end
+
+  it 'returns CRITICAL if file size is over --critical value' do
   end
 
 end
