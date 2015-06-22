@@ -34,38 +34,38 @@ class CheckFileSize < Sensu::Plugin::Check::CLI
   attr_accessor :file_size
 
   option :file,
-    :description => 'file to stat (full path)',
-    :short => '-f',
-    :long => '--file FILENAME',
-    :required => true
+         description: 'file to stat (full path)',
+         short: '-f',
+         long: '--file FILENAME',
+         required: true
 
   option :warn,
-    :description => 'The size (in bytes) of the file where WARNING is raised',
-    :short => '-w SIZE',
-    :long => '--warn SIZE',
-    :proc => proc(&:to_i),
-    :default => 2_000_000
+         description: 'The size (in bytes) of the file where WARNING is raised',
+         short: '-w SIZE',
+         long: '--warn SIZE',
+         proc: proc(&:to_i),
+         default: 2_000_000
 
   option :crit,
-    :description => 'The size (in bytes) of the file where CRITICAL is raised',
-    :short => '-c SIZE',
-    :long => '--critical SIZE',
-    :proc => proc(&:to_i),
-    :default => 3_000_000
+         description: 'The size (in bytes) of the file where CRITICAL is raised',
+         short: '-c SIZE',
+         long: '--critical SIZE',
+         proc: proc(&:to_i),
+         default: 3_000_000
 
   option :ignore_missing,
-    :short => '-i',
-    :long => '--ignore-missing',
-    :description => 'Do not throw CRITICAL if the file is missing',
-    :boolean => true,
-    :default => false
+         short: '-i',
+         long: '--ignore-missing',
+         description: 'Do not throw CRITICAL if the file is missing',
+         boolean: true,
+         default: false
 
   option :debug,
-    :short => '-d',
-    :long => '--debug',
-    :description => 'Output list of included filesystems',
-    :boolean => true,
-    :default => false
+         short: '-d',
+         long: '--debug',
+         description: 'Output list of included filesystems',
+         boolean: true,
+         default: false
 
   def stat_file
     if File.exist? config[:file]
