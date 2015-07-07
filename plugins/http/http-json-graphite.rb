@@ -81,6 +81,7 @@ class HttpJsonGraphite < Sensu::Plugin::Metric::CLI::Graphite
               output([scheme, metric].join('.'), v)
             end
           end
+        else
           JSON.parse(r).each do |k, v|
             if k == attribute
               output([scheme, metric].join('.'), v)
