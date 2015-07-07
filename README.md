@@ -4,7 +4,7 @@
 
 ###Bug fixes and security fixes are still permitted at the admin's discretion.  All new code and issues should be directed to [sensu-plugins](https://github.com/sensu-plugins).  If your plugin does not belong in an existing repo or if you are unsure than open an Issue in [sensu-plugins-feature-requests](https://github.com/sensu-plugins/sensu-plugins-feature-requests) and we can take a look at it and create a new repo for you or offer a suggestion as to where it should go.
 
-In the comming weeks the remaining open issues and pull requests will be migrated, resolved or dropped.  We encourage everyone to keep contributing to this project at its [new home](https://github.com/sensu-plugins). The project site is more than adaquate to keep you up-to-date.
+In the comming weeks the remaining open issues and pull requests will be migrated, resolved or dropped.  We encourage everyone to keep contributing to this project at its [new home](https://github.com/sensu-plugins). The [project site](http://sensu-plugins.io/index.html) is more than adaquate to keep you up-to-date.
 
 **[Sensu-Plugins Documentation](http://sensu-plugins.io/docs/overview.html)** (WIP)
 
