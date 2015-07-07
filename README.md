@@ -1,10 +1,11 @@
-# On July 6th 2015, we will be freezing this repo for all new code.  
+# THIS REPO IS DEPRECIATED
 
-###Bug fixes and security fixes will still be permitted.  All new code should be directed to [sensu-plugins](https://github.com/sensu-plugins).  If your plugin does not belong in an existing repo or if you are unsure than make a PR against [sensu-plugins-feature-requests](https://github.com/sensu-plugins/sensu-plugins-feature-requests) and we can take a look at it and move it if necessary.
+# This repo is not currently accepting new feature code or issues not concerning established bug or security issues.
 
-[![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)[![Code Climate](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/gpa.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)[![Test Coverage](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/coverage.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)
+###Bug fixes and security fixes are still permitted at the admin's discretion.  All new code and issues should be directed to [sensu-plugins](https://github.com/sensu-plugins).  If your plugin does not belong in an existing repo or if you are unsure than open an Issue in [sensu-plugins-feature-requests](https://github.com/sensu-plugins/sensu-plugins-feature-requests) and we can take a look at it and create a new repo for you or offer a suggestion as to where it should go.
 
-[![Backlog Issues](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=Backlog&title=Issue and Pull Request Backlog)](http://waffle.io/sensu/sensu-community-plugins)[![Issues In Progress](https://badge.waffle.io/sensu/sensu-community-plugins.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/sensu/sensu-community-plugins)
+[![Build Status](https://travis-ci.org/sensu/sensu-community-plugins.png?branch=master)](https://travis-ci.org/sensu/sensu-community-plugins)[![Code Climate](https://codeclimate.com/github/sensu/sensu-community-plugins/badges/gpa.svg)](https://codeclimate.com/github/sensu/sensu-community-plugins)
+
 
 ![sensu](https://raw.github.com/sensu/sensu/master/sensu-logo.png)
 
