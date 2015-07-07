@@ -12,13 +12,14 @@
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
-#   gem: mongo
+#   gem: mongo 2.X
 #
 # USAGE:
 #   #YELLOW
 #
 # NOTES:
 #   Basics from github.com/mantree/mongodb-graphite-metrics
+#   mongo driver must be 2.X not 1.X
 #
 # LICENSE:
 #   Copyright 2013 github.com/foomatty
@@ -73,36 +74,52 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
          long: '--ssl_ca_cert /path/to/ca_cert',
          default: nil
 
+  def get_mongo_doc(db, command)
+    rs = @db.command(command)
+    if rs.successful?
+      return rs.documents[0]
+    end
+  end
+
   def run
-    host = config[:host]
-    port = config[:port]
-    db_name = 'admin'
-    db_user = config[:user]
-    db_password = config[:password]
+    address_str = "#{config[:host]}:#{config[:port]}"
 
-    ssl_opts = {}
-    ssl_opts[:ssl] = config[:ssl]
+    client_opts = {}
+    client_opts[:database] = 'admin'
+    unless config[:user].nil?
+      client_opts[:user] = config[:user]
+      client_opts[:password] = config[:password]
+    end
+    client_opts[:ssl] = config[:ssl]
 
-    if config[:ssl]
+    if client_opts[:ssl]
       if config[:ssl_cert]
-        ssl_opts[:ssl_cert] = config[:ssl_cert]
+        client_opts[:ssl_cert] = config[:ssl_cert]
       end
 
       if config[:ssl_ca_cert]
-        ssl_opts[:ssl_ca_cert] = config[:ssl_ca_cert]
+        client_opts[:ssl_ca_cert] = config[:ssl_ca_cert]
       end
     end
 
-    mongo_client = MongoClient.new(host, port, ssl_opts)
-    @db = mongo_client.db(db_name)
-    @db.authenticate(db_user, db_password) unless db_user.nil?
+    mongo_client = Mongo::Client.new([address_str], client_opts)
+    @db = mongo_client.database
 
-    @is_master = { 'isMaster' => 1 }
+    _result = false
+    # check if master
+    begin
+      is_master = get_mongo_doc(@db, 'isMaster' => 1)
+      unless is_master.nil?
+        _result = is_master['ok'] == 1
+      end
+    rescue
+      exit(1)
+    end
+    # get the metrics
     begin
       metrics = {}
-      _result = @db.command(@is_master)['ok'] == 1
-      server_status = @db.command('serverStatus' => 1)
-      if server_status['ok'] == 1
+      server_status = get_mongo_doc(@db, 'serverStatus' => 1)
+      unless server_status.nil? || server_status['ok'] != 1
         metrics.update(gather_replication_metrics(server_status))
         timestamp = Time.now.to_i
         metrics.each do |k, v|
