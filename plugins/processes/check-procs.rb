@@ -121,6 +121,12 @@ class CheckProcs < Sensu::Plugin::Check::CLI
          description: 'Trigger on a specific user',
          proc: proc { |a| a.split(',') }
 
+  option :usernot,
+         short: '-U USER',
+         long: '--user-not USER',
+         description: 'Trigger if not owned a specific user',
+         proc: proc { |a| a.split(',') }
+
   option :esec_over,
          short: '-e SECONDS',
          long: '--esec-over SECONDS',
@@ -216,11 +222,13 @@ class CheckProcs < Sensu::Plugin::Check::CLI
     procs.reject! { |p| cputime_to_csec(p[:time]) <= config[:cpu_over] } if config[:cpu_over]
     procs.reject! { |p| !config[:state].include?(p[:state]) } if config[:state]
     procs.reject! { |p| !config[:user].include?(p[:user]) } if config[:user]
+    procs.reject! { |p| config[:usernot].include?(p[:user]) } if config[:usernot]
 
     msg = "Found #{procs.size} matching processes"
     msg += "; cmd /#{config[:cmd_pat]}/" if config[:cmd_pat]
     msg += "; state #{config[:state].join(',')}" if config[:state]
     msg += "; user #{config[:user].join(',')}" if config[:user]
+    msg += "; not user #{config[:usernot].join(',')}" if config[:usernot]
     msg += "; vsz < #{config[:vsz]}" if config[:vsz]
     msg += "; rss < #{config[:rss]}" if config[:rss]
     msg += "; pcpu < #{config[:pcpu]}" if config[:pcpu]
