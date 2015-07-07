@@ -1,4 +1,4 @@
-# THIS REPO IS DEPRECIATED
+# SENSU/SENSU-COMMUNITY-PLUGINS IS NOW DEPRECIATED
 
 # This repo is not currently accepting new feature code or issues not concerning established bug or security issues.
 
