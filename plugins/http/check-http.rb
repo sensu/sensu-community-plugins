@@ -33,6 +33,7 @@
 require 'sensu-plugin/check/cli'
 require 'net/http'
 require 'net/https'
+require 'net/http/digest_auth'
 
 class CheckHTTP < Sensu::Plugin::Check::CLI
   option :ua,
@@ -162,6 +163,11 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
          description: 'Do not use proxy server even from environment http_proxy setting',
          default: false
 
+  option :digest_auth,
+         short: '-d',
+         long: '--digest',
+         description: 'An implementation of RFC 2617 Digest Access Authentication'
+
   def run
     if config[:url]
       uri = URI.parse(config[:url])
@@ -234,6 +240,18 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
       end
     end
     res = http.request(req)
+
+    if res.code.to_s == '401' && config[:digest_auth]
+      digest_auth = Net::HTTP::DigestAuth.new
+      uri = URI.parse(config[:url])
+      uri.user = config[:user]
+      uri.password = config[:password]
+      auth = digest_auth.auth_header uri, res['www-authenticate'], 'GET'
+      req = Net::HTTP::Get.new uri.request_uri
+      req.add_field 'Authorization', auth
+      # Repeating the request but authenticated
+      res = http.request(req)
+    end
 
     if config[:whole_response]
       body = "\n" + res.body
