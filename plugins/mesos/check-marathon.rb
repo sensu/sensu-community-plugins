@@ -37,8 +37,15 @@ class MarathonNodeStatus < Sensu::Plugin::Check::CLI
          long: '--server SERVER',
          default: 'localhost'
 
+  option :timeout,
+         description: 'timeout in seconds',
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         proc: proc(&:to_i),
+         default: 5
+
   def run
-    r = RestClient::Resource.new("http://#{config[:server]}:8080/ping", timeout: 5).get
+    r = RestClient::Resource.new("http://#{config[:server]}:8080/ping", timeout: config[:timeout]).get
     if r.code == 200
       ok 'Marathon Service is up'
     else

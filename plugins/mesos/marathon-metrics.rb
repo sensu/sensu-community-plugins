@@ -48,8 +48,15 @@ class MarathonMetrics < Sensu::Plugin::Metric::CLI::Graphite
          long: '--host SERVER',
          default: 'localhost'
 
+  option :timeout,
+         description: 'timeout in seconds',
+         short: '-t TIMEOUT',
+         long: '--timeout TIMEOUT',
+         proc: proc(&:to_i),
+         default: 5
+
   def run
-    r = RestClient::Resource.new("http://#{config[:server]}:8080/metrics", timeout: 5).get
+    r = RestClient::Resource.new("http://#{config[:server]}:8080/metrics", timeout: config[:timeout]).get
     all_metrics = JSON.parse(r)
     metric_groups = all_metrics.keys - SKIP_ROOT_KEYS
     metric_groups.each do |metric_groups_key|
