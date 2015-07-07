@@ -16,7 +16,7 @@
 #   gem: tempfile
 #
 # USAGE:
-#   ./check-fs-writable.rb --auto  (check all volgroups in fstab)
+#   ./check-fs-writable.rb --auto  (check all nfs mounts in fstab)
 #   ./check-fs-writable.rb --dir /,/var,/usr,/home  (check a defined list of directories)
 #
 # NOTES:
@@ -62,7 +62,7 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
   end
 
   def acquire_mnt_pts
-    `grep VolGroup /proc/self/mounts | awk '{print $2, $4}' | awk -F, '{print $1}' | awk '{print $1, $2}'`
+    `grep '\snfs\s' /proc/self/mounts | awk '{print $2, $4}' | awk -F, '{print $1}' | awk '{print $1, $2}'`
   end
 
   def rw_in_proc?(mount_info)
