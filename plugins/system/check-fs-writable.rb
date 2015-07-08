@@ -86,10 +86,8 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
   end
 
   def auto_discover
-    # #YELLOW
-    # this will only work for a single namespace as of now
     mount_info = acquire_mnt_pts.split("\n")
-    warning 'No mount points found' if mount_info.length == 0
+    ok 'No mount points found' if mount_info.length == 0
     # #YELLOW
     #  I want to map this at some point to make it pretty and eaiser to read for large filesystems
     puts 'This is a list of mount_pts and their current status: ', mount_info if config[:debug]
