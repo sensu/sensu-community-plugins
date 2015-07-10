@@ -126,7 +126,14 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
   end
 
   def run
-    (auto_discover if config[:auto]) || (manual_test if config[:dir]) || (warning 'No directorties to check')
+    if config[:auto]
+      auto_discover
+    elsif config[:dir]
+      manual_test
+    else
+      warning 'No directorties to check'
+    end
+
     usage_summary
   end
 end
