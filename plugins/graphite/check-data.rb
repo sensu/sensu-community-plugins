@@ -122,6 +122,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          short: '-h',
          long: '--help'
 
+  option :debug,
+         description: 'Show verbose debugging output',
+         short: '-d',
+         long: '--debug'
+
   # Run checks
   def run
     if config[:help]
@@ -130,6 +135,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     end
 
     data = retrieve_data
+    puts "Data retrieved from graphite: #{ data }" if config[:debug]
     data.each_pair do |_key, value|
       @value = value
       @data = value['data']
