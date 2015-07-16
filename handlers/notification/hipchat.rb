@@ -39,6 +39,17 @@ class HipChatNotif < Sensu::Handler
     @event['check']['name'] + ' @ ' + @event['client']['name']
   end
 
+  def get_message
+    notification = @event['check']['notification']
+    output = @event['check']['output']
+
+    if notification
+      "#{ notification }: #{ output }"
+    else
+      output
+    end
+  end
+
   def handle
     json_config = config[:json_config] || 'hipchat'
     server_url = settings[json_config]['server_url'] || 'https://api.hipchat.com'
@@ -47,8 +58,7 @@ class HipChatNotif < Sensu::Handler
     hipchatmsg = HipChat::Client.new(settings[json_config]['apikey'], api_version: apiversion, http_proxy: proxy_url, server_url: server_url)
     room = @event['client']['hipchat_room'] || settings[json_config]['room']
     from = settings[json_config]['from'] || 'Sensu'
-
-    message = @event['check']['notification'] || @event['check']['output']
+    message = get_message
 
     # If the playbook attribute exists and is a URL, "[<a href='url'>playbook</a>]" will be output.
     # To control the link name, set the playbook value to the HTML output you would like.
