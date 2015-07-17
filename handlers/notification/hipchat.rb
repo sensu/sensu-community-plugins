@@ -27,6 +27,7 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'hipchat'
 require 'timeout'
+require 'erb'
 
 class HipChatNotif < Sensu::Handler
   option :json_config,
