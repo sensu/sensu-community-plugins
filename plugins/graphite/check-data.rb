@@ -107,6 +107,11 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          long: '--from FROM',
          default: '-10mins'
 
+  option :below,
+         description: 'warnings/critical if values below specified thresholds',
+         short: '-b',
+         long: '--below'
+
   option :no_ssl_verify,
          description: 'Do not verify SSL certs',
          short: '-v',
@@ -227,16 +232,12 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check if value is below defined threshold
   def below?(type)
-    if config[:warning] > config[:critical]
-      @data.last < config[type]
-    end
+    config[:below] && @data.last < config[type]
   end
 
   # Check is value is above defined threshold
   def above?(type)
-    if config[:warning] < config[:critical]
-      (@data.last > config[type]) && (!decreased?)
-    end
+    (!config[:below]) && (@data.last > config[type]) && (!decreased?)
   end
 
   # Check if values have decreased within interval if given
