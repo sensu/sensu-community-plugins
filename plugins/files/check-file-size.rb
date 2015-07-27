@@ -83,7 +83,7 @@ class CheckFileSize < Sensu::Plugin::Check::CLI
   def compare_size
     if @file_size >= config[:crit].to_i
       critical "#{config[:file]} is greater than #{format_bytes(config[:crit])} bytes! [actual size: #{format_bytes(@file_size)} bytes]"
-    elsif @file_size >= config[:warn]
+    elsif @file_size >= config[:warn].to_i
       warning "#{config[:file]} is greater than #{format_bytes(config[:warn])} bytes! [actual size: #{format_bytes(@file_size)} bytes]"
     else
       ok "#{config[:file]} is within size limit"
