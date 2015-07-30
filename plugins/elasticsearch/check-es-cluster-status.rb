@@ -59,8 +59,14 @@ class ESClusterStatus < Sensu::Plugin::Check::CLI
          proc: proc(&:to_i),
          default: 30
 
+  option :https,
+         description: 'Connect over HTTPS',
+         long: '--https',
+         default: false
+
   def get_es_resource(resource)
-    r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
+    scheme = config[:https] ? 'https' : 'http'
+    r = RestClient::Resource.new("#{scheme}://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
     JSON.parse(r.get)
   rescue Errno::ECONNREFUSED
     critical 'Connection refused'

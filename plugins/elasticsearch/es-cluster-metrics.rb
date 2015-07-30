@@ -61,13 +61,19 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
          proc: proc(&:to_i),
          default: 30
 
+  option :https,
+         description: 'Connect over HTTPS',
+         long: '--https',
+         default: false
+
   def acquire_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
 
   def get_es_resource(resource)
-    r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
+    scheme = config[:https] ? 'https' : 'http'
+    r = RestClient::Resource.new("#{scheme}://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
     JSON.parse(r.get)
   rescue Errno::ECONNREFUSED
     warning 'Connection refused'
