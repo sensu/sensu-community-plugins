@@ -97,9 +97,15 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     health
   end
 
-  def acquire_document_count
-    document_count = get_es_resource('/_count?q=*:*')
-    document_count['count']
+  def acquire_stats
+    stats = get_es_resource('/_cluster/stats')
+    {
+      'document_count' => stats['indices']['docs']['count'],
+      'index_count' => stats['indices']['count'],
+      'segment_count' => stats['indices']['segments']['count'],
+      'fs.total' => stats['nodes']['fs']['total_in_bytes'],
+      'fs.free' => stats['nodes']['fs']['free_in_bytes']
+    }
   end
 
   def run
@@ -107,7 +113,9 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
       acquire_health.each do |k, v|
         output(config[:scheme] + '.' + k, v)
       end
-      output(config[:scheme] + '.document_count', acquire_document_count)
+      acquire_stats.each do |k, v|
+        output(config[:scheme] + '.' + k, v)
+      end
     end
     ok
   end
