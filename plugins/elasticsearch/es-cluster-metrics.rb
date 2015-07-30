@@ -61,13 +61,19 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
          proc: proc(&:to_i),
          default: 30
 
+  option :https,
+         description: 'Connect over HTTPS',
+         long: '--https',
+         default: false
+
   def acquire_es_version
     info = get_es_resource('/')
     info['version']['number']
   end
 
   def get_es_resource(resource)
-    r = RestClient::Resource.new("http://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
+    scheme = config[:https] ? 'https' : 'http'
+    r = RestClient::Resource.new("#{scheme}://#{config[:host]}:#{config[:port]}/#{resource}", timeout: config[:timeout])
     JSON.parse(r.get)
   rescue Errno::ECONNREFUSED
     warning 'Connection refused'
@@ -76,13 +82,14 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def master?
-    state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
     if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
+      master = get_es_resource('_cluster/state/master_node')['master_node']
       local = get_es_resource('/_nodes/_local')
     else
+      master = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')['master_node']
       local = get_es_resource('/_cluster/nodes/_local')
     end
-    local['nodes'].keys.first == state['master_node']
+    local['nodes'].keys.first == master
   end
 
   def acquire_health
@@ -91,9 +98,15 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
     health
   end
 
-  def acquire_document_count
-    document_count = get_es_resource('/_count?q=*:*')
-    document_count['count']
+  def acquire_stats
+    stats = get_es_resource('/_cluster/stats')
+    {
+      'document_count' => stats['indices']['docs']['count'],
+      'index_count' => stats['indices']['count'],
+      'segment_count' => stats['indices']['segments']['count'],
+      'fs.total' => stats['nodes']['fs']['total_in_bytes'],
+      'fs.free' => stats['nodes']['fs']['free_in_bytes']
+    }
   end
 
   def run
@@ -101,7 +114,9 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
       acquire_health.each do |k, v|
         output(config[:scheme] + '.' + k, v)
       end
-      output(config[:scheme] + '.document_count', acquire_document_count)
+      acquire_stats.each do |k, v|
+        output(config[:scheme] + '.' + k, v)
+      end
     end
     ok
   end
