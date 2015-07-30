@@ -107,6 +107,12 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          long: '--from FROM',
          default: '-10mins'
 
+  option :until,
+         description: 'Get samples up until UNTIL (default: -1min)',
+         short: '-u UNTIL',
+         long: '--until UNTIL',
+         default: '-1min'
+
   option :below,
          description: 'warnings/critical if values below specified thresholds',
          short: '-b',
@@ -130,7 +136,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   # Run checks
   def run
     if config[:help]
-      puts opt_parser if config[:help]
+      puts opt_parser
       exit
     end
 
@@ -167,7 +173,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
           config[:server].prepend('http://')
         end
 
-        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
+        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}&until=#{config[:until]}"
 
         url_opts = {}
 
