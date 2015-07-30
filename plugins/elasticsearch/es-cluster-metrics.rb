@@ -82,13 +82,14 @@ class ESClusterMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def master?
-    state = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')
     if Gem::Version.new(acquire_es_version) >= Gem::Version.new('1.0.0')
+      master = get_es_resource('_cluster/state/master_node')['master_node']
       local = get_es_resource('/_nodes/_local')
     else
+      master = get_es_resource('/_cluster/state?filter_routing_table=true&filter_metadata=true&filter_indices=true')['master_node']
       local = get_es_resource('/_cluster/nodes/_local')
     end
-    local['nodes'].keys.first == state['master_node']
+    local['nodes'].keys.first == master
   end
 
   def acquire_health
