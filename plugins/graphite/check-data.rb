@@ -173,7 +173,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
           config[:server].prepend('http://')
         end
 
-        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}&until=#{config[:until]}"
+        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}&until=#{config[:until]}&noCache=True"
 
         url_opts = {}
 
