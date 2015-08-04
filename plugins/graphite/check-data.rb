@@ -89,13 +89,6 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          long: '--name NAME',
          default: 'graphite check'
 
-  option :allowed_graphite_age,
-         description: 'Allowed number of seconds since last data update (default: 60 seconds)',
-         short: '-a SECONDS',
-         long: '--age SECONDS',
-         default: 60,
-         proc: proc(&:to_i)
-
   option :hostname_sub,
          description: 'Character used to replace periods (.) in hostname (default: _)',
          short: '-s CHARACTER',
@@ -145,7 +138,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
     data.each_pair do |_key, value|
       @value = value
       @data = value['data']
-      check_age || check(:critical) || check(:warning)
+      check(:critical) || check(:warning)
     end
     ok("#{name} value okay")
   end
@@ -154,14 +147,6 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def name
     base = config[:name]
     @formatted ? "#{base} (#{@formatted})" : base
-  end
-
-  # Check the age of the data being processed
-  def check_age
-    # #YELLOW
-    if (Time.now.to_i - @value['end']) > config[:allowed_graphite_age] # rubocop:disable GuardClause
-      unknown "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
-    end
   end
 
   # grab data from graphite
