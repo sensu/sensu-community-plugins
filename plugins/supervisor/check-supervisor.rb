@@ -14,7 +14,7 @@
 #
 # DEPENDENCIES:
 #   gem: sensu-plugin
-#   gem: uby-supervisor
+#   gem: ruby-supervisor
 #
 # USAGE:
 #   check-supervisor-socket.rb
