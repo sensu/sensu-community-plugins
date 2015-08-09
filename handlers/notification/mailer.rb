@@ -78,6 +78,7 @@ class Mailer < Sensu::Handler
     mail_to = build_mail_to_list
     mail_from =  settings[json_config]['mail_from']
     reply_to = settings[json_config]['reply_to'] || mail_from
+    subject_tag = settings[json_config]['subject_tag'] || ''
 
     delivery_method = settings[json_config]['delivery_method'] || 'smtp'
     smtp_address = settings[json_config]['smtp_address'] || 'localhost'
@@ -106,9 +107,9 @@ class Mailer < Sensu::Handler
             #{playbook}
           BODY
     if @event['check']['notification'].nil?
-      subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
+      subject = "#{subject_tag}#{action_to_string} - #{short_name}: #{status_to_string}"
     else
-      subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
+      subject = "#{subject_tag}#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
     end
 
     Mail.defaults do
