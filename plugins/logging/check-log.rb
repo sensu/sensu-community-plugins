@@ -181,7 +181,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
     @log.seek(@bytes_to_skip, File::SEEK_SET) if @bytes_to_skip > 0
     # #YELLOW
     @log.each_line do |line| # rubocop:disable Style/Next
-      bytes_read += line.size
+      bytes_read += line.bytesize
       if config[:case_insensitive]
         m = line.downcase.match(config[:pattern].downcase) unless line.match(config[:exclude])
       else
