@@ -69,7 +69,8 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
 
   option :timeout,
          short: '-t SECS',
-         default: 10
+         default: 10,
+         proc: proc(&:to_i)
 
   def run
     check_sms!
