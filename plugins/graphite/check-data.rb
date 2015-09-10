@@ -102,7 +102,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   option :until,
          description: 'Get samples up until UNTIL (default: -1min)',
-         short: '-u UNTIL',
+         short: '-e UNTIL',
          long: '--until UNTIL',
          default: '-1min'
 
@@ -175,6 +175,9 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
           url_opts[:http_basic_authentication] = [config[:username], pass.chomp]
         end # we don't have both username and password trying without
+
+        puts "url is: #{url}" if config[:debug]
+        puts "url_opts is: #{url_opts}" if config[:debug]
 
         handle = open(url, url_opts)
 
