@@ -54,7 +54,8 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
       next if line =~ /^\s*$/
 
       fields = line.split(/\s+/)
-      mount_path = fields[1].chomp('/')
+      mount_path = fields[1]
+      mount_path.chomp!('/') unless mount_path == '/'
 
       next if mount_path == 'none' || (fields[3].include? 'noauto')
       next if config[:fstypes] && !config[:fstypes].include?(fields[2])
