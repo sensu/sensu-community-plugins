@@ -52,13 +52,18 @@ class CheckFstabMounts < Sensu::Plugin::Check::CLI
     @fstab.each do |line|
       next if line =~ /^\s*#/
       next if line =~ /^\s*$/
+
       fields = line.split(/\s+/)
-      next if fields[1] == 'none' || (fields[3].include? 'noauto')
+      mount_path = fields[1]
+      mount_path.chomp!('/') unless mount_path == '/'
+
+      next if mount_path == 'none' || (fields[3].include? 'noauto')
       next if config[:fstypes] && !config[:fstypes].include?(fields[2])
+
       if fields[2] != 'swap'
-        @missing_mounts << fields[1] if @mtab.select { |m| m.split(/\s+/)[1] == fields[1] }.empty?
+        @missing_mounts << mount_path if @mtab.select { |m| m.split(/\s+/)[1] == mount_path }.empty?
       else
-        @missing_mounts << fields[1] if @swap_mounts.select { |m| m.split(/\s+/)[0] == Pathname.new(fields[0]).realpath.to_s }.empty?
+        @missing_mounts << mount_path if @swap_mounts.select { |m| m.split(/\s+/)[0] == Pathname.new(fields[0]).realpath.to_s }.empty?
       end
     end
   end

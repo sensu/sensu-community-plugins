@@ -89,13 +89,6 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          long: '--name NAME',
          default: 'graphite check'
 
-  option :allowed_graphite_age,
-         description: 'Allowed number of seconds since last data update (default: 60 seconds)',
-         short: '-a SECONDS',
-         long: '--age SECONDS',
-         default: 60,
-         proc: proc(&:to_i)
-
   option :hostname_sub,
          description: 'Character used to replace periods (.) in hostname (default: _)',
          short: '-s CHARACTER',
@@ -106,6 +99,12 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          short: '-f FROM',
          long: '--from FROM',
          default: '-10mins'
+
+  option :until,
+         description: 'Get samples up until UNTIL (default: -1min)',
+         short: '-e UNTIL',
+         long: '--until UNTIL',
+         default: '-1min'
 
   option :below,
          description: 'warnings/critical if values below specified thresholds',
@@ -122,18 +121,24 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
          short: '-h',
          long: '--help'
 
+  option :debug,
+         description: 'Show verbose debugging output',
+         short: '-d',
+         long: '--debug'
+
   # Run checks
   def run
     if config[:help]
-      puts opt_parser if config[:help]
+      puts opt_parser
       exit
     end
 
     data = retrieve_data
+    puts "Data retrieved from graphite: #{ data }" if config[:debug]
     data.each_pair do |_key, value|
       @value = value
       @data = value['data']
-      check_age || check(:critical) || check(:warning)
+      check(:critical) || check(:warning)
     end
     ok("#{name} value okay")
   end
@@ -142,14 +147,6 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
   def name
     base = config[:name]
     @formatted ? "#{base} (#{@formatted})" : base
-  end
-
-  # Check the age of the data being processed
-  def check_age
-    # #YELLOW
-    if (Time.now.to_i - @value['end']) > config[:allowed_graphite_age] # rubocop:disable GuardClause
-      unknown "Graphite data age is past allowed threshold (#{config[:allowed_graphite_age]} seconds)"
-    end
   end
 
   # grab data from graphite
@@ -161,7 +158,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
           config[:server].prepend('http://')
         end
 
-        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}"
+        url = "#{config[:server]}/render?format=json&target=#{formatted_target}&from=#{config[:from]}&until=#{config[:until]}&noCache=True"
 
         url_opts = {}
 
@@ -178,6 +175,9 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
           url_opts[:http_basic_authentication] = [config[:username], pass.chomp]
         end # we don't have both username and password trying without
+
+        puts "url is: #{url}" if config[:debug]
+        puts "url_opts is: #{url_opts}" if config[:debug]
 
         handle = open(url, url_opts)
 

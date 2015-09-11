@@ -39,7 +39,7 @@ class Mailer < Sensu::Handler
          required: false
 
   def short_name
-    @event['client']['name'] + '/' + @event['check']['name']
+    @event['check']['name'] + ' @ ' + @event['client']['name']
   end
 
   def action_to_string
@@ -94,19 +94,20 @@ class Mailer < Sensu::Handler
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
-            #{output}
-            Admin GUI: #{admin_gui}
-            Host: #{@event['client']['name']}
-            Timestamp: #{Time.at(@event['check']['issued'])}
-            Address:  #{@event['client']['address']}
+            Host: #{@event['client']['name']} (#{@event['client']['address']})
             Check Name:  #{@event['check']['name']}
             Command:  #{command}
             Status:  #{status_to_string}
+            Timestamp: #{Time.at(@event['check']['issued'])}
             Occurrences:  #{@event['occurrences']}
+
+            #{output}
+
+            Sensu UI: #{admin_gui}
             #{playbook}
           BODY
     if @event['check']['notification'].nil?
-      subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
+      subject = "#{action_to_string} (#{status_to_string}) - #{short_name}"
     else
       subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
     end
