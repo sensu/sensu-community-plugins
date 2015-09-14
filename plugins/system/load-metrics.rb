@@ -58,7 +58,7 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    result = `uptime`.gsub(',', '').split(' ')
+    result = `LC_NUMERIC=C uptime`.gsub(',', '').split(' ')
     result = result[-3..-1]
 
     timestamp = Time.now.to_i
