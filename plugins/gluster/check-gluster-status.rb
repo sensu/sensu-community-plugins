@@ -42,15 +42,15 @@ class GlusterReplStatus < Sensu::Plugin::Check::CLI
          description: 'Ignore selfheal service',
          boolean: true,
          default: false
-  
+
   def run
     errors = []
     # #YELLOW
     `sudo gluster volume status`.each_line do |l| # rubocop:disable Style/Next
       # Don't match those lines or conditions.
       if l =~ / N /
-        unless (config[:ignore_nfs]      and 'NFS'.include?(l.split[0])) \
-            or (config[:ignore_selfheal] and 'Self-heal'.include?(l.split[0]))
+        unless (config[:ignore_nfs]      && 'NFS'.include?(l.split[0])) \
+            || (config[:ignore_selfheal] && 'Self-heal'.include?(l.split[0]))
           errors << "#{l.split[0]} #{l.split[1]} is DOWN"
         end
       end
