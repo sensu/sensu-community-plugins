@@ -97,6 +97,21 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       graphitepath = config[:scheme]
     end
 
+    dimensions = if config[:cachenodeid]
+      [{
+         'name' => 'CacheClusterId',
+         'value' => config[:cacheclusterid],
+       },{
+         'name' => 'CacheNodeId',
+         'value' => config[:cachenodeid],
+       }]
+    else
+      [{
+        'name' => 'CacheClusterId',
+        'value' => config[:cacheclusterid],
+      }]
+    end
+
     statistic_type = {
       'redis' => {
         'CPUUtilization' => 'Percent',
@@ -167,9 +182,7 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
       options = {
         'namespace' => 'AWS/ElastiCache',
         'metric_name' => config[:metric],
-        'dimensions' => [
-          { 'name' => 'CacheClusterId', 'value' => config[:cacheclusterid] }
-        ],
+        'dimensions' => dimensions,
         'start_time' => st.iso8601,
         'end_time' => et.iso8601,
         'period' => 60,
