@@ -51,10 +51,10 @@ class Graphite < Sensu::Plugin::Check::CLI
          required: true
 
   option :complex_target,
-         :description => "Allows complex targets which contain functions. Disables splitting on comma.",
-         :short => "-x",
-         :long => "--complex_target",
-         :default => false
+         description: 'Allows complex targets which contain functions. Disables splitting on comma.',
+         short: '-x',
+         long: '--complex_target',
+         default: false
 
   option :period,
          description: 'The period back in time to extract from Graphite and compare with. Use 24hours,2days etc, same format as in Graphite',
@@ -474,7 +474,7 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def run
-    targets = config[:complex_target] ? config[:target] : config[:target].split(",")
+    targets = config[:complex_target] ? [config[:target]] : config[:target].split(",")
     @period = config[:period]
     critical_errors = []
     warnings = []
