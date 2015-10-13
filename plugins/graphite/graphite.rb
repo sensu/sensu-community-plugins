@@ -474,7 +474,7 @@ class Graphite < Sensu::Plugin::Check::CLI
   end
 
   def run
-    targets = config[:complex_target] ? [config[:target]] : config[:target].split(",")
+    targets = config[:complex_target] ? [config[:target]] : config[:target].split(',')
     @period = config[:period]
     critical_errors = []
     warnings = []
