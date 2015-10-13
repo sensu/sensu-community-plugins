@@ -1,0 +1,9 @@
+{
+    "influxdb"   : {
+               "server"      : "influxdb.familyguy.com",
+               "port"        : "8086",
+               "username"    : "root",
+               "password"    : "root",
+               "database"    : "stats"
+     }
+}

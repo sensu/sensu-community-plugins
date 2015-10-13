@@ -2,6 +2,7 @@
   "opsgenie": {
     "customerKey": "the-key",
     "recipients": "the-recipients",
+    "teams": [ "the-team" ],
     "source": "alert-source",
     "overwrite_quiet_hours": true,
     "tags": [ "sensu" ]

@@ -23,7 +23,7 @@ class RT < Sensu::Handler
   end
 
   def action_to_string
-   @event['action'].eql?('resolve') ? "RESOLVED" : "ALERT"
+    @event['action'].eql?('resolve') ? 'RESOLVED' : 'ALERT'
   end
 
   def handle
@@ -48,12 +48,12 @@ class RT < Sensu::Handler
     content = "id: ticket/new\nRequestor: #{requestor}\nSubject: #{subject}\nStatus: new\nText: #{body} ticket\nQueue: #{queue}"
     begin
       timeout 10 do
-        puts "Connecting to Request tracker"
-        response = Net::HTTP.post_form(uri, {'user' => user, 'pass' => pass, 'content' => content})
+        puts 'Connecting to Request tracker'
+        response = Net::HTTP.post_form(uri, 'user' => user, 'pass' => pass, 'content' => content)
         puts "Response - #{response}"
       end
     rescue Timeout::Error
-      puts "CRITICAL --- Timed out while attempting to create ticket in RT"
+      puts 'CRITICAL --- Timed out while attempting to create ticket in RT'
     rescue Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
       puts "Critical --- HTTP Connection error #{e.message}"
     end

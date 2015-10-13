@@ -18,10 +18,11 @@ class LibratoMetrics < Sensu::Handler
   end
 
   def handle
-    queue = Librato::Metrics::Queue.new
+    source = settings['librato']['use_sensu_client_hostname_as_source'] ? @event['client']['name'] : nil
+    queue = Librato::Metrics::Queue.new source: source
     @event['check']['output'].split("\n").each do |line|
       name, value, timestamp = line.split(/\s+/)
-      queue.add name => {:measure_time => timestamp.to_i, :value => value.to_f}
+      queue.add name => { measure_time: timestamp.to_i, value: value.to_f }
     end
 
     Librato::Metrics.authenticate settings['librato']['email'], settings['librato']['api_key']
@@ -31,7 +32,7 @@ class LibratoMetrics < Sensu::Handler
         queue.submit
       end
     rescue Timeout::Error
-      puts "librato -- timed out while sending metrics"
+      puts 'librato -- timed out while sending metrics'
     rescue => error
       puts "librato -- failed to send metrics : #{error.message}"
       puts "  #{error.backtrace.join("\n\t")}"

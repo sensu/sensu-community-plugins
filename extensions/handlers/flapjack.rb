@@ -37,10 +37,10 @@ module Sensu
       def options
         return @options if @options
         @options = {
-          :host    => '127.0.0.1',
-          :port    => 6379,
-          :channel => 'events',
-          :db      => 0
+          host: '127.0.0.1',
+          port: 6379,
+          channel: 'events',
+          db: 0
         }
         if @settings[:flapjack].is_a?(Hash)
           @options.merge!(@settings[:flapjack])
@@ -50,15 +50,15 @@ module Sensu
 
       def definition
         {
-          :type => "extension",
-          :name => name,
-          :mutator => "ruby_hash"
+          type: 'extension',
+          name: name,
+          mutator: 'ruby_hash'
         }
       end
 
       def post_init
         @redis = Sensu::Redis.connect(options)
-        @redis.on_error do |error|
+        @redis.on_error do |_error|
           @logger.warn('Flapjack Redis instance not available on ' + options[:host])
         end
       end
@@ -67,9 +67,11 @@ module Sensu
         client = event[:client]
         check = event[:check]
         tags = []
+        tags.concat(client[:tags]) if client[:tags].is_a?(Array)
         tags.concat(check[:tags]) if check[:tags].is_a?(Array)
         tags << client[:environment] unless client[:environment].nil?
-        unless check[:subscribers].nil? || check[:subscribers].empty?
+        # #YELLOW
+        unless check[:subscribers].nil? || check[:subscribers].empty? # rubocop:disable UnlessElse
           tags.concat(client[:subscriptions] - (client[:subscriptions] - check[:subscribers]))
         else
           tags.concat(client[:subscriptions])
@@ -78,14 +80,14 @@ module Sensu
         details << 'Tags:' + tags.join(',')
         details << "Raw Output: #{check[:output]}" if check[:notification]
         flapjack_event = {
-          :entity  => client[:name],
-          :check   => check[:name],
-          :type    => 'service',
-          :state   => Sensu::SEVERITIES[check[:status]] || 'unknown',
-          :summary => check[:notification] || check[:output],
-          :details => details.join(' '),
-          :time    => check[:executed],
-          :tags    => tags
+          entity: client[:name],
+          check: check[:name],
+          type: 'service',
+          state: Sensu::SEVERITIES[check[:status]] || 'unknown',
+          summary: check[:notification] || check[:output],
+          details: details.join(' '),
+          time: check[:executed],
+          tags: tags
         }
         @redis.lpush(options[:channel], MultiJson.dump(flapjack_event))
         yield 'sent an event to the flapjack redis queue', 0

@@ -5,13 +5,12 @@ require 'sensu-handler'
 require 'dogapi'
 
 class DatadogNotif < Sensu::Handler
-
   def handle
     filter
     datadog
   end
 
-  def get_action
+  def acquire_action
     case @event['action']
     when 'create'
       'error'
@@ -21,7 +20,7 @@ class DatadogNotif < Sensu::Handler
   end
 
   # Return a low priotiry for resolve and warn events, normal for critical and unkown
-  def get_priority
+  def acquire_priority
     case @event['status']
     when '0', '1'
       'low'
@@ -31,7 +30,8 @@ class DatadogNotif < Sensu::Handler
   end
 
   def filter
-    if @event['check']['alert'] == false
+    # #YELLOW
+    if @event['check']['alert'] == false # rubocop:disable GuardClause
       puts 'alert disabled -- filtered event ' + [@event['client']['name'], @event['check']['name']].join(' : ')
       exit 0
     end
@@ -39,8 +39,8 @@ class DatadogNotif < Sensu::Handler
 
   def datadog
     description = @event['notification'] || [@event['client']['name'], @event['check']['name'], @event['check']['output']].join(' ')
-    action = get_action
-    priority = get_priority
+    action = acquire_action
+    priority = acquire_priority
     tags = []
     tags.push('sensu')
     # allow for tags to be set in the configuration, this could be used to indicate environment
@@ -52,18 +52,18 @@ class DatadogNotif < Sensu::Handler
         dog = Dogapi::Client.new(settings['datadog']['api_key'], settings['datadog']['app_key'])
         response = dog.emit_event(Dogapi::Event.new(
                                             description,
-                                            :msg_title => @event['check']['name'],
-                                            :tags => tags,
-                                            :alert_type => action,
-                                            :priority => priority,
-                                            :source_type_name => 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
-                                            :aggregation_key => @event['check']['name']
-                                          ), :host => @event['client']['name']
+                                            msg_title: @event['check']['name'],
+                                            tags: tags,
+                                            alert_type: action,
+                                            priority: priority,
+                                            source_type_name: 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
+                                            aggregation_key: @event['check']['name']
+                                          ), host: @event['client']['name']
                         )
 
         begin
-          if response[0] == "202"
-            puts "Submitted event to Datadog"
+          if response[0] == '202'
+            puts 'Submitted event to Datadog'
           else
             puts "Unexpected response from Datadog: HTTP code #{response[0]}"
           end

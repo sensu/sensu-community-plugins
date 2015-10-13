@@ -1,65 +1,74 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# This is a simple Ping check script for Sensu.
+#  check-ping
 #
-# Requires "net-ping" gem
+# DESCRIPTION:
+#   This is a simple Ping check script for Sensu.
 #
-# Examples:
+# OUTPUT:
+#   plain text
 #
+# PLATFORMS:
+#   Linux
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: net-ping
+#
+# USAGE:
 #   check-ping -h host -T timeout [--report]
 #
-#  Default host is "localhost"
+# NOTES:
 #
-#  Author Deepak Mohan Dass   <deepakmdass88@gmail.com>
+# LICENSE:
+#   Deepak Mohan Dass   <deepakmdass88@gmail.com>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-#
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 require 'net/ping'
 
 class CheckPING < Sensu::Plugin::Check::CLI
-
   option :host,
-    :short => '-h host',
-    :default => 'localhost'
+         short: '-h host',
+         default: 'localhost'
 
   option :timeout,
-    :short => '-T timeout',
-    :proc => Proc.new {|s| s.to_i},
-    :default => '5'
+         short: '-T timeout',
+         proc: proc(&:to_i),
+         default: 5
 
   option :count,
-    :short => '-c count',
-    :description => 'The number of ping requests',
-    :proc => Proc.new {|s| s.to_i },
-    :default => 1
+         short: '-c count',
+         description: 'The number of ping requests',
+         proc: proc(&:to_i),
+         default: 1
 
   option :interval,
-    :short => '-i interval',
-    :description => 'The number of seconds to wait between ping requests',
-    :proc => Proc.new {|s| s.to_f },
-    :default => 1
+         short: '-i interval',
+         description: 'The number of seconds to wait between ping requests',
+         proc: proc(&:to_f),
+         default: 1
 
   option :warn_ratio,
-    :short => '-W ratio',
-    :description => 'Warn if successful ratio is under this value',
-    :proc => Proc.new {|s| s.to_f },
-    :default => 0.5
+         short: '-W ratio',
+         description: 'Warn if successful ratio is under this value',
+         proc: proc(&:to_f),
+         default: 0.5
 
   option :critical_ratio,
-    :short => '-C ratio',
-    :description => 'Critical if successful ratio is under this value',
-    :proc => Proc.new {|s| s.to_f },
-    :default => 0.2
+         short: '-C ratio',
+         description: 'Critical if successful ratio is under this value',
+         proc: proc(&:to_f),
+         default: 0.2
 
   option :report,
-    :short => '-r',
-    :long => '--report',
-    :description => "Attach MTR report if ping is failed",
-    :default => false
+         short: '-r',
+         long: '--report',
+         description: 'Attach MTR report if ping is failed',
+         default: false
 
   def run
     result = []

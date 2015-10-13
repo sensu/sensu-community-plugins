@@ -1,7 +1,6 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Cassandra metrics using nodetool
-# ===
+#   cassandra-graphite
 #
 # DESCRIPTION:
 #   This plugin uses Apache Cassandra's `nodetool` to collect metrics
@@ -18,18 +17,17 @@
 #   `--filter REGEX` flag is used.
 #
 # OUTPUT:
-#   Graphite plain-text format (name value timestamp\n)
+#   metric data
 #
 # PLATFORMS:
-#   linux
+#   Linux
 #
 # DEPENDENCIES:
-#   sensu-plugin Ruby gem
+#   gem: sensu-plugin
 #   Cassandra's nodetool
 #
 # USAGE:
-#
-#   info and tpstats
+#  #   info and tpstats
 #   ----------------
 #
 #     $ ./cassandra-metrics.rb
@@ -58,16 +56,18 @@
 #
 #     $ ./cassandra-metrics.rb --cfstats NOTHING_SHOULD_MATCH_THIS_REGEX
 #
-# Copyright 2012 Joe Miller https://github.com/joemiller
+# NOTES:
+#   Heavily inspired by Datadog's python plugin:
+#   https://github.com/miketheman/dd-agent/blob/master/checks/cassandra.py
 #
-# Heavily inspired by Datadog's python plugin:
-# https://github.com/miketheman/dd-agent/blob/master/checks/cassandra.py
+# LICENSE:
+#   Copyright 2012 Joe Miller https://github.com/joemiller
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
-#
-# rubocop:disable AssignmentInCondition
 
+# #YELLOW
+# rubocop:disable AssignmentInCondition
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/metric/cli'
 require 'socket'
@@ -81,62 +81,76 @@ UNITS_FACTOR = {
 }
 
 class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
-
   option :hostname,
-    :short => "-h HOSTNAME",
-    :long => "--host HOSTNAME",
-    :description => "cassandra hostname",
-    :default => "localhost"
+         short: '-h HOSTNAME',
+         long: '--host HOSTNAME',
+         description: 'cassandra hostname',
+         default: 'localhost'
 
   option :port,
-    :short => "-P PORT",
-    :long => "--port PORT",
-    :description => "cassandra JMX port",
-    :default => "7199"
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'cassandra JMX port',
+         default: '7199'
+
+  option :username,
+         short: '-u USERNAME',
+         long: '--username USERNAME',
+         description: 'cassandra JMX username'
+
+  option :password,
+         short: '-p PASSWORD',
+         long: '--password PASSWORD',
+         description: 'cassandra JMX password'
+
+  option :passwordfile,
+         short: '-F PASSWORD-FILE',
+         long: '--password-file PASSWORD-FILE',
+         description: 'cassandra JMX password file'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.cassandra"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.cassandra"
 
   option :filter_regex,
-    :description => "regular expression for filtering column families (use with --cfstats)",
-    :on => :tail,
-    :short => "-f REGEX",
-    :long => "--filter REGEX"
+         description: 'regular expression for filtering column families (use with --cfstats)',
+         on: :tail,
+         short: '-f REGEX',
+         long: '--filter REGEX'
 
   option :info,
-    :description => 'output high-level Cassandra "info" metrics (default: yes)',
-    :on => :tail,
-    :short => '-i',
-    :long => '--[no-]info',
-    :boolean => true,
-    :default => true
+         description: 'output high-level Cassandra "info" metrics (default: yes)',
+         on: :tail,
+         short: '-i',
+         long: '--[no-]info',
+         boolean: true,
+         default: true
 
   option :compactionstats,
-    :description => 'output Cassandra "compactionstats" metrics (default: yes)',
-    :on => :tail,
-    :short => '-o',
-    :long => '--[no-]compactionstats',
-    :boolean => true,
-    :default => true
+         description: 'output Cassandra "compactionstats" metrics (default: yes)',
+         on: :tail,
+         short: '-o',
+         long: '--[no-]compactionstats',
+         boolean: true,
+         default: true
 
   option :tpstats,
-    :description => 'output Cassandra threadPool metrics (default: yes)',
-    :on => :tail,
-    :short => '-t',
-    :long => '--[no-]tpstats',
-    :boolean => true,
-    :default => true
+         description: 'output Cassandra threadPool metrics (default: yes)',
+         on: :tail,
+         short: '-t',
+         long: '--[no-]tpstats',
+         boolean: true,
+         default: true
 
   option :cfstats,
-    :description => 'output metrics on keyspaces and column families (default: no)',
-    :on => :tail,
-    :short => '-c',
-    :long => '--[no-]cfstats',
-    :boolean => true,
-    :default => false
+         description: 'output metrics on keyspaces and column families (default: no)',
+         on: :tail,
+         short: '-c',
+         long: '--[no-]cfstats',
+         boolean: true,
+         default: false
 
   # convert_to_bytes(512, 'KB') => 524288
   # convert_to_bytes(1, 'MB') => 1048576
@@ -146,7 +160,15 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   # execute cassandra's nodetool and return output as string
   def nodetool_cmd(cmd)
-    `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd}`
+    if config[:username]
+      if config[:passwordfile]
+        `nodetool -h #{config[:hostname]} -u #{config[:username]} -pwf #{config[:passwordfile]} -p #{config[:port]} #{cmd}`
+      elsif config[:password]
+        `nodetool -h #{config[:hostname]} -u #{config[:username]} -pw #{config[:password]} -p #{config[:port]} #{cmd}`
+      end
+    else
+      `nodetool -h #{config[:hostname]} -p #{config[:port]} #{cmd}`
+    end
   end
 
   # nodetool -h localhost info:
@@ -188,7 +210,8 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
   #
   def parse_info
     info = nodetool_cmd('info')
-    info.each_line do |line|
+    # #YELLOW
+    info.each_line do |line| # rubocop:disable Style/Next
       if m = line.match(/^Exceptions\s*:\s+([0-9]+)$/)
         output "#{config[:scheme]}.exceptions", m[1], @timestamp
       end
@@ -285,6 +308,9 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   # nodetool -h localhost cfstats
+  #
+  # Pre v 2.0
+  #
   # Keyspace: system
   #   Read Count: 216
   #   Read Latency: 1.4066805555555557 ms.
@@ -315,11 +341,41 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
   #     Compacted row maximum size: 0
   #     Compacted row mean size: 0
   #
+  # Post v 2.0
+  #
+  # Keyspace: system
+  #         Read Count: 1806
+  #         Read Latency: 0.47397231450719823 ms.
+  #         Write Count: 77488
+  #         Write Latency: 0.03966830993186042 ms.
+  #         Pending Tasks: 0
+  #                 Table: IndexInfo
+  #                 SSTable count: 0
+  #                 Space used (live), bytes: 0
+  #                 Space used (total), bytes: 0
+  #                 SSTable Compression Ratio: 0.0
+  #                 Number of keys (estimate): 0
+  #                 Memtable cell count: 0
+  #                 Memtable data size, bytes: 0
+  #                 Memtable switch count: 0
+  #                 Local read count: 0
+  #                 Local read latency: 0.000 ms
+  #                 Local write count: 0
+  #                 Local write latency: 0.000 ms
+  #                 Pending tasks: 0
+  #                 Bloom filter false positives: 0
+  #                 Bloom filter false ratio: 0.00000
+  #                 Bloom filter space used, bytes: 0
+  #                 Compacted partition minimum bytes: 0
+  #                 Compacted partition maximum bytes: 0
+  #                 Compacted partition mean bytes: 0
+  #                 Average live cells per slice (last five minutes): 0.0
+  #                 Average tombstones per slice (last five minutes): 0.0
+  #
   # some notes on parsing cfstats output:
-  # - a line preceeded by 1 tab contains keyspace metrics
-  # - a line preceeded by 2 tabs contains column family metrics
+  # - a line preceded by 1 tab contains keyspace metrics
+  # - a line preceded by 2 tabs contains column family metrics
   def parse_cfstats
-
     def get_metric(string)
       string.strip!
       (metric, value) = string.split(': ')
@@ -332,7 +388,7 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
         metric.gsub!(/[_]{2,}/, '_')       # convert sequence of multiple _'s to single _
         metric.downcase!
         # sanitize metric values for graphite. Numbers only, please.
-        value = value.chomp(' ms.').gsub(/([0-9.]+)$/, '\1')
+        value = value.gsub(/([0-9.]+) \w.*$/, '\1')
       end
       [metric, value]
     end
@@ -346,20 +402,21 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
       num_indents = line.count("\t")
       if m = line.match(/^Keyspace:\s+(\w+)$/)
         keyspace = m[1]
-      elsif m = line.match(/\t\tColumn Family[^:]*:\s+(\w+)$/)
-        cf = m[1]
+      elsif m = line.match(/\t\t(Column Family|Table)[^:]*:\s+(\w+)$/)
+        cf = m[2]
       elsif num_indents == 0
         # keyspace = nil
         cf = nil
       elsif num_indents == 2 && !cf.nil?
         # a column family metric
+        # #YELLOW
         if config[:filter_regex]
-          unless cf.match(config[:filter_regex])
+          unless cf.match(config[:filter_regex]) # rubocop:disable IfUnlessModifier
             next
           end
         end
         (metric, value) = get_metric(line)
-        output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp unless value == "disabled"
+        output "#{config[:scheme]}.#{keyspace}.#{cf}.#{metric}", value, @timestamp unless value == 'disabled'
       elsif num_indents == 1 && !keyspace.nil?
         # a keyspace metric
         (metric, value) = get_metric(line)
@@ -378,5 +435,4 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     ok
   end
-
 end

@@ -1,4 +1,34 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
+#
+#   <script name>
+#
+# DESCRIPTION:
+#   what is this thing supposed to do, monitor?  How do alerts or
+#   alarms work?
+#
+# OUTPUT:
+#   plain text, metric data, etc
+#
+# PLATFORMS:
+#   Linux, Windows, BSD, Solaris, etc
+#
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: <?>
+#
+# USAGE:
+#   example commands
+#
+# NOTES:
+#   Does it behave differently on specific platforms, specific use cases, etc
+#
+# LICENSE:
+#   <your name>  <your email>
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
+
+# !/usr/bin/env ruby
 #
 # Push mysql stats into graphite
 # ===
@@ -37,53 +67,51 @@ require 'socket'
 require 'inifile'
 
 class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
-
   option :host,
-    :short => "-h HOST",
-    :long => "--host HOST",
-    :description => "Mysql Host to connect to",
-    :required => true
+         short: '-h HOST',
+         long: '--host HOST',
+         description: 'Mysql Host to connect to',
+         required: true
 
   option :port,
-    :short => "-P PORT",
-    :long => "--port PORT",
-    :description => "Mysql Port to connect to",
-    :proc => proc {|p| p.to_i },
-    :default => 3306
+         short: '-P PORT',
+         long: '--port PORT',
+         description: 'Mysql Port to connect to',
+         proc: proc(&:to_i),
+         default: 3306
 
   option :username,
-    :short => "-u USERNAME",
-    :long => "--user USERNAME",
-    :description => "Mysql Username"
+         short: '-u USERNAME',
+         long: '--user USERNAME',
+         description: 'Mysql Username'
 
   option :password,
-    :short => "-p PASSWORD",
-    :long => "--pass PASSWORD",
-    :description => "Mysql password",
-    :default => ""
+         short: '-p PASSWORD',
+         long: '--pass PASSWORD',
+         description: 'Mysql password',
+         default: ''
 
   option :ini,
-    :short => '-i',
-    :long => '--ini VALUE',
-    :description => "My.cnf ini file"
+         short: '-i',
+         long: '--ini VALUE',
+         description: 'My.cnf ini file'
 
   option :scheme,
-    :description => "Metric naming scheme, text to prepend to metric",
-    :short => "-s SCHEME",
-    :long => "--scheme SCHEME",
-    :default => "#{Socket.gethostname}.mysql"
+         description: 'Metric naming scheme, text to prepend to metric',
+         short: '-s SCHEME',
+         long: '--scheme SCHEME',
+         default: "#{Socket.gethostname}.mysql"
 
   option :socket,
-    :short => "-S SOCKET",
-    :long => "--socket SOCKET"
+         short: '-S SOCKET',
+         long: '--socket SOCKET'
 
   option :verbose,
-    :short => "-v",
-    :long => "--verbose",
-    :boolean => true
+         short: '-v',
+         long: '--verbose',
+         boolean: true
 
   def run
-
     # props to https://github.com/coredump/hoardd/blob/master/scripts-available/mysql.coffee
 
     metrics = {
@@ -154,7 +182,7 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         'Com_unlock_tables' =>  'unlock_tables',
         'Com_alter_table' =>    'alter_table'
       },
-        'counters' => {
+      'counters' => {
         'Handler_write' =>              'handlerWrite',
         'Handler_update' =>             'handlerUpdate',
         'Handler_delete' =>             'handlerDelete',
@@ -208,50 +236,49 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       end
       begin
         mysql = Mysql2::Client.new(
-          :host => mysql_host,
-          :port => config[:port],
-          :username => db_user,
-          :password => db_pass,
-          :socket => config[:socket]
+          host: mysql_host,
+          port: config[:port],
+          username: db_user,
+          password: db_pass,
+          socket: config[:socket]
         )
 
-        results = mysql.query("SHOW GLOBAL STATUS")
+        results = mysql.query('SHOW GLOBAL STATUS')
       rescue => e
         puts e.message
       end
 
       results.each do |row|
         metrics.each do |category, var_mapping|
-          if var_mapping.has_key?(row["Variable_name"])
-            output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{var_mapping[row["Variable_name"]]}", row["Value"]
+          if var_mapping.key?(row['Variable_name'])
+            output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{var_mapping[row['Variable_name']]}", row['Value']
           end
         end
       end
 
       begin
-        slave_results = mysql.query("SHOW SLAVE STATUS")
+        slave_results = mysql.query('SHOW SLAVE STATUS')
         # should return a single element array containing one hash
-        slave_results.first.each do |key, value|
+        # #YELLOW
+        slave_results.first.each do |key, value| # rubocop:disable Style/Next
           if metrics['general'].include?(key)
             # Replication lag being null is bad, very bad, so negativate it here
-            if key == 'Seconds_Behind_Master' && value.nil?
-              value = -1
-            end
+            value = -1 if key == 'Seconds_Behind_Master' && value.nil?
             output "#{config[:scheme]}.#{mysql_shorthostname}.general.#{metrics['general'][key]}", value
           end
         end
-      rescue Exception => e
+      rescue => e
         puts "Error querying slave status: #{e}" if config[:verbose]
       end
 
       begin
-        variables_results = mysql.query("SHOW GLOBAL VARIABLES")
+        variables_results = mysql.query('SHOW GLOBAL VARIABLES')
 
         category = 'configuration'
         variables_results.each do |row|
           metrics[category].each do |metric, desc|
-            if metric.casecmp(row["Variable_name"]) == 0
-              output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{desc}", row["Value"]
+            if metric.casecmp(row['Variable_name']) == 0
+              output "#{config[:scheme]}.#{mysql_shorthostname}.#{category}.#{desc}", row['Value']
             end
           end
         end
@@ -262,7 +289,5 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     ok
-
   end
-
 end

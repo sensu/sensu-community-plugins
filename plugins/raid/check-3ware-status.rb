@@ -52,7 +52,8 @@ class Check3wareStatus < Sensu::Plugin::Check::CLI
   end
 
   def parse_disks!(data, controller)
-    data.lines.each do |line|
+    # #YELLOW
+    data.lines.each do |line| # rubocop:disable Style/Next
       unless line.empty?
         splitted = line.split
         if /^[p][0-9]+$/ =~ splitted[0]
@@ -62,7 +63,8 @@ class Check3wareStatus < Sensu::Plugin::Check::CLI
           name = splitted[0]
           unit = splitted[2]
           if unit != '-' && unit != 'NOT-PRESENT'
-            if status == 'OK'
+            # #YELLOW
+            if status == 'OK' # rubocop:disable BlockNesting
               @good_disks << controller + unit + name + ': ' + status
             else
               @bad_disks << controller + unit + name + ': ' + status

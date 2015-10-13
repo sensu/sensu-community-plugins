@@ -12,27 +12,25 @@ require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
 
 class PostfixMailq < Sensu::Plugin::Check::CLI
-
   option :path,
-    :short => '-p MAILQ_PATH',
-    :long => '--path MAILQ_PATH',
-    :description => 'Path to the postfix mailq binary.  Defaults to /usr/bin/mailq',
-    :default => '/usr/bin/mailq'
+         short: '-p MAILQ_PATH',
+         long: '--path MAILQ_PATH',
+         description: 'Path to the postfix mailq binary.  Defaults to /usr/bin/mailq',
+         default: '/usr/bin/mailq'
 
   option :warning,
-    :short  => '-w WARN_NUM',
-    :long  => '--warnnum WARN_NUM',
-    :description => 'Number of messages in the queue considered to be a warning',
-    :required => true
+         short: '-w WARN_NUM',
+         long: '--warnnum WARN_NUM',
+         description: 'Number of messages in the queue considered to be a warning',
+         required: true
 
   option :critical,
-    :short  => '-c CRIT_NUM',
-    :long  => '--critnum CRIT_NUM',
-    :description => 'Number of messages in the queue considered to be critical',
-    :required => true
+         short: '-c CRIT_NUM',
+         long: '--critnum CRIT_NUM',
+         description: 'Number of messages in the queue considered to be critical',
+         required: true
 
   def run
-
     # mailq will either end with a summary line (-- 11 Kbytes in 31 Requests.)
     # or 'Mail queue is empty'.  Using grep rather than returning the entire
     # list since that could consume a significant amount of memory.
@@ -52,7 +50,5 @@ class PostfixMailq < Sensu::Plugin::Check::CLI
     else
       ok "#{num_messages} messages in the postfix mail queue"
     end
-
   end
-
 end

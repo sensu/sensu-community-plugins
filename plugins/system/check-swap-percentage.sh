@@ -9,6 +9,7 @@
 # Usage: check-swap-percentage.sh -w warn_percent -c critical_percent
 # Uses free (Linux-only) & bc
 
+# #RED
 # input options
 while getopts ':w:c:' OPT; do
   case $OPT in
