@@ -12,6 +12,9 @@
 #
 #   sensu-plugin >= 1.0.0
 #
+# Note: The sensu api tocken could also be configured on a per client  or per check basis.
+#       By defining the "pager_team" attribute in the client config file or the check config. 
+#       The override order will be client > check > json_config
 
 require 'sensu-handler'
 require 'redphone/pagerduty'
@@ -29,7 +32,9 @@ class Pagerduty < Sensu::Handler
   end
 
   def handle
-    if @event['check']['pager_team']
+    if @event['client']['pager_team']
+      api_key = settings[config[:json_config]][@event['client']['pager_team']]['api_key']
+    elsif @event['check']['pager_team']
       api_key = settings[config[:json_config]][@event['check']['pager_team']]['api_key']
     else
       api_key = settings[config[:json_config]]['api_key']
