@@ -147,7 +147,7 @@ class CheckRabbitMQNodeHealth < Sensu::Plugin::Check::CLI
         message = "Socket usage is critical: #{psocket}%"
         status = 'critical'
       elsif pfd.to_f >= config[:fdcrit]
-        message = "Socket usage is critical: #{pfd}%"
+        message = "File Descriptor usage is critical: #{pfd}%"
         status = 'critical'
       # warnings
       elsif pmem.to_f >= config[:memwarn]
@@ -157,7 +157,7 @@ class CheckRabbitMQNodeHealth < Sensu::Plugin::Check::CLI
         message = "Socket usage is at warning: #{psocket}%"
         status = 'warning'
       elsif pfd.to_f >= config[:fdwarn]
-        message = "Socket usage is at warning: #{pfd}%"
+        message = "File Descriptor usage is at warning: #{pfd}%"
         status = 'warning'
       end
 
