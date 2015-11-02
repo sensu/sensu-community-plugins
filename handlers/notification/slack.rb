@@ -63,7 +63,7 @@ class Slack < Sensu::Handler
 
   def handle
     description = @event['check']['notification'] || build_description
-    post_data("*Check*\n#{incident_key}\n\n*Description*\n#{description}")
+    post_data("*#{check_status_name}*\n#{incident_key}\n\n*Description*\n#{description}")
   end
 
   def build_description
@@ -124,6 +124,16 @@ class Slack < Sensu::Handler
       3 => '#6600CC'
     }
     color.fetch(check_status.to_i)
+  end
+
+  def check_status_name
+    names = {
+      0 => 'OK',
+      1 => 'WARNING',
+      2 => 'CRITICAL',
+      3 => 'UNKNOWN'
+    }
+    names.fetch(check_status.to_i)
   end
 
   def check_status
