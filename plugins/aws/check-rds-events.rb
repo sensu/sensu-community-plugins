@@ -20,7 +20,7 @@
 #   gem: sensu-plugin
 #
 # USAGE:
-#  ./check-rds-events.rb -r ${you_region} -s ${your_aws_secret_access_key} -a ${your_aws_access_key}
+#  ./check-rds-events.rb -r ${your_region} -s ${your_aws_secret_access_key} -a ${your_aws_access_key}
 #
 # NOTES:
 #
@@ -69,7 +69,8 @@ class CheckRDSEvents < Sensu::Plugin::Check::CLI
         next if events_record[:events].empty?
 
         # if the last event is a start maint event then the cluster is still in maint
-        maint_clusters.push(cluster_name) if events_record[:events][-1][:message] =~ /has started|is being|off-line|shutdown/
+        cluster_name_long = "#{cluster_name} (#{config[:aws_region]}) #{events_record[:events][-1][:message]}"
+        maint_clusters.push(cluster_name_long) if events_record[:events][-1][:message] =~ /has started|is being|off-line|shutdown/
       end
     rescue => e
       unknown "An error occurred processing AWS RDS API: #{e.message}"
@@ -78,7 +79,7 @@ class CheckRDSEvents < Sensu::Plugin::Check::CLI
     if maint_clusters.empty?
       ok
     else
-      critical("Clusters w/ critical events: #{maint_clusters.join(',')}")
+      critical("Clusters w/ critical events: #{maint_clusters.join(', ')}")
     end
   end
 end
