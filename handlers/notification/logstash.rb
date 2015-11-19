@@ -70,7 +70,7 @@ class LogstashHandler < Sensu::Handler
       redis.lpush(settings['logstash']['list'], logstash_msg.to_json)
     when 'udp'
       socket = UDPSocket.new
-      socket.send(JSON.parse(logstash_msg), 0, settings['logstash']['server'], settings['logstash']['port'])
+      socket.send(JSON.generate(logstash_msg), 0, settings['logstash']['server'], settings['logstash']['port'])
       socket.close
     end
   end
