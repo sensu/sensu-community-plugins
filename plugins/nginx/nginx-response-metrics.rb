@@ -63,6 +63,18 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Hostnames to filter on',
          default: ''
 
+  option :regex,
+         short: '-r REGEX',
+         long: '--regex REGEX',
+         description: 'Regex to filter hostnames',
+         default: ''
+
+  option :noip,
+         short: '-n',
+         long: '--noip',
+         description: 'Converts all direct IP requests into HOST_IP hostname instead',
+         default: true
+
   option :scheme,
          description: 'Metric naming scheme, text to prepend to metric',
          short: '-s SCHEME',
@@ -74,7 +86,10 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def get_host(url)
-    host = URI.parse(url).host.downcase
+    if match = url.match(/^(http|https):\/\/([^\/]+)\//i)
+       scheme, host = match.captures
+    end
+    return host
   end
 
   def run
@@ -91,22 +106,39 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
         # print error message
         unknown "error executing logsince:%s" % stderr
       else
-        found = 0
+        found = true
         filter_hostname = false
         if config[:hostname].length > 0
           filter_hostname = true
           hostnames = config[:hostname].split(/,/)
         end
+        filter_regex = false
+        if config[:regex].length > 0
+          filter_regex = true
+          regex = Regexp.new config[:regex]
+          puts config[:regex]
+          puts regex
+        end
 
         # parse and build per hostname
         stdout.each_line do |line|
+          line.chomp!
           fields = line.split(/ /)
+          # skip empty lines
+          if fields.length == 0
+            next
+          end
 
           # get the host
-          host = get_host(fields[6])
-
-          # if hostnames provided only use those
-          next if filter_hostname && (hostnames.include? host)
+          # if ip and noip set, change host to HOST_IP - to reduce the no. of metrics generated and stored
+          # encode the line to sanitise the data
+          encoded_url = URI.encode(fields[6])
+          host = get_host(encoded_url)
+          if config[:noip] && host.match(/^[0-9\.]+$/) != nil
+            host = 'HOST_IP'
+          elsif (filter_hostname && (hostnames.include? host)) || (filter_regex && host !~ regex)
+            host = 'OTHER'
+          end
 
           # increment the counters
           field = fields[0]
@@ -118,7 +150,6 @@ class NginxMetrics < Sensu::Plugin::Metric::CLI::Graphite
           end
 
           field = fields[-1]
-          field.chomp!
           if field == '-'
             field = 'NA'
           end
