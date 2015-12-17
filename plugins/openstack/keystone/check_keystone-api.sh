@@ -37,8 +37,8 @@ usage ()
     echo " -h               Get help"
     echo " -H <Auth URL>    URL for obtaining an auth token"
     echo " -U <username>    Username to use to get an auth token"
-    echo " -P <password>    Password to use ro get an auth token"
-    echo " -T <seconds>     Timeout after integer <seconds>"
+    echo " -P <password>    Password to use to get an auth token"
+    echo " -T <seconds>     Time, in seconds, to wait for a reply (integer value only)"
 }
 
 while getopts 'h:H:U:P:T:' OPTION
@@ -58,7 +58,7 @@ do
             export OS_PASSWORD=$OPTARG
             ;;
         T)
-            export TIMEOUT=$OPTARG
+            export MAX_TIME=$OPTARG
             ;;
         *)
             usage
@@ -73,13 +73,17 @@ then
     exit $STATE_UNKNOWN
 fi
 
-if [ ! -z "${TIMEOUT//[0-9]}" ]; then
-    echo "TIMEOUT value is not an integer"
+if [ ! -z "${MAX_TIME//[0-9]}" ]; then
+    echo "'-T <seconds>' option value is not an integer"
     exit $STATE_UNKNOWN
 fi
 
 START=$(date +%s)
-TOKEN=$(curl -d '{"auth":{"passwordCredentials":{"username": "'$OS_USERNAME'", "password": "'$OS_PASSWORD'"}}}' -H "Content-type: application/json" ${OS_AUTH_URL}:5000/v2.0/tokens/ 2>&1 | grep token|awk '{print $8}'|grep -o '".*"' | sed -n 's/.*"\([^"]*\)".*/\1/p')
+TOKEN=$(curl -d '{"auth":{"passwordCredentials":{"username": "'$OS_USERNAME'", "password": "'$OS_PASSWORD'"}}}' \
+             -H "Content-type: application/json" \
+             ${OS_AUTH_URL}:5000/v2.0/tokens/ 2>&1 | \
+             \grep "token" | awk '{print $8}'| \grep -o '".*"' | \
+             sed -n 's/.*"\([^"]*\)".*/\1/p')
 END=$(date +%s)
 
 TIME=$((END-START))
@@ -88,8 +92,8 @@ if [ -z "$TOKEN" ]; then
     echo "Unable to get a token"
     exit $STATE_CRITICAL
 else
-    if [ $TIME -gt $TIMEOUT ]; then
-        echo "Got a token after $TIMEOUT seconds. That is too long."
+    if [ $TIME -gt $MAX_TIME ]; then
+        echo "It took too long to retrieve a token. Time taken: $MAX_TIME seconds"
         exit $STATE_WARNING
     else
         echo "Got a token. Keystone API is working."
