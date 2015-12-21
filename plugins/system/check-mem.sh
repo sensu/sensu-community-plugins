@@ -44,7 +44,7 @@ CRIT=${CRIT:=0}
 # validate fedora > 20 and rhel > 7.0
 if [[ `awk '{print $3}' /etc/redhat-release` =~ ^2[0-9]{1} ]]; then
    redhat_version=1
-elif [[ `awk '{print $7}' /etc/redhat-version` =~ ^7\.[0-9]{1} ]]; then
+elif [[ `awk '{print $7}' /etc/redhat-release` =~ ^7\.[0-9]{1} ]]; then
    redhat_version=1
 else
    redhat_version=0
