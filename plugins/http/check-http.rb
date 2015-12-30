@@ -111,6 +111,11 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
          long: '--query PAT',
          description: 'Query for a specific pattern'
 
+  option :notpattern,
+         short: '-n PAT',
+         long: '--notpattern PAT',
+         description: 'Query for a specific pattern that should not match'
+
   option :timeout,
          short: '-t SECS',
          long: '--timeout SECS',
@@ -264,6 +269,12 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
           ok "#{res.code}, found /#{config[:pattern]}/ in #{size} bytes" + body
         else
           critical "#{res.code}, did not find /#{config[:pattern]}/ in #{size} bytes: #{res.body[0...200]}..."
+        end
+      elsif config[:notpattern]
+        if res.body !~ /#{config[:notpattern]}/
+          ok "#{res.code}, did not find /#{config[:notpattern]}/ in #{size} bytes" + body
+        else
+          critical "#{res.code}, found /#{config[:notpattern]}/ in #{size} bytes: #{res.body[0...200]}..."
         end
       else
         ok("#{res.code}, #{size} bytes" + body) unless config[:response_code]
