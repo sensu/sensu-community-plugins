@@ -107,9 +107,23 @@ class CheckLog < Sensu::Plugin::Check::CLI
          boolean: true,
          default: false
 
+  option :save,
+         description: 'Save warn and critical levels until manually cleared using --clear or -C',
+         short: '-S',
+         long: '--save',
+         boolean: true,
+         default: false
+
+  option :clear,
+         description: 'Clears the warn and critical levels',
+         short: '-C',
+         long: '--clear',
+         boolean: true,
+         default: false
+
   def run
     unknown 'No log file specified' unless config[:log_file] || config[:file_pattern]
-    unknown 'No pattern specified' unless config[:pattern]
+    unknown 'No pattern specified' unless config[:pattern] || config[:clear]
     file_list = []
     file_list << config[:log_file] if config[:log_file]
     if config[:file_pattern]
@@ -123,6 +137,14 @@ class CheckLog < Sensu::Plugin::Check::CLI
         end
       end
     end
+    if config[:clear]
+      clear_saved file_list
+    else
+      check file_list
+    end
+  end
+
+  def check(file_list)
     n_warns_overall = 0
     n_crits_overall = 0
     error_overall = ''
@@ -132,6 +154,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
       rescue => e
         unknown "Could not open log file: #{e}"
       end
+
       n_warns, n_crits, accumulative_error = search_log
       n_warns_overall += n_warns
       n_crits_overall += n_crits
@@ -150,8 +173,79 @@ class CheckLog < Sensu::Plugin::Check::CLI
     end
   end
 
-  def open_log(log_file)
+  def clear_saved(file_list)
+    file_list.each do |log_file|
+      begin
+        set_state_file log_file
+        @bytes_to_skip = File.open(@state_file) do |file|
+          file.readline.to_i
+        end
+        # rewrite the data - set the n_warns and n_crits to 0
+        write_state_file 0, 0, 0
+      rescue => e
+        unknown "Could not open log file: #{e}"
+      end
+    end
+    message "counters cleared"
+    ok
+  end
+
+  def set_state_file(log_file)
     state_dir = config[:state_auto] || config[:state_dir]
+    @state_file = File.join(state_dir, File.expand_path(log_file).sub(/^([A-Z]):\//, '\1/'))
+  end
+
+  def read_state_file
+    # if saving the warnings/criticals, then read them in too
+    if config[:save]
+      begin
+        File.open(@state_file) do |file|
+          begin
+            @bytes_to_skip = file.readline.to_i
+          rescue
+            @bytes_to_skip = 0
+          end
+          begin
+            @saved_warnings = file.readline.to_i
+          rescue
+            @saved_warnings = 0
+          end
+          begin
+            @saved_criticals = file.readline.to_i
+          rescue
+            @saved_criticals = 0
+          end
+        end
+      rescue
+        @bytes_to_skip = 0
+        @saved_warnings = 0
+        @saved_criticals = 0
+      end
+    else
+      @bytes_to_skip = begin
+        File.open(@state_file) do |file|
+          file.readline.to_i
+        end
+      rescue
+        0
+      end
+      @saved_warnings = 0
+      @saved_criticals = 0
+    end
+  end
+
+  def write_state_file(bytes_read, n_warns, n_crits)
+    File.open(@state_file, 'w') do |file|
+      file.puts(@bytes_to_skip + bytes_read)
+      if config[:save]
+        file.puts(n_warns, n_crits)
+      end
+    end
+  end
+
+  def open_log(log_file)
+
+    set_state_file log_file
 
     # Opens file using optional encoding page.  ex: 'iso8859-1'
     if config[:encoding]
@@ -160,22 +254,16 @@ class CheckLog < Sensu::Plugin::Check::CLI
       @log = File.open(log_file)
     end
 
-    @state_file = File.join(state_dir, File.expand_path(log_file).sub(/^([A-Z]):\//, '\1/'))
-    @bytes_to_skip = begin
-      File.open(@state_file) do |file|
-        file.readline.to_i
-      end
-    rescue
-      0
-    end
+    read_state_file
+
   end
 
   def search_log
     log_file_size = @log.stat.size
     @bytes_to_skip = 0 if log_file_size < @bytes_to_skip
     bytes_read = 0
-    n_warns = 0
-    n_crits = 0
+    n_warns = @saved_warnings
+    n_crits = @saved_criticals
     accumulative_error = ''
 
     @log.seek(@bytes_to_skip, File::SEEK_SET) if @bytes_to_skip > 0
@@ -205,9 +293,7 @@ class CheckLog < Sensu::Plugin::Check::CLI
       end
     end
     FileUtils.mkdir_p(File.dirname(@state_file))
-    File.open(@state_file, 'w') do |file|
-      file.write(@bytes_to_skip + bytes_read)
-    end
+    write_state_file bytes_read, n_warns, n_crits
     [n_warns, n_crits, accumulative_error]
   end
 end
