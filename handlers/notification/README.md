@@ -21,6 +21,7 @@ There is an optional subscriptions hash which can be added to your mailer.json f
     "subscriptions": {
         "subscription_name": {
             "mail_to": "teamemail@example.com"
+        }
     }
   }
 }
