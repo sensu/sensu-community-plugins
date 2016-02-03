@@ -18,6 +18,9 @@
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
 
+require 'sys/filesystem'
+include Sys
+
 module Sensu
   module Extension
     class SystemProfile < Check
@@ -48,7 +51,9 @@ module Sensu
           proc_loadavg_metrics do
             proc_net_dev_metrics do
               proc_meminfo_metrics do
-                yield flush_metrics, 0
+                disk_usage do
+                  yield flush_metrics, 0
+                end
               end
             end
           end
@@ -62,6 +67,8 @@ module Sensu
         @options = {
           interval: 10,
           handler: 'graphite',
+          add_metric_prefix: true,
+          metric_prefix: 'os',
           add_client_prefix: true,
           path_prefix: 'system',
           prefix_at_start: 0
@@ -84,6 +91,7 @@ module Sensu
         path << options[:path_prefix] if options[:prefix_at_start]
         path << settings[:client][:name] if options[:add_client_prefix]
         path << options[:path_prefix] unless options[:prefix_at_start]
+        path << options[:metric_prefix] if options[:add_metric_prefix]
         path = (path + args).join('.')
         @metrics << [path, value, Time.now.to_i].join(' ')
       end
@@ -145,6 +153,27 @@ module Sensu
               yield
             end
           end
+        end
+      end
+
+      def disk_usage
+        read_file('/etc/mtab') do |etc_mtab|
+          etc_mtab.each_line do |line|
+            next if line.strip.eql? ''
+            next if line.start_with?('#')
+            volume = line.split(/\s+/)
+            path = volume[1].to_s
+            type = volume[2].to_s
+            next if ["autofs", "binfmt_misc", "cgroup", "configfs", "debugfs", "devpts", "devtmpfs", "hugetlbfs", "mqueue", "nfsd", "proc", "pstore", "rootfs", "rpc_pipefs", "securityfs", "selinuxfs", "sysfs", "tmpfs"].include?(type)
+            stat = Filesystem.stat(path)
+            used = stat.percent_used
+            if path.eql? '/'
+              path = 'root'
+            end
+            path.gsub!('/', '_')
+            add_metric('disk_usage', path, used)
+          end
+          yield
         end
       end
 
