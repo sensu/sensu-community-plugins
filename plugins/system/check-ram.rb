@@ -45,18 +45,19 @@ class CheckRAM < Sensu::Plugin::Check::CLI
          default: 5
 
   def run
-    total_ram, free_ram = 0, 0
+    memhash = {}
+    meminfo = File.read('/proc/meminfo')
+    meminfo.each_line do |i|
+      key, val = i.split(':')
+      val = val.include?('kB') ? val.gsub(/\s+kB/, '') : val
+      memhash["#{key}"] = val.strip
+    end
 
-    if `free --help` =~ /.*wide output.*/
-      `free -mw`.split("\n").drop(1).each do |line|
-        free_ram = line.split[7].to_i if line =~ /^Mem:/
-        total_ram = line.split[1].to_i if line =~ /^Mem:/
-      end
+    total_ram = (memhash['MemTotal'].to_i << 10) >> 20
+    if memhash.key?('MemAvailable')
+      free_ram = (memhash['MemAvailable'].to_i << 10) >> 20
     else
-      `free -m`.split("\n").drop(1).each do |line|
-        free_ram = line.split[3].to_i if line =~ /^-\/\+ buffers\/cache:/ # rubocop:disable RegexpLiteral
-        total_ram = line.split[1].to_i if line =~ /^Mem:/
-      end
+      free_ram = ((memhash['MemFree'].to_i + memhash['Buffers'].to_i + memhash['Cached'].to_i) << 10) >> 20
     end
 
     if config[:megabytes]
