@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # Copyright 2014 Dan Shultz and contributors.
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
@@ -8,6 +7,22 @@
 # In order to use this plugin, you must first configure an incoming webhook
 # integration in slack. You can create the required webhook by visiting
 # https://{your team}.slack.com/services/new/incoming-webhook
+#
+# ## Client Configuraiton
+#
+# It is possible to select the Slack channel a message will be sent to at
+# event time using the 'sensu_channel' check configuration.
+#
+#    {
+#      "checks": {
+#      "my_check": {
+#        "handlers": ["default", "slack"],
+#        "slack_channel": "#mycustomchannel",
+#        "command": "some-command.sh",
+#        ...
+#      }
+#    }
+#
 #
 # After you configure your webhook, you'll need the webhook URL from the integration.
 
@@ -26,6 +41,9 @@ class Slack < Sensu::Handler
   end
 
   def slack_channel
+    if @event['check']['slack_channel']
+      return @event['check']['slack_channel']
+    end
     get_setting('channel')
   end
 
