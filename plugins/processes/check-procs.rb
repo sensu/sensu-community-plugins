@@ -33,27 +33,27 @@ class CheckProcs < Sensu::Plugin::Check::CLI
          short: '-w N',
          long: '--warn-over N',
          description: 'Trigger a warning if over a number',
-         proc: proc(&:to_i)
+         proc: proc(&:to_i),
+         default: 1
 
   option :crit_over,
          short: '-c N',
          long: '--critical-over N',
          description: 'Trigger a critical if over a number',
-         proc: proc(&:to_i)
+         proc: proc(&:to_i),
+         default: 1
 
   option :warn_under,
          short: '-W N',
          long: '--warn-under N',
          description: 'Trigger a warning if under a number',
-         proc: proc(&:to_i),
-         default: 1
+         proc: proc(&:to_i)
 
   option :crit_under,
          short: '-C N',
          long: '--critical-under N',
          description: 'Trigger a critial if under a number',
-         proc: proc(&:to_i),
-         default: 1
+         proc: proc(&:to_i)
 
   option :metric,
          short: '-t METRIC',
