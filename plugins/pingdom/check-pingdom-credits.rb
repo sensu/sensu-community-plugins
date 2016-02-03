@@ -48,7 +48,7 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
          short: '-k APP_KEY',
          long: '--application-key APP_KEY',
          required: true
-
+  
   option :warn_sms,
          long: '--warn-available-sms COUNT',
          default: 10,
@@ -69,7 +69,12 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
 
   option :timeout,
          short: '-t SECS',
-         default: 10
+         default: 10,
+         proc: proc(&:to_i)
+
+  option :account_email,
+         short: '-e ACCOUNT_EMAIL',
+         long:  '--account-email ACCOUNT_EMAIL'
 
   def run
     check_sms!
@@ -115,12 +120,20 @@ class CheckPingdomCredits < Sensu::Plugin::Check::CLI
     @credits ||= api_call[:credits]
   end
 
+  def headers
+    if config[:account_email]
+      { 'App-Key' => config[:application_key], 'Account-Email' => config[:account_email] }
+    else
+      { 'App-Key' => config[:application_key] }
+    end
+  end
+
   def api_call
     resource = RestClient::Resource.new(
       'https://api.pingdom.com/api/2.0/credits',
       user: config[:user],
       password: config[:password],
-      headers: { 'App-Key' => config[:application_key] },
+      headers: headers,
       timeout: config[:timeout]
     )
     JSON.parse(resource.get, symbolize_names: true)
