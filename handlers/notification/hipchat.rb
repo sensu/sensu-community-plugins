@@ -40,6 +40,9 @@ class HipChatNotif < Sensu::Handler
   end
 
   def handle
+    # skip OK handler calls in checks with type == 'metric'
+    return if @event['check']['status'] == 0 and not @event['action'].eql?('resolve')
+
     json_config = config[:json_config] || 'hipchat'
     server_url = settings[json_config]['server_url'] || 'https://api.hipchat.com'
     apiversion = settings[json_config]['apiversion'] || 'v1'
