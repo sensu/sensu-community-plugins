@@ -39,7 +39,7 @@ class EntropyGraphite < Sensu::Plugin::Metric::CLI::Graphite
   def run
     File.open('/proc/sys/kernel/random/entropy_avail', 'r').each_line do |line|
       entropy = line.strip.split(/\s+/).shift
-      output "#{config[:scheme]}", entropy
+      output config[:scheme].to_s, entropy
     end
     ok
   end

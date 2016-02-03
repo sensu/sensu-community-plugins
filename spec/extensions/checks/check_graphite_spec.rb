@@ -145,13 +145,10 @@ describe Sensu::Extension::GraphiteCheck do
       expect(output).to eq(good_data)
     end
     it 'should prepend server name with http if missing' do
-
     end
-
   end
 
   describe 'run check' do
-
     before do
       allow(subject).to receive(:check_age)
     end
@@ -192,13 +189,10 @@ describe Sensu::Extension::GraphiteCheck do
         expect(message).to include('okay')
         expect(status).to eq(0)
       end
-
     end
-
   end
 
   describe 'outdated data' do
-
     it 'should fail on outdated data' do
       allow(subject).to receive(:retrieve_data).and_return(good_data)
       subject.run(check) do |message, status|
@@ -206,7 +200,5 @@ describe Sensu::Extension::GraphiteCheck do
         expect(status).to eq(3)
       end
     end
-
   end
-
 end

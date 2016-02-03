@@ -180,19 +180,18 @@ class SmartCheck < Sensu::Plugin::Check::CLI
       # #YELLOW
       output[dev].split("\n").each do |line| # rubocop:disable Style/Next
         fields = line.split
-        if fields.size == 10 && fields[0].to_i != 0 && att_check_list.include?(fields[0].to_i)
-          smart_att = @smart_attributes.find { |att| att[:id] == fields[0].to_i }
-          att_value = fields[9].to_i
-          att_value = send(smart_att[:read], att_value) unless smart_att[:read].nil?
-          if att_value < smart_att[:crit_min] || att_value > smart_att[:crit_max]
-            criticals << "#{dev} critical #{fields[0]} #{smart_att[:name]}: #{att_value}"
-            puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (critical)" if @smart_debug
-          elsif att_value < smart_att[:warn_min] || att_value > smart_att[:warn_max]
-            warnings << "#{dev} warning #{fields[0]} #{smart_att[:name]}: #{att_value}"
-            puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (warning)" if @smart_debug
-          else
-            puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (ok)" if @smart_debug
-          end
+        next unless fields.size == 10 && fields[0].to_i != 0 && att_check_list.include?(fields[0].to_i)
+        smart_att = @smart_attributes.find { |att| att[:id] == fields[0].to_i }
+        att_value = fields[9].to_i
+        att_value = send(smart_att[:read], att_value) unless smart_att[:read].nil?
+        if att_value < smart_att[:crit_min] || att_value > smart_att[:crit_max]
+          criticals << "#{dev} critical #{fields[0]} #{smart_att[:name]}: #{att_value}"
+          puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (critical)" if @smart_debug
+        elsif att_value < smart_att[:warn_min] || att_value > smart_att[:warn_max]
+          warnings << "#{dev} warning #{fields[0]} #{smart_att[:name]}: #{att_value}"
+          puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (warning)" if @smart_debug
+        else
+          puts "#{fields[0]} #{smart_att[:name]}: #{att_value} (ok)" if @smart_debug
         end
       end
       puts "\n\n" if @smart_debug

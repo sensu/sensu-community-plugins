@@ -50,7 +50,7 @@ Dir.glob('**/*').each do |file|
   next unless File.file?(file)
   File.open(file) do |f|
     f.each_line do |line|
-      yellow_debt << "* #{ file }\n" if line.include?(tech_debt_yellow)
+      yellow_debt << "* #{file}\n" if line.include?(tech_debt_yellow)
     end
   end
 end
@@ -59,7 +59,7 @@ Dir.glob('**/*').each do |file|
   next unless File.file?(file)
   File.open(file) do |f|
     f.each_line do |line|
-      orange_debt << "* #{ file }\n" if line.include?(tech_debt_orange)
+      orange_debt << "* #{file}\n" if line.include?(tech_debt_orange)
     end
   end
 end
@@ -68,7 +68,7 @@ Dir.glob('**/*').each do |file|
   next unless File.file?(file)
   File.open(file) do |f|
     f.each_line do |line|
-      red_debt << "* #{ file }\n" if line.include?(tech_debt_red)
+      red_debt << "* #{file}\n" if line.include?(tech_debt_red)
     end
   end
 end
@@ -76,14 +76,14 @@ end
 github.issues.edit user: 'sensu',
                    repo: 'sensu-community-plugins',
                    number: '891',
-                   body: "#{ yellow_debt }"
+                   body: yellow_debt.to_s
 
 github.issues.edit user: 'sensu',
                    repo: 'sensu-community-plugins',
                    number: '892',
-                   body: "#{ orange_debt }"
+                   body: orange_debt.to_s
 
 github.issues.edit user: 'sensu',
                    repo: 'sensu-community-plugins',
                    number: '893',
-                   body: "#{ red_debt }"
+                   body: red_debt.to_s

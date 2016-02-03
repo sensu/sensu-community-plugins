@@ -65,10 +65,10 @@ class DNS < Sensu::Plugin::Check::CLI
          boolean: true
 
   def resolve_domain
-    if config[:type] == 'PTR'
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ''} -x #{config[:domain]} +short +time=1"
-    else
-      cmd = "dig #{config[:server] ? "@#{config[:server]}" : ''} #{config[:domain]} #{config[:type]} +short +time=1"
+    cmd = if config[:type] == 'PTR'
+            "dig #{config[:server] ? "@#{config[:server]}" : ''} -x #{config[:domain]} +short +time=1"
+          else
+            "dig #{config[:server] ? "@#{config[:server]}" : ''} #{config[:domain]} #{config[:type]} +short +time=1"
     end
     puts cmd if config[:debug]
     output = `#{cmd}`
@@ -93,7 +93,7 @@ class DNS < Sensu::Plugin::Check::CLI
       else
         if config[:result]
           # #YELLOW
-          if entries.include?(config[:result])  # rubocop:disable BlockNesting
+          if entries.include?(config[:result]) # rubocop:disable BlockNesting
             ok "Resolved #{config[:domain]} including #{config[:result]}"
           else
             critical "Resolved #{config[:domain]} did not include #{config[:result]}"

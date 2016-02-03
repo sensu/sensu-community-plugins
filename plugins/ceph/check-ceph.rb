@@ -122,7 +122,7 @@ class CheckCephHealth < Sensu::Plugin::Check::CLI
     r = result.dup
     r.gsub!(/HEALTH_WARN\ /, '')
      .gsub!(/\ ?flag\(s\) set/, '')
-     .gsub!(/\n/, '')
+     .delete!("\n")
     config[:ignore_flags].each do |f|
       r.gsub!(/,?#{f},?/, '')
     end

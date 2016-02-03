@@ -106,7 +106,7 @@ class CheckDisk < Sensu::Plugin::Check::CLI
       if capacity.to_i >= config[:crit]
         @crit_fs << "#{mnt} #{capacity}"
       elsif capacity.to_i >= config[:warn]
-        @warn_fs <<  "#{mnt} #{capacity}"
+        @warn_fs << "#{mnt} #{capacity}"
       end
     end
 

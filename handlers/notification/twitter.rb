@@ -27,18 +27,17 @@ class TwitterHandler < Sensu::Handler
     puts settings['twitter']
     # #YELLOW
     settings['twitter'].each do |account| # rubocop:disable Style/Next
-      if @event['client']['subscriptions'].include?(account[1]['sensusub'])
-        Twitter.configure do |t|
-          t.consumer_key = account[1]['consumer_key']
-          t.consumer_secret = account[1]['consumer_secret']
-          t.oauth_token = account[1]['oauth_token']
-          t.oauth_token_secret = account[1]['oauth_token_secret']
-        end
-        if @event['action'].eql?('resolve')
-          Twitter.update("RESOLVED - #{event_name}: #{@event['check']['notification']} Time: #{Time.now} ")
-        else
-          Twitter.update("ALERT - #{event_name}: #{@event['check']['notification']} Time: #{Time.now} ")
-        end
+      next unless @event['client']['subscriptions'].include?(account[1]['sensusub'])
+      Twitter.configure do |t|
+        t.consumer_key = account[1]['consumer_key']
+        t.consumer_secret = account[1]['consumer_secret']
+        t.oauth_token = account[1]['oauth_token']
+        t.oauth_token_secret = account[1]['oauth_token_secret']
+      end
+      if @event['action'].eql?('resolve')
+        Twitter.update("RESOLVED - #{event_name}: #{@event['check']['notification']} Time: #{Time.now} ")
+      else
+        Twitter.update("ALERT - #{event_name}: #{@event['check']['notification']} Time: #{Time.now} ")
       end
     end
   end

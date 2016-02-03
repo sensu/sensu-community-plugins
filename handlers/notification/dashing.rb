@@ -33,7 +33,7 @@ class DashingNotifier < Sensu::Handler
   def handle
     token = settings['dashing']['auth_token']
     data = @event['check']['output']
-    payload = { 'auth_token' => "#{token}", 'moreinfo' => "#{data}" }.to_json
+    payload = { 'auth_token' => token.to_s, 'moreinfo' => data.to_s }.to_json
 
     uri = URI.parse(settings['dashing']['host'])
     http = Net::HTTP.new(uri.host, uri.port)

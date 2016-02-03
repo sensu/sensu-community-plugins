@@ -70,16 +70,15 @@ class CephOsdMetrics < Sensu::Plugin::Metric::CLI::Graphite
     # #YELLOW
     Dir.glob(config[:pattern]).each do |socket| # rubocop:disable Style/Next
       data = `ceph --admin-daemon #{socket} perf dump`
-      if $CHILD_STATUS.exitstatus == 0
-        # Left side of wildcard
-        strip1 = config[:pattern].match(/^.*\*/).to_s.gsub(/\*/, '')
-        # Right side of wildcard
-        strip2 = config[:pattern].match(/\*.*$/).to_s.gsub(/\*/, '')
-        osd_num = socket.gsub(strip1, '').gsub(strip2, '')
-        JSON.parse(data).each do |k, v|
-          k = k.gsub(/\/$/, '').gsub(/\//, '_')
-          output_data(v, "#{osd_num}.#{k}")
-        end
+      next unless $CHILD_STATUS.exitstatus == 0
+      # Left side of wildcard
+      strip1 = config[:pattern].match(/^.*\*/).to_s.delete('*')
+      # Right side of wildcard
+      strip2 = config[:pattern].match(/\*.*$/).to_s.delete('*')
+      osd_num = socket.gsub(strip1, '').gsub(strip2, '')
+      JSON.parse(data).each do |k, v|
+        k = k.gsub(/\/$/, '').gsub(/\//, '_')
+        output_data(v, "#{osd_num}.#{k}")
       end
     end
     ok

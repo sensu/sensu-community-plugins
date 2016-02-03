@@ -29,10 +29,10 @@ class Pagerduty < Sensu::Handler
   end
 
   def handle
-    if @event['check']['pager_team']
-      api_key = settings[config[:json_config]][@event['check']['pager_team']]['api_key']
-    else
-      api_key = settings[config[:json_config]]['api_key']
+    api_key = if @event['check']['pager_team']
+                settings[config[:json_config]][@event['check']['pager_team']]['api_key']
+              else
+                settings[config[:json_config]]['api_key']
     end
     incident_key_prefix = settings[config[:json_config]]['incident_key_prefix']
     description_prefix = settings[config[:json_config]]['description_prefix']

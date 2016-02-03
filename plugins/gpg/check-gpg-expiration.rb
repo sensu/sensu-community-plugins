@@ -61,7 +61,7 @@ class CheckGpgExpire < Sensu::Plugin::Check::CLI
          long: '--id GPG_KEY_ID',
          required: true
 
-  GPG = '/usr/bin/gpg'
+  GPG = '/usr/bin/gpg'.freeze
 
   # Set things up
   def initialize

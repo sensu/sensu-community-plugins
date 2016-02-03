@@ -128,9 +128,9 @@ class SpringBootMetrics < Sensu::Plugin::Metric::CLI::Graphite
     if json_valid?(res.body)
       json = JSON.parse(res.body)
       json.each do |key, val|
-        if key.to_s.match(/^counter\.(.+)/)
+        if key.to_s =~ /^counter\.(.+)/
           output(config[:scheme] + '.' + key, val) if config[:counters]
-        elsif key.to_s.match(/^gauge\.(.+)/)
+        elsif key.to_s =~ /^gauge\.(.+)/
           output(config[:scheme] + '.' + key, val) if config[:gauges]
         else
           output(config[:scheme] + '.' + key, val)

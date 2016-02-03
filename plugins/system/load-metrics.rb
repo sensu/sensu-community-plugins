@@ -44,7 +44,7 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
          description: 'Metric naming scheme, text to prepend to .$parent.$child',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}"
+         default: Socket.gethostname.to_s
 
   option :per_core,
          description: 'Divide load average results by cpu/core count',
@@ -54,11 +54,11 @@ class LoadStat < Sensu::Plugin::Metric::CLI::Graphite
          default: false
 
   def number_of_cores
-    @cores ||= File.readlines('/proc/cpuinfo').select { |l| l =~ /^processor\s+:/ }.count
+    @cores ||= File.readlines('/proc/cpuinfo').count { |l| l =~ /^processor\s+:/ }
   end
 
   def run
-    result = `uptime`.gsub(',', '').split(' ')
+    result = `uptime`.delete(',').split(' ')
     result = result[-3..-1]
 
     timestamp = Time.now.to_i

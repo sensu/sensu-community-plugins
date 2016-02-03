@@ -103,7 +103,7 @@ class IOPingMetrics < Sensu::Plugin::Metric::CLI::Graphite
     'min' => 60,
     'hour' => 60 * 60,
     'day' => 24 * 60 * 60
-  }
+  }.freeze
   # #YELLOW
   STATS_HEADER = /min\/avg\/max\/mdev/ # rubocop:disable RegexpLiteral
 

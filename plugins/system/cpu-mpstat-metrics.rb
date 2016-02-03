@@ -57,7 +57,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def delta_cpu_metrics(baseline_cpus, sample_cpus)
     delta_cpus = {}
-    baseline_cpus.each do | cpu, columns|
+    baseline_cpus.each do |cpu, columns|
       delta_cpus[:"#{cpu}"] = {}
       columns.each do |task, time|
         delta_cpus[:"#{cpu}"][:"#{task}"] = sample_cpus[:"#{cpu}"][:"#{task}"] - time
@@ -77,7 +77,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
       # assumes architecture's jiffie is 1/100th of a second
       columns.each_pair do |task, time|
         # #YELLOW
-        time = time / cpu_count if "#{cpu}" == 'cpu' # rubocop:disable Style/SelfAssignment
+        time = time / cpu_count if cpu.to_s == 'cpu' # rubocop:disable Style/SelfAssignment
         output "#{config[:scheme]}.#{cpu}.#{task}", time
       end
     end

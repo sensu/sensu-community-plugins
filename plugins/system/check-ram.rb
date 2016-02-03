@@ -50,14 +50,14 @@ class CheckRAM < Sensu::Plugin::Check::CLI
     meminfo.each_line do |i|
       key, val = i.split(':')
       val = val.include?('kB') ? val.gsub(/\s+kB/, '') : val
-      memhash["#{key}"] = val.strip
+      memhash[key.to_s] = val.strip
     end
 
     total_ram = (memhash['MemTotal'].to_i << 10) >> 20
-    if memhash.key?('MemAvailable')
-      free_ram = (memhash['MemAvailable'].to_i << 10) >> 20
-    else
-      free_ram = ((memhash['MemFree'].to_i + memhash['Buffers'].to_i + memhash['Cached'].to_i) << 10) >> 20
+    free_ram = if memhash.key?('MemAvailable')
+                 (memhash['MemAvailable'].to_i << 10) >> 20
+               else
+                 ((memhash['MemFree'].to_i + memhash['Buffers'].to_i + memhash['Cached'].to_i) << 10) >> 20
     end
 
     if config[:megabytes]

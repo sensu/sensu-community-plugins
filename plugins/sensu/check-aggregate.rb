@@ -112,7 +112,7 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
     uri = "/aggregates/#{config[:check]}"
     issued = api_request(uri + "?age=#{config[:age]}" + (config[:limit] ? "&limit=#{config[:limit]}" : ''))
     # #YELLOW
-    unless issued.empty?  # rubocop:disable UnlessElse
+    unless issued.empty? # rubocop:disable UnlessElse
       issued_sorted = issued.sort
       time = issued_sorted.pop
       # #YELLOW
@@ -148,17 +148,16 @@ class CheckAggregate < Sensu::Plugin::Check::CLI
       # #YELLOW
       aggregate[:outputs].each do |output, _count| # rubocop:disable Style/Next
         matched = regex.match(output.to_s)
-        unless matched.nil?
-          key = matched[1]
-          value = matched[2..-1]
-          if mappings.key?(key)
-            # #YELLOW
-            unless mappings[key] == value  # rubocop:disable IfUnlessModifier, BlockNesting
-              critical message + " (#{key})"
-            end
+        next if matched.nil?
+        key = matched[1]
+        value = matched[2..-1]
+        if mappings.key?(key)
+          # #YELLOW
+          unless mappings[key] == value # rubocop:disable IfUnlessModifier, BlockNesting
+            critical message + " (#{key})"
           end
-          mappings[key] = value
         end
+        mappings[key] = value
       end
     end
   end

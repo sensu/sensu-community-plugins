@@ -57,13 +57,13 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
         fs, _type, _blocks, used, avail, capacity, _mnt = line.split
 
         timestamp = Time.now.to_i
-        if fs.match('/dev')
+        if fs =~ '/dev'
           fs = fs.gsub('/dev/', '')
           metrics = {
             disk: {
               "#{fs}.used" => used,
               "#{fs}.avail" => avail,
-              "#{fs}.capacity" => capacity.gsub('%', '')
+              "#{fs}.capacity" => capacity.delete('%')
             }
           }
           metrics.each do |parent, children|
@@ -83,13 +83,13 @@ class DiskCapacity < Sensu::Plugin::Metric::CLI::Graphite
         fs, _inodes, used, avail, capacity, _mnt = line.split
 
         timestamp = Time.now.to_i
-        if fs.match('/dev')
+        if fs =~ '/dev'
           fs = fs.gsub('/dev/', '')
           metrics = {
             disk: {
               "#{fs}.iused" => used,
               "#{fs}.iavail" => avail,
-              "#{fs}.icapacity" => capacity.gsub('%', '')
+              "#{fs}.icapacity" => capacity.delete('%')
             }
           }
           metrics.each do |parent, children|

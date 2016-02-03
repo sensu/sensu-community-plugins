@@ -55,10 +55,10 @@ class CheckQMAILQ < Sensu::Plugin::Check::CLI
   end
 
   def run
-    msg_ct = checkq("#{config[:type]}")
-    if msg_ct >= "#{config[:critical]}".to_i
+    msg_ct = checkq(config[:type].to_s)
+    if msg_ct >= config[:critical].to_s.to_i
       critical "#{msg_ct} messages in the #{config[:type]} queue"
-    elsif msg_ct >= "#{config[:warn]}".to_i
+    elsif msg_ct >= config[:warn].to_s.to_i
       warning "#{msg_ct} messages in the #{config[:type]} queue"
     else
       ok "#{msg_ct} messages in the #{config[:type]} queue"

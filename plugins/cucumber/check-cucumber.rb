@@ -153,21 +153,20 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     results.each do |feature|
       # #YELLOW
       Array(feature[:elements]).each do |element| # rubocop:disable Style/Next
-        if element[:type] == 'scenario'
-          event_name = "#{config[:name]}.#{generate_name_from_scenario(feature, element)}"
-          scenario_status = get_scenario_status(element)
+        next unless element[:type] == 'scenario'
+        event_name = "#{config[:name]}.#{generate_name_from_scenario(feature, element)}"
+        scenario_status = get_scenario_status(element)
 
-          sensu_events << generate_sensu_event(event_name, feature, element, scenario_status)
+        sensu_events << generate_sensu_event(event_name, feature, element, scenario_status)
 
-          metrics = generate_metrics_from_scenario(feature, element, scenario_status, utc_timestamp)
+        metrics = generate_metrics_from_scenario(feature, element, scenario_status, utc_timestamp)
 
-          unless metrics.nil?
-            sensu_events << generate_metric_event(event_name, metrics)
-          end
-
-          scenario_count += 1
-          status_counts[scenario_status] += 1
+        unless metrics.nil?
+          sensu_events << generate_metric_event(event_name, metrics)
         end
+
+        scenario_count += 1
+        status_counts[scenario_status] += 1
       end
     end
 
@@ -265,19 +264,19 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
     name = scenario[:id]
     name += ";#{feature[:profile]}" if feature.key? :profile
 
-    name = name.gsub(/\./, '-')
-      .gsub(/;/, '.')
-      .gsub(/[^a-zA-Z0-9\._-]/, '-')
-      .gsub(/^\.+/, '')
-      .gsub(/\.+$/, '')
-      .gsub(/\.+/, '.')
+    name = name.tr('.', '-')
+               .tr(';', '.')
+               .gsub(/[^a-zA-Z0-9\._-]/, '-')
+               .gsub(/^\.+/, '')
+               .gsub(/\.+$/, '')
+               .gsub(/\.+/, '.')
 
     parts = []
 
     name.split('.').each do |part|
       part = part.gsub(/^-+/, '')
-        .gsub(/-+$/, '')
-        .gsub(/-+/, '-')
+                 .gsub(/-+$/, '')
+                 .gsub(/-+/, '-')
 
       parts << part unless part.length == 0
     end
@@ -338,10 +337,10 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
       end
     end
 
-    if metrics.length == 0
-      metrics = nil
-    else
-      metrics = metrics.join("\n")
+    metrics = if metrics.length == 0
+                nil
+              else
+                metrics.join("\n")
     end
 
     metrics
@@ -448,13 +447,12 @@ class CheckCucumber < Sensu::Plugin::Check::CLI
 
     # #YELLOW
     Array(scenario[:steps]).each do |step| # rubocop:disable Style/Next
-      if step.key? :result
-        step_status = step[:result][:status]
+      next unless step.key? :result
+      step_status = step[:result][:status]
 
-        if %w(failed pending undefined).include? step_status
-          scenario_status = step_status.to_sym
-          break
-        end
+      if %w(failed pending undefined).include? step_status
+        scenario_status = step_status.to_sym
+        break
       end
     end
 

@@ -34,7 +34,7 @@ require 'sensu-plugin/check/cli'
 require 'fileutils'
 
 class CheckLog < Sensu::Plugin::Check::CLI
-  BASE_DIR = '/var/cache/check-log'
+  BASE_DIR = '/var/cache/check-log'.freeze
 
   option :state_auto,
          description: 'Set state file dir automatically using name',
@@ -154,10 +154,10 @@ class CheckLog < Sensu::Plugin::Check::CLI
     state_dir = config[:state_auto] || config[:state_dir]
 
     # Opens file using optional encoding page.  ex: 'iso8859-1'
-    if config[:encoding]
-      @log = File.open(log_file, "r:#{config[:encoding]}")
-    else
-      @log = File.open(log_file)
+    @log = if config[:encoding]
+             File.open(log_file, "r:#{config[:encoding]}")
+           else
+             File.open(log_file)
     end
 
     @state_file = File.join(state_dir, File.expand_path(log_file).sub(/^([A-Z]):\//, '\1/'))
@@ -187,20 +187,19 @@ class CheckLog < Sensu::Plugin::Check::CLI
       else
         m = line.match(config[:pattern]) unless line.match(config[:exclude])
       end
-      if m
-        accumulative_error += "\n" + line.slice(0, 250)
-        if m[1]
-          if config[:crit] && m[1].to_i > config[:crit]
-            n_crits += 1
-          elsif config[:warn] && m[1].to_i > config[:warn]
-            n_warns += 1
-          end
+      next unless m
+      accumulative_error += "\n" + line.slice(0, 250)
+      if m[1]
+        if config[:crit] && m[1].to_i > config[:crit]
+          n_crits += 1
+        elsif config[:warn] && m[1].to_i > config[:warn]
+          n_warns += 1
+        end
+      else
+        if config[:only_warn]
+          n_warns += 1
         else
-          if config[:only_warn]
-            n_warns += 1
-          else
-            n_crits += 1
-          end
+          n_crits += 1
         end
       end
     end

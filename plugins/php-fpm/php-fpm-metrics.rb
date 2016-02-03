@@ -39,20 +39,19 @@ class PhpfpmMetrics < Sensu::Plugin::Metric::CLI::Graphite
     # #YELLOW
     until found || attempts >= 10 # rubocop:disable Style/Next
       attempts += 1
-      if config[:url]
-        uri = URI.parse(config[:url])
-        http = Net::HTTP.new(uri.host, uri.port)
-        if uri.scheme == 'https'
-          http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
-        request = Net::HTTP::Get.new(uri.request_uri + '?xml', 'User-Agent' => "#{config[:agent]}")
-        response = http.request(request)
-        if response.code == '200'
-          found = true
-        elsif !response.header['location'].nil?
-          config[:url] = response.header['location']
-        end
+      next unless config[:url]
+      uri = URI.parse(config[:url])
+      http = Net::HTTP.new(uri.host, uri.port)
+      if uri.scheme == 'https'
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+      request = Net::HTTP::Get.new(uri.request_uri + '?xml', 'User-Agent' => config[:agent].to_s)
+      response = http.request(request)
+      if response.code == '200'
+        found = true
+      elsif !response.header['location'].nil?
+        config[:url] = response.header['location']
       end
     end # until
 

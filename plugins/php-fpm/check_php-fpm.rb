@@ -70,7 +70,7 @@ class CheckPHPFpm < Sensu::Plugin::Check::CLI
 
     if response.code == '200'
       if response.body == config[:response]
-        ok "#{config[:response]}"
+        ok config[:response].to_s
       else
         critical "#{response.body} instead of #{config[:response]}"
       end

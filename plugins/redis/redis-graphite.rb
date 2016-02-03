@@ -21,7 +21,7 @@ class Redis2Graphite < Sensu::Plugin::Metric::CLI::Graphite
                      'run_id', '^slave', 'used_memory_human', 'used_memory_peak_human',
                      'redis_mode', 'os', 'arch_bits', 'tcp_port',
                      'rdb_last_bgsave_status', 'aof_last_bgrewrite_status', 'config_file',
-                     'redis_build_id']
+                     'redis_build_id'].freeze
 
   option :host,
          short: '-h HOST',

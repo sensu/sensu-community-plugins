@@ -102,29 +102,28 @@ class CheckELBCerts < Sensu::Plugin::Check::CLI
     begin
       elb.load_balancers.each do |lb|
         lb.listeners.each do |listener| # rubocop:disable Style/Next
-          if listener.protocol.to_s == 'https'
-            url = URI.parse("https://#{lb.dns_name}:#{listener.port}")
-            http = Net::HTTP.new(url.host, url.port)
-            http.use_ssl = true
-            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-            cert = ''
+          next unless listener.protocol.to_s == 'https'
+          url = URI.parse("https://#{lb.dns_name}:#{listener.port}")
+          http = Net::HTTP.new(url.host, url.port)
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          cert = ''
 
-            begin
-              http.start { cert = http.peer_cert }
-            rescue => e
-              critical "An issue occurred attempting to get cert: #{e.message}"
-            end
+          begin
+            http.start { cert = http.peer_cert }
+          rescue => e
+            critical "An issue occurred attempting to get cert: #{e.message}"
+          end
 
-            cert_days_remaining = ((cert.not_after - Time.now) / 86_400).to_i
-            message = sprintf '%s(%d)', lb.name, cert_days_remaining
+          cert_days_remaining = ((cert.not_after - Time.now) / 86_400).to_i
+          message = sprintf '%s(%d)', lb.name, cert_days_remaining
 
-            if config[:crit_under] > 0 && config[:crit_under] >= cert_days_remaining
-              critical_message << message
-            elsif config[:warn_under] > 0 && config[:warn_under] >= cert_days_remaining
-              warning_message << message
-            else
-              ok_message << message
-            end
+          if config[:crit_under] > 0 && config[:crit_under] >= cert_days_remaining
+            critical_message << message
+          elsif config[:warn_under] > 0 && config[:warn_under] >= cert_days_remaining
+            warning_message << message
+          else
+            ok_message << message
           end
         end
       end

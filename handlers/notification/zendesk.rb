@@ -73,18 +73,18 @@ class Zendesk < Sensu::Handler
       timeout(60) do
         if settings['zendesk']['status_to_use'].include?(@event['check']['status'])
           ZendeskAPI::Ticket.create(
-              client,
-              subject: ticket_subject,
-              comment: { value: ticket_description },
-              submitter_id: client.current_user.id,
-              priority: settings['zendesk']['priority'] || 'urgent',
-              type: settings['zendesk']['type'] || 'incident',
-              tags: ticket_tags
+            client,
+            subject: ticket_subject,
+            comment: { value: ticket_description },
+            submitter_id: client.current_user.id,
+            priority: settings['zendesk']['priority'] || 'urgent',
+            type: settings['zendesk']['type'] || 'incident',
+            tags: ticket_tags
           )
         end
       end
-  rescue Timeout::Error
-    puts 'zendesk -- timed out while attempting to create a ticket for #{ticket_subject} --'
+    rescue Timeout::Error
+      puts 'zendesk -- timed out while attempting to create a ticket for #{ticket_subject} --'
     end
   end
 end

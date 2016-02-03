@@ -28,13 +28,12 @@ require_relative '../../../plugins/files/check_dir_count'
 require 'plugin_stub'
 
 describe DirCount, 'run' do
-
   include_context :plugin_stub
 
-  ROOTDIR = 'spec/fixtures/plugins/files'
+  ROOTDIR = 'spec/fixtures/plugins/files'.freeze
 
   before(:all) do
-    %w[another-sample-1, another-sample-2, another-sample-3, sample-1, sample-2, test-sample].each do |foldername|
+    %w(another-sample-1, another-sample-2, another-sample-3, sample-1, sample-2, test-sample).each do |foldername|
       FileUtils.mkdir_p "#{ROOTDIR}/#{foldername}"
     end
   end

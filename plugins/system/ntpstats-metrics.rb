@@ -44,7 +44,7 @@ class NtpStatsMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     # #YELLOW
-    unless config[:host] == 'localhost'  # rubocop:disable IfUnlessModifier
+    unless config[:host] == 'localhost' # rubocop:disable IfUnlessModifier
       config[:scheme] = config[:host]
     end
 

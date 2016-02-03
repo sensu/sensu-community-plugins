@@ -70,10 +70,10 @@ class BillingMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    if config[:scheme] == ''
-      graphitepath = 'billing'
-    else
-      graphitepath = config[:scheme]
+    graphitepath = if config[:scheme] == ''
+                     'billing'
+                   else
+                     config[:scheme]
     end
     begin
       AWS.config(aws_config)

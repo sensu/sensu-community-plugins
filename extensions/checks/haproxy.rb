@@ -83,7 +83,7 @@ module Sensu
             yield 'No services found', 1
           end
         else
-          percent_up = 100 * services.select { |svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' }.size / services.size
+          percent_up = 100 * services.count { |svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' } / services.size
           failed_names = services.reject { |svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' }.map { |svc| svc[:svname] }
           critical_sessions = services.select { |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > options[:session_crit_percent] }
           warning_sessions = services.select { |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > options[:session_warn_percent] }
@@ -128,10 +128,10 @@ module Sensu
 
       def acquire_services
         uri = URI.parse(options[:stats_source])
-        if uri.is_a?(URI::Generic) && File.socket?(uri.path)
-          out = socket_request
-        else
-          out = http_request
+        out = if uri.is_a?(URI::Generic) && File.socket?(uri.path)
+                socket_request
+              else
+                http_request
         end
 
         parsed = CSV.parse(out, skip_blanks: true)
@@ -140,7 +140,7 @@ module Sensu
         if options[:all_services]
           haproxy_stats
         else
-          regexp = options[:exact_match] ? Regexp.new("^#{options[:service]}$") : Regexp.new("#{options[:service]}")
+          regexp = options[:exact_match] ? Regexp.new("^#{options[:service]}$") : Regexp.new(options[:service].to_s)
           haproxy_stats.select do |svc|
             svc[:pxname] =~ regexp
             # #YELLOW

@@ -48,7 +48,7 @@ class GTALK < Sensu::Handler
         puts 'gtalk -- Connected'
         settings['gtalk']['recipients'].each do |rcp|
           puts "gtalk -- Sending alert to #{rcp}"
-          jabber.deliver(rcp, "#{body}")
+          jabber.deliver(rcp, body.to_s)
         end
         sleep(5)
         puts 'gtalk -- Alert successfully sent to recipients'

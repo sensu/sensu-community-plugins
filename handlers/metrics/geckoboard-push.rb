@@ -36,22 +36,20 @@ class GeckoboardPush < Sensu::Handler
     # #YELLOW
     metrics.split(/\n/).each do |m| # rubocop:disable Style/Next
       v = m.split(/\t/)
-      if checks.key?(v[0])
-        c = settings['geckoboard']['checks'][v[0]]
-        wk = c['widget_key']
+      next unless checks.key?(v[0])
+      c = settings['geckoboard']['checks'][v[0]]
+      wk = c['widget_key']
 
-        case c['type']
-        when 'number_and_secondary_value'
-          Geckoboard::Push.new(wk).number_and_secondary_value(v[1], v[1])
-        when 'geckometer'
-          Geckoboard::Push.new(wk).geckometer(v[1], c['min'], c['max'])
-        when 'piechart'
-          Geckoboard::Push.new(wk).pie(all)
-        when 'funnel'
-          Geckoboard::Push.new(wk).funnel(all)
-        end
+      case c['type']
+      when 'number_and_secondary_value'
+        Geckoboard::Push.new(wk).number_and_secondary_value(v[1], v[1])
+      when 'geckometer'
+        Geckoboard::Push.new(wk).geckometer(v[1], c['min'], c['max'])
+      when 'piechart'
+        Geckoboard::Push.new(wk).pie(all)
+      when 'funnel'
+        Geckoboard::Push.new(wk).funnel(all)
       end
-
     end
   end
 end

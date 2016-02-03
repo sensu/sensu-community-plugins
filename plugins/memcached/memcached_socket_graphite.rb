@@ -54,12 +54,12 @@ class MemcachedGraphite < Sensu::Plugin::Metric::CLI::Graphite
     stats = {}
     metrics = {}
     Timeout.timeout(30) do
-      TCPSocket.open("#{config[:host]}", "#{config[:port]}") do |socket|
+      TCPSocket.open(config[:host].to_s, config[:port].to_s) do |socket|
         socket.print "stats\r\n"
         socket.close_write
         recv = socket.read
         recv.each_line do |line|
-          stats[line.split(' ')[1]] = line.split(' ')[2] if line.match('STAT')
+          stats[line.split(' ')[1]] = line.split(' ')[2] if line =~ 'STAT'
         end
         metrics.update(sort_metrics(stats))
         metrics.each do |k, v|

@@ -28,7 +28,6 @@ require_relative '../../../plugins/files/check-file-size'
 require_relative '../../../spec_helper'
 
 describe CheckFileSize do
-
   it 'will fail with no parameters' do
   end
 
@@ -49,5 +48,4 @@ describe CheckFileSize do
 
   it 'returns CRITICAL if file size is over --critical value' do
   end
-
 end

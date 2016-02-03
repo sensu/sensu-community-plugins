@@ -76,7 +76,7 @@ class Mailer < Sensu::Handler
     json_config = config[:json_config] || 'mailer'
     admin_gui = settings[json_config]['admin_gui'] || 'http://localhost:8080/'
     mail_to = build_mail_to_list
-    mail_from =  settings[json_config]['mail_from']
+    mail_from = settings[json_config]['mail_from']
     reply_to = settings[json_config]['reply_to'] || mail_from
 
     delivery_method = settings[json_config]['delivery_method'] || 'smtp'
@@ -89,8 +89,8 @@ class Mailer < Sensu::Handler
     smtp_authentication = settings[json_config]['smtp_authentication'] || :plain
     smtp_enable_starttls_auto = settings[json_config]['smtp_enable_starttls_auto'] == 'false' ? false : true
     # try to redact passwords from output and command
-    output = "#{@event['check']['output']}".gsub(/(-p|-P|--password)\s*\S+/, '\1 <password redacted>')
-    command = "#{@event['check']['command']}".gsub(/(-p|-P|--password)\s*\S+/, '\1 <password redacted>')
+    output = (@event['check']['output']).to_s.gsub(/(-p|-P|--password)\s*\S+/, '\1 <password redacted>')
+    command = (@event['check']['command']).to_s.gsub(/(-p|-P|--password)\s*\S+/, '\1 <password redacted>')
 
     playbook = "Playbook:  #{@event['check']['playbook']}" if @event['check']['playbook']
     body = <<-BODY.gsub(/^\s+/, '')
@@ -107,18 +107,18 @@ class Mailer < Sensu::Handler
           BODY
 
     headers = {
-      'X-Sensu-Host'        => "#{@event['client']['name']}",
-      'X-Sensu-Timestamp'   => "#{Time.at(@event['check']['issued'])}",
-      'X-Sensu-Address'     => "#{@event['client']['address']}",
-      'X-Sensu-Check-Name'  => "#{@event['check']['name']}",
-      'X-Sensu-Status'      => "#{status_to_string}",
-      'X-Sensu-Occurrences' => "#{@event['occurrences']}"
+      'X-Sensu-Host'        => (@event['client']['name']).to_s,
+      'X-Sensu-Timestamp'   => Time.at(@event['check']['issued']).to_s,
+      'X-Sensu-Address'     => (@event['client']['address']).to_s,
+      'X-Sensu-Check-Name'  => (@event['check']['name']).to_s,
+      'X-Sensu-Status'      => status_to_string.to_s,
+      'X-Sensu-Occurrences' => (@event['occurrences']).to_s
     }
 
-    if @event['check']['notification'].nil?
-      subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
-    else
-      subject = "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
+    subject = if @event['check']['notification'].nil?
+                "#{action_to_string} - #{short_name}: #{status_to_string}"
+              else
+                "#{action_to_string} - #{short_name}: #{@event['check']['notification']}"
     end
 
     Mail.defaults do

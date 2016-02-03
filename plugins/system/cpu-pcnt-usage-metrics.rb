@@ -42,7 +42,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
       name = info.shift
 
       # we are matching TOTAL stats and returning a hash of values
-      if name.match(/^cpu$/)
+      if name =~ /^cpu$/
         # return the CPU metrics sample as a hash
         # filter out nil values, as some kernels don't have a 'guest' value
         return Hash[cpu_metrics.zip(info.map(&:to_i))].reject { |_key, value| value.nil? }

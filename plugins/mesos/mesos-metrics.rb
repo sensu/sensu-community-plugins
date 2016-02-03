@@ -45,7 +45,7 @@ class MesosMetrics < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Metric naming scheme',
          short: '-s SCHEME',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}"
+         default: Socket.gethostname.to_s
 
   option :server,
          description: 'Mesos Host',

@@ -84,7 +84,7 @@ TCP_STATES = {
   '09' => 'LAST_ACK',
   '0A' => 'LISTEN',
   '0B' => 'CLOSING'
-}
+}.freeze
 
 class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
@@ -106,15 +106,14 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
     # #YELLOW
     File.open('/proc/net/' + protocol).each do |line| # rubocop:disable Style/Next
       line.strip!
-      if m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
-        connection_state = m[5]
-        connection_port = m[2].to_i(16)
-        connection_state = TCP_STATES[connection_state]
-        if config[:port] && config[:port] == connection_port
-          state_counts[connection_state] += 1
-        elsif !config[:port]
-          state_counts[connection_state] += 1
-        end
+      next unless m = line.match(/^\s*\d+:\s+(.{8}):(.{4})\s+(.{8}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
+      connection_state = m[5]
+      connection_port = m[2].to_i(16)
+      connection_state = TCP_STATES[connection_state]
+      if config[:port] && config[:port] == connection_port
+        state_counts[connection_state] += 1
+      elsif !config[:port]
+        state_counts[connection_state] += 1
       end
     end
     state_counts
@@ -125,7 +124,7 @@ class NetstatTCPMetrics < Sensu::Plugin::Metric::CLI::Graphite
     netstat('tcp').each do |state, count|
       graphite_name = config[:port] ? "#{config[:scheme]}.#{config[:port]}.#{state}" :
         "#{config[:scheme]}.#{state}"
-      output "#{graphite_name}", count, timestamp
+      output graphite_name.to_s, count, timestamp
     end
     ok
   end

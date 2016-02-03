@@ -64,11 +64,11 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
 
   def run
     begin
-      manager = SNMP::Manager.new(host: "#{config[:host]}",
-                                  community: "#{config[:community]}",
+      manager = SNMP::Manager.new(host: config[:host].to_s,
+                                  community: config[:community].to_s,
                                   version: config[:snmp_version].to_sym,
                                   timeout: config[:timeout].to_i)
-      response = manager.get(["#{config[:objectid]}"])
+      response = manager.get([config[:objectid].to_s])
     rescue SNMP::RequestTimeout
       unknown "#{config[:host]} not responding"
     rescue => e
@@ -85,10 +85,10 @@ class CheckSNMP < Sensu::Plugin::Check::CLI
           critical "Value: #{vb.value} failed to match Pattern: #{config[:match]}"
         end
       else
-        critical 'Critical state detected' if "#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)
+        critical 'Critical state detected' if vb.value.to_s.to_i.send(symbol, config[:critical].to_s.to_i)
         # #YELLOW
-        warning 'Warning state detected' if ("#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)) && !("#{vb.value}".to_i.send(symbol, "#{config[:critical]}".to_i)) # rubocop:disable LineLength
-        unless "#{vb.value}".to_i.send(symbol, "#{config[:warning]}".to_i)
+        warning 'Warning state detected' if vb.value.to_s.to_i.send(symbol, config[:warning].to_s.to_i) && !vb.value.to_s.to_i.send(symbol, config[:critical].to_s.to_i) # rubocop:disable LineLength
+        unless vb.value.to_s.to_i.send(symbol, config[:warning].to_s.to_i)
           ok 'All is well!'
         end
       end

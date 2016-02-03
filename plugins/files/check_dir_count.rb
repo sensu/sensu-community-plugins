@@ -55,11 +55,9 @@ class DirCount < Sensu::Plugin::Check::CLI
          required: true
 
   def run
-    if File.directory?(config[:directory])
-      num_files = Dir.glob(File.join(config[:directory], config[:file_pattern])).count
-    else
-      num_files = nil
-    end
+    num_files = if File.directory?(config[:directory])
+                  Dir.glob(File.join(config[:directory], config[:file_pattern])).count
+                end
 
     if num_files.nil?
       unknown "Error listing files in #{config[:directory]}"

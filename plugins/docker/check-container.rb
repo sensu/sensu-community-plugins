@@ -47,7 +47,7 @@ class CheckDockerContainer < Sensu::Plugin::Check::CLI
          default: 'tcp://127.0.0.1:4243/'
 
   def run
-    Docker.url = "#{config[:url]}"
+    Docker.url = config[:url].to_s
 
     id = argv.first
     container = Docker::Container.get(id)

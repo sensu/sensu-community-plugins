@@ -98,10 +98,10 @@ class CheckRabbitStomp < Sensu::Plugin::Check::CLI
       conn.subscribe("/queue/#{config[:queue]}") do |_msg|
       end
       { 'status' => 'ok', 'message' => 'RabbitMQ server is alive' }
-     rescue Errno::ECONNREFUSED
-       { 'status' => 'critical', 'message' => 'TCP connection refused' }
-     rescue Stomp::Error::BrokerException => e
-       { 'status' => 'critical', 'message' => "Error from broker. Check auth details? #{e.message}" }
+    rescue Errno::ECONNREFUSED
+      { 'status' => 'critical', 'message' => 'TCP connection refused' }
+    rescue Stomp::Error::BrokerException => e
+      { 'status' => 'critical', 'message' => "Error from broker. Check auth details? #{e.message}" }
     rescue => e
       { 'status' => 'unknown', 'message' => "#{e.class}: #{e.message}" }
     end

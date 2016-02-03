@@ -115,7 +115,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
         warning
       end
     else
-      percent_up = 100 * services.select { |svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' }.size / services.size
+      percent_up = 100 * services.count { |svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' } / services.size
       failed_names = services.reject { |svc| svc[:status] == 'UP' || svc[:status] == 'OPEN' }.map { |svc| svc[:svname] }
       critical_sessions = services.select { |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > config[:session_crit_percent] }
       warning_sessions = services.select { |svc| svc[:slim].to_i > 0 && (100 * svc[:scur].to_f / svc[:slim].to_f) > config[:session_warn_percent] }
@@ -165,7 +165,7 @@ class CheckHAProxy < Sensu::Plugin::Check::CLI
     if config[:all_services]
       haproxy_stats
     else
-      regexp = config[:exact_match] ? Regexp.new("^#{config[:service]}$") : Regexp.new("#{config[:service]}")
+      regexp = config[:exact_match] ? Regexp.new("^#{config[:service]}$") : Regexp.new(config[:service].to_s)
       haproxy_stats.select do |svc|
         svc[:pxname] =~ regexp
         # #YELLOW

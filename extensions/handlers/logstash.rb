@@ -53,7 +53,7 @@ module Sensu
 
       def post_init
         @redis = Sensu::Redis.connect(options)
-        @redis.on_error do |error|
+        @redis.on_error do |_error|
           @logger.warn('Logstash handler: Redis instance not available on ' + options[:host])
         end
       end
@@ -208,7 +208,7 @@ module Sensu
           check = event[:check]
           state = check[:status]
           state_msg, _color, _notify = clarify_state(state, check)
-          status_msg = "#{event[:action].to_s.upcase}"
+          status_msg = event[:action].to_s.upcase.to_s
           tags = []
           tags.concat(client[:tags]) if client[:tags].is_a?(Array)
           tags.concat(check[:tags]) if check[:tags].is_a?(Array)

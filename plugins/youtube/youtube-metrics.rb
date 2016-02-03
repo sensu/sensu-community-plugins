@@ -56,7 +56,7 @@ class YoutubeMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
       stats  = Crack::XML.parse(res.body)
 
-      author =  stats['entry']['author']['name']
+      author = stats['entry']['author']['name']
       comments = stats['entry']['gd:comments']['gd:feedLink']['countHint']
       likes = stats['entry']['gd:rating']['numRaters']
       favorites = stats['entry']['yt:statistics']['favoriteCount']

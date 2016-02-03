@@ -106,7 +106,7 @@ class CheckSSLHost < Sensu::Plugin::Check::CLI
     # CA.
     valid = true
     parent = nil
-    certs.reverse.each do |c|
+    certs.reverse_each do |c|
       if parent
         valid &= c.verify(parent.public_key)
       end

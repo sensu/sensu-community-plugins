@@ -78,7 +78,7 @@ UNITS_FACTOR = {
   'MB' => 1024**2,
   'GB' => 1024**3,
   'TB' => 1024**4
-}
+}.freeze
 
 class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :hostname,
@@ -237,12 +237,11 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
         output "#{config[:scheme]}.key_cache.requests", m[4], @timestamp
       end
 
-      if m = line.match(/^Row Cache[^:]+: size ([0-9]+) \(bytes\), capacity ([0-9]+) \(bytes\), ([0-9]+) hits, ([0-9]+) requests/)
-        output "#{config[:scheme]}.row_cache.size", m[1], @timestamp
-        output "#{config[:scheme]}.row_cache.capacity", m[2], @timestamp
-        output "#{config[:scheme]}.row_cache.hits", m[3], @timestamp
-        output "#{config[:scheme]}.row_cache.requests", m[4], @timestamp
-      end
+      next unless m = line.match(/^Row Cache[^:]+: size ([0-9]+) \(bytes\), capacity ([0-9]+) \(bytes\), ([0-9]+) hits, ([0-9]+) requests/)
+      output "#{config[:scheme]}.row_cache.size", m[1], @timestamp
+      output "#{config[:scheme]}.row_cache.capacity", m[2], @timestamp
+      output "#{config[:scheme]}.row_cache.hits", m[3], @timestamp
+      output "#{config[:scheme]}.row_cache.requests", m[4], @timestamp
     end
   end
 
@@ -273,11 +272,11 @@ class CassandraMetrics < Sensu::Plugin::Metric::CLI::Graphite
   def parse_tpstats
     tpstats = nodetool_cmd('tpstats')
     tpstats.each_line do |line|
-      next if line.match(/^Pool Name/)
-      next if line.match(/^Message type/)
+      next if line =~ /^Pool Name/
+      next if line =~ /^Message type/
 
       if m = line.match(/^(\w+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/)
-        (thread, active, pending, completed, blocked, _) = m.captures
+        (thread, active, pending, completed, blocked, = m.captures
 
         output "#{config[:scheme]}.threadpool.#{thread}.active", active, @timestamp
         output "#{config[:scheme]}.threadpool.#{thread}.pending", pending, @timestamp

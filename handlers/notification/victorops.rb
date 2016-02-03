@@ -55,20 +55,19 @@ class VictorOps < Sensu::Handler
     state_message = description
     begin
       timeout(10) do
-
         case @event['action']
         when 'create'
-          case @event['check']['status']
-          when 1
-            message_type = 'WARNING'
-          else
-            message_type = 'CRITICAL'
+          message_type = case @event['check']['status']
+                         when 1
+                           'WARNING'
+                         else
+                           'CRITICAL'
           end
         when 'resolve'
           message_type = 'RECOVERY'
         end
 
-        payload = Hash.new
+        payload = {}
         payload[:message_type] = message_type
         payload[:state_message] = state_message.chomp
         payload[:entity_id] = entity_id

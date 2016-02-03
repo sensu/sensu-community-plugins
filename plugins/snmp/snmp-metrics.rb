@@ -69,17 +69,17 @@ class SNMPGraphite < Sensu::Plugin::Metric::CLI::Graphite
   def run
     mibs = config[:mibs].split(',')
     begin
-      manager = SNMP::Manager.new(host: "#{config[:host]}", community: "#{config[:community]}", version: config[:snmp_version].to_sym)
+      manager = SNMP::Manager.new(host: config[:host].to_s, community: config[:community].to_s, version: config[:snmp_version].to_sym)
       if config[:mibdir] && !mibs.empty?
         manager.load_modules(mibs, config[:mibdir])
       end
-      response = manager.get(["#{config[:objectid]}"])
+      response = manager.get([config[:objectid].to_s])
     rescue SNMP::RequestTimeout
       unknown "#{config[:host]} not responding"
     rescue => e
       unknown "An unknown error occured: #{e.inspect}"
     end
-    config[:host] = config[:host].gsub('.', '_') if config[:graphite]
+    config[:host] = config[:host].tr('.', '_') if config[:graphite]
     response.each_varbind do |vb|
       if config[:prefix]
         output "#{config[:prefix]}.#{config[:host]}.#{config[:suffix]}", vb.value.to_f

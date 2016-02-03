@@ -617,7 +617,7 @@ describe CheckCucumber do
         end
       end
 
-      ["123\ntext", "text\n123", "text\n123\ntext"].each do |string_value|
+      %W(123\ntext text\n123 text\n123\ntext).each do |string_value|
         describe "when an event data item is almost an integer and its value is #{string_value.gsub("\n", '\\n')}" do
           before(:each) do
             args = default_args.dup
@@ -1358,9 +1358,9 @@ def generate_sensu_event(options = {})
 
       if has_durations
         metrics.unshift([
-          "#{metric_prefix}.duration #{scenario_duration} 123",
-          "#{metric_prefix}.step-count #{scenario[:steps].length} 123"
-        ])
+                          "#{metric_prefix}.duration #{scenario_duration} 123",
+                          "#{metric_prefix}.step-count #{scenario[:steps].length} 123"
+                        ])
       end
     end
 
@@ -1373,7 +1373,7 @@ def generate_sensu_event(options = {})
       output: metrics,
       status: 0
     }
-    else
+  else
     name = options[:name] || "example-name.Feature-#{feature_index}.scenario-#{scenario_index}"
     data = {
       'status' => options[:status].to_s
@@ -1442,12 +1442,12 @@ def generate_output(options = {})
     errors = []
 
     Array(options[:errors]).each do |error|
-      if error.is_a? String
-        errors << {
-          'message' => error
-        }
-      else
-        errors << error
+      errors << if error.is_a? String
+                  {
+                    'message' => error
+                  }
+                else
+                  error
       end
     end
 

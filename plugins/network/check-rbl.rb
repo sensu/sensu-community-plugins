@@ -93,21 +93,18 @@ class RblCheck < Sensu::Plugin::Check::CLI
       critical_bls_set = critical_bls.split(',').to_set
     end
 
-    dnsbl_ret   = c.lookup("#{ip_add}")
+    dnsbl_ret   = c.lookup(ip_add.to_s)
     msg_string  = ''
     criticality = 0
 
     # #YELLOW
     dnsbl_ret.each do |dnsbl_result| # rubocop:disable Style/Next
-
-      if dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~ /blacklist/i
-        unless ignored_bls_set.member?(dnsbl_result.dnsbl)
-          msg_string =  "#{msg_string} #{dnsbl_result.dnsbl}"
-        end
-
-        criticality += 1 if critical_bls_set.member?(dnsbl_result.dnsbl)
+      next unless dnsbl_result.meaning =~ /spam/i || dnsbl_result.meaning =~ /blacklist/i
+      unless ignored_bls_set.member?(dnsbl_result.dnsbl)
+        msg_string = "#{msg_string} #{dnsbl_result.dnsbl}"
       end
 
+      criticality += 1 if critical_bls_set.member?(dnsbl_result.dnsbl)
     end
 
     # YELLOW
@@ -119,7 +116,7 @@ class RblCheck < Sensu::Plugin::Check::CLI
       end
     else
       msg_txt = "All is well. #{ip_add} has good reputation."
-      ok "#{msg_txt}"
+      ok msg_txt.to_s
     end
   end
 end

@@ -54,16 +54,16 @@ class CheckIMAP < Sensu::Plugin::Check::CLI
 
   def run
     Timeout.timeout(15) do
-      imap = Net::IMAP.new("#{config[:host]}")
-      status = imap.authenticate("#{config[:mech]}", "#{config[:user]}", "#{config[:pass]}")
+      imap = Net::IMAP.new(config[:host].to_s)
+      status = imap.authenticate(config[:mech].to_s, config[:user].to_s, config[:pass].to_s)
       unless status.nil?
         ok 'IMAP SERVICE WORKS FINE'
         imap.disconnect
       end
     end
-    rescue Timeout::Error
-      critical 'IMAP Connection timed out'
-    rescue => e
-      critical "Connection error: #{e.message}"
+  rescue Timeout::Error
+    critical 'IMAP Connection timed out'
+  rescue => e
+    critical "Connection error: #{e.message}"
   end
 end

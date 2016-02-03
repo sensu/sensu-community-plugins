@@ -71,7 +71,7 @@ class SidekiqCheck < Sensu::Plugin::Check::CLI
       unknown "Could not load Sidekiq stats from #{config[:url]}. Error: #{error}"
     end
 
-    maximum_latency   = stats['queues'].map { |name, data| data['latency'] }.max
+    maximum_latency   = stats['queues'].map { |_name, data| data['latency'] }.max
     total_concurrency = stats['processes'].map { |process| process['concurrency'] }.reduce(&:+) || 0
 
     if total_concurrency.zero?

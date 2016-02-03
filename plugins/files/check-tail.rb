@@ -77,7 +77,7 @@ class Tail < Sensu::Plugin::Check::CLI
         if pattern_match?
           send(
             # #YELLOW
-            config[:warn_only] ? :warning : :critical,  # rubocop:disable BlockNesting
+            config[:warn_only] ? :warning : :critical, # rubocop:disable BlockNesting
             "Pattern matched: #{config[:pattern]}"
           )
         else

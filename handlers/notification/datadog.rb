@@ -51,15 +51,15 @@ class DatadogNotif < Sensu::Handler
       timeout(3) do
         dog = Dogapi::Client.new(settings['datadog']['api_key'], settings['datadog']['app_key'])
         response = dog.emit_event(Dogapi::Event.new(
-                                            description,
-                                            msg_title: @event['check']['name'],
-                                            tags: tags,
-                                            alert_type: action,
-                                            priority: priority,
-                                            source_type_name: 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
-                                            aggregation_key: @event['check']['name']
-                                          ), host: @event['client']['name']
-                        )
+                                    description,
+                                    msg_title: @event['check']['name'],
+                                    tags: tags,
+                                    alert_type: action,
+                                    priority: priority,
+                                    source_type_name: 'nagios', # make events appear as nagios alerts so the weekly nagios report can be produced
+                                    aggregation_key: @event['check']['name']
+        ), host: @event['client']['name']
+                                 )
 
         begin
           if response[0] == '202'

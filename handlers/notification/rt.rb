@@ -33,7 +33,7 @@ class RT < Sensu::Handler
     server = 'http://localhost/'
     queue = 'queue'
     uri = URI("#{server}/REST/1.0/ticket/new")
-    stat = "#{@event['check']['output']}".chomp
+    stat = (@event['check']['output']).to_s.chomp
     body = <<-BODY.gsub(/^ {14}/, '')
       #{stat}
             Host: #{@event['client']['name']}

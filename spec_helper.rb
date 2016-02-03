@@ -1,7 +1,6 @@
 require 'rspec'
 
 RSpec.configure do |config|
-
   config.order = :random
   config.before(:all) do
     config.fail_fast = true
@@ -15,7 +14,5 @@ RSpec.configure do |config|
         end
       end
     end
-
   end
-
 end

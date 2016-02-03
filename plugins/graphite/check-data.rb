@@ -231,7 +231,7 @@ class CheckGraphiteData < Sensu::Plugin::Check::CLI
 
   # Check is value is above defined threshold
   def above?(type)
-    (!config[:below]) && (@data.last > config[type]) && (!decreased?)
+    !config[:below] && (@data.last > config[type]) && !decreased?
   end
 
   # Check if values have decreased within interval if given

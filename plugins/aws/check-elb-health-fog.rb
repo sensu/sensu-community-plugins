@@ -109,7 +109,7 @@ class ELBHealth < Sensu::Plugin::Check::CLI
         ok "All instances on ELB #{aws_region}::#{config[:elb_name]} healthy!"
       else
         if config[:verbose]
-          critical "Unhealthy instances detected: #{unhealthy_instances.map { |id, state| '[' + id + '::' + state + ']' }.join(' ') }"
+          critical "Unhealthy instances detected: #{unhealthy_instances.map { |id, state| '[' + id + '::' + state + ']' }.join(' ')}"
         else
           critical "Detected [#{unhealthy_instances.size}] unhealthy instances"
         end

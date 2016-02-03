@@ -71,22 +71,21 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
     processes_found = 0
     # #YELLOW
     app_status.each_line do |line| # rubocop:disable Style/Next
-      if line =~ /(pid:)/
-        processes_found += 1
-        case line
-        when /unmonitored$/
-          out[:warn] << "#{name}::#{line}".strip
-          next
-        when /starting$/
-          out[:warn] << "#{name}::#{line}".strip
-          next
-        when /down$/
-          out[:crit] << "#{name}::#{line}".strip
-          next
-        when /up$/
-          out[:ok] << "#{name}::#{line}".strip
-          next
-        end
+      next unless line =~ /(pid:)/
+      processes_found += 1
+      case line
+      when /unmonitored$/
+        out[:warn] << "#{name}::#{line}".strip
+        next
+      when /starting$/
+        out[:warn] << "#{name}::#{line}".strip
+        next
+      when /down$/
+        out[:crit] << "#{name}::#{line}".strip
+        next
+      when /up$/
+        out[:ok] << "#{name}::#{line}".strip
+        next
       end
     end
     out[:err] << name if processes_found == 0
@@ -119,7 +118,7 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
 
     if config[:apps]
       requested_apps = config[:apps].split(',').map(&:strip) || []
-      puts "***** DEBUG: requested applications: #{requested_apps }*****" if config[:debug]
+      puts "***** DEBUG: requested applications: #{requested_apps}*****" if config[:debug]
       requested_apps.each do |a|
         out = merge_output(out, bluepill_application_status(a))
       end
@@ -142,12 +141,11 @@ class CheckBluepill < Sensu::Plugin::Check::CLI
         # get here if -a option is unset.
         # #YELLOW
         bluepill_status.each_line do |line| # rubocop:disable Style/Next
-          if line =~ /^\s \d\.\s/
-            app_name = line.split(/^\s \d\.\s/)[1].strip
-            # #YELLOW
-            puts "***** DEBUG: found an application: #{app_name} *****" if config[:debug] # rubocop:disable BlockNesting
-            out = merge_output(out, bluepill_application_status(app_name))
-          end
+          next unless line =~ /^\s \d\.\s/
+          app_name = line.split(/^\s \d\.\s/)[1].strip
+          # #YELLOW
+          puts "***** DEBUG: found an application: #{app_name} *****" if config[:debug] # rubocop:disable BlockNesting
+          out = merge_output(out, bluepill_application_status(app_name))
         end
       end
     end

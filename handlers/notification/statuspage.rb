@@ -56,8 +56,6 @@ class StatusPage < Sensu::Handler
                      'major_outage'
                    when 'resolve'
                      'operational'
-                   else
-                     nil
                    end
           unless status.nil?
             statuspage.update_component(

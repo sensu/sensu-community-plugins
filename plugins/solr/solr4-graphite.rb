@@ -100,7 +100,7 @@ class Solr4Graphite < Sensu::Plugin::Metric::CLI::Graphite
       end
 
       mbeans_json['solr-mbeans']['UPDATEHANDLER']['updateHandler']['stats'].each do |stat, value|
-        output "#{graphite_path}.updateHandler.#{stat.gsub(' ', '_')}", value if value.is_a?(Numeric)
+        output "#{graphite_path}.updateHandler.#{stat.tr(' ', '_')}", value if value.is_a?(Numeric)
       end
 
       # cache stats

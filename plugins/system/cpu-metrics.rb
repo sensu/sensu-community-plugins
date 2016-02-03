@@ -45,7 +45,7 @@ class CpuGraphite < Sensu::Plugin::Metric::CLI::Graphite
       next if info.empty?
       name = info.shift
 
-      if name.match(/cpu([0-9]+|)/)
+      if name =~ /cpu([0-9]+|)/
         # #YELLOW
         cpu_count = cpu_count + 1 # rubocop:disable Style/SelfAssignment
         name = 'total' if name == 'cpu'

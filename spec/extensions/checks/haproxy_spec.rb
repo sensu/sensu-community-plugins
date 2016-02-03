@@ -249,7 +249,5 @@ generic-service,BACKEND,0,0,0'
         expect(message).to include('Failed to fetch from')
       end
     end
-
   end
-
 end

@@ -139,7 +139,7 @@ class CheckSftp < Sensu::Plugin::Check::CLI
 
   def check_file_age
     # #YELLOW
-    if config[:check_older]  # rubocop:disable GuardClause
+    if config[:check_older] # rubocop:disable GuardClause
       run_at    = Time.now
       old_files = matching_files.select { |f| (run_at.to_i - f.attributes.mtime) > config[:check_older] }
       unless old_files.empty?

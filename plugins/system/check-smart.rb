@@ -49,7 +49,7 @@ class Disk
     check_health! if smart_capable?
   end
   attr_reader :capability_output, :health_output, :smart_healthy
-  alias_method :healthy?, :smart_healthy
+  alias healthy? smart_healthy
 
   def smart_capable?
     @smart_available && @smart_enabled
@@ -97,7 +97,7 @@ class CheckSMART < Sensu::Plugin::Check::CLI
 
   def run
     # #YELLOW
-    unless @devices.length > 0  # rubocop:disable IfUnlessModifier
+    unless @devices.length > 0 # rubocop:disable IfUnlessModifier
       unknown 'No SMART capable devices found'
     end
 

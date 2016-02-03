@@ -148,7 +148,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
 
       message += "#{msg} " unless s == 0
       status = s unless s < status
-      status = s unless s > status if config[:below]
+      status = s if config[:below] && !s > status
     end
 
     if status == 2

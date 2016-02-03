@@ -50,16 +50,16 @@ module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
       end
     end
 
-    def run(event, &block)
+    def run(event, &_block)
       client_name = event[:client][:name]
-      if @reverse
-        renamed_client_name = client_name.split('.').reverse.join('.')
-      else
-        renamed_client_name = client_name
+      renamed_client_name = if @reverse
+                              client_name.split('.').reverse.join('.')
+                            else
+                              client_name
       end
       renamed_client_name = renamed_client_name.gsub('.', @replace)
       mutated = event[:check][:output].gsub(client_name, renamed_client_name)
-      block.call(mutated, 0)
+      yield mutated, 0
     end
   end
 end

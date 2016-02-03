@@ -50,13 +50,13 @@ class MemoryGraphite < Sensu::Plugin::Metric::CLI::Graphite
   def metrics_hash
     mem = {}
     meminfo_output.each_line do |line|
-      mem['total']     = line.split(/\s+/)[1].to_i * 1024 if line.match(/^MemTotal/)
-      mem['free']      = line.split(/\s+/)[1].to_i * 1024 if line.match(/^MemFree/)
-      mem['buffers']   = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Buffers/)
-      mem['cached']    = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Cached/)
-      mem['swapTotal'] = line.split(/\s+/)[1].to_i * 1024 if line.match(/^SwapTotal/)
-      mem['swapFree']  = line.split(/\s+/)[1].to_i * 1024 if line.match(/^SwapFree/)
-      mem['dirty']     = line.split(/\s+/)[1].to_i * 1024 if line.match(/^Dirty/)
+      mem['total']     = line.split(/\s+/)[1].to_i * 1024 if line =~ /^MemTotal/
+      mem['free']      = line.split(/\s+/)[1].to_i * 1024 if line =~ /^MemFree/
+      mem['buffers']   = line.split(/\s+/)[1].to_i * 1024 if line =~ /^Buffers/
+      mem['cached']    = line.split(/\s+/)[1].to_i * 1024 if line =~ /^Cached/
+      mem['swapTotal'] = line.split(/\s+/)[1].to_i * 1024 if line =~ /^SwapTotal/
+      mem['swapFree']  = line.split(/\s+/)[1].to_i * 1024 if line =~ /^SwapFree/
+      mem['dirty']     = line.split(/\s+/)[1].to_i * 1024 if line =~ /^Dirty/
     end
 
     mem['swapUsed'] = mem['swapTotal'] - mem['swapFree']

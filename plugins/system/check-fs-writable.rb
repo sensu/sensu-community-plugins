@@ -57,7 +57,7 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
     if @crit_pt_test.empty? && @crit_pt_proc.empty?
       ok 'All filesystems are writable'
     elsif @crit_pt_test || @crit_pt_proc
-      critical "The following file systems are not writeable: #{ @crit_pt_test }, #{@crit_pt_proc}"
+      critical "The following file systems are not writeable: #{@crit_pt_test}, #{@crit_pt_proc}"
     end
   end
 
@@ -66,20 +66,20 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
   end
 
   def rw_in_proc?(mount_info)
-    mount_info.each  do |pt|
-      @crit_pt_proc <<  "#{ pt.split[0] }" if pt.split[1] != 'rw'
+    mount_info.each do |pt|
+      @crit_pt_proc << pt.split[0].to_s if pt.split[1] != 'rw'
     end
   end
 
   def rw_test?(mount_info)
     mount_info.each do |pt|
-      (Dir.exist? pt.split[0]) || (@crit_pt_test << "#{ pt.split[0] }")
+      (Dir.exist? pt.split[0]) || (@crit_pt_test << pt.split[0].to_s)
       file = Tempfile.new('.sensu', pt.split[0])
-      puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
+      puts "The temp file we are writing to is: #{file.path}" if config[:debug]
       # #YELLOW
       #  need to add a check here to validate permissions, if none it pukes
-      file.write('mops') || @crit_pt_test <<  "#{ pt.split[0] }"
-      file.read || @crit_pt_test <<  "#{ pt.split[0] }"
+      file.write('mops') || @crit_pt_test << pt.split[0].to_s
+      file.read || @crit_pt_test << pt.split[0].to_s
       file.close
       file.unlink
     end
@@ -95,19 +95,19 @@ class CheckFSWritable < Sensu::Plugin::Check::CLI
     puts 'This is a list of mount_pts and their current status: ', mount_info if config[:debug]
     rw_in_proc?(mount_info)
     rw_test?(mount_info)
-    puts "The critical mount points according to proc are: #{ @crit_pt_proc }" if config[:debug]
-    puts "The critical mount points according to actual testing are: #{ @crit_pt_test }" if config[:debug]
+    puts "The critical mount points according to proc are: #{@crit_pt_proc}" if config[:debug]
+    puts "The critical mount points according to actual testing are: #{@crit_pt_test}" if config[:debug]
   end
 
   def manual_test
     config[:dir].each do |d|
-      (Dir.exist? d) || (@crit_pt_test << "#{ d }")
+      (Dir.exist? d) || (@crit_pt_test << d.to_s)
       file = Tempfile.new('.sensu', d)
-      puts "The temp file we are writing to is: #{ file.path }" if config[:debug]
+      puts "The temp file we are writing to is: #{file.path}" if config[:debug]
       # #YELLOW
       #  need to add a check here to validate permissions, if none it pukes
-      file.write('mops') || @crit_pt_test <<  "#{ d }"
-      file.read || @crit_pt_test <<  "#{ d }"
+      file.write('mops') || @crit_pt_test << d.to_s
+      file.read || @crit_pt_test << d.to_s
       file.close
       file.unlink
     end

@@ -93,10 +93,10 @@ class ProcStatus < Sensu::Plugin::Metric::CLI::Graphite
     metric_names = config[:metrics].split(',')
     proc_status_lines = `cat /proc/#{pid}/status`.split("\n")
 
-    out = { "#{cmdline}" => {} }
+    out = { cmdline.to_s => {} }
 
     metric_names.each do |m|
-      line = proc_status_lines.select { |x| /^#{m}/.match(x) }.first
+      line = proc_status_lines.find { |x| /^#{m}/.match(x) }
       val = line ? line.split("\t")[1].to_i : nil
       out[cmdline.to_s][m] = val
     end

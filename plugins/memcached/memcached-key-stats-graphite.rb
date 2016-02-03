@@ -60,19 +60,18 @@ class MemcachedKeyStatsGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     Timeout.timeout(config[:timeout]) do
-      TCPSocket.open("#{config[:host]}", "#{config[:port]}") do |socket|
+      TCPSocket.open(config[:host].to_s, config[:port].to_s) do |socket|
         socket.print "stats detail dump\r\n"
         socket.close_write
         recv = socket.read
         # #YELLOW
         recv.each_line do |line| # rubocop:disable Style/Next
-          if line.match('PREFIX')
-            _, key, _, get, _, hit, _, set, _, del = line.split(' ', -1)
-            output "#{config[:scheme]}.#{key}.get", get.to_i
-            output "#{config[:scheme]}.#{key}.hit", hit.to_i
-            output "#{config[:scheme]}.#{key}.set", set.to_i
-            output "#{config[:scheme]}.#{key}.del", del.to_i
-          end
+          next unless line =~ 'PREFIX'
+          _, key, _, get, _, hit, _, set, _, del = line.split(' ', -1)
+          output "#{config[:scheme]}.#{key}.get", get.to_i
+          output "#{config[:scheme]}.#{key}.hit", hit.to_i
+          output "#{config[:scheme]}.#{key}.set", set.to_i
+          output "#{config[:scheme]}.#{key}.del", del.to_i
         end
       end
     end

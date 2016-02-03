@@ -93,7 +93,7 @@ class CheckRabbitMQCluster < Sensu::Plugin::Check::CLI
     port     = config[:port]
     username = config[:username]
     password = config[:password]
-    nodes   =  config[:nodes].split(',')
+    nodes =  config[:nodes].split(',')
 
     begin
       resource = RestClient::Resource.new "http://#{host}:#{port}/api/nodes", username, password
@@ -108,12 +108,12 @@ class CheckRabbitMQCluster < Sensu::Plugin::Check::CLI
 
       # build status and message
       status = failed_nodes.empty? && missing_nodes.empty? ? 'ok' : 'critical'
-      if failed_nodes.empty?
-        message = "#{servers_status.keys.count} healthy cluster nodes"
-      else
-        message = "#{failed_nodes.count} failed cluster node: #{failed_nodes.sort.join(',')}"
+      message = if failed_nodes.empty?
+                  "#{servers_status.keys.count} healthy cluster nodes"
+                else
+                  "#{failed_nodes.count} failed cluster node: #{failed_nodes.sort.join(',')}"
       end
-      message.prepend("#{missing_nodes.count } node(s) not found: #{missing_nodes.join(',')}. ") unless missing_nodes.empty?
+      message.prepend("#{missing_nodes.count} node(s) not found: #{missing_nodes.join(',')}. ") unless missing_nodes.empty?
       { 'status' => status, 'message' => message }
     rescue Errno::ECONNREFUSED => e
       { 'status' => 'critical', 'message' => e.message }

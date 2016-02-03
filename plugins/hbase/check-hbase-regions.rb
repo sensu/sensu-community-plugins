@@ -57,7 +57,7 @@ module SensuUtils
     'WARNING' => 1,
     'CRITICAL' => 2,
     'UNKNOWN' => 3
-  }
+  }.freeze
 
   def output(fn, *args)
     puts "#{fn.upcase}: #{args}"

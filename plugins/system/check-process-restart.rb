@@ -50,7 +50,7 @@ class CheckProcessRestart < Sensu::Plugin::Check::CLI
          short: '-c CRIT',
          default: 2
 
-  CHECK_RESTART = '/usr/sbin/checkrestart'
+  CHECK_RESTART = '/usr/sbin/checkrestart'.freeze
 
   # Set path for the checkrestart script
   def initialize
@@ -94,7 +94,7 @@ class CheckProcessRestart < Sensu::Plugin::Check::CLI
     end
 
     checkrestart_out = run_checkrestart
-    if /^Failed/.match(checkrestart_out[:found])
+    if /^Failed/ =~ checkrestart_out[:found]
       unknown checkrestart_out[:found]
     end
     message JSON.generate(checkrestart_out)

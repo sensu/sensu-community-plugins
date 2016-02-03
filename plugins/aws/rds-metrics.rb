@@ -135,11 +135,10 @@ class RDSMetrics < Sensu::Plugin::Metric::CLI::Graphite
           r = cw.get_metric_statistics(options)
           result[rdsname + '.' + key] = r[:datapoints][0] unless r[:datapoints][0].nil?
         end
-        unless result.nil?
-          # We only return data when we have some to return
-          result.each do |key, value|
-            output graphitepath + "#{key.downcase}", value.to_a.last[1], value[:timestamp].to_i
-          end
+        next if result.nil?
+        # We only return data when we have some to return
+        result.each do |key, value|
+          output graphitepath + key.downcase.to_s, value.to_a.last[1], value[:timestamp].to_i
         end
       end
     rescue => e

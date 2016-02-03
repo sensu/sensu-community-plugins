@@ -84,7 +84,7 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
          short: '-f BACKEND1[,BACKEND2]',
          long: '--backends BACKEND1[,BACKEND2]',
          proc: proc { |l| l.split(',') },
-         default: []  # an empty list means show all backends
+         default: [] # an empty list means show all backends
 
   option :server_metrics,
          description: 'Add metrics for backend servers',
@@ -175,7 +175,6 @@ class HAProxyMetrics < Sensu::Plugin::Metric::CLI::Graphite
       elsif config[:server_metrics]
         output "#{config[:scheme]}.#{line[0]}.#{line[1]}.session_total", line[7]
       end
-
     end
 
     ok

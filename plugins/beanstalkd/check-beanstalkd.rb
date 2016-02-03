@@ -85,7 +85,7 @@ class BeanstalkdQueuesStatus < Sensu::Plugin::Check::CLI
   end
 
   def run
-    stats = acquire_beanstalkd_connection.tubes["#{config[:tube]}"].stats
+    stats = acquire_beanstalkd_connection.tubes[config[:tube].to_s].stats
     message 'All queues are healthy'
 
     warns, crits, msg = check_queues(stats)

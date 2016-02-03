@@ -35,13 +35,12 @@ class NexmoSMS < Sensu::Handler
 
     recipients = []
     # #YELLOW
-    candidates.each do |mobile, candidate|  # rubocop:disable Style/Next
-      if ((candidate['sensu_roles'].include?('all')) ||
+    candidates.each do |mobile, candidate| # rubocop:disable Style/Next
+      next unless (candidate['sensu_roles'].include?('all') ||
           ((candidate['sensu_roles'] & @event['check']['subscribers']).size > 0) ||
-          (candidate['sensu_checks'].include?(@event['check']['name']))) &&
-          (candidate['sensu_level'] >= @event['check']['status'])
-        recipients << mobile
-      end
+          candidate['sensu_checks'].include?(@event['check']['name'])) &&
+                  (candidate['sensu_level'] >= @event['check']['status'])
+      recipients << mobile
     end
 
     message = "Sensu #{action_to_string}: #{short_name} (#{@event['client']['address']}) #{@event['check']['output']}"

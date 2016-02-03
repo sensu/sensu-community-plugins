@@ -54,23 +54,20 @@ class Check3wareStatus < Sensu::Plugin::Check::CLI
   def parse_disks!(data, controller)
     # #YELLOW
     data.lines.each do |line| # rubocop:disable Style/Next
-      unless line.empty?
-        splitted = line.split
-        if /^[p][0-9]+$/ =~ splitted[0]
-          # '-' means the drive doesn't belong to any array
-          # If is NOT PRESENT too, it just means this is an empty port
-          status = splitted[1]
-          name = splitted[0]
-          unit = splitted[2]
-          if unit != '-' && unit != 'NOT-PRESENT'
-            # #YELLOW
-            if status == 'OK' # rubocop:disable BlockNesting
-              @good_disks << controller + unit + name + ': ' + status
-            else
-              @bad_disks << controller + unit + name + ': ' + status
-            end
-          end
-        end
+      next if line.empty?
+      splitted = line.split
+      next unless /^[p][0-9]+$/ =~ splitted[0]
+      # '-' means the drive doesn't belong to any array
+      # If is NOT PRESENT too, it just means this is an empty port
+      status = splitted[1]
+      name = splitted[0]
+      unit = splitted[2]
+      next unless unit != '-' && unit != 'NOT-PRESENT'
+      # #YELLOW
+      if status == 'OK' # rubocop:disable BlockNesting
+        @good_disks << controller + unit + name + ': ' + status
+      else
+        @bad_disks << controller + unit + name + ': ' + status
       end
     end
   end

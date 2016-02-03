@@ -20,10 +20,10 @@ class ImkayacNotif < Sensu::Handler
     message = @event['check']['notification'] || @event['check']['output']
     begin
       timeout(3) do
-        p ImKayac.to("#{user}").password("#{pass}").post("#{event_action} - #{event_name} - #{message}")
+        p ImKayac.to(user.to_s).password(pass.to_s).post("#{event_action} - #{event_name} - #{message}")
       end
-      rescue Timeout::Error
-        puts 'im.kayac -- timed out while attempting to message'
+    rescue Timeout::Error
+      puts 'im.kayac -- timed out while attempting to message'
     end
   end
 end

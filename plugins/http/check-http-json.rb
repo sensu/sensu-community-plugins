@@ -147,7 +147,7 @@ class CheckJson < Sensu::Plugin::Check::CLI
   end
 
   def json_has_value?(json, k, v)
-    if k.match(/,/)
+    if k =~ /,/
       # nested keys
       return nested_value?(json, k.split(','), v)
     else

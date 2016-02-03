@@ -51,7 +51,7 @@ class HttpJsonGraphite < Sensu::Plugin::Metric::CLI::Graphite
          description: 'Metric naming scheme',
          short: '-s SCHEME',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}"
+         default: Socket.gethostname.to_s
 
   option :metric,
          description: 'Metric/JSON key pair ex:Connections::numConnections',
@@ -64,34 +64,33 @@ class HttpJsonGraphite < Sensu::Plugin::Metric::CLI::Graphite
          long: '--object OBJECT'
 
   def run
-    scheme = "#{config[:scheme]}"
-    metric_pair_input = "#{config[:metric]}"
+    scheme = config[:scheme].to_s
+    metric_pair_input = config[:metric].to_s
     if config[:object]
-      object = "#{config[:object]}"
+      object = config[:object].to_s
     end
-    url = URI.encode("#{config[:url]}")
+    url = URI.encode(config[:url].to_s)
     begin
       r = RestClient.get url
       metric_pair_array = metric_pair_input.split(/,/)
       metric_pair_array.each do |m|
         metric, attribute = m.to_s.split(/::/)
-        unless object.nil?
-          JSON.parse(r)[object].each do |k, v|
-            if k == attribute
-              output([scheme, metric].join('.'), v)
-            end
+        next if object.nil?
+        JSON.parse(r)[object].each do |k, v|
+          if k == attribute
+            output([scheme, metric].join('.'), v)
           end
-          JSON.parse(r).each do |k, v|
-            if k == attribute
-              output([scheme, metric].join('.'), v)
-            end
+        end
+        JSON.parse(r).each do |k, v|
+          if k == attribute
+            output([scheme, metric].join('.'), v)
           end
         end
       end
-      rescue Errno::ECONNREFUSED
-        critical "#{config[:url]} is not responding"
-      rescue RestClient::RequestTimeout
-        critical "#{config[:url]} Connection timed out"
+    rescue Errno::ECONNREFUSED
+      critical "#{config[:url]} is not responding"
+    rescue RestClient::RequestTimeout
+      critical "#{config[:url]} Connection timed out"
     end
     ok
   end

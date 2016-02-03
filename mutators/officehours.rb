@@ -33,7 +33,7 @@ require 'time'
 event = JSON.parse(STDIN.read, symbolize_names: true)
 @t = Time.now
 @start_time = '9:00'
-@end_time =  '17:00'
+@end_time = '17:00'
 @gmt_offset = '+0:00'
 
 def office_hours?
@@ -46,9 +46,11 @@ end
 
 # mutate the event based on office hours or not
 if office_day? && office_hours?
-  event.merge!(mutated: true, office_hours: true)
+  event[:mutated] = true
+  event[:office_hours] = true
 else
-  event.merge!(mutated: true, office_hours: false)
+  event[:mutated] = true
+  event[:office_hours] = false
 end
 
 # output modified event

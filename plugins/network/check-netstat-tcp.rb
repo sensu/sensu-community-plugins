@@ -74,7 +74,7 @@ TCP_STATES = {
   '09' => 'LAST_ACK',
   '0A' => 'LISTEN',
   '0B' => 'CLOSING'
-}
+}.freeze
 
 class CheckNetstatTCP < Sensu::Plugin::Check::CLI
   option :states,
@@ -112,16 +112,15 @@ class CheckNetstatTCP < Sensu::Plugin::Check::CLI
       # #YELLOW
       File.open('/proc/net/' + protocol).each do |line| # rubocop:disable Style/Next
         line.strip!
-        if m = line.match(/^\s*\d+:\s+(.{8}|.{32}):(.{4})\s+(.{8}|.{32}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
-          connection_state = m[5]
-          connection_port = m[2].to_i(16)
-          connection_state = TCP_STATES[connection_state]
-          next unless config[:states].include?(connection_state)
-          if config[:port] && config[:port] == connection_port
-            state_counts[connection_state] += 1
-          elsif !config[:port]
-            state_counts[connection_state] += 1
-          end
+        next unless m = line.match(/^\s*\d+:\s+(.{8}|.{32}):(.{4})\s+(.{8}|.{32}):(.{4})\s+(.{2})/) # rubocop:disable AssignmentInCondition
+        connection_state = m[5]
+        connection_port = m[2].to_i(16)
+        connection_state = TCP_STATES[connection_state]
+        next unless config[:states].include?(connection_state)
+        if config[:port] && config[:port] == connection_port
+          state_counts[connection_state] += 1
+        elsif !config[:port]
+          state_counts[connection_state] += 1
         end
       end
     end

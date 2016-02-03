@@ -59,9 +59,9 @@ class OpenTSDB < Sensu::Handler
       sock.close
     end
 
-    rescue Timeout::Error
-      puts 'opentsdb -- timed out while sending metrics'
-    rescue => error
-      puts "opentsdb -- failed to send metrics : #{error}"
+  rescue Timeout::Error
+    puts 'opentsdb -- timed out while sending metrics'
+  rescue => error
+    puts "opentsdb -- failed to send metrics : #{error}"
   end
 end

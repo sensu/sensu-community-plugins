@@ -235,14 +235,14 @@ class CheckHTTP < Sensu::Plugin::Check::CLI
     end
     res = http.request(req)
 
-    if config[:whole_response]
-      body = "\n" + res.body
-    else
-      if config[:response_bytes]
-        body = "\n" + res.body[0..config[:response_bytes]]
-      else
-        body = ''
-      end
+    body = if config[:whole_response]
+             "\n" + res.body
+           else
+             body = if config[:response_bytes]
+                      "\n" + res.body[0..config[:response_bytes]]
+                    else
+                      ''
+             end
     end
 
     if config[:require_bytes] && res.body.length != config[:require_bytes]

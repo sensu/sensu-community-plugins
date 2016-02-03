@@ -82,7 +82,7 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
 
     parsed['examples'].each do |serverspec_test|
       test_name = serverspec_test['file_path'].split('/')[-1] + '_' + serverspec_test['line_number'].to_s
-      output = serverspec_test['full_description'].gsub!(/\"/, '')
+      output = serverspec_test['full_description'].delete!('"')
 
       if serverspec_test['status'] == 'passed'
         send_ok(
@@ -95,7 +95,6 @@ class CheckServerspec < Sensu::Plugin::Check::CLI
           output
         )
       end
-
     end
 
     puts parsed['summary_line']

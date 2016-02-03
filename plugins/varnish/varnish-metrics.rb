@@ -58,14 +58,14 @@ class VarnishMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     begin
-      if config[:varnish_name]
-        varnishstat = `varnishstat -x -n #{config[:varnish_name]}`
-      else
-        varnishstat = `varnishstat -x`
+      varnishstat = if config[:varnish_name]
+                      `varnishstat -x -n #{config[:varnish_name]}`
+                    else
+                      `varnishstat -x`
       end
       stats = Crack::XML.parse(varnishstat)
       stats['varnishstat']['stat'].each do |stat|
-        path = "#{config[:scheme]}"
+        path = config[:scheme].to_s
         path += '.' + graphite_path_sanitize(stat['type'])    if stat['type']
         path += '.' + graphite_path_sanitize(stat['ident'])   if stat['ident']
         path += '.' + graphite_path_sanitize(stat['name'])

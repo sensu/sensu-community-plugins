@@ -37,10 +37,10 @@ class PostfixMailq < Sensu::Plugin::Check::CLI
     queue = `#{config[:path]} | /bin/egrep '[0-9]+ Kbytes in [0-9]+ Request\|Mail queue is empty'`
 
     # Set the number of messages in the queue
-    if queue == 'Mail queue is empty'
-      num_messages = 0
-    else
-      num_messages = queue.split(' ')[4].to_i
+    num_messages = if queue == 'Mail queue is empty'
+                     0
+                   else
+                     queue.split(' ')[4].to_i
     end
 
     if num_messages >= config[:critical].to_i

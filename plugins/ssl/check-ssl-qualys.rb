@@ -43,7 +43,7 @@ require 'json'
 # Checks a single DNS entry has a rating above a certain level
 class CheckSSLQualys < Sensu::Plugin::Check::CLI
   # Current grades that are avaialble from the API
-  GRADE_OPTIONS = ['A+', 'A', 'A-', 'B', 'C', 'D', 'E', 'F', 'T', 'M']
+  GRADE_OPTIONS = ['A+', 'A', 'A-', 'B', 'C', 'D', 'E', 'F', 'T', 'M'].freeze
 
   option :domain,
          description: 'The domain to run the test against',
@@ -86,7 +86,7 @@ class CheckSSLQualys < Sensu::Plugin::Check::CLI
 
   def ssl_api_request(fromCache)
     params = { host: config[:domain] }
-    params.merge!(startNew: 'on') unless fromCache
+    params[:startNew] = 'on' unless fromCache
     r = RestClient.get("#{config[:api_url]}analyze", params: params)
     warning "HTTP#{r.code} recieved from API" unless r.code == 200
     JSON.parse(r.body)

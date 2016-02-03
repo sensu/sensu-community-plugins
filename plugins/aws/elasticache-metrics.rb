@@ -91,10 +91,10 @@ class ElastiCacheMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    if config[:scheme] == ''
-      graphitepath = "#{config[:elasticachename]}.#{config[:metric].downcase}"
-    else
-      graphitepath = config[:scheme]
+    graphitepath = if config[:scheme] == ''
+                     "#{config[:elasticachename]}.#{config[:metric].downcase}"
+                   else
+                     config[:scheme]
     end
 
     statistic_type = {

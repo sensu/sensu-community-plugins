@@ -44,7 +44,7 @@ class CheckIisCurrentConnections < Sensu::Plugin::Check::CLI
 
   def run
     io = IO.popen("typeperf -sc 1 \"Web Service(#{config[:site]})\\Current\ Connections\"")
-    current_connection = io.readlines[2].split(',')[1].gsub(/"/, '').to_f
+    current_connection = io.readlines[2].split(',')[1].delete('"').to_f
     critical "Current Connectio at #{current_connection}" if current_connection > config[:critical]
     warning "Current Connectio at #{current_connection}" if current_connection > config[:warning]
     ok "Current Connection at #{current_connection}"

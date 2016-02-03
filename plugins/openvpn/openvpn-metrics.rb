@@ -97,22 +97,22 @@ class OpenvpnGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
   def run
     # Are these options overriden locally in .json?
-    if defined? settings['openvpn-metrics']['host']
-      def_host = settings['openvpn-metrics']['host']
-    else
-      def_host = config[:host]
+    def_host = if defined? settings['openvpn-metrics']['host']
+                 settings['openvpn-metrics']['host']
+               else
+                 config[:host]
     end
 
-    if defined? settings['openvpn-metrics']['port']
-      def_port = settings['openvpn-metrics']['port']
-    else
-      def_port = config[:port]
+    def_port = if defined? settings['openvpn-metrics']['port']
+                 settings['openvpn-metrics']['port']
+               else
+                 config[:port]
     end
 
-    if defined? settings['openvpn-metrics']['service']
-      def_service = settings['openvpn-metrics']['service']
-    else
-      def_service = config[:service]
+    def_service = if defined? settings['openvpn-metrics']['service']
+                    settings['openvpn-metrics']['service']
+                  else
+                    config[:service]
     end
 
     # collect data

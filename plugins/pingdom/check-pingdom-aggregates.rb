@@ -78,7 +78,7 @@ class CheckPingdomAggregates < Sensu::Plugin::Check::CLI
 
   def details
     return nil unless config[:verbose]
-    ":\n#{ down_checks.map { |check| "#{check[:name]} is down" }.join("\n") }"
+    ":\n#{down_checks.map { |check| "#{check[:name]} is down" }.join("\n")}"
   end
 
   def down_checks

@@ -64,9 +64,9 @@ class CheckBanner < Sensu::Plugin::Check::CLI
       acquire_banner
       true
     end
-    rescue Timeout::Error
-      critical 'Request timed out'
-    rescue => e
-      critical "Request error: #{e.message}"
+  rescue Timeout::Error
+    critical 'Request timed out'
+  rescue => e
+    critical "Request error: #{e.message}"
   end
 end

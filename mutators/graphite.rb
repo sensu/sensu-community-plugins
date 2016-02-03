@@ -34,5 +34,5 @@ event = JSON.parse(STDIN.read, symbolize_names: true)
 if ARGV[0] == '-r' || ARGV[0] == '--reverse'
   puts event[:check][:output].gsub(event[:client][:name], event[:client][:name].split('.').reverse.join('.'))
 else
-  puts event[:check][:output].gsub(event[:client][:name], event[:client][:name].gsub('.', '_'))
+  puts event[:check][:output].gsub(event[:client][:name], event[:client][:name].tr('.', '_'))
 end

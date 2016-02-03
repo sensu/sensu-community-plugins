@@ -32,11 +32,11 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
   def check_hp
     # #YELLOW
-    if File.exist?('/usr/bin/cciss_vol_status')  # rubocop:disable GuardClause
+    if File.exist?('/usr/bin/cciss_vol_status') # rubocop:disable GuardClause
       contents = `/usr/bin/cciss_vol_status /dev/sg0`
       c = contents.lines.grep(/status\: OK\./)
       # #YELLOW
-      unless c.empty?  # rubocop:disable UnlessElse
+      unless c.empty? # rubocop:disable UnlessElse
         ok 'HP RAID OK'
       else
         warning 'HP RAID warning'
@@ -46,12 +46,12 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
   def check_adaptec
     # #YELLOW
-    if File.exist?('/usr/StorMan/arcconf')  # rubocop:disable GuardClause
+    if File.exist?('/usr/StorMan/arcconf') # rubocop:disable GuardClause
       contents = `/usr/StorMan/arcconf GETCONFIG 1 AL`
 
       mg = contents.lines.grep(/Controller Status/)
       # #YELLOW
-      unless mg.empty?  # rubocop:disable UnlessElse
+      unless mg.empty? # rubocop:disable UnlessElse
         sg = mg.to_s.lines.grep(/Optimal/)
         warning 'Adaptec Physical RAID Controller Failure' if sg.empty?
       else
@@ -60,7 +60,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
       mg = contents.lines.grep(/Status of logical device/)
       # #YELLOW
-      unless mg.empty?   # rubocop:disable UnlessElse
+      unless mg.empty? # rubocop:disable UnlessElse
         sg = mg.to_s.lines.grep(/Optimal/)
         warning 'Adaptec Logical RAID Controller Failure' if sg.empty?
       else
@@ -69,7 +69,7 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
       mg = contents.lines.grep(/S\.M\.A\.R\.T\.   /)
       # #YELLOW
-      unless mg.empty?   # rubocop:disable UnlessElse
+      unless mg.empty? # rubocop:disable UnlessElse
         sg = mg.to_s.lines.grep(/No/)
         warning 'Adaptec S.M.A.R.T. Disk Failed' if sg.empty?
       else
@@ -82,11 +82,11 @@ class CheckRaid < Sensu::Plugin::Check::CLI
 
   def check_mega_raid
     # #YELLOW
-    if File.exist?('/usr/sbin/megacli')  # rubocop:disable GuardClause
+    if File.exist?('/usr/sbin/megacli') # rubocop:disable GuardClause
       contents = `/usr/sbin/megacli -AdpAllInfo -aALL`
       c = contents.lines.grep(/(Critical|Failed) Disks\s+\: 0/)
       # #YELLOW
-      unless c.empty?   # rubocop:disable UnlessElse
+      unless c.empty? # rubocop:disable UnlessElse
         ok 'MegaRaid RAID OK'
       else
         warning 'MegaRaid RAID warning'

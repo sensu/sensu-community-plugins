@@ -102,7 +102,7 @@ class AggregateMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    ([config[:repo] || acquire_org_repos].flatten).each do |repo|
+    [config[:repo] || acquire_org_repos].flatten.each do |repo|
       schema = "#{config[:scheme]}.#{config[:owner]}.#{repo}"
       now = Time.now.to_i
       %w(pulls branches tags contributors languages).each do |resource|

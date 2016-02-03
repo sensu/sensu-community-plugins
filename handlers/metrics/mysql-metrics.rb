@@ -43,10 +43,10 @@ class MysqlMetric < Sensu::Handler
 
     begin
       con = Mysql.new mysql_hostname, mysql_username, mysql_password
-      con.query("INSERT INTO "\
-                "sensumetrics.sensu_historic_metrics("\
-                "client_id, check_name, issue_time, "\
-                "output, status) "\
+      con.query('INSERT INTO '\
+                'sensumetrics.sensu_historic_metrics('\
+                'client_id, check_name, issue_time, '\
+                'output, status) '\
                 "VALUES ('#{client_id}', '#{check_name}', "\
                 "#{check_issued}, '#{check_output}', #{check_status})")
     rescue Mysql::Error => e

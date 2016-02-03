@@ -11,10 +11,12 @@ describe CheckHardwareFail do
       # https://robots.thoughtbot.com/fight-back-utf-8-invalid-byte-sequences
       "hi \255"
     end
-    def checker.ok(*args)
+
+    def checker.ok(*_args)
       'ok notification'
     end
-    def checker.critical(*args)
+
+    def checker.critical(*_args)
       'critical notification'
     end
   end

@@ -80,13 +80,13 @@ class KeystoneTokenCounts < Sensu::Plugin::Metric::CLI::Graphite
     end
     metrics = %w(active expired total)
     sql = <<-eosql
-SELECT #{ 'user.name,' if config[:by_user] }
+SELECT #{'user.name,' if config[:by_user]}
   SUM(IF(NOW() <= expires,1,0)) AS active,
   SUM(IF(NOW() > expires,1,0)) AS expired,
 COUNT(*) AS total FROM token
     eosql
     sql.concat <<-eosql if config[:by_user]
-LEFT JOIN user ON token.user_id = user.id #{ where }
+LEFT JOIN user ON token.user_id = user.id #{where}
 GROUP BY user.name
     eosql
     begin

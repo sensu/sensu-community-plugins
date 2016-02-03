@@ -34,7 +34,7 @@ class SELinuxCheck < Sensu::Plugin::Check::CLI
          required: false
 
   def enforcing?(check)
-    if check.downcase == 'enforcing'
+    if check.casecmp('enforcing')
       true
     else
       false

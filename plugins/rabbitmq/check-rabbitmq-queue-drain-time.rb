@@ -103,7 +103,7 @@ class CheckRabbitMQQueueDrainTime < Sensu::Plugin::Check::CLI
 
       # handle rate of zero which is an infinite time until empty
       if queue['backing_queue_status']['avg_egress_rate'].to_f == 0
-        crit_queues[queue['name']]  = 'Infinite (drain rate = 0)'
+        crit_queues[queue['name']] = 'Infinite (drain rate = 0)'
         next
       end
 

@@ -15,12 +15,12 @@ class CheckSheduledTask < Sensu::Plugin::Check::CLI
   option :ignore,
          short: '-i Ignore',
          description: 'Ignore certain scheduled tasks',
-         proc: proc { |a| a.split(',').select { |b| b.chomp } }
+         proc: proc { |a| a.split(',').select(&:chomp) }
 
   option :directory,
          short: '-d Directory',
          description: 'Only select tasks within the specified tasks directory(ies)',
-         proc: proc { |a| a.split(',').select { |b| b.chomp } }
+         proc: proc { |a| a.split(',').select(&:chomp) }
 
   def initialize
     super
@@ -30,12 +30,12 @@ class CheckSheduledTask < Sensu::Plugin::Check::CLI
   def read_schtask
     name = "/TN #{config[:name]}" unless config[:name].nil?
     @tasks = `schtasks /Query /FO CSV #{name}`
-      .lines
-      .select { |task| task != "\"TaskName\",\"Next Run Time\",\"Status\"\n" }
-      .map do |task|
-        split = task.tr('\"', '').split(',')
-        { name: split[0], next_run: split[1], status: split[2].chomp }
-      end
+             .lines
+             .select { |task| task != "\"TaskName\",\"Next Run Time\",\"Status\"\n" }
+             .map do |task|
+      split = task.tr('\"', '').split(',')
+      { name: split[0], next_run: split[1], status: split[2].chomp }
+    end
 
     unless config[:directory].nil?
       @tasks.select! { |task| config[:directory].any? { |folder_name| task[:name].start_with?(folder_name) } }
@@ -55,7 +55,7 @@ class CheckSheduledTask < Sensu::Plugin::Check::CLI
   end
 
   def disabled_tasks
-    @tasks.select { |task| task[:next_run].downcase == 'disabled' }
+    @tasks.select { |task| task[:next_run].casecmp('disabled') }
   end
 
   def run

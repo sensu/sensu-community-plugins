@@ -97,10 +97,10 @@ class CheckEc2CpuCredits < Sensu::Plugin::Check::CLI
 
   def get_count_metric(group)
     cloud_watch.metrics
-      .with_namespace('AWS/EC2')
-      .with_metric_name("#{config[:countmetric]}")
-      .with_dimensions(name: 'AutoScalingGroupName', value: group)
-      .first
+               .with_namespace('AWS/EC2')
+               .with_metric_name(config[:countmetric].to_s)
+               .with_dimensions(name: 'AutoScalingGroupName', value: group)
+               .first
   end
 
   def statistics_options

@@ -3,10 +3,10 @@ require 'rubocop/rake_task'
 
 desc 'Don\'t run Rubocop for unsupported versions'
 begin
-  if RUBY_VERSION >= '1.9.3'
-    args = [:spec, :make_plugins_executable, :rubocop]
-  else
-    args = [:spec, :make_plugins_executable]
+  args = if RUBY_VERSION >= '1.9.3'
+           [:spec, :make_plugins_executable, :rubocop]
+         else
+           [:spec, :make_plugins_executable]
   end
 end
 

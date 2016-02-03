@@ -39,8 +39,8 @@ class CheckWindowsCpuLoad < Sensu::Plugin::Check::CLI
          proc: proc(&:to_i)
 
   def run
-    io = IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\"")
-    cpu_load = io.readlines[2].split(',')[1].gsub(/"/, '').to_i
+    io = IO.popen('typeperf -sc 1 "processor(_total)\\% processor time"')
+    cpu_load = io.readlines[2].split(',')[1].delete('"').to_i
     critical "CPU at #{cpu_load}%" if cpu_load > config[:critical]
     warning "CPU at #{cpu_load}%" if cpu_load > config[:warning]
     ok "CPU at #{cpu_load}%"

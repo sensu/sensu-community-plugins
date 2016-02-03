@@ -20,9 +20,7 @@ require_relative '../../../plugins/http/http-json-graphite'
 require_relative '../../../spec_helper'
 
 describe HttpJsonGraphite do
-
   it 'is able to parse json and output graphite data' do
-
     input_file = File.open('spec/fixtures/plugins/http/input.json', 'r')
     data = input_file.read
     input_file.close
@@ -43,5 +41,4 @@ describe HttpJsonGraphite do
     end
     expected.to output(/localhost.c3p0.Connections 15\s\d+\nlocalhost.c3p0.BusyConnections 0\s\d+/).to_stdout
   end
-
 end

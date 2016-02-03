@@ -55,7 +55,6 @@ aws_debug = false
 
 options = {}
 optparse = OptionParser.new do|opts|
-
   opts.on('-h', '--help', '') do
     puts opts
     exit
@@ -80,19 +79,18 @@ optparse = OptionParser.new do|opts|
   opts.on('-l', '--lessthan', 'Threshold is less than') do|lessthan|
     options[:lessthan] = lessthan
   end
-
 end
 begin
   optparse.parse!
-  mandatory = [:warn, :crit, :stat, :host]                         # Enforce the presence of
-  missing = mandatory.select { |param| options[param].nil? }        # the -t and -f switches
+  mandatory = [:warn, :crit, :stat, :host] # Enforce the presence of
+  missing = mandatory.select { |param| options[param].nil? } # the -t and -f switches
   unless missing.empty?                                            #
     puts "Missing options: #{missing.join(', ')}"                  #
     puts optparse                                                  #
     exit                                                           #
   end                                                              #
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument  #
-  puts $ERROR_INFO.to_s                                                     # Friendly output when parsing fails
+  puts $ERROR_INFO.to_s # Friendly output when parsing fails
   puts optparse                                                    #
   exit                                                             #
 end
@@ -102,9 +100,9 @@ AWS.config(access_key_id: aws_access_key_id,
            region: aws_region,
            http_wire_trace: aws_debug)
 
-metric = AWS::CloudWatch::Metric.new('AWS/RDS', "#{options[:stat]}",
+metric = AWS::CloudWatch::Metric.new('AWS/RDS', (options[:stat]).to_s,
                                      dimensions: [
-                                       { name: 'DBInstanceIdentifier', value: "#{options[:host]}" }
+                                       { name: 'DBInstanceIdentifier', value: (options[:host]).to_s }
                                      ])
 stats = metric.statistics(
   start_time: Time.now - 600,
@@ -146,14 +144,14 @@ if options[:lessthan] == true
   else
     puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
   end
+else
+  if average.to_f > options[:crit].to_f
+    puts "CRITICAL: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:crit]} #{unit}"
+    exit 1
+  elsif average.to_f > options[:warn].to_f
+    puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:warn]} #{unit}"
+    exit 2
   else
-    if average.to_f > options[:crit].to_f
-      puts "CRITICAL: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:crit]} #{unit}"
-      exit 1
-    elsif average.to_f > options[:warn].to_f
-      puts "WARNING: #{options[:host]} statistic #{options[:stat]} is at #{average} #{unit} which is above threshold #{options[:warn]} #{unit}"
-      exit 2
-    else
-      puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
-    end
+    puts "OK: #{options[:host]} statistic #{options[:stat]} is #{average} #{unit}"
+  end
 end

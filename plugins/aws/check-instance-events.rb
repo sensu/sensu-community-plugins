@@ -70,34 +70,29 @@ class CheckInstanceEvents < Sensu::Plugin::Check::CLI
 
   def run
     event_instances = []
-    aws_config =   {}
+    aws_config = {}
 
     if config[:use_iam_role].nil?
-      aws_config.merge!(
-      access_key_id: config[:aws_access_key],
-      secret_access_key: config[:aws_secret_access_key]
-      )
+      aws_config[:access_key_id] = config[:aws_access_key]
+      aws_config[:secret_access_key] = config[:aws_secret_access_key]
     end
 
     ec2 = AWS::EC2::Client.new(aws_config.merge!(region: config[:aws_region]))
     begin
       ec2.describe_instance_status[:instance_status_set].each do |i| # rubocop:disable Next
-
-        unless i[:events_set].empty?
-          # Exclude completed reboots since the events API appearently returns these even after they have been completed:
-          # Example:
-          #  "events_set": [
-          #     {
-          #         "code": "system-reboot",
-          #         "description": "[Completed] Scheduled reboot",
-          #         "not_before": "2015-01-05 12:00:00 UTC",
-          #         "not_after": "2015-01-05 18:00:00 UTC"
-          #     }
-          # ]
-          if i[:events_set].select { |x| x[:code] == 'system-reboot' && x[:description] =~ /\[Completed\]/ }.empty?
-            event_instances << i[:instance_id]
-          end
-        end
+        next if i[:events_set].empty?
+        # Exclude completed reboots since the events API appearently returns these even after they have been completed:
+        # Example:
+        #  "events_set": [
+        #     {
+        #         "code": "system-reboot",
+        #         "description": "[Completed] Scheduled reboot",
+        #         "not_before": "2015-01-05 12:00:00 UTC",
+        #         "not_after": "2015-01-05 18:00:00 UTC"
+        #     }
+        # ]
+        next unless i[:events_set].select { |x| x[:code] == 'system-reboot' && x[:description] =~ /\[Completed\]/ }.empty?
+        event_instances << i[:instance_id]
       end
     rescue => e
       unknown "An error occurred processing AWS EC2 API: #{e.message}"

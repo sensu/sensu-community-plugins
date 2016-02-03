@@ -72,8 +72,8 @@ class CheckDisk < Sensu::Plugin::Check::CLI
         next if config[:fstype] && !config[:fstype].include?(type)
         next if config[:ignoretype] && config[:ignoretype].include?(type)
         next if config[:ignoremnt] && config[:ignoremnt].include?(mnt)
-    rescue
-      unknown "malformed line from df: #{line}"
+      rescue
+        unknown "malformed line from df: #{line}"
       end
       # If label value is not set, the drive letter will end up in that column.  Set mnt to label in that case.
       mnt = label if mnt.nil?

@@ -41,7 +41,7 @@ class CheckChefServer < Sensu::Plugin::Check::CLI
       status = `/usr/bin/chef-server-ctl status`
       failed_processes = []
       status.each_line do |proc|
-        if proc.match('^(fail|down|warning)')
+        if proc =~ '^(fail|down|warning)'
           failed_processes << proc.match('^(fail|down|warning):\s+([a-z-]+)')[2]
         end
       end

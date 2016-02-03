@@ -203,8 +203,6 @@ class Graphite < Sensu::Plugin::Check::CLI
     if data.size > 0
       data.each { |d| @graphite_cache[target] << { target: d['target'], period: @period, datapoints: d['datapoints'] } }
       graphite_cache target
-    else
-      nil
     end
   end
 
@@ -213,7 +211,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     max_values = {}
     values = get_graphite_values target
     if values
-      values.each do | val |
+      values.each do |val|
         max = get_max_value(val[:datapoints])
         max_values[val[:target]] = max
       end
@@ -224,8 +222,6 @@ class Graphite < Sensu::Plugin::Check::CLI
   def get_max_value(values)
     if values
       values.map { |i| i[0] ? i[0] : 0 }[0..-2].max
-    else
-      nil
     end
   end
 
@@ -233,7 +229,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_values = {}
     values = get_graphite_values target
     if values
-      values.each do | val |
+      values.each do |val|
         last = get_last_metric(val[:datapoints], count)
         last_values[val[:target]] = last
       end
@@ -253,8 +249,6 @@ class Graphite < Sensu::Plugin::Check::CLI
         ret.push(values[values_size]) if values[values_size][0]
       end
       ret
-    else
-      nil
     end
   end
 
@@ -262,8 +256,8 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_metrics = last_graphite_metric(target, count)
     last_values = {}
     if last_metrics
-      last_metrics.each do | target_name, metrics |
-        last_values[target_name] = metrics.map { | metric |  metric[0] }.mean
+      last_metrics.each do |target_name, metrics|
+        last_values[target_name] = metrics.map { |metric|  metric[0] }.mean
       end
     end
     last_values
@@ -273,7 +267,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_time_stamp = last_graphite_metric target
     warnings = []
     if last_time_stamp
-      last_time_stamp.each do | target_name, value |
+      last_time_stamp.each do |target_name, value|
         last_time_stamp_bool = value[1] > time.to_i ? true : false
         warnings << "The metric #{target_name} has not been updated in #{updated_since} seconds" unless last_time_stamp_bool
       end
@@ -295,14 +289,13 @@ class Graphite < Sensu::Plugin::Check::CLI
     last_gv = last_graphite_value target
     if last_gv.is_a?(Hash) && max_gv.is_a?(Hash)
       # #YELLOW
-      last_gv.each do | target_name, value | # rubocop:disable Style/Next
-        if value && max_gv[target_name]
-          last = value
-          max = max_gv[target_name]
-          if max > last * (1 + config[:acceptable_diff_percentage].to_f / 100)
-            msg = "The metric #{target} with last value #{last} is less than max value #{max} during #{config[:period]} period"
-            critical_errors << msg
-          end
+      last_gv.each do |target_name, value| # rubocop:disable Style/Next
+        next unless value && max_gv[target_name]
+        last = value
+        max = max_gv[target_name]
+        if max > last * (1 + config[:acceptable_diff_percentage].to_f / 100)
+          msg = "The metric #{target} with last value #{last} is less than max value #{max} during #{config[:period]} period"
+          critical_errors << msg
         end
       end
     else
@@ -321,7 +314,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     criticals = []
     fatal = []
-    values.each do | data |
+    values.each do |data|
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
@@ -330,25 +323,24 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last_values[target]
       percent = last_value / avg_value unless last_value.nil? || avg_value.nil?
       # #YELLOW
-      %w(fatal error warning).each do |type|  # rubocop:disable Style/Next
+      %w(fatal error warning).each do |type| # rubocop:disable Style/Next
         next unless max_values.key?(type)
         max_value = max_values[type]
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
-        if !percent.nil? && var1 > var2 && (values_array.size > 0 || !config[:ignore_nulls])
-          text = "The last value of metric #{target} is #{percent}% #{greater_less} than allowed #{max_value}% of the average value #{avg_value}"
-          case type
-          when 'warning'
-            warnings <<  text
-          when 'error'
-            criticals << text
-          when 'fatal'
-            fatal << text
-          else
-            fail "Unknown type #{type}"
-          end
-          break if config[:short_output]
+        next unless !percent.nil? && var1 > var2 && (values_array.size > 0 || !config[:ignore_nulls])
+        text = "The last value of metric #{target} is #{percent}% #{greater_less} than allowed #{max_value}% of the average value #{avg_value}"
+        case type
+        when 'warning'
+          warnings <<  text
+        when 'error'
+          criticals << text
+        when 'fatal'
+          fatal << text
+        else
+          fail "Unknown type #{type}"
         end
+        break if config[:short_output]
       end
     end
     [warnings, criticals, fatal]
@@ -360,32 +352,31 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     criticals = []
     fatal = []
-    values.each do | data |
+    values.each do |data|
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
       # #YELLOW
       avg_value = values_array.reduce { |sum, el| sum + el if el }.to_f / values_array.size # rubocop:disable SingleLineBlockParams
       # YELLOW
-      %w(fatal error warning).each do |type|  # rubocop:disable Style/Next
+      %w(fatal error warning).each do |type| # rubocop:disable Style/Next
         next unless max_values.key?(type)
         max_value = max_values[type]
         var1 = config[:greater_than] ? avg_value : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : avg_value
-        if var1 > var2 && (values_array.size > 0 || !config[:ignore_nulls])
-          text = "The average value of metric #{target} is #{avg_value} that is #{greater_less} than allowed average of #{max_value}"
-          case type
-          when 'warning'
-            warnings <<  text
-          when 'error'
-            criticals << text
-          when 'fatal'
-            fatal << text
-          else
-            fail "Unknown type #{type}"
-          end
-          break if config[:short_output]
+        next unless var1 > var2 && (values_array.size > 0 || !config[:ignore_nulls])
+        text = "The average value of metric #{target} is #{avg_value} that is #{greater_less} than allowed average of #{max_value}"
+        case type
+        when 'warning'
+          warnings <<  text
+        when 'error'
+          criticals << text
+        when 'fatal'
+          fatal << text
+        else
+          fail "Unknown type #{type}"
         end
+        break if config[:short_output]
       end
     end
     [warnings, criticals, fatal]
@@ -398,7 +389,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     criticals = []
     fatal = []
-    values.each do | data |
+    values.each do |data|
       target = data[:target]
       values_pair = data[:datapoints]
       values_array = values_pair.select(&:first).map { |v| v.first unless v.first.nil? }
@@ -406,26 +397,25 @@ class Graphite < Sensu::Plugin::Check::CLI
       last_value = last_values[target]
       percent = last_value / percentile_value unless last_value.nil? || percentile_value.nil?
       # #YELLOW
-      %w(fatal error warning).each do |type|  # rubocop:disable Style/Next
+      %w(fatal error warning).each do |type| # rubocop:disable Style/Next
         next unless max_values.key?(type)
         max_value = max_values[type]
         var1 = config[:greater_than] ? percent : max_value.to_f
         var2 = config[:greater_than] ? max_value.to_f : percent
-        if !percentile_value.nil? && var1 > var2
-          text = "The percentile value of metric #{target} (#{last_value}) is #{greater_less} than the
-            #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
-          case type
-          when 'warning'
-            warnings <<  text
-          when 'error'
-            criticals << text
-          when 'fatal'
-            fatal << text
-          else
-            fail "Unknown type #{type}"
-          end
-          break if config[:short_output]
+        next unless !percentile_value.nil? && var1 > var2
+        text = "The percentile value of metric #{target} (#{last_value}) is #{greater_less} than the
+          #{percentile}th percentile (#{percentile_value}) by more than #{max_value}%"
+        case type
+        when 'warning'
+          warnings <<  text
+        when 'error'
+          criticals << text
+        when 'fatal'
+          fatal << text
+        else
+          fail "Unknown type #{type}"
         end
+        break if config[:short_output]
       end
     end
     [warnings, criticals, fatal]
@@ -438,30 +428,28 @@ class Graphite < Sensu::Plugin::Check::CLI
     criticals = []
     fatal = []
     # #YELLOW
-    last_targets.each do | target_name, last |   # rubocop:disable Style/Next
+    last_targets.each do |target_name, last| # rubocop:disable Style/Next
       last_value = last.first
-      unless last_value.nil?
-        # #YELLOW
-        %w(fatal error warning).each do |type|   # rubocop:disable Style/Next
-          next unless max_values.key?(type)
-          max_value = max_values[type]
-          var1 = config[:greater_than] ? last_value : max_value.to_f
-          var2 = config[:greater_than] ? max_value.to_f : last_value
-          if var1 > var2
-            text = "The metric #{target_name} is #{last_value} that is #{greater_less} than max allowed #{max_value}"
-            case type
-            when 'warning'
-              warnings <<  text
-            when 'error'
-              criticals << text
-            when 'fatal'
-              fatal << text
-            else
-              fail "Unknown type #{type}"
-            end
-            break if config[:short_output]
-          end
+      next if last_value.nil?
+      # #YELLOW
+      %w(fatal error warning).each do |type| # rubocop:disable Style/Next
+        next unless max_values.key?(type)
+        max_value = max_values[type]
+        var1 = config[:greater_than] ? last_value : max_value.to_f
+        var2 = config[:greater_than] ? max_value.to_f : last_value
+        next unless var1 > var2
+        text = "The metric #{target_name} is #{last_value} that is #{greater_less} than max allowed #{max_value}"
+        case type
+        when 'warning'
+          warnings <<  text
+        when 'error'
+          criticals << text
+        when 'fatal'
+          fatal << text
+        else
+          fail "Unknown type #{type}"
         end
+        break if config[:short_output]
       end
     end
     [warnings, criticals, fatal]
@@ -474,7 +462,7 @@ class Graphite < Sensu::Plugin::Check::CLI
     warnings = []
     fatals = []
     # #YELLOW
-    targets.each do |target|   # rubocop:disable Style/Next
+    targets.each do |target| # rubocop:disable Style/Next
       if config[:check_function_increasing]
         inc_warnings, inc_critical, inc_fatal = check_increasing target
         warnings += inc_warnings
@@ -502,13 +490,12 @@ class Graphite < Sensu::Plugin::Check::CLI
         critical_errors += avg_critical
         fatals += avg_fatal
       end
-      if config[:check_percentile]
-        max_values = get_levels config[:check_percentile]
-        pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile].to_i, config[:data_points].to_i)
-        warnings += pct_warnings
-        critical_errors += pct_critical
-        fatals += pct_fatal
-      end
+      next unless config[:check_percentile]
+      max_values = get_levels config[:check_percentile]
+      pct_warnings, pct_critical, pct_fatal = check_percentile(target, max_values, config[:percentile].to_i, config[:data_points].to_i)
+      warnings += pct_warnings
+      critical_errors += pct_critical
+      fatals += pct_fatal
     end
     fatals_string = fatals.size > 0 ? fatals.join("\n") : ''
     criticals_string = critical_errors.size > 0 ? critical_errors.join("\n") : ''

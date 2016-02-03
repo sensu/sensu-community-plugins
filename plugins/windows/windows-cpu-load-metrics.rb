@@ -35,12 +35,12 @@ class CpuMetric < Sensu::Plugin::Metric::CLI::Graphite
   option :scheme,
          description: 'Metric naming scheme, text to prepend to .$parent.$child',
          long: '--scheme SCHEME',
-         default: "#{Socket.gethostname}"
+         default: Socket.gethostname.to_s
 
   def acquire_cpu_load
     temp_arr = []
     timestamp = Time.now.utc.to_i
-    IO.popen("typeperf -sc 1 \"processor(_total)\\% processor time\" ") { |io| io.each { |line| temp_arr.push(line) } }
+    IO.popen('typeperf -sc 1 "processor(_total)\\% processor time" ') { |io| io.each { |line| temp_arr.push(line) } }
     temp = temp_arr[2].split(',')[1]
     cpu_metric = temp[1, temp.length - 3].to_f
     [cpu_metric, timestamp]

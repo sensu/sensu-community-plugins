@@ -65,7 +65,7 @@ class CheckDockerContainers < Sensu::Plugin::Check::CLI
          default: 1
 
   def run
-    Docker.url = "#{config[:url]}"
+    Docker.url = config[:url].to_s
     conn = Docker::Container.all(ruuning: true)
     count = conn.size.to_i
     puts "#{count} Running Containers..."

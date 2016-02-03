@@ -19,37 +19,37 @@ class Eep < Sensu::Handler
   include EepClient::Const
 
   # some constants
-  EEP = 'eep'
-  API_TOKEN = 'api_token'
-  SENSU_CHECK = 'Sensu Check'
-  EVENT = 'event'
-  CLEAR = 'clear'
+  EEP = 'eep'.freeze
+  API_TOKEN = 'api_token'.freeze
+  SENSU_CHECK = 'Sensu Check'.freeze
+  EVENT = 'event'.freeze
+  CLEAR = 'clear'.freeze
 
   # sensu event attrs
-  S_ACTION = 'action'
-  S_CLIENT = 'client'
-  S_CHECK = 'check'
-  S_SOURCE = 'source'
-  S_NAME = 'name'
-  S_OUTPUT = 'output'
-  S_STATUS = 'status'
-  S_EXECUTED = 'executed'
-  S_COMMAND = 'command'
+  S_ACTION = 'action'.freeze
+  S_CLIENT = 'client'.freeze
+  S_CHECK = 'check'.freeze
+  S_SOURCE = 'source'.freeze
+  S_NAME = 'name'.freeze
+  S_OUTPUT = 'output'.freeze
+  S_STATUS = 'status'.freeze
+  S_EXECUTED = 'executed'.freeze
+  S_COMMAND = 'command'.freeze
 
   # sensu event attr vals
   S_STATUS_OK = 0
   S_STATUS_WARNING = 1
   S_STATUS_CRITICAL = 2
 
-  S_ACTION_CREATE = 'create'
-  S_ACTION_RESOLVE = 'resolve'
+  S_ACTION_CREATE = 'create'.freeze
+  S_ACTION_RESOLVE = 'resolve'.freeze
 
   # severity mapping
   SEVERITY_MAP = {
     S_STATUS_OK => SEV_INFO,
     S_STATUS_WARNING => SEV_WARNING,
     S_STATUS_CRITICAL => SEV_CRITICAL
-  }
+  }.freeze
 
   def handle
     # get EEP client config
@@ -104,10 +104,10 @@ class Eep < Sensu::Handler
     # send to EEP
     begin
       timeout(10) do
-        if send_type == EVENT
-          res = ec.send_event(data)
-        else
-          res = ec.send_clear(data)
+        res = if send_type == EVENT
+                ec.send_event(data)
+              else
+                ec.send_clear(data)
         end
 
         if res.is_a? EepClient::OkResponse

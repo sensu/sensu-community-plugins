@@ -47,10 +47,10 @@ class TalkerNotif < Sensu::Handler
     request = Net::HTTP::Post.new(room_uri.request_uri)
     request['X-Talker-Token'] = settings['talker']['token']
 
-    if @event['action'].eql?('resolve')
-      message = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
-    else
-      message = "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
+    message = if @event['action'].eql?('resolve')
+                "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
+              else
+                "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
     end
 
     request.content_type = 'application/json'

@@ -56,7 +56,7 @@ class CheckPorts < Sensu::Plugin::Check::CLI
   def run
     stdout, stderr = Open3.capture3(
       ENV,
-      "nmap -P0 -p #{ config[:ports] } #{ config[:host] }"
+      "nmap -P0 -p #{config[:ports]} #{config[:host]}"
     )
 
     case stderr
@@ -68,22 +68,20 @@ class CheckPorts < Sensu::Plugin::Check::CLI
     check_pass  = true
 
     stdout.split("\n").each do |line|
-
       line.scan(/(\d+).tcp\s+(\w+)\s+(\w+)/).each do |status|
         port_checks[status[1]] ||= []
         port_checks[status[1]].push status[0]
         check_pass = false unless status[1]['open']
       end
-
     end
 
-    result = port_checks.map { |state, ports| "#{ state }:#{ ports.join(',') }" }.join(' ')
+    result = port_checks.map { |state, ports| "#{state}:#{ports.join(',')}" }.join(' ')
 
     if check_pass
       ok result
-    elsif config[:level].upcase == 'WARN'
+    elsif config[:level].casecmp('WARN')
       warning result
-    elsif config[:level].upcase == 'CRIT'
+    elsif config[:level].casecmp('CRIT')
       critical result
     else
       unknown "Unknown alert level #{config[:level]}"

@@ -35,7 +35,7 @@ require 'json'
 require 'jsonpath'
 require 'dentaku'
 
-VERSION = '0.1.0'
+VERSION = '0.1.0'.freeze
 
 class CheckInfluxdbQuery < Sensu::Plugin::Check::CLI
   check_name nil
@@ -132,10 +132,10 @@ class CheckInfluxdbQuery < Sensu::Plugin::Check::CLI
 
     value = influxdb.query config[:query]
 
-    if config[:alias]
-      query_name = config[:alias]
-    else
-      query_name = config[:query]
+    query_name = if config[:alias]
+                   config[:alias]
+                 else
+                   config[:query]
     end
 
     if config[:noresult] && value.empty?

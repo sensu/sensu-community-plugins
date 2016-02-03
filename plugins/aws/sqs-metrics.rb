@@ -60,12 +60,12 @@ class SQSMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: 'us-east-1'
 
   def run
-    if config[:scheme] == '' && config[:queue]
-      scheme = "aws.sqs.queue.#{config[:queue].gsub('-', '_')}.message_count"
-    elsif config[:scheme] == ''
-      scheme = config[:scheme]
-    else
-      scheme = config[:scheme] + '.'
+    scheme = if config[:scheme] == '' && config[:queue]
+               "aws.sqs.queue.#{config[:queue].tr('-', '_')}.message_count"
+             elsif config[:scheme] == ''
+               config[:scheme]
+             else
+               config[:scheme] + '.'
     end
 
     begin

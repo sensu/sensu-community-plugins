@@ -20,7 +20,7 @@ class PonyMailer < Sensu::Handler
     0 => 'OK',
     1 => 'WARNING',
     2 => 'CRITICAL'
-  }
+  }.freeze
 
   def short_name
     @event['client']['name'] + '/' + @event['check']['name']
@@ -50,14 +50,14 @@ class PonyMailer < Sensu::Handler
       charset: 'utf-8',
       sender: settings['ponymailer']['from']
     }
-    mail_options.merge!(via_options: {
-                          address: settings['ponymailer']['hostname'],
-                          port: settings['ponymailer']['port'],
-                          enable_starttls_auto: settings['ponymailer']['tls'],
-                          user_name: settings['ponymailer']['username'],
-                          password: settings['ponymailer']['password'],
-                          authentication: :plain
-                        }) if settings['ponymailer']['authenticate']
+    mail_options[:via_options] = {
+      address: settings['ponymailer']['hostname'],
+      port: settings['ponymailer']['port'],
+      enable_starttls_auto: settings['ponymailer']['tls'],
+      user_name: settings['ponymailer']['username'],
+      password: settings['ponymailer']['password'],
+      authentication: :plain
+    } if settings['ponymailer']['authenticate']
 
     mail_options[:body] = %(Sensu has detected a failed check. Event analysis follows:
 
@@ -67,7 +67,7 @@ Check That Failed:  #{@event['check']['name']}
 Check Command:      #{@event['check']['command']}
 Check Flapping:     #{@event['check']['flapping']}
 Check Occurrences:  #{@event['occurrences']}
-Check History:      #{@event['check']['history'].map {  |h| STATUSES[h.to_i] }.join(' => ')}
+Check History:      #{@event['check']['history'].map { |h| STATUSES[h.to_i] }.join(' => ')}
 
 Node Name:          #{@event['client']['name']}
 Node IP Address:    #{@event['client']['address']}
@@ -92,8 +92,8 @@ Node Subscriptions: #{@event['client']['subscriptions'].join(', ')}
             Pony.mail(to: to)
             puts 'mail -- sent alert for ' + short_name + ' to ' + to
           end
-      rescue Timeout::Error
-        puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
+        rescue Timeout::Error
+          puts 'mail -- timed out while attempting to ' + @event['action'] + ' an incident -- ' + short_name
         end
       end
     end

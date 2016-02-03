@@ -43,9 +43,8 @@ class GlusterGeoReplStatus < Sensu::Plugin::Check::CLI
     `sudo gluster volume geo-replication status`.each_line do |l| # rubocop:disable Style/Next
       # Don't match those lines or conditions.
       unless l =~ /(^geo-replication|^Another|^No active geo-replication sessions|^MASTER|^\s*$|^-)/
-        unless config[:states].include?(l.split[4])
-          errors << "#{l.split[1]} on #{l.split[0]} is in #{l.split[4]} state"
-        end
+        next if config[:states].include?(l.split[4])
+        errors << "#{l.split[1]} on #{l.split[0]} is in #{l.split[4]} state"
       end
     end
 

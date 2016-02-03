@@ -85,10 +85,10 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         unless total.nil?
           data[:instance_status_set].each do |value|
             stat = value[:instance_state][:name]
-            if status[stat].nil?
-              status[stat] = 1
-            else
-              status[stat] = status[stat] + 1
+            status[stat] = if status[stat].nil?
+                             1
+                           else
+                             status[stat] + 1
             end
           end
         end
@@ -113,10 +113,10 @@ class EC2Metrics < Sensu::Plugin::Metric::CLI::Graphite
         instances[:reservation_set].each do |i|
           i[:instances_set].each do |instance|
             type = instance[:instance_type]
-            if data[type].nil?
-              data[type] = 1
-            else
-              data[type] = data[type] + 1
+            data[type] = if data[type].nil?
+                           1
+                         else
+                           data[type] + 1
             end
           end
         end

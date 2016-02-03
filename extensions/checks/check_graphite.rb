@@ -159,6 +159,7 @@ module Sensu
           output
         end
       end
+
       # type:: :warning or :critical
       # Return alert if required
       def check(type)
@@ -178,7 +179,7 @@ module Sensu
 
       # Check is value is above defined threshold
       def above?(type)
-        (!options[:below]) && (@data.last > options[type]) && (!decreased?)
+        !options[:below] && (@data.last > options[type]) && !decreased?
       end
 
       # Check if values have decreased within interval if given

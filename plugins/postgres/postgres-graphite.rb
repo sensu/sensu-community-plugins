@@ -66,7 +66,7 @@ class CheckpostgresReplicationStatus < Sensu::Plugin::Metric::CLI::Graphite
 
     # Compute lag
     lag = lag_compute(res1, res, m_segbytes)
-    output "#{config[:scheme]}", lag
+    output config[:scheme].to_s, lag
 
     ok
   end

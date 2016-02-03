@@ -58,10 +58,10 @@ class CheckUnicornQueue < Sensu::Plugin::Check::CLI
   def queued
     if config[:addr]
       Raindrops::Linux
-      .tcp_listener_stats(config[:addr].split(','))[0].queued
+        .tcp_listener_stats(config[:addr].split(','))[0].queued
     elsif config[:socket]
       Raindrops::Linux
-      .unix_listener_stats(config[:socket].split(','))[0].queued
+        .unix_listener_stats(config[:socket].split(','))[0].queued
     end
   end
 end

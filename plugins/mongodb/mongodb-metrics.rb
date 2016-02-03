@@ -74,7 +74,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
          long: '--ssl_ca_cert /path/to/ca_cert',
          default: nil
 
-  def get_mongo_doc(db, command)
+  def get_mongo_doc(_db, command)
     rs = @db.command(command)
     if rs.successful?
       return rs.documents[0]
@@ -134,7 +134,7 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
 
   def gather_replication_metrics(server_status)
     server_metrics = {}
-    server_metrics['lock.ratio'] = "#{sprintf('%.5f', server_status['globalLock']['ratio'])}" unless server_status['globalLock']['ratio'].nil?
+    server_metrics['lock.ratio'] = sprintf('%.5f', server_status['globalLock']['ratio']).to_s unless server_status['globalLock']['ratio'].nil?
 
     server_metrics['lock.queue.total'] = server_status['globalLock']['currentQueue']['total']
     server_metrics['lock.queue.readers'] = server_status['globalLock']['currentQueue']['readers']
@@ -144,11 +144,11 @@ class MongoDB < Sensu::Plugin::Metric::CLI::Graphite
     server_metrics['connections.available'] = server_status['connections']['available']
 
     if server_status['indexCounters']['btree'].nil?
-      server_metrics['indexes.missRatio'] = "#{sprintf('%.5f', server_status['indexCounters']['missRatio'])}"
+      server_metrics['indexes.missRatio'] = sprintf('%.5f', server_status['indexCounters']['missRatio']).to_s
       server_metrics['indexes.hits'] = server_status['indexCounters']['hits']
       server_metrics['indexes.misses'] = server_status['indexCounters']['misses']
     else
-      server_metrics['indexes.missRatio'] = "#{sprintf('%.5f', server_status['indexCounters']['btree']['missRatio'])}"
+      server_metrics['indexes.missRatio'] = sprintf('%.5f', server_status['indexCounters']['btree']['missRatio']).to_s
       server_metrics['indexes.hits'] = server_status['indexCounters']['btree']['hits']
       server_metrics['indexes.misses'] = server_status['indexCounters']['btree']['misses']
     end

@@ -80,7 +80,7 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
          default: []
 
   def generate_message(status_hash)
-    message =  []
+    message = []
     status_hash.each_pair do |k, v|
       message << "#{k}: #{v}"
     end
@@ -111,15 +111,15 @@ class CheckRabbitMQMessages < Sensu::Plugin::Check::CLI
       crit_queues = {}
       rabbitmq.queues.each do |queue|
         next if config[:excluded].include?(queue['name'])
-        (crit_queues["#{queue['name']}"] = queue['messages']; next) if queue['messages'] >= config[:critical].to_i # rubocop: disable Style/Semicolon
-        (warn_queues["#{queue['name']}"] = queue['messages']; next) if queue['messages'] >= config[:warn].to_i # rubocop: disable Style/Semicolon
+        (crit_queues[(queue['name']).to_s] = queue['messages']; next) if queue['messages'] >= config[:critical].to_i # rubocop: disable Style/Semicolon
+        (warn_queues[(queue['name']).to_s] = queue['messages']; next) if queue['messages'] >= config[:warn].to_i # rubocop: disable Style/Semicolon
       end
       message crit_queues.empty? ? generate_message(warn_queues) : generate_message(crit_queues)
       critical unless crit_queues.empty?
       warning unless warn_queues.empty?
     else
       total = rabbitmq.overview['queue_totals']['messages']
-      message "#{total}"
+      message total.to_s
       critical if total > config[:critical].to_i
       warning if total > config[:warn].to_i
     end

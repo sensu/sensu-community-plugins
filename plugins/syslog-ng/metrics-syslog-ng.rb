@@ -24,7 +24,7 @@ class SyslogNgMetrics < Sensu::Plugin::Metric::CLI::Graphite
          short: '-s SCHEME',
          long: '--scheme SCHEME',
          required: true,
-         default: "#{Socket.gethostname.gsub('.', '_')}.syslog_ng"
+         default: "#{Socket.gethostname.tr('.', '_')}.syslog_ng"
 
   option :ctl_path,
          description: 'Path to syslog-ng-ctl command',

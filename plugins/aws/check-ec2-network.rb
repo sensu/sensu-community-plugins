@@ -93,7 +93,7 @@ class CheckEc2Network < Sensu::Plugin::Check::CLI
   end
 
   def network_metric(instance)
-    cloud_watch.metrics.with_namespace('AWS/EC2').with_metric_name("#{config[:direction]}").with_dimensions(name: 'InstanceId', value: instance).first
+    cloud_watch.metrics.with_namespace('AWS/EC2').with_metric_name(config[:direction].to_s).with_dimensions(name: 'InstanceId', value: instance).first
   end
 
   def statistics_options

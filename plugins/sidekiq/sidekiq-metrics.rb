@@ -65,7 +65,7 @@ class SidekiqMetrics < Sensu::Plugin::Metric::CLI::Graphite
 
     total_concurrency = stats['processes'].map { |process| process['concurrency'] }.reduce(&:+) || 0
     total_busy        = stats['processes'].map { |process| process['busy'] }.reduce(&:+) || 0
-    maximum_latency   = stats['queues'].map { |name, data| data['latency'] }.max
+    maximum_latency   = stats['queues'].map { |_name, data| data['latency'] }.max
 
     output "#{config[:scheme]}.concurrency", total_concurrency
     output "#{config[:scheme]}.busy",        total_busy

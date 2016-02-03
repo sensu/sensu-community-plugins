@@ -36,7 +36,7 @@ require 'uri'
 event = JSON.parse(STDIN.read, symbolize_names: true)
 
 # set up the URL and URI
-dsn = %r{(.+\/\/)(.+):(.+)@(.+)\/(\d+)}.match("#{ARGV[0]}")
+dsn = %r{(.+\/\/)(.+):(.+)@(.+)\/(\d+)}.match((ARGV[0]).to_s)
 @proto = dsn[1]
 @key = dsn[2]
 @secret = dsn[3]

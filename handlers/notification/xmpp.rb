@@ -20,12 +20,12 @@ class XmppHandler < Sensu::Handler
     xmpp_server = settings['xmpp']['server']
     xmpp_room_password = settings['xmpp']['room_password']
 
-    if @event['action'].eql?('resolve')
-      #      body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
-      body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['output']} - #{@event['check']['notification']}"
-    else
-      #      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
-      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['output']} - #{@event['check']['notification']}"
+    body = if @event['action'].eql?('resolve')
+             #      body = "Sensu RESOLVED - [#{event_name}] - #{@event['check']['notification']}"
+             "Sensu RESOLVED - [#{event_name}] - #{@event['check']['output']} - #{@event['check']['notification']}"
+           else
+             #      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['notification']}"
+             "Sensu ALERT - [#{event_name}] - #{@event['check']['output']} - #{@event['check']['notification']}"
       #      body = "Sensu ALERT - [#{event_name}] - #{@event['check']['output']}"
     end
 

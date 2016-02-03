@@ -69,14 +69,14 @@ class AutoScalingInstanceCountMetrics < Sensu::Plugin::Metric::CLI::Graphite
   end
 
   def run
-    if config[:scheme] == ''
-      graphitepath = "#{config[:groupname]}.autoscaling.instance_count"
-    else
-      graphitepath = config[:scheme]
+    graphitepath = if config[:scheme] == ''
+                     "#{config[:groupname]}.autoscaling.instance_count"
+                   else
+                     config[:scheme]
     end
     begin
       as = AWS::AutoScaling.new aws_config
-      count = as.groups[config[:groupname]].auto_scaling_instances.map { |i| i.lifecycle_state }.count('InService')
+      count = as.groups[config[:groupname]].auto_scaling_instances.map(&:lifecycle_state).count('InService')
       output graphitepath, count
     rescue => e
       puts "Error: exception: #{e}"

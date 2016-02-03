@@ -49,14 +49,14 @@ class CheckLXCMemstat < Sensu::Plugin::Check::CLI
          default: '90'
 
   def run
-    conn = LXC.container("#{config[:name]}")
+    conn = LXC.container(config[:name].to_s)
     if conn.exists?
       if conn.running?
         used = conn.memory_usage
         max = conn.memory_limit
-        if used > (max * ("#{config[:critical]}".to_f / 100))
+        if used > (max * (config[:critical].to_s.to_f / 100))
           critical "container #{config[:name]} memory usage crossed the critical limit"
-        elsif used > (max * ("#{config[:warning]}".to_f / 100))
+        elsif used > (max * (config[:warning].to_s.to_f / 100))
           warning "container #{config[:name]} memory usage crossed the warning limit"
         else
           ok "container #{config[:name]} memory usage is normal"

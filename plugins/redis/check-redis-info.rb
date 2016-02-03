@@ -59,10 +59,10 @@ class RedisSlaveCheck < Sensu::Plugin::Check::CLI
     options[:password] = config[:password] if config[:password]
     redis = Redis.new(options)
 
-    if redis.info.fetch("#{config[:redis_info_key]}") == "#{config[:redis_info_value]}"
+    if redis.info.fetch(config[:redis_info_key].to_s) == config[:redis_info_value].to_s
       ok "Redis #{config[:redis_info_key]} is #{config[:redis_info_value]}"
     else
-      critical "Redis #{config[:redis_info_key]} is #{redis.info.fetch("#{config[:redis_info_key]}")}!"
+      critical "Redis #{config[:redis_info_key]} is #{redis.info.fetch(config[:redis_info_key].to_s)}!"
     end
 
   rescue

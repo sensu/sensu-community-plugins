@@ -55,10 +55,10 @@ class HipChatNotif < Sensu::Handler
     if @event['check']['playbook']
       begin
         uri = URI.parse(@event['check']['playbook'])
-        if %w( http https ).include?(uri.scheme)
-          message << "  [<a href='#{@event['check']['playbook']}'>Playbook</a>]"
-        else
-          message << "  Playbook:  #{@event['check']['playbook']}"
+        message << if %w( http https ).include?(uri.scheme)
+                     "  [<a href='#{@event['check']['playbook']}'>Playbook</a>]"
+                   else
+                     "  Playbook:  #{@event['check']['playbook']}"
         end
       rescue
         message << "  Playbook:  #{@event['check']['playbook']}"

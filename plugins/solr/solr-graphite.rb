@@ -56,12 +56,11 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
     end
 
     cores.each do |core|
-
-      if config[:core]
-        # Don't include core name in scheme to match previous functionality
-        graphitepath = config[:scheme]
-      else
-        graphitepath = "#{config[:scheme]}.#{core}"
+      graphitepath = if config[:core]
+                       # Don't include core name in scheme to match previous functionality
+                       config[:scheme]
+                     else
+                       "#{config[:scheme]}.#{core}"
       end
       ping_url = "http://#{config[:host]}:#{config[:port]}/solr/#{core}/admin/ping?wt=json"
 
@@ -73,17 +72,17 @@ class SolrGraphite < Sensu::Plugin::Metric::CLI::Graphite
 
       stats_url = "http://#{config[:host]}:#{config[:port]}/solr/#{core}/admin/stats.jsp"
 
-      xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.gsub("\n", '')
-      stats  = Crack::XML.parse(xml_data)
+      xml_data = Net::HTTP.get_response(URI.parse(stats_url)).body.delete("\n")
+      stats = Crack::XML.parse(xml_data)
 
       # this xml is an ugly beast.
-      core_searcher = stats['solr']['solr_info']['CORE']['entry'].select { |v| v['name'].strip! == 'searcher' }.first['stats']['stat']
-      standard = stats['solr']['solr_info']['QUERYHANDLER']['entry'].select { |v| v['name'].strip! == 'standard' }.first['stats']['stat']
-      update = stats['solr']['solr_info']['QUERYHANDLER']['entry'].select { |v| v['name'] == '/update' }.first['stats']['stat']
+      core_searcher = stats['solr']['solr_info']['CORE']['entry'].find { |v| v['name'].strip! == 'searcher' }['stats']['stat']
+      standard = stats['solr']['solr_info']['QUERYHANDLER']['entry'].find { |v| v['name'].strip! == 'standard' }['stats']['stat']
+      update = stats['solr']['solr_info']['QUERYHANDLER']['entry'].find { |v| v['name'] == '/update' }['stats']['stat']
       updatehandler = stats['solr']['solr_info']['UPDATEHANDLER']['entry']['stats']['stat']
-      querycache = stats['solr']['solr_info']['CACHE']['entry'].select { |v| v['name'].strip! == 'queryResultCache' }.first['stats']['stat']
-      documentcache = stats['solr']['solr_info']['CACHE']['entry'].select { |v| v['name'] == 'documentCache' }.first['stats']['stat']
-      filtercache = stats['solr']['solr_info']['CACHE']['entry'].select { |v| v['name'] == 'filterCache' }.first['stats']['stat']
+      querycache = stats['solr']['solr_info']['CACHE']['entry'].find { |v| v['name'].strip! == 'queryResultCache' }['stats']['stat']
+      documentcache = stats['solr']['solr_info']['CACHE']['entry'].find { |v| v['name'] == 'documentCache' }['stats']['stat']
+      filtercache = stats['solr']['solr_info']['CACHE']['entry'].find { |v| v['name'] == 'filterCache' }['stats']['stat']
 
       output "#{graphitepath}.core.maxdocs", core_searcher[2].strip!
       output "#{graphitepath}.core.maxdocs", core_searcher[3].strip!

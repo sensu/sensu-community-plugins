@@ -261,11 +261,10 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
         # should return a single element array containing one hash
         # #YELLOW
         slave_results.first.each do |key, value| # rubocop:disable Style/Next
-          if metrics['general'].include?(key)
-            # Replication lag being null is bad, very bad, so negativate it here
-            value = -1 if key == 'Seconds_Behind_Master' && value.nil?
-            output "#{config[:scheme]}.#{mysql_shorthostname}.general.#{metrics['general'][key]}", value
-          end
+          next unless metrics['general'].include?(key)
+          # Replication lag being null is bad, very bad, so negativate it here
+          value = -1 if key == 'Seconds_Behind_Master' && value.nil?
+          output "#{config[:scheme]}.#{mysql_shorthostname}.general.#{metrics['general'][key]}", value
         end
       rescue => e
         puts "Error querying slave status: #{e}" if config[:verbose]
@@ -285,7 +284,6 @@ class Mysql2Graphite < Sensu::Plugin::Metric::CLI::Graphite
       rescue => e
         puts e.message
       end
-
     end
 
     ok

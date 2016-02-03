@@ -116,13 +116,12 @@ class CheckSensor < Sensu::Plugin::Metric::CLI::Graphite
       name = sensor[1][:name]
       value = sensor[1][:value]
 
-      if name !~ /^error_/
-        begin
-          value = Float(value)
-          output "#{config[:scheme]}.#{name}", value, Time.now.to_i
-        rescue TypeError, ArgumentError
-          'Not numeric' # Not a numeric value - no point pushing as a metric
-        end
+      next unless name !~ /^error_/
+      begin
+        value = Float(value)
+        output "#{config[:scheme]}.#{name}", value, Time.now.to_i
+      rescue TypeError, ArgumentError
+        'Not numeric' # Not a numeric value - no point pushing as a metric
       end
     end
     ok

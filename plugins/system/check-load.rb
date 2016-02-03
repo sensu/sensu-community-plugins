@@ -32,7 +32,9 @@ class LoadAverage
   end
 
   def cpu_count
-    `grep -sc ^processor /proc/cpuinfo`.to_i rescue 0
+    `grep -sc ^processor /proc/cpuinfo`.to_i
+  rescue
+    0
   end
 
   def failed?

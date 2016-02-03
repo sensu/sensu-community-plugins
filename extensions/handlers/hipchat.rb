@@ -60,8 +60,8 @@ module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
     # Sensu during extension initialization.
     def definition
       {
-        type: 'extension',  # Always.
-        name: 'hipchat',   # Usually just class name lower case.
+        type: 'extension', # Always.
+        name: 'hipchat', # Usually just class name lower case.
         mutator: 'ruby_hash'
       }
     end
@@ -251,8 +251,6 @@ module Sensu::Extension # rubocop:disable Style/ClassAndModuleChildren
         rescue
           "Playbook:  #{check[:playbook]}"
         end
-      else
-        nil
       end
     end
 
