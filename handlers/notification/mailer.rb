@@ -105,6 +105,16 @@ class Mailer < Sensu::Handler
             Occurrences:  #{@event['occurrences']}
             #{playbook}
           BODY
+
+    headers = {
+      'X-Sensu-Host'        => "#{@event['client']['name']}",
+      'X-Sensu-Timestamp'   => "#{Time.at(@event['check']['issued'])}",
+      'X-Sensu-Address'     => "#{@event['client']['address']}",
+      'X-Sensu-Check-Name'  => "#{@event['check']['name']}",
+      'X-Sensu-Status'      => "#{status_to_string}",
+      'X-Sensu-Occurrences' => "#{@event['occurrences']}"
+    }
+
     if @event['check']['notification'].nil?
       subject = "#{action_to_string} - #{short_name}: #{status_to_string}"
     else
@@ -138,6 +148,7 @@ class Mailer < Sensu::Handler
           to mail_to
           from mail_from
           reply_to reply_to
+          headers headers
           subject subject
           body body
         end
