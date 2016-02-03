@@ -74,6 +74,13 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
          proc: proc(&:to_f),
          required: false
 
+  option :below,
+         short: '-b',
+         long: '--below',
+         description: 'Trigger warning/critical if stat falls below threshold',
+         boolean: true,
+         default: false
+
   option :unknown_ignore,
          short: '-u',
          long: '--unknown-ignore',
@@ -95,11 +102,20 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
     unless datapoints.empty? # rubocop:disable UnlessElse
       avg = average(datapoints)
 
-      if !config[:crit].nil? && avg > config[:crit]
-        return [2, "#{metric['target']} is #{avg}"]
-      elsif !config[:warn].nil? && avg > config[:warn]
-        return [1, "#{metric['target']} is #{avg}"]
+      if config[:below]
+        if !config[:crit].nil? && avg < config[:crit]
+          return [2, "#{metric['target']} is #{avg}"]
+        elsif !config[:warn].nil? && avg < config[:warn]
+          return [1, "#{metric['target']} is #{avg}"]
+        end
+      else
+        if !config[:crit].nil? && avg > config[:crit]
+          return [2, "#{metric['target']} is #{avg}"]
+        elsif !config[:warn].nil? && avg > config[:warn]
+          return [1, "#{metric['target']} is #{avg}"]
+        end
       end
+
     else
       return [3, "#{metric['target']} has no datapoints"] unless config[:unknown_ignore]
     end
@@ -132,6 +148,7 @@ class CheckGraphiteStat < Sensu::Plugin::Check::CLI
 
       message += "#{msg} " unless s == 0
       status = s unless s < status
+      status = s unless s > status if config[:below]
     end
 
     if status == 2
