@@ -1,7 +1,0 @@
-{
-  "librato": {
-    "email": "email@example.com",
-    "api_key": "12345",
-    "use_sensu_client_hostname_as_source": false
-  }
-}

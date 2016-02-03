@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "cucumber": ">=0.4.2",
-    "parallel-cucumber": ">=0.1.7"
-  }
-}

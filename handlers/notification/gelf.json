@@ -1,6 +1,0 @@
-{
-  "gelf": {
-    "server": "graylog.dom.tld",
-    "port": "12201"
-  }
-}

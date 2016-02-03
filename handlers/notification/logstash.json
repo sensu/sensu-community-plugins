@@ -1,9 +1,0 @@
-{
-  "logstash": {
-    "server": "redis.example.tld",
-    "port": 6379,
-    "list": "logstash",
-    "type": "sensu-logstash",
-    "output": "redis"
-  }
-}

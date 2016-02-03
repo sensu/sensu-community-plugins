@@ -1,7 +1,0 @@
-{  
-  "opentsdb" : {
-     "server" : "opentsdb.int.example.com",
-     "port" : 4242,
-     "hostname_length" : 3
-   }
-}

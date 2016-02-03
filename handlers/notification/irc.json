@@ -1,8 +1,0 @@
-{
-  "irc": {
-    "irc_server": "irc://sensubot:password@irc.freenode.net:6667#channel",
-    "irc_ssl": false
-    // "nickserv_password": "bananas",
-    // "nickserv_command": "PRIVMSG NickServ@some.special.hostname :IDENTIFY password"
-  }
-}
