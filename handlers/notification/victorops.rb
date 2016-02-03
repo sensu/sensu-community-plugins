@@ -3,6 +3,10 @@
 #
 # Released under the same terms as Sensu (the MIT license); see LICENSE
 # for details.
+#
+# arguments:
+#   - settingsname: Sensu settings name, defaults to victorops
+#   - routingkey: VictorOps routing key
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
@@ -12,8 +16,36 @@ require 'net/https'
 require 'json'
 
 class VictorOps < Sensu::Handler
+  option :settingsname,
+         description: 'Sensu settings name',
+         short: '-n NAME',
+         long: '--name NAME',
+         default: 'victorops'
+
+  option :routing_key,
+         description: 'Routing key',
+         short: '-r KEY',
+         long: '--routingkey KEY',
+         default: nil
+
   def handle
-    config = settings['victorops']
+    # validate that we have settings
+    unless defined? settings[config[:settingsname]] && !settings[config[:settingsname]].nil?
+      fail "victorops.rb sensu setting '#{config[:settingsname]}' not found or empty"
+    end
+    unless defined? settings[config[:settingsname]]['api_url'] && !settings[config[:settingsname]]['api_url'].nil?
+      fail "victorops.rb sensu setting '#{config[:settingsname]}.api_url' not found or empty"
+    end
+    api_url = settings[config[:settingsname]]['api_url']
+
+    # validate that we have a routing key - command arguments take precedence
+    routing_key = config[:routing_key]
+    routing_key = settings[config[:settingsname]]['routing_key'] if routing_key.nil?
+
+    unless defined? routing_key && !routing_key.nil?
+      fail 'routing key not defined, should be in Sensu settings or passed via command arguments'
+    end
+
     incident_key = @event['client']['name'] + '/' + @event['check']['name']
 
     description = @event['check']['notification']
@@ -47,7 +79,7 @@ class VictorOps < Sensu::Handler
         payload[:check] = @event['check']
         payload[:client] = @event['client']
 
-        uri   = URI("#{config['api_url'].chomp('/')}/#{config['routing_key']}")
+        uri   = URI("#{api_url.chomp('/')}/#{routing_key}")
         https = Net::HTTP.new(uri.host, uri.port)
 
         https.use_ssl = true
