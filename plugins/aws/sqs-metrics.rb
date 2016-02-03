@@ -22,6 +22,7 @@
 #
 # LICENSE:
 #   Copyright 2015 Eric Heydrick <eheydrick@gmail.com>
+#   Improvements 2015 Gavin Hamill <gavin@bashton.com>
 #   Released under the same terms as Sensu (the MIT license); see LICENSE
 #   for details.
 #
@@ -34,8 +35,7 @@ class SQSMetrics < Sensu::Plugin::Metric::CLI::Graphite
   option :queue,
          description: 'Name of the queue',
          short: '-q QUEUE',
-         long: '--queue QUEUE',
-         required: true
+         long: '--queue QUEUE'
 
   option :scheme,
          description: 'Metric naming scheme, text to prepend to metric',
@@ -60,10 +60,12 @@ class SQSMetrics < Sensu::Plugin::Metric::CLI::Graphite
          default: 'us-east-1'
 
   def run
-    if config[:scheme] == ''
+    if config[:scheme] == '' && config[:queue]
       scheme = "aws.sqs.queue.#{config[:queue].gsub('-', '_')}.message_count"
-    else
+    elsif config[:scheme] == ''
       scheme = config[:scheme]
+    else
+      scheme = config[:scheme] + '.'
     end
 
     begin
@@ -73,8 +75,9 @@ class SQSMetrics < Sensu::Plugin::Metric::CLI::Graphite
         region: config[:aws_region]
       )
 
-      messages = sqs.queues.named(config[:queue]).approximate_number_of_messages
-      output scheme, messages
+      sqs.queues.each do |q|
+        output scheme + q.arn.split(':').last + '.approximate_number_of_messages', q.approximate_number_of_messages
+      end
 
     rescue => e
       critical "Error fetching SQS queue metrics: #{e.message}"
