@@ -1,0 +1,16 @@
+df.inodes.total 1383318100 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383318400 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383318701 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383319001 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383319301 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383319601 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383319902 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383320202 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383320502 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383320802 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383321102 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383321403 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383321703 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383322003 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383322303 5722989 host=web-1001.example.com tier=stage
+df.inodes.total 1383322604 5722989 host=web-1001.example.com tier=stage

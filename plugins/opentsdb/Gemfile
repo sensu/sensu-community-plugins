@@ -1,0 +1,15 @@
+source 'https://rubygems.org'
+
+gem 'continuum'
+
+group :development do
+  gem 'awesome_print',  '~> 1.1.0'
+  gem 'sensu-plugin',   '~> 0.1.4'
+  gem 'rspec',          '~> 2.14.0'
+  gem 'simplecov',      '~> 0.7.0'
+  gem 'guard',          '~> 1.8.0'
+  gem 'guard-rspec',    '~> 3.0.1'
+  gem 'webmock',        '~> 1.13.0'
+  gem 'rubocop',        '~> 0.14.1'
+end
+
