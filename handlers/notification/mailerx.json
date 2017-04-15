@@ -1,0 +1,18 @@
+{
+  "mailer": {
+    "mail_from": "sensu@example.com",
+    "smtp_address": "smtp.example.com",
+    "smtp_port": "25",
+    "smtp_domain": "example.com",
+    "contacts": [
+      {
+        "mail": "oggy@example.com",
+        "subscriptions": [ "test", "frontend" ]
+      },
+      {
+        "mail": "jack@example.com",
+        "subscriptions": [ "mysql", "system" ]
+      }
+    ]
+  }
+}
