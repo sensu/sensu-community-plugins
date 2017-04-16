@@ -1,0 +1,7 @@
+{
+	"snpp": {
+		"server": "my.examplesnppserver.com:444",
+		"contacts": [ "5551235555" ]
+	}
+}
+
